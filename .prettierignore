@@ -1,0 +1,7 @@
+*.json
+public
+node_modules
+.eslintrc
+.vscode
+lib
+docs

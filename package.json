@@ -1,0 +1,70 @@
+{
+  "name": "@provenanceio/walletconnect-js",
+  "version": "0.1.0",
+  "private": false,
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@provenanceio/wallet-lib": "1.0.0",
+    "@walletconnect/client": "^1.6.5",
+    "@walletconnect/qrcode-modal": "^1.6.5",
+    "@walletconnect/utils": "1.6.6",
+    "axios": "0.24.0",
+    "base64url": "3.0.1",
+    "bip32": "^2.0.6",
+    "formik": "2.2.9",
+    "history": "5.0.1",
+    "prop-types": "^15.7.2",
+    "react": "17.0.2",
+    "react-app-polyfill": "2.0.0",
+    "react-dom": "17.0.2",
+    "react-fast-compare": "3.2.0",
+    "react-redux": "7.2.5",
+    "react-router-dom": "6.0.0-beta.0",
+    "redux": "4.1.1",
+    "redux-actions": "2.6.5",
+    "redux-thunk": "2.3.0",
+    "secp256k1": "^4.0.2",
+    "styled-components": "5.3.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "10.1.0",
+    "env-cmd": "10.1.0",
+    "eslint": "7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-config-react-app": "6.0.0",
+    "eslint-plugin-flowtype": "6.1.0",
+    "eslint-plugin-import": "2.24.2",
+    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-react": "7.25.3",
+    "eslint-plugin-react-hooks": "4.2.0",
+    "prettier": "2.4.1",
+    "react-scripts": "4.0.3"
+  },
+  "scripts": {
+    "build": "react-scripts build",
+    "build:production": "env-cmd -e default,production npm run build",
+    "build:staging": "env-cmd -e default,staging npm run build",
+    "lint": "eslint ./src/",
+    "prebuild": "npm run test:all",
+    "start": "env-cmd -e default react-scripts start",
+    "start:cli": "env-cmd -e default,e2e react-scripts -r @cypress/instrument-cra start",
+    "test": "",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all",
+      "ie 11"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version",
+      "ie 11"
+    ]
+  }
+}
