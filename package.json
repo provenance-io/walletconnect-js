@@ -2,7 +2,21 @@
   "name": "@provenanceio/walletconnect-js",
   "version": "0.1.0",
   "private": false,
+  "main": "lib/index.js",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/provenance-io/walletconnect-js.git"
+  },
+  "keywords": [
+    "react",
+    "walletconnect"
+  ],
+  "author": "Provenance",
+  "bugs": {
+    "url": "https://github.com/provenance-io/walletconnect-js/issues"
+  },
+  "homepage": "https://github.com/provenance-io/walletconnect-js#readme",
   "dependencies": {
     "@provenanceio/wallet-lib": "1.0.0",
     "@walletconnect/client": "^1.6.5",
