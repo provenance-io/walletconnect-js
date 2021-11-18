@@ -2,7 +2,7 @@
   "name": "@provenanceio/walletconnect-js",
   "version": "0.1.0",
   "private": false,
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
