@@ -21,7 +21,7 @@ npm install @provenaceio/walletconnect-js --save
 
 Importable items:
 
-```
+```js
 import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
 ```
 * `useWalletConnect` - React hook which contains `walletConnectService` and `walletConnectState`
@@ -35,7 +35,7 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
       - `delegateHash({ to: '123', amount: 100 })` - Delegate a custom amount of Hash token to a custom address
   - `walletConnectState` - Holds current walletconnect-js state values
     - *Initial State*
-      ```
+      ```js
         connected: false,
         connector: null,
         address: '',
