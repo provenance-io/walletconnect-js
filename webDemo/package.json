@@ -1,0 +1,50 @@
+{
+  "name": "walletconnect-js-webdemo",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": false,
+  "dependencies": {
+    "prop-types": "^15.7.2",
+    "react": "17.0.2",
+    "react-app-polyfill": "2.0.0",
+    "react-dom": "17.0.2",
+    "react-redux": "7.2.5",
+    "react-router-dom": "6.0.0-beta.0",
+    "redux": "4.1.1",
+    "redux-actions": "2.6.5",
+    "redux-thunk": "2.3.0",
+    "styled-components": "5.3.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "10.1.0",
+    "eslint": "7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-config-react-app": "6.0.0",
+    "eslint-plugin-cypress": "2.12.1",
+    "eslint-plugin-import": "2.24.2",
+    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-react": "7.25.3",
+    "eslint-plugin-react-hooks": "4.2.0",
+    "prettier": "2.4.1",
+    "react-scripts": "4.0.3"
+  },
+  "scripts": {
+    "start": "react-scripts start"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all",
+      "ie 11"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version",
+      "ie 11"
+    ]
+  }
+}
