@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { WalletConnectService } from '../services';
 
 export const useWalletConnectService = () => {
