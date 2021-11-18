@@ -52,7 +52,7 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
     ```
 * `WalletConnectContextProvider` - React context provider to supply state to every child within
   - Include as parent to all Components using walletconnect-js
-  - Takes in an optional `network` prop [`mainnet` vs `testnet`](defaults to `mainnet`)
+  - Takes in an optional `network` prop [`"mainnet"` vs `"testnet"`](defaults to `"mainnet"`)
   - Example:
     ```js
     // index.js
@@ -70,7 +70,7 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
 * `WINDOW_MESSAGES` - Various messages broadcast out from walletconnect-js to the parent application
   - Use these messages to prompt or indicate status updates to the end user
   - Current Messages: `CONNECTED`, `DISCONNECT`, `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`, `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `DELEGATE_HASH_COMPLETE`, and `DELEGATE_HASH_FAILED`.
-  - Usage:  Currently there is a custom event listener methods on `walletConnectService`
+  - Usage:  Currently there is are custom event listener methods on `walletConnectService`
     - These are `addEventListener(eventName, callback)`, `removeEventListener(eventName)`, and `removeAllEventListeners()`
     - Example:
       ```js
