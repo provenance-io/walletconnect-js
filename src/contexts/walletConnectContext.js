@@ -4,14 +4,14 @@ import { WalletConnectService } from '../services';
 const StateContext = createContext(undefined);
 const walletConnectService = new WalletConnectService();
 
-const WalletConnectContextProvider = ({ children }) => { // eslint-disable-line react/prop-types
+const WalletConnectContextProvider = ({ children, network }) => { // eslint-disable-line react/prop-types
   const [walletConnectState, setWalletConnectState] = useState({ ...walletConnectService.state });
 
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
-
+    if (network) { walletConnectService.setNetwork(network)}
     return () => walletConnectService.removeAllEventListeners();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <StateContext.Provider value={{ walletConnectService, walletConnectState }}>

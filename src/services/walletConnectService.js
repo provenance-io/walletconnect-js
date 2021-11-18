@@ -20,15 +20,26 @@ const initialState = {
   delegateHashLoading: false,
   assetsPending: false,
   assets: [],
-  network: 'mainnet',
 };
 
 export class WalletConnectService {
   #setWalletConnectState = undefined;
   
+  #network = 'mainnet';
+  
   #eventListeners = {};
 
   state = { ...initialState };
+  
+  constructor(network) {
+    if (network) {
+      this.#network = network;
+    }
+  }
+
+  setNetwork(network) {
+    this.#network = network;
+  };
 
   addEventListener(event, callback) {
     this.#eventListeners[event] = callback;
@@ -89,7 +100,7 @@ export class WalletConnectService {
     // Loading while we wait for mobile to respond
     this.setState({ signMessageLoading: true });
     // Get result back from mobile actions and wc
-    const result = await signMessageMethod(this.state, customMessage);
+    const result = await signMessageMethod(this.state, customMessage, this.#network);
     // No longer loading
     this.setState({ signMessageLoading: false });
     // Broadcast result of method
@@ -111,7 +122,7 @@ export class WalletConnectService {
   signJWT = async () => {
     // Loading while we wait for mobile to respond
     this.setState({ signJWTLoading: true });
-    const result = await signJWTMethod(this.state);
+    const result = await signJWTMethod(this.state, this.#network);
     // No longer loading
     this.setState({ signJWTLoading: false });
     // Broadcast result of method

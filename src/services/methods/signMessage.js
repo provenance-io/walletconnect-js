@@ -2,10 +2,10 @@ import { convertUtf8ToHex } from "@walletconnect/utils";
 import { GET_PROVENANCE_NETWORK } from '../../consts';
 import { verifySignature } from '../../helpers';
 
-export const signMessage = async (state, message) => {
+export const signMessage = async (state, message, networkName) => {
   const { connector, address, publicKey } = state;
   const method = 'provenance_sign';
-  const network = GET_PROVENANCE_NETWORK(state.network);
+  const network = GET_PROVENANCE_NETWORK(networkName);
   // const type = 'MsgSend';
 
   if (!connector) return { method, error: 'No wallet connected' };

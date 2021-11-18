@@ -2,10 +2,10 @@ import base64url from 'base64url';
 import { GET_PROVENANCE_NETWORK } from '../../consts';
 import { verifySignature } from '../../helpers';
 
-export const signJWT = async (state) => {
+export const signJWT = async (state, networkName) => {
   const { connector, address, publicKey } = state;
   const method = 'provenance_sign';
-  const network = GET_PROVENANCE_NETWORK(state.network);
+  const network = GET_PROVENANCE_NETWORK(networkName);
   // const type = 'MsgSend';
 
   if (!connector) return { method, error: 'No wallet connected' };
