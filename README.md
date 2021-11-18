@@ -34,8 +34,8 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
       - `sendHash({ to: '123', amount: 100 })` - Send a custom amount of Hash token to a custom address
       - `delegateHash({ to: '123', amount: 100 })` - Delegate a custom amount of Hash token to a custom address
   - `walletConnectState` - Holds current walletconnect-js state values
-    - *Initial State*
-      ```js
+    ```js
+      initialState: {
         connected: false,
         connector: null,
         address: '',
@@ -48,7 +48,8 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
         delegateHashLoading: false,
         assetsPending: false,
         assets: [],
-      ```
+      }
+    ```
 * `WalletConnectContextProvider` - React context provider to supply state to every child within
   - Include as parent to all Components using walletconnect-js
   - Takes in an optional `network` prop [`mainnet` vs `testnet`](defaults to `mainnet`)
