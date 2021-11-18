@@ -5,6 +5,7 @@ import { verifySignature } from '../../helpers';
 export const signMessage = async (state, message) => {
   const { connector, address, publicKey } = state;
   const method = 'provenance_sign';
+  const network = GET_PROVENANCE_NETWORK(state.network);
   // const type = 'MsgSend';
 
   if (!connector) return { method, error: 'No wallet connected' };
@@ -25,7 +26,6 @@ export const signMessage = async (state, message) => {
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
-    const network = PROVENANCE_NETWORK;
     const valid = await verifySignature(message, signature, publicKey, network);
 
     return { method, valid, result, message };

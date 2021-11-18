@@ -1,10 +1,11 @@
 import base64url from 'base64url';
-import { PROVENANCE_NETWORK } from '../../consts';
+import { GET_PROVENANCE_NETWORK } from '../../consts';
 import { verifySignature } from '../../helpers';
 
 export const signJWT = async (state) => {
   const { connector, address, publicKey } = state;
   const method = 'provenance_sign';
+  const network = GET_PROVENANCE_NETWORK(state.network);
   // const type = 'MsgSend';
 
   if (!connector) return { method, error: 'No wallet connected' };
@@ -33,7 +34,6 @@ export const signJWT = async (state) => {
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
-    const network = PROVENANCE_NETWORK;
     const valid = await verifySignature(jwtEncoded, signature, publicKey, network);
     // const { signedPayload } = result?.message;
     // const signedPayloadEncoded = base64url(signedPayload);

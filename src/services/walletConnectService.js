@@ -20,6 +20,7 @@ const initialState = {
   delegateHashLoading: false,
   assetsPending: false,
   assets: [],
+  network: 'mainnet',
 };
 
 export class WalletConnectService {
