@@ -1,6 +1,5 @@
 import styled, { keyframes } from 'styled-components';
 import PropTypes from 'prop-types';
-import { breakpoints } from 'consts';
 import figureRocketImg from 'assets/img/FigureRocket.png';
 import starsBackImg from 'assets/img/StarsBack.png';
 import starsFrontImg from 'assets/img/StarsFront.png';
@@ -19,10 +18,6 @@ const Container = styled.div`
   position: relative;
   align-items: center;
   justify-content: center;
-  @media ${breakpoints.down('md')} {
-    max-width: 80%;
-    margin: 40px auto auto auto;
-  }
 `;
 const FrontStars = styled.div`
   animation: ${Flyby} 30s linear infinite;
@@ -59,9 +54,6 @@ const RocketImg = styled.img`
   animation-direction: alternate;
   transform-origin: center;
   position: relative;
-  @media ${breakpoints.down('md')} {
-    max-width: 80%;
-  }
   z-index: 5;
 `;
 

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import PropTypes from 'prop-types';
-import Sprite from '../Sprite/Sprite';
 
 const PopupContainer = styled.div`
   position: fixed;
@@ -41,10 +40,12 @@ const PopupContent = styled.div`
   animation-fill-mode: both;
   opacity: 0.95;
 `;
-const CloseIcon = styled(Sprite)`
+const CloseIcon = styled.div`
   position: absolute;
   top: 20px;
   right: 20px;
+  font-size: 3rem;
+  transform: rotate(45deg);
   cursor: pointer;
 `;
 const Content = styled.div`
@@ -74,7 +75,7 @@ const Popup = ({ className, children, onClose, status, delay }) => {
   return (
     <PopupContainer className={className}>
       <PopupContent status={status.toLowerCase()} isClosing={isClosing}>
-        <CloseIcon icon="CLOSE" height="16px" width="16px" onClick={() => setIsClosing(true)} />
+        <CloseIcon onClick={() => setIsClosing(true)}>+</CloseIcon>
         <Content>{children}</Content>
       </PopupContent>
     </PopupContainer>

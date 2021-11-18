@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useWalletConnect, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
 import styled from 'styled-components';
 import { RocketLogo, Button as BaseButton, Popup } from 'Components';
-import { breakpoints } from 'consts';
 import { useApp } from 'redux/hooks';
-import { useWalletConnect, WINDOW_MESSAGES } from '../../../../src';
 
 const HomeContainer = styled.div`
   display: flex;
@@ -14,9 +13,6 @@ const HomeContainer = styled.div`
   background: ${({ theme }) => theme.WHITE };
   border-radius: 4px;
   padding: 60px 30px;
-  @media ${breakpoints.down('md')} {
-    padding: 20px;
-  }
 `;
 const Header = styled.h1`
   font-size: 5rem;
@@ -24,9 +20,6 @@ const Header = styled.h1`
   font-family: ${({ theme }) => theme.FONT_FAMILY_PRIMARY };
   font-weight: ${({ theme }) => theme.FONT_WEIGHT_NORMAL };
   margin-bottom: 40px;
-  @media ${breakpoints.down('md')} {
-    font-size: 3rem;
-  } 
 `;
 const Title = styled.h2`
   font-size: 2rem;
@@ -105,7 +98,7 @@ export const Home = () => {
   const [popupContent, setPopupContent] = useState('');
   const [popupStatus, setPopupStatus] = useState('success');
   const [popupDuration, setPopupDuration] = useState(2500);
-  const [signMessageText, setSignMessageText] = useState('Figure.Tech | FWC | Sign Message');
+  const [signMessageText, setSignMessageText] = useState('WalletConnect-JS | WebDemo | Sign Message');
   const [sendHashData, setSendHashData] = useState({ to: 'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6', amount: 100 });
   const [delegateHashData, setDelegateHashData] = useState({ to: 'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6', amount: 100 });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
@@ -152,18 +145,18 @@ export const Home = () => {
   return (
     <HomeContainer>
         {popupContent && <Popup delay={popupDuration} onClose={() => setPopupContent('')} status={popupStatus}>{popupContent}</Popup>}
-        <Header>Figure.Tech</Header>
-        <Title>WalletConnect</Title>
-        <Text>Use your phone to manage wallet connections</Text>
+        <Header>Provenance.io | WalletConnect-JS | WebDemo</Header>
+        <Title>WEBDEMO</Title>
+        <Text>Use your phone to manage Provenance.io wallet connections</Text>
         {connected ? (
           <ConnectedContent>
             <Title>Wallet Connected!</Title>
-            <Subtitle>FWC Actions:</Subtitle>
+            <Subtitle>WalletConnect Actions:</Subtitle>
             {/* SIGN CUSTOM MESSAGE */}
             <ActionSection>
               <InputContainer width="100%">
                 <InputLabel>Message</InputLabel>
-                <Input value={signMessageText} placeholder="Figure.Tech | FWC | Sign Message" onChange={({target}) => setSignMessageText(target.value)} />
+                <Input value={signMessageText} placeholder="WalletConnect-JS | WebDemo | Sign Message" onChange={({target}) => setSignMessageText(target.value)} />
               </InputContainer>
               <SmallButton color="PURPLE_PRIMARY" disabled={signMessageLoading} onClick={() => wcs.signMessage(signMessageText)}>
                 {signMessageLoading ? 'Sign Message Pending...' : 'Sign Message'}

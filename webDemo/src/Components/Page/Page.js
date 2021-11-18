@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { breakpoints } from 'consts';
 
 const PageContainer = styled.div`
   padding: 60px 80px;
@@ -8,9 +7,6 @@ const PageContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  @media ${breakpoints.down('md')} {
-    padding: 20px 10px;
-  }
   width: 100%;
 `;
 

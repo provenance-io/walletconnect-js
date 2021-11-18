@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import Sprite from 'Components/Sprite';
 
 const StyledButton = styled.button`
   ${({ width }) => width && `flex-basis: ${width};` }
@@ -26,12 +25,8 @@ const StyledButton = styled.button`
   }
 `;
 const ButtonContent = styled.div``;
-const ButtonIcon = styled.div`
-  margin-right: 10px;
-  display: flex;
-`;
 
-const Button = ({ className, color, icon, iconSize, iconColor, iconOptions, onClick, children, disabled, width, title, type }) => {
+const Button = ({ className, color, onClick, children, disabled, width, title, type }) => {
   const handleClick = () => {
     if (!disabled) {
       onClick();
@@ -53,11 +48,6 @@ const Button = ({ className, color, icon, iconSize, iconColor, iconOptions, onCl
       width={width}
       type={type}
     >
-      {icon && (
-        <ButtonIcon>
-          <Sprite {...iconOptions} icon={icon} size={iconSize} color={iconColor} />
-        </ButtonIcon>
-      )}
       <ButtonContent>{children}</ButtonContent>
     </StyledButton>
   );
@@ -66,10 +56,6 @@ const Button = ({ className, color, icon, iconSize, iconColor, iconOptions, onCl
 Button.propTypes = {
   className: PropTypes.string,
   color: PropTypes.string,
-  icon: PropTypes.string,
-  iconSize: PropTypes.string,
-  iconColor: PropTypes.string,
-  iconOptions: PropTypes.object, // see Components/Sprite for available options
   onClick: PropTypes.func,
   children: PropTypes.node.isRequired,
   disabled: PropTypes.bool,
@@ -80,10 +66,6 @@ Button.propTypes = {
 Button.defaultProps = {
   className: '',
   color: '',
-  icon: '',
-  iconSize: '2.2rem',
-  iconColor: 'ICON_WHITE',
-  iconOptions: null,
   onClick: () => {},
   disabled: false,
   width: '',

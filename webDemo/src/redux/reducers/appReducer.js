@@ -121,7 +121,7 @@ const reducer = handleActions(
     /* -------------------------
     RESET_WALLETCONNECT_STORE
     ------------------------- */
-    [RESET_WALLETCONNECT_STORE](state) {
+    [RESET_WALLETCONNECT_STORE]() {
       return {
         ...initialState,
       };

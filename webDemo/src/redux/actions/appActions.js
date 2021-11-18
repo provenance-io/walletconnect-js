@@ -1,5 +1,5 @@
 import { createAction } from 'redux-actions';
-import { PROVENANCE_API_ACCOUNT_ASSETS_URL, PROVENANCE_API_ACCOUNT_ATTRIBUTES } from 'consts';
+import { PROVENANCE_API_ACCOUNT_ATTRIBUTES } from 'consts';
 import { ajaxGet } from './xhrActions';
 
 // Vars
@@ -22,16 +22,8 @@ export const setConnector = createAction(SET_CONNECTOR);
 export const resetWalletConnectStore = createAction(RESET_WALLETCONNECT_STORE);
 export const setSignPending = createAction(SET_SIGN_PENDING);
 export const setSendPending = createAction(SET_SEND_PENDING);
-// - API
-export const getAccountAssets = (address) => async (dispatch) => (
-  ajaxGet(
-    GET_ACCOUNT_ASSETS,
-    dispatch,
-    `${PROVENANCE_API_ACCOUNT_ASSETS_URL}/${address}`,
-  )
-);
 
-export const getWalletKYC = (address, fullJWT) => async (dispatch) => (
+export const getWalletKYC = (address) => async (dispatch) => (
   ajaxGet(
     GET_WALLET_KYC,
     dispatch,
