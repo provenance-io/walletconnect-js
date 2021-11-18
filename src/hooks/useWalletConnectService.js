@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { WalletConnectService } from './services';
+import { WalletConnectService } from '../services';
 
 export const useWalletConnectService = () => {
   const walletConnectService = useRef(new WalletConnectService()).current // Note: Why does wallet-lib use "useRef" here?

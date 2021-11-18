@@ -1,4 +1,4 @@
-import { WINDOW_MESSAGES } from './consts';
+import { WINDOW_MESSAGES } from '../consts';
 import {
   connect as connectMethod,
   signMessage as signMessageMethod,

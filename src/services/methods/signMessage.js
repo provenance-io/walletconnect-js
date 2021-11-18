@@ -1,6 +1,6 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import { PROVENANCE_NETWORK } from 'consts';
-import { verifySignature } from './helpers';
+import { PROVENANCE_NETWORK } from '../../consts';
+import { verifySignature } from '../../helpers';
 
 export const signMessage = async (state, message) => {
   const { connector, address, publicKey } = state;

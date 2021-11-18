@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { WalletConnectService } from './services';
+import { WalletConnectService } from '../services';
 
 const StateContext = createContext(undefined);
 const walletConnectService = new WalletConnectService();

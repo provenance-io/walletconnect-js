@@ -1,6 +1,6 @@
 import base64url from 'base64url';
-import { PROVENANCE_NETWORK } from 'consts';
-import { verifySignature } from './helpers';
+import { PROVENANCE_NETWORK } from '../../consts';
+import { verifySignature } from '../../helpers';
 
 export const signJWT = async (state) => {
   const { connector, address, publicKey } = state;

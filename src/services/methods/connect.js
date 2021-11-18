@@ -1,6 +1,6 @@
 import WalletConnectClient from "@walletconnect/client";
 import QRCodeModal from "@walletconnect/qrcode-modal";
-import { WALLETCONNECT_BRIDGE_URL, WINDOW_MESSAGES } from '../consts';
+import { WALLETCONNECT_BRIDGE_URL, WINDOW_MESSAGES } from '../../consts';
 
 export const connect = async (setState, resetState, broadcast) => {
   // ----------------
