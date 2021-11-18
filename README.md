@@ -1,9 +1,9 @@
 <div align="center">
-  <img src="./src/logo.svg" alt="Provenance WalletConnect | Frontlib"/>
+  <img src="./src/logo.svg" alt="Provenance.io WalletConnect-JS"/>
 </div>
 <br/><br/>
 
-# Provenance WalletConnect | Frontlib
+# Provenance.io WalletConnect-JS
 
 Library to interface with Provenance Wallet using WalletConnect.
 
@@ -13,19 +13,75 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
 
 ## Use
 
-* More details coming soon!
-
 Import the dependency
 
 ```bash
 npm install @provenaceio/walletconnect-js --save
 ```
 
-## Watch for changes and run build
+Importable items:
 
-```bash
-npm run watch
 ```
+import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
+```
+* `useWalletConnect` - React hook which contains `walletConnectService` and `walletConnectState`
+  - `walletConnectService` - Holds all main methods and functions to use WalletConnect service
+    - *Methods*
+      - `connect()` - Connect a WalletConnect wallet
+      - `disconnect()` - Disconnect current session
+      - `signMessage(message)` - Prompt user to sign a custom message
+      - `signJWT()` - Prompt user to sign a generated JWT
+      - `sendHash({ to: '123', amount: 100 })` - Send a custom amount of Hash token to a custom address
+      - `delegateHash({ to: '123', amount: 100 })` - Delegate a custom amount of Hash token to a custom address
+  - `walletConnectState` - Holds current walletconnect-js state values
+    - *Initial State*
+      ```
+        connected: false,
+        connector: null,
+        address: '',
+        publicKey: '',
+        peer: {},
+        signedJWT: '',
+        signJWTLoading: false,
+        signMessageLoading: false,
+        sendHashLoading: false,
+        delegateHashLoading: false,
+        assetsPending: false,
+        assets: [],
+      ```
+* `WalletConnectContextProvider` - React context provider to supply state to every child within
+  - Include as parent to all Components using walletconnect-js
+  - Takes in an optional `network` prop [`mainnet` vs `testnet`](defaults to `mainnet`)
+  - Example:
+    ```js
+    // index.js
+    ...
+
+    ReactDOM.render(
+      <Provider store={store}>
+        <WalletConnectContextProvider network="testnet">
+          <App />
+        </WalletConnectContextProvider>
+      </Provider>,
+      document.getElementById('root')
+    );
+    ```
+* `WINDOW_MESSAGES` - Various messages broadcast out from walletconnect-js to the parent application
+  - Use these messages to prompt or indicate status updates to the end user
+  - Current Messages: `CONNECTED`, `DISCONNECT`, `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`, `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `DELEGATE_HASH_COMPLETE`, and `DELEGATE_HASH_FAILED`.
+  - Usage:  Currently there is a custom event listener methods on `walletConnectService`
+    - These are `addEventListener(eventName, callback)`, `removeEventListener(eventName)`, and `removeAllEventListeners()`
+    - Example:
+      ```js
+      // Home.js
+      ...
+      useEffect(() => {
+        // Wallet Connected/Disconnected
+        walletConnectService.addEventListener(WINDOW_MESSAGES.CONNECTED, () => {console.log('Wallet Connected')});
+        walletConnectService.addEventListener(WINDOW_MESSAGES.DISCONNECT, () => {console.log('Wallet Disconnected')});
+      }, [walletConnectService]);
+      ...
+      ```
 
 ## Status
 
@@ -42,5 +98,5 @@ npm run watch
 [lint-badge]: https://github.com/provenance-io/walletconnect-js/workflows/Lint/badge.svg
 [provenance]: https://provenance.io/#overview
 
-Provenance WalletConnect Frontlib is under heavy development. The upcoming public blockchain is the evolution of the private Provenance network blockchain started in 2018.
+This application is under heavy development. The upcoming public blockchain is the evolution of the private Provenance network blockchain started in 2018.
 Current development is being supported by [Figure Technologies](https://figure.com).
