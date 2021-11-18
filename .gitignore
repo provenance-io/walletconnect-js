@@ -16,6 +16,9 @@
 
 # production
 /build
+/esm
+/lib
+/docs
 
 # misc
 .DS_Store

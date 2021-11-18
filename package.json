@@ -3,7 +3,7 @@
   "version": "0.1.2",
   "private": false,
   "sideEffects": false,
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "module": "esm/index.js",
   "license": "Apache-2.0",
   "files": [
@@ -66,7 +66,7 @@
     "clean": "rm -rf ./lib ./esm",
     "build": "npm run clean && npm run build:commonjs && npm run build:esm",
     "build:esm": "BABEL_ENV=esm babel src -d esm --extensions \".js,.jsx\" --copy-files",
-    "build:commonjs": "BABEL_ENV=cjs babel ./src --extensions \".js,.tsx\" -d lib --copy-files",
+    "build:commonjs": "BABEL_ENV=cjs babel ./src --extensions \".js,.jsx\" -d lib --copy-files",
     "build:production": "env-cmd -e default,production npm run build",
     "build:staging": "env-cmd -e default,staging npm run build",
     "lint": "eslint ./src/",
