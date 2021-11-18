@@ -47,7 +47,7 @@ export const connect = async (setState, resetState, broadcast) => {
     // Disconnect
     newConnector.on("disconnect", (error, payload) => {
       if (error) throw error;
-      onDisconnect();
+      onDisconnect(payload);
     });
     // Latest values
     const { accounts, _accounts } = newConnector;

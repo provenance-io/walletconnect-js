@@ -25,4 +25,4 @@ const PROVENANCE_TESTNET_NETWORK = {
 };
 
 // Variable network either prod or testnet 
-export const GET_PROVENANCE_NETWORK = (network) => ('mainnet') ? PROVENANCE_MAINNET_NETWORK : PROVENANCE_TESTNET_NETWORK;
+export const GET_PROVENANCE_NETWORK = (network) => (network === 'mainnet') ? PROVENANCE_MAINNET_NETWORK : PROVENANCE_TESTNET_NETWORK;

@@ -3,7 +3,6 @@ module.exports = {
     'airbnb',
     'airbnb/hooks',
     'eslint:recommended',
-    'react-app',
     'prettier',
   ],
   parser: 'babel-eslint',
