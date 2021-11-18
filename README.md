@@ -84,6 +84,10 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
       ...
       ```
 
+## Web App
+This package comes bundled with a full React demo that you can run locally to test out the various features of walletconnect-js.
+To see how to initiate and run the webDemo, look through the [webDemo README.md](./webDemo/README.md)
+
 ## Status
 
 [![Latest Release][release-badge]][release-latest]
