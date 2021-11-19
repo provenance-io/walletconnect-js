@@ -71,15 +71,16 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
   - Use these messages to prompt or indicate status updates to the end user
   - Current Messages: `CONNECTED`, `DISCONNECT`, `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`, `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `DELEGATE_HASH_COMPLETE`, and `DELEGATE_HASH_FAILED`.
   - Usage:  Currently there is are custom event listener methods on `walletConnectService`
-    - These are `addEventListener(eventName, callback)`, `removeEventListener(eventName)`, and `removeAllEventListeners()`
+    - These are `addListener(eventName, callback)`, `removeListener(eventName, callback)`, and `removeAllListeners(eventName)`
+    - Note: All of these are based off Node.js Event Emitters, read more on that here: [https://nodejs.org/api/events.html#event-newlistener]
     - Example:
       ```js
       // Home.js
       ...
       useEffect(() => {
         // Wallet Connected/Disconnected
-        walletConnectService.addEventListener(WINDOW_MESSAGES.CONNECTED, () => {console.log('Wallet Connected')});
-        walletConnectService.addEventListener(WINDOW_MESSAGES.DISCONNECT, () => {console.log('Wallet Disconnected')});
+        walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, () => {console.log('Wallet Connected')});
+        walletConnectService.addListener(WINDOW_MESSAGES.DISCONNECT, () => {console.log('Wallet Disconnected')});
       }, [walletConnectService]);
       ...
       ```
@@ -87,6 +88,10 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
 ## Web App
 This package comes bundled with a full React demo that you can run locally to test out the various features of walletconnect-js.
 To see how to initiate and run the webDemo, look through the [webDemo README.md](./webDemo/README.md)
+
+  * Quick Start:
+    1) Run `npm i`, followed by `npm run start`.  This will start a localhost server with live updates
+
 
 ## Status
 

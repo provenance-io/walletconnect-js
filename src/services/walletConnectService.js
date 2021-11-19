@@ -1,3 +1,4 @@
+import events from 'events';
 import { WINDOW_MESSAGES } from '../consts';
 import {
   connect as connectMethod,
@@ -23,11 +24,11 @@ const initialState = {
 };
 
 export class WalletConnectService {
+  #eventEmitter = new events.EventEmitter();
+
   #setWalletConnectState = undefined;
   
   #network = 'mainnet';
-  
-  #eventListeners = {};
 
   state = { ...initialState };
   
@@ -37,22 +38,31 @@ export class WalletConnectService {
     }
   }
 
+  // *** Event Listener *** (https://nodejs.org/api/events.html)
+  // Instead of having to use walletConnectService.eventEmitter.addListener()
+  // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
+  #broadcastEvent = (eventName, params) => {
+    this.#eventEmitter.emit(eventName, params);
+  }
+  
+  addListener(eventName, callback) {
+    this.#eventEmitter.addListener(eventName, callback);
+  };
+
+  on(eventName, callback) {
+    this.#eventEmitter.addListener(eventName, callback);
+  };
+
+  removeListener(eventName, callback) {
+    this.#eventEmitter.removeListener(eventName, callback);
+  };
+
+  removeAllListeners(eventName) {
+    this.#eventEmitter.removeAllListeners(eventName);
+  }
+
   setNetwork(network) {
     this.#network = network;
-  };
-
-  addEventListener(event, callback) {
-    this.#eventListeners[event] = callback;
-  };
-
-  removeEventListener(event) {
-    if (this.#eventListeners[event]) {
-      delete this.#eventListeners[event];
-    }
-  };
-
-  removeAllEventListeners() {
-    this.#eventListeners = {};
   };
 
   updateState() {
@@ -67,12 +77,6 @@ export class WalletConnectService {
     this.#setWalletConnectState = setWalletConnectState;
   };
 
-  #broadcastEvent = (eventName, data) => {
-    if (this.#eventListeners[eventName]) {
-      this.#eventListeners[eventName](data);
-    }
-  };
-
   resetState = () => {
     this.state = { ...initialState };
     this.updateState();
@@ -85,7 +89,7 @@ export class WalletConnectService {
     }, this);
     this.updateState();
   };
-
+  
   connect = () => {
     connectMethod(this.setState, this.resetState, this.#broadcastEvent);
   };

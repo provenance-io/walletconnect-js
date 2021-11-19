@@ -119,27 +119,27 @@ export const Home = () => {
 
   useEffect(() => {
     // Wallet Connected/Disconnected
-    wcs.addEventListener(WINDOW_MESSAGES.CONNECTED, () => {setPopup('Wallet Connected', 'success')});
-    wcs.addEventListener(WINDOW_MESSAGES.DISCONNECT, () => {setPopup('Wallet Disconnected', 'failure')});
+    wcs.addListener(WINDOW_MESSAGES.CONNECTED, () => {setPopup('Wallet Connected', 'success')});
+    wcs.addListener(WINDOW_MESSAGES.DISCONNECT, () => {setPopup('Wallet Disconnected', 'failure')});
     // Send Hash Events
-    wcs.addEventListener(WINDOW_MESSAGES.TRANSACTION_COMPLETE, ({ sendDetails }) => {
+    wcs.addListener(WINDOW_MESSAGES.TRANSACTION_COMPLETE, ({ sendDetails }) => {
       setPopup(`Transaction Complete! ${sendDetails.amountList[0].amount}${sendDetails.amountList[0].denom} to ${sendDetails.toAddress}`, 'success', 5000);
     });
-    wcs.addEventListener(WINDOW_MESSAGES.TRANSACTION_FAILED, ({ error }) => {setPopup(`Transaction Failed! ${error}`, 'failure', 5000)});
+    wcs.addListener(WINDOW_MESSAGES.TRANSACTION_FAILED, ({ error }) => {setPopup(`Transaction Failed! ${error}`, 'failure', 5000)});
     // Sign Message Events
-    wcs.addEventListener(WINDOW_MESSAGES.SIGNATURE_COMPLETE, ({ message }) => {setPopup(`Successfully Signed Message! "${message}"`, 'success', 5000)});
-    wcs.addEventListener(WINDOW_MESSAGES.SIGNATURE_FAILED, ({ error }) => {setPopup(`Signing Message Failed! ${error}`, 'failure', 5000)});
+    wcs.addListener(WINDOW_MESSAGES.SIGNATURE_COMPLETE, ({ message }) => {setPopup(`Successfully Signed Message! "${message}"`, 'success', 5000)});
+    wcs.addListener(WINDOW_MESSAGES.SIGNATURE_FAILED, ({ error }) => {setPopup(`Signing Message Failed! ${error}`, 'failure', 5000)});
     // Sign JWT Events
-    wcs.addEventListener(WINDOW_MESSAGES.SIGN_JWT_COMPLETE, ({ signedJWT, address }) => {
+    wcs.addListener(WINDOW_MESSAGES.SIGN_JWT_COMPLETE, ({ signedJWT, address }) => {
       setPopup(`Successfully Signed JWT!`, 'success');
       getWalletKYC(address, signedJWT);
     });
-    wcs.addEventListener(WINDOW_MESSAGES.SIGN_JWT_FAILED, ({ error }) => {setPopup(`Signing Message Failed! ${error}`, 'failure', 5000)});
+    wcs.addListener(WINDOW_MESSAGES.SIGN_JWT_FAILED, ({ error }) => {setPopup(`Signing Message Failed! ${error}`, 'failure', 5000)});
     // Delegate Hash Events
-    wcs.addEventListener(WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE, ({ sendDetails }) => {
+    wcs.addListener(WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE, ({ sendDetails }) => {
       setPopup(`Delegation Complete! ${sendDetails.amountList[0].amount}${sendDetails.amountList[0].denom} delegated to ${sendDetails.toAddress}`, 'success', 5000);
     });
-    wcs.addEventListener(WINDOW_MESSAGES.DELEGATE_HASH_FAILED, ({ error }) => {setPopup(`Delegation Failed! ${error}`, 'failure', 5000)});
+    wcs.addListener(WINDOW_MESSAGES.DELEGATE_HASH_FAILED, ({ error }) => {setPopup(`Delegation Failed! ${error}`, 'failure', 5000)});
   }, [wcs, getWalletKYC]);
 
   return (
