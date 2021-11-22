@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700&family=Poppins:wght@700&display=swap');
+
+html {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 62.5%; /* =10px and will allow for all rem sizing to be easier, 1.4 rem => 14px*/
+  color: #30323F;
+};
+html, *, ::after, ::before {
+  box-sizing: border-box;
+}
+body {
+  font-size: 10px;
+  letter-spacing: 0.045rem;
+  height: 100%;
+  position:relative;
+  background: #F5F7FD;
+  line-height: 2rem;
+  padding: 60px;
+}
+a {
+  color: #3923A9;
+  text-decoration: none;
+}

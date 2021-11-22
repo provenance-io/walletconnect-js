@@ -1,24 +1,29 @@
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { Loading } from 'Components';
 
 const StyledButton = styled.button`
-  ${({ width }) => width && `flex-basis: ${width};` }
+  flex-basis: ${({ width }) => width };
+  ${({ width }) => width === 'auto' && 'min-width: 100px' };
   align-items: center;
-  color: ${({ theme }) => theme.BUTTON_COLOR };
-  background: ${({ theme, color }) => color ? theme[color] : theme.BUTTON_BG };
+  background: ${({ color }) => color };
+  white-space: nowrap;
   border-radius: 6px;
-  border: 1px solid ${({ theme, color }) => color ? theme[color] : theme.BUTTON_BORDER };
+  border: 1px solid ${({ color }) => color };
+  color: white;
   cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer' };
   display: flex;
-  font-size: 1.4rem;
   justify-content: center;
   letter-spacing: 0.07rem;
-  padding: 14px 40px;
   transition: 250ms all;
   user-select: none;
+  font-size: 1.0rem;
+  height: 40px;
   &:hover:not(:disabled) {
-    background: ${({ theme, color }) => color ? theme[color] : theme.BUTTON_BG };
-    border: 1px solid ${({ theme, color }) => color ? theme[color] : theme.BUTTON_BORDER_HOVER };
+    filter: contrast(200%);
+  }
+  &:active:not(:disabled) {
+    filter: contrast(90%);
   }
   &:disabled {
     filter: grayscale(80%);
@@ -26,7 +31,7 @@ const StyledButton = styled.button`
 `;
 const ButtonContent = styled.div``;
 
-const Button = ({ className, color, onClick, children, disabled, width, title, type }) => {
+const Button = ({ className, color, onClick, children, disabled, width, title, type, loading }) => {
   const handleClick = () => {
     if (!disabled) {
       onClick();
@@ -44,11 +49,11 @@ const Button = ({ className, color, onClick, children, disabled, width, title, t
           handleClick();
         }
       }}
-      disabled={disabled}
+      disabled={disabled || loading}
       width={width}
       type={type}
     >
-      <ButtonContent>{children}</ButtonContent>
+      <ButtonContent>{loading ? <Loading /> : children}</ButtonContent>
     </StyledButton>
   );
 };
@@ -59,18 +64,20 @@ Button.propTypes = {
   onClick: PropTypes.func,
   children: PropTypes.node.isRequired,
   disabled: PropTypes.bool,
+  loading: PropTypes.bool,
   width: PropTypes.string,
   title: PropTypes.string,
   type: PropTypes.string,
 };
 Button.defaultProps = {
   className: '',
-  color: '',
+  color: '#dddddd',
   onClick: () => {},
   disabled: false,
-  width: '',
+  width: 'auto',
   title: '',
   type: 'button',
+  loading: false,
 };
 
 export default Button;

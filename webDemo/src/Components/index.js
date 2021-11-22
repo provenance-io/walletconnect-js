@@ -1,4 +1,5 @@
 export { default as Button } from './Button';
-export { default as RocketLogo } from './RocketLogo';
 export { default as Popup } from './Popup';
-export { default as Page } from './Page';
+export { default as Input } from './Input';
+export { default as Loading } from './Loading';
+export * from './Actions';

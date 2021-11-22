@@ -24,13 +24,13 @@ const SlideOutAnimation = keyframes`
 const PopupContent = styled.div`
   padding: 20px;
   width: 100%;
-  background: ${({ theme, status }) => {
-    if (status === 'error' || status === 'failure') return theme.ALERT_ERROR;
-    if (status === 'warning') return theme.ALERT_WARNING;
-    if (status === 'success') return theme.ALERT_SUCCESS;
-    return theme.GREY_PRIMARY;
+  background: ${({ status }) => {
+    if (status === 'error' || status === 'failure') return '#FFAAAA';
+    if (status === 'warning') return '#FFFFAA';
+    if (status === 'success') return '#AAFFAA';
+    return '#DDDDDD';
   }};
-  box-shadow: ${({ theme }) => theme.BOX_SHADOW_MAIN };
+  box-shadow: '1px 1px 4px 1px rgba(0,0,0,0.10)';
   border-radius: 0 0 3px 3px;
   display: flex;
   align-items: center;
@@ -50,7 +50,7 @@ const CloseIcon = styled.div`
 `;
 const Content = styled.div`
   font-size: 1.4rem;
-  font-weight: ${({ theme }) => theme.FONT_WEIGHT_BOLD };
+  font-weight: 700;
 `;
 
 const Popup = ({ className, children, onClose, status, delay }) => {
