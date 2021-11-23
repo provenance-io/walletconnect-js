@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -8,7 +8,8 @@
   "license": "Apache-2.0",
   "files": [
     "lib",
-    "esm"
+    "esm",
+    "checkWebDemo.js"
   ],
   "repository": {
     "type": "git",
