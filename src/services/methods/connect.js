@@ -64,18 +64,20 @@ export const connect = async (setState, resetState, broadcast) => {
   // ----------------------------
   // CREATE NEW WC CONNECTION
   // ----------------------------
-  // create new connector
-  class TestQRCodeModal {
+  // Create custom QRCode modal
+  class QRCodeModal {
     open = async (data) => {
       const qrcode = await QRCode.toDataURL(data);
-      setState({ QRCode: qrcode });
+      setState({ QRCode: qrcode, showQRCodeModal: true });
     }
-
-    close = () => {}
+    
+    close = () => {
+      setState({ showQRCodeModal: false });
+    }
   };
-  const testQRCodeModal = new TestQRCodeModal();
-  // const newConnector = new WalletConnectClient({ bridge: WALLETCONNECT_BRIDGE_URL, qrcodeModal: QRCodeModal });
-  const newConnector = new WalletConnectClient({ bridge: WALLETCONNECT_BRIDGE_URL, qrcodeModal: testQRCodeModal });
+  const qrcodeModal = new QRCodeModal();
+  // create new connector
+  const newConnector = new WalletConnectClient({ bridge: WALLETCONNECT_BRIDGE_URL, qrcodeModal });
   // check if already connected
   if (!newConnector.connected) {
     // create new session

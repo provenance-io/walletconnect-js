@@ -9,7 +9,7 @@ const Info = styled.div`
   font-size: 1.4rem;
   margin-right: 40px;
 `;
-export const Connect = ({ walletConnectService, setPopup, setShowQR }) => {
+export const Connect = ({ walletConnectService, setPopup }) => {
   const color = '#498AFD';
 
   useEffect(() => {
@@ -22,15 +22,10 @@ export const Connect = ({ walletConnectService, setPopup, setShowQR }) => {
     }
   }, [walletConnectService, setPopup]);
 
-  const handleConnect = () => {
-    setShowQR(true);
-    walletConnectService.connect();
-  };
-
   return (
     <ActionContainer color={color}>
       <Info>Connect Wallet</Info>
-      <Button width="20%" color={color} onClick={handleConnect}>Connect</Button>
+      <Button width="20%" color={color} onClick={walletConnectService.connect}>Connect</Button>
     </ActionContainer>
   );
 };
@@ -42,5 +37,4 @@ Connect.propTypes = {
     removeAllListeners: PropTypes.func,
   }).isRequired,
   setPopup: PropTypes.func.isRequired,
-  setShowQR: PropTypes.func.isRequired,
 };
