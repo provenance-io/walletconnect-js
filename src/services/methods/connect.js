@@ -1,5 +1,6 @@
 import WalletConnectClient from "@walletconnect/client";
-import QRCodeModal from "@walletconnect/qrcode-modal";
+import QRCode from 'qrcode';
+
 import { WALLETCONNECT_BRIDGE_URL, WINDOW_MESSAGES } from '../../consts';
 
 export const connect = async (setState, resetState, broadcast) => {
@@ -8,7 +9,7 @@ export const connect = async (setState, resetState, broadcast) => {
   // ----------------
   const onSessionUpdate = (updatedAccounts) => {
     const [address, publicKey] = updatedAccounts;
-    setState({ address, publicKey });
+    setState({ address, publicKey, connected: true });
     // await getAccountAssets(newAddress);
     broadcast(WINDOW_MESSAGES.CONNECTED);
   };
@@ -58,13 +59,25 @@ export const connect = async (setState, resetState, broadcast) => {
       onSessionUpdate(updatedAccounts);
     }
     // Update Connector
-    setState({ connector: newConnector, connected: true, address, publicKey });
+    setState({ connector: newConnector, connected: !!address, address, publicKey });
   };
   // ----------------------------
   // CREATE NEW WC CONNECTION
   // ----------------------------
+  // Create custom QRCode modal
+  class QRCodeModal {
+    open = async (data) => {
+      const qrcode = await QRCode.toDataURL(data);
+      setState({ QRCode: qrcode, showQRCodeModal: true });
+    }
+    
+    close = () => {
+      setState({ showQRCodeModal: false });
+    }
+  };
+  const qrcodeModal = new QRCodeModal();
   // create new connector
-  const newConnector = new WalletConnectClient({ bridge: WALLETCONNECT_BRIDGE_URL, qrcodeModal: QRCodeModal });
+  const newConnector = new WalletConnectClient({ bridge: WALLETCONNECT_BRIDGE_URL, qrcodeModal });
   // check if already connected
   if (!newConnector.connected) {
     // create new session

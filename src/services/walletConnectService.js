@@ -11,6 +11,8 @@ import {
 const initialState = {
   connected: false,
   connector: null,
+  QRCode: '',
+  showQRCodeModal: false,
   address: '',
   publicKey: '',
   peer: {},
@@ -143,5 +145,9 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.DELEGATE_HASH_FAILED : WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+  };
+
+  showQRCode = (value) => {
+    this.setState({ showQRCodeModal: value })
   };
 };

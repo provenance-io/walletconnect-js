@@ -9,6 +9,7 @@ import {
   SendHash,
   DelegateHash,
   SignJWT,
+  QRCodeModal,
 } from 'Components';
 
 const HomeContainer = styled.div`
@@ -20,6 +21,7 @@ const HomeContainer = styled.div`
   background: #ffffff;
   border-radius: 4px;
   padding: 60px 30px;
+  position: relative;
 `;
 const Header = styled.h1`
   font-size: 3rem;
@@ -30,7 +32,11 @@ const Header = styled.h1`
 const Text = styled.p`
   font-size: 1.6rem;
   line-height: 3rem;
-  margin-bottom: 30px;
+  width: 600px;
+  margin: 0;
+  &:last-of-type {
+    margin-bottom: 20px;
+  }
 `;
 const ConnectedContent = styled.div`
   width: 500px;
@@ -43,6 +49,8 @@ export const App = () => {
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const {
     connected,
+    address,
+    peer,
     sendHashLoading,
     signMessageLoading,
     signJWTLoading,
@@ -59,7 +67,16 @@ export const App = () => {
     <HomeContainer>
         {popupContent && <Popup delay={popupDuration} onClose={() => setPopupContent('')} status={popupStatus}>{popupContent}</Popup>}
         <Header>Provenance.io | WalletConnect-JS | WebDemo</Header>
-        <Text>{connected ? 'Wallet Connected!  Select an action below:' : 'Use your phone to connect a Provenance.io wallet'}</Text>
+        {connected ? (
+          <>
+            <Text>Connected!</Text>
+            {peer?.name && <Text>- Wallet: {peer.url ? <a href={peer.url} target="_blank" rel="noreferrer">{peer.name}</a> : peer.name}</Text>}
+            <Text>- Address: <a href={`https://explorer.provenance.io/accounts/${address}`} target="_blank" rel="noreferrer">{address}</a></Text>
+            <Text>Actions:</Text>
+          </>
+        ) : (
+          <Text>Use your phone to connect a Provenance.io wallet</Text>
+        )}
         {connected ? (
           <ConnectedContent>
             <SignMessage walletConnectService={wcs} loading={signMessageLoading} setPopup={setPopup} />
@@ -71,6 +88,7 @@ export const App = () => {
         ): ( 
           <Connect walletConnectService={wcs} setPopup={setPopup} />
         )}
+        <QRCodeModal title="This is a test"><div>Another Test</div></QRCodeModal>
     </HomeContainer>
   );
 }
