@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -69,7 +69,9 @@
     "build": "npm run clean && npm run build:commonjs && npm run build:esm",
     "build:esm": "BABEL_ENV=esm babel src -d esm --extensions \".js,.jsx\" --copy-files",
     "build:commonjs": "BABEL_ENV=cjs babel ./src --extensions \".js,.jsx\" -d lib --copy-files",
-    "postinstall": "cd webDemo && npm i",
+    "check:webDemo": "node checkWebDemo.js",
+    "install:webDemo": "cd webDemo && npm i",
+    "postinstall": "npm run check:webDemo && npm run install:webDemo",
     "prebuild": "npm run test",
     "prepare": "npm run build",
     "start:webdemo": "cd webDemo && npm run start",
