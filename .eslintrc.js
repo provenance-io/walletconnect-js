@@ -9,6 +9,7 @@ module.exports = {
   rules: {
     'arrow-body-style': ['warn', 'as-needed'],
     'consistent-return': 'warn',
+    'import/no-extraneous-dependencies': 'off',
     'import/newline-after-import': 'error',
     'import/order': ['error', { groups: [['builtin', 'external', 'internal']] }],
     'import/prefer-default-export': 0,

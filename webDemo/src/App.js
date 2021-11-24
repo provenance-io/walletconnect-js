@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import { useWalletConnect, QRCodeModal } from '@provenanceio/walletconnect-js';
 import styled from 'styled-components';
 import {
   Popup,
@@ -9,7 +9,6 @@ import {
   SendHash,
   DelegateHash,
   SignJWT,
-  QRCodeModal,
 } from 'Components';
 
 const HomeContainer = styled.div`
@@ -88,7 +87,13 @@ export const App = () => {
         ): ( 
           <Connect walletConnectService={wcs} setPopup={setPopup} />
         )}
-        <QRCodeModal title="This is a test"><div>Another Test</div></QRCodeModal>
+        <QRCodeModal
+          title="This is a test"
+          walletConnectService={wcs}
+          walletConnectState={walletConnectState}
+        >
+          <div>Another Test</div>
+        </QRCodeModal>
     </HomeContainer>
   );
 }

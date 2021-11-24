@@ -1,4 +1,4 @@
-import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import React from 'react'; // eslint-disable-line no-unused-vars
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
@@ -54,8 +54,7 @@ const ImgContainer = styled.div`
   flex-basis: 100%;
 `;
 
-const QRCodeModal = ({ className, children, title }) => {
-  const { walletConnectService: wcs, walletConnectState: state } = useWalletConnect();
+const QRCodeModal = ({ className, children, title, walletConnectService: wcs, walletConnectState: state }) => {
   const { showQRCodeModal, QRCode } = state;
 
   return showQRCodeModal ? (
@@ -76,6 +75,11 @@ QRCodeModal.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   title: PropTypes.string,
+  walletConnectService: PropTypes.shape({ showQRCode: PropTypes.func }).isRequired,
+  walletConnectState: PropTypes.shape({
+    showQRCodeModal: PropTypes.bool,
+    QRCode: PropTypes.string,
+  }).isRequired,
 };
 
 QRCodeModal.defaultProps = {
