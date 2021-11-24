@@ -4,16 +4,13 @@
   "homepage": "/walletconnect",
   "license": "Apache-2.0",
   "private": false,
-  "dependencies": {
+  "devDependencies": {
     "@provenanceio/walletconnect-js": "file:../esm",
-    "axios": "0.24.0",
-    "prop-types": "^15.7.2",
+    "prop-types": "file:../node_modules/prop-types",
     "react": "file:../node_modules/react",
+    "styled-components": "file:../node_modules/styled-components",
     "react-app-polyfill": "2.0.0",
     "react-dom": "17.0.2",
-    "styled-components": "file:../node_modules/styled-components"
-  },
-  "devDependencies": {
     "babel-eslint": "10.1.0",
     "eslint": "7.32.0",
     "eslint-config-airbnb": "^18.2.1",
