@@ -68,7 +68,7 @@ export const connect = async (setState, resetState, broadcast) => {
   class QRCodeModal {
     open = async (data) => {
       const qrcode = await QRCode.toDataURL(data);
-      setState({ QRCode: qrcode, showQRCodeModal: true });
+      setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: true });
     }
     
     close = () => {

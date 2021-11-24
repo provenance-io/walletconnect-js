@@ -88,7 +88,6 @@ export const App = () => {
           <Connect walletConnectService={wcs} setPopup={setPopup} />
         )}
         <QRCodeModal
-          title="This is a test"
           walletConnectService={wcs}
           walletConnectState={walletConnectState}
         >

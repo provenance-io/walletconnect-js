@@ -1,1 +1,1 @@
-export { default as QRCodeModal } from './QRCodeModal';
+export { default } from './QRCodeModal';
