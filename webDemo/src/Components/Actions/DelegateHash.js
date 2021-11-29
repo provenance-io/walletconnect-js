@@ -30,7 +30,7 @@ export const DelegateHash = ({ walletConnectService, loading, setPopup }) => {
       <Input
         width="80%"
         value={delegateTo}
-        label="Hash To"
+        label="Delegate To"
         placeholder="To"
         onChange={setDelegateTo}
       />
