@@ -11,7 +11,7 @@ export const connect = async (setState, resetState, broadcast) => {
     const [address, publicKey] = updatedAccounts;
     setState({ address, publicKey, connected: true });
     // await getAccountAssets(newAddress);
-    broadcast(WINDOW_MESSAGES.CONNECTED);
+    broadcast(WINDOW_MESSAGES.CONNECTED, updatedAccounts);
   };
   // ----------------
   // CONNECTED
@@ -20,14 +20,14 @@ export const connect = async (setState, resetState, broadcast) => {
     const { accounts, peerMeta: peer } = payload.params[0];
     const [address, publicKey] = accounts;
     setState({ address, publicKey, peer, connected: true });
-    broadcast(WINDOW_MESSAGES.CONNECTED);
+    broadcast(WINDOW_MESSAGES.CONNECTED, payload);
   };
   // --------------------
   // WALLET DISCONNECT
   // --------------------
-  const onDisconnect = () => {
+  const onDisconnect = (values) => {
     resetState();
-    broadcast(WINDOW_MESSAGES.DISCONNECT);
+    broadcast(WINDOW_MESSAGES.DISCONNECT, values);
   };
   // --------------------------
   // SUBSCRIBE TO WC EVENTS
