@@ -36,11 +36,17 @@ export const SignJWT = ({ walletConnectService, loading, setPopup }) => {
       request.send();
     };
 
-    walletConnectService.addListener(WINDOW_MESSAGES.SIGN_JWT_COMPLETE, ({ signedJWT, address }) => {
+    walletConnectService.addListener(WINDOW_MESSAGES.SIGN_JWT_COMPLETE, (result) => {
+      const { signedJWT, address } = result;
+      console.log('WalletConnectJS | SignJWT Complete | Result: ', result); // eslint-disable-line no-console
       setPopup(`Successfully Signed JWT!`, 'success');
       getWalletKYC(address, signedJWT);
     });
-    walletConnectService.addListener(WINDOW_MESSAGES.SIGN_JWT_FAILED, ({ error }) => {setPopup(`Signing Message Failed! ${error}`, 'failure', 5000)});
+    walletConnectService.addListener(WINDOW_MESSAGES.SIGN_JWT_FAILED, (result) => {
+      const { error } = result;
+      console.log('WalletConnectJS | SignJWT Failed | Result: ', result); // eslint-disable-line no-console
+      setPopup(`Signing Message Failed! ${error}`, 'failure', 5000)
+    });
 
     return () => {
       walletConnectService.removeAllListeners(WINDOW_MESSAGES.SIGN_JWT_COMPLETE);

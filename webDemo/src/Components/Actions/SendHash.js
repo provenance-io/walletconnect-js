@@ -12,10 +12,14 @@ export const SendHash = ({ walletConnectService, loading, setPopup }) => {
 
   useEffect(() => {
     // Send Hash Events
-    walletConnectService.addListener(WINDOW_MESSAGES.TRANSACTION_COMPLETE, ({ sendDetails }) => {
+    walletConnectService.addListener(WINDOW_MESSAGES.TRANSACTION_COMPLETE, (result) => {
+      const { sendDetails } = result;
+      console.log('WalletConnectJS | SendHash/Transaction Complete | Result: ', result); // eslint-disable-line no-console
       setPopup(`Transaction Complete! ${sendDetails.amountList[0].amount}${sendDetails.amountList[0].denom} to ${sendDetails.toAddress}`, 'success', 5000);
     });
-    walletConnectService.addListener(WINDOW_MESSAGES.TRANSACTION_FAILED, ({ error }) => {
+    walletConnectService.addListener(WINDOW_MESSAGES.TRANSACTION_FAILED, (result) => {
+      const { error } = result;
+      console.log('WalletConnectJS | SendHash/Transaction Failed | Result: ', result); // eslint-disable-line no-console
       setPopup(`Transaction Failed! ${error}`, 'failure', 5000);
     });
 
