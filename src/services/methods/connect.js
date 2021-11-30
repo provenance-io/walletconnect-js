@@ -7,11 +7,13 @@ export const connect = async (setState, resetState, broadcast) => {
   // ----------------
   // SESSION UPDATE
   // ----------------
-  const onSessionUpdate = (updatedAccounts) => {
+  const onSessionUpdate = (newConnector) => {
+    const { accounts, _accounts } = newConnector;
+    const updatedAccounts = accounts || _accounts;
     const [address, publicKey] = updatedAccounts;
     setState({ address, publicKey, connected: true });
     // await getAccountAssets(newAddress);
-    broadcast(WINDOW_MESSAGES.CONNECTED);
+    broadcast(WINDOW_MESSAGES.CONNECTED, updatedAccounts);
   };
   // ----------------
   // CONNECTED
@@ -20,14 +22,14 @@ export const connect = async (setState, resetState, broadcast) => {
     const { accounts, peerMeta: peer } = payload.params[0];
     const [address, publicKey] = accounts;
     setState({ address, publicKey, peer, connected: true });
-    broadcast(WINDOW_MESSAGES.CONNECTED);
+    broadcast(WINDOW_MESSAGES.CONNECTED, payload);
   };
   // --------------------
   // WALLET DISCONNECT
   // --------------------
-  const onDisconnect = () => {
+  const onDisconnect = (payload) => {
     resetState();
-    broadcast(WINDOW_MESSAGES.DISCONNECT);
+    broadcast(WINDOW_MESSAGES.DISCONNECT, payload);
   };
   // --------------------------
   // SUBSCRIBE TO WC EVENTS
@@ -35,10 +37,9 @@ export const connect = async (setState, resetState, broadcast) => {
   const subscribeToEvents = (newConnector) => {
     if (!newConnector) return;
     // Session Update
-    newConnector.on("session_update", (error, payload) => {
+    newConnector.on("session_update", (error) => {
       if (error) throw error;
-      const { accounts } = payload.params[0];
-      onSessionUpdate(accounts);
+      onSessionUpdate(newConnector);
     });
     // Connect
     newConnector.on("connect", (error, payload) => {
@@ -56,7 +57,7 @@ export const connect = async (setState, resetState, broadcast) => {
     const [address, publicKey] = updatedAccounts;
     // Are we already connected
     if (newConnector.connected) {
-      onSessionUpdate(updatedAccounts);
+      onSessionUpdate(newConnector);
     }
     // Update Connector
     setState({ connector: newConnector, connected: !!address, address, publicKey });

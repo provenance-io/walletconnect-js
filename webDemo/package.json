@@ -26,7 +26,7 @@
     "react-scripts": "4.0.3"
   },
   "scripts": {
-    "start": "react-scripts start"
+    "start": "node -p \"'export const REACT_APP_WCJS_VERSION = ' + JSON.stringify(require('../package.json').version)\" > src/version.js && react-scripts start"
   },
   "browserslist": {
     "production": [

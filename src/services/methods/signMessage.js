@@ -27,7 +27,6 @@ export const signMessage = async (state, message, networkName) => {
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
     const valid = await verifySignature(message, signature, publicKey, network);
-
     return { method, valid, result, message };
   } catch (error) {
     return { method, valid: false, error };

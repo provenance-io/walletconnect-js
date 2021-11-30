@@ -10,6 +10,7 @@ import {
   DelegateHash,
   SignJWT,
 } from 'Components';
+import { REACT_APP_WCJS_VERSION } from './version'; // eslint-disable-line
 
 const HomeContainer = styled.div`
   display: flex;
@@ -93,6 +94,7 @@ export const App = () => {
         >
           <div>Another Test</div>
         </QRCodeModal>
+        <div>WalletConnect-JS Version: {REACT_APP_WCJS_VERSION || '??.??.??'}</div>
     </HomeContainer>
   );
 }

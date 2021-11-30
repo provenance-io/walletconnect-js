@@ -32,4 +32,4 @@ yarn-error.log*
 *.ignored.*
 ignored/
 .eslintcache
-
+src/version.js

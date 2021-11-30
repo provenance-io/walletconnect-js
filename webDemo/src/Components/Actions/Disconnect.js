@@ -13,7 +13,8 @@ export const Disconnect = ({ walletConnectService, setPopup }) => {
   const color = '#FFAAAA';
   
   useEffect(() => {
-    walletConnectService.addListener(WINDOW_MESSAGES.DISCONNECT, () => {
+    walletConnectService.addListener(WINDOW_MESSAGES.DISCONNECT, (result) => {
+      console.log('WalletConnectJS | Disconnect | Result: ', result); // eslint-disable-line no-console
       setPopup('Wallet Disconnected', 'failure');
     });
 
