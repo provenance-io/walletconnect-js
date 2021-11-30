@@ -13,7 +13,7 @@ export const connect = async (setState, resetState, broadcast) => {
     const [address, publicKey] = updatedAccounts;
     setState({ address, publicKey, connected: true });
     // await getAccountAssets(newAddress);
-    broadcast(WINDOW_MESSAGES.CONNECTED, updatedAccounts);
+    broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
   };
   // ----------------
   // CONNECTED
