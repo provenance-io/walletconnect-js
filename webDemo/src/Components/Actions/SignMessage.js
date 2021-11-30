@@ -11,10 +11,14 @@ export const SignMessage = ({ walletConnectService, loading, setPopup }) => {
 
   useEffect(() => {
     // Sign Message Events
-    walletConnectService.addListener(WINDOW_MESSAGES.SIGNATURE_COMPLETE, ({ message: resultMessage }) => {
+    walletConnectService.addListener(WINDOW_MESSAGES.SIGNATURE_COMPLETE, (result) => {
+      const { message: resultMessage } = result
+      console.log('WalletConnectJS | Sign Message Complete | Result: ', result); // eslint-disable-line no-console
       setPopup(`Successfully Signed Message! "${resultMessage}"`, 'success', 5000);
     });
-    walletConnectService.addListener(WINDOW_MESSAGES.SIGNATURE_FAILED, ({ error }) => {
+    walletConnectService.addListener(WINDOW_MESSAGES.SIGNATURE_FAILED, (result) => {
+      const { error } = result
+      console.log('WalletConnectJS | Sign Message Failed | Result: ', result); // eslint-disable-line no-console
       setPopup(`Signing Message Failed! ${error}`, 'failure', 5000);
     });
 

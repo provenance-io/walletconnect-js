@@ -13,7 +13,8 @@ export const Connect = ({ walletConnectService, setPopup }) => {
   const color = '#498AFD';
 
   useEffect(() => {
-    walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, () => {
+    walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, (result) => {
+      console.log('WalletConnectJS | Connected | Result: ', result); // eslint-disable-line no-console
       setPopup('Wallet Connected', 'success');
     });
 

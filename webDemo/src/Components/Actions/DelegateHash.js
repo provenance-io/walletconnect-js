@@ -12,10 +12,14 @@ export const DelegateHash = ({ walletConnectService, loading, setPopup }) => {
 
   useEffect(() => {
     // Delegate Hash Events
-    walletConnectService.addListener(WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE, ({ sendDetails }) => {
+    walletConnectService.addListener(WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE, (result) => {
+      const { sendDetails } = result;
+      console.log('WalletConnectJS | DelegateHash Complete | Result: ', result); // eslint-disable-line no-console
       setPopup(`Delegation Complete! ${sendDetails.amountList[0].amount}${sendDetails.amountList[0].denom} delegated to ${sendDetails.toAddress}`, 'success', 5000);
     });
-    walletConnectService.addListener(WINDOW_MESSAGES.DELEGATE_HASH_FAILED, ({ error }) => {
+    walletConnectService.addListener(WINDOW_MESSAGES.DELEGATE_HASH_FAILED, (result) => {
+      const { error } = result;
+      console.log('WalletConnectJS | DelegateHash Failed | Result: ', result); // eslint-disable-line no-console
       setPopup(`Delegation Failed! ${error}`, 'failure', 5000);
     });
 
