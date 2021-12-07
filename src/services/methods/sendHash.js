@@ -22,7 +22,14 @@ export const sendHash = async (state, data) => {
   const hexMsg = convertUtf8ToHex(message);
 
   // provenance_signTransaction params
-  const msgParams = [address, hexMsg];
+  const metadata = JSON.stringify({
+    description: 'Send Hash',
+    address,
+    whatever: {
+      even_more: 'stuff',
+    }
+  });
+  const msgParams = [metadata, hexMsg];
   try {
     // Custom Request
     const customRequest = {

@@ -23,8 +23,15 @@ export const delegateHash = async (state, data) => {
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
 
+  const metadata = JSON.stringify({
+    description: 'Delegate Hash',
+    address,
+    whatever: {
+      even_more: 'stuff',
+    }
+  });
   // provenance_signTransaction params
-  const msgParams = [address, hexMsg];
+  const msgParams = [metadata, hexMsg];
   try {
     // Custom Request
     const customRequest = {
