@@ -12,7 +12,14 @@ export const signMessage = async (state, message, networkName) => {
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
   // eth_sign params
-  const msgParams = [address, hexMsg];
+  const metadata = JSON.stringify({
+    description: 'Sign Message',
+    address,
+    whatever: {
+      even_more: 'stuff',
+    },
+  });
+  const msgParams = [metadata, hexMsg];
   // Custom Request
   const customRequest = {
     id: 1,

@@ -1,4 +1,5 @@
 import base64url from 'base64url';
+import { convertUtf8ToHex } from '@walletconnect/utils';
 import { GET_PROVENANCE_NETWORK } from '../../consts';
 import { verifySignature } from '../../helpers';
 
@@ -6,7 +7,6 @@ export const signJWT = async (state, networkName) => {
   const { connector, address, publicKey } = state;
   const method = 'provenance_sign';
   const network = GET_PROVENANCE_NETWORK(networkName);
-  // const type = 'MsgSend';
 
   if (!connector) return { method, error: 'No wallet connected' };
   // Build JWT
@@ -17,10 +17,17 @@ export const signJWT = async (state, networkName) => {
   const payload = JSON.stringify({sub: `${publicKeyEncoded},${address}`, iss: 'provenance.io', iat: expires, exp: expires});
   const payloadEncoded = base64url(payload);
   const jwtEncoded = base64url(`${header}.${payload}`);
-  // encode message (hex)
-  // const hexMsg = convertUtf8ToHex(message);
   // prov_sign params
-  const msgParams = [address, jwtEncoded];
+  const metadata = JSON.stringify({
+    description: 'Sign JWT Token',
+    address,
+    public_key_b64: publicKeyEncoded,
+    whatever: {
+      even_more: 'stuff',
+    },
+  });
+  const hexJWT = convertUtf8ToHex(jwtEncoded);
+  const msgParams = [metadata, hexJWT];
   // Custom Request
   const customRequest = {
     id: 1,
