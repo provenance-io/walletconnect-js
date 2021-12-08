@@ -19,10 +19,11 @@ export const connect = async (setState, resetState, broadcast) => {
   // CONNECTED
   // ----------------
   const onConnect = (payload) => {
-    const { accounts, peerMeta: peer } = payload.params[0];
+    const data = payload.params[0];
+    const { accounts, peerMeta: peer } = data;
     const [address, publicKey] = accounts;
     setState({ address, publicKey, peer, connected: true });
-    broadcast(WINDOW_MESSAGES.CONNECTED, payload);
+    broadcast(WINDOW_MESSAGES.CONNECTED, data);
   };
   // --------------------
   // WALLET DISCONNECT
