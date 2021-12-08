@@ -91,9 +91,8 @@ export const App = () => {
         <QRCodeModal
           walletConnectService={wcs}
           walletConnectState={walletConnectState}
-        >
-          <div>Another Test</div>
-        </QRCodeModal>
+          title="Scan to initiate walletConnect-js session"
+        />
         <div>WalletConnect-JS Version: {REACT_APP_WCJS_VERSION || '??.??.??'}</div>
     </HomeContainer>
   );

@@ -34,8 +34,6 @@ const QRModalContent = styled.div`
   box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.25);
 `;
 const CloseQRModal = styled.div`
-  transform: rotate(45deg);
-  font-size: 3rem;
   background: #FFFFFF;
   height: 24px;
   width: 24px;
@@ -72,7 +70,6 @@ const ToggleNotch = styled.div`
 `;
 const Text = styled.p`
   font-size: 1.6rem;
-  flex-basis: 100%;
   margin: 0;
   ${({ link }) => link && `
     color: #5588DD;
@@ -109,8 +106,14 @@ const WalletIcon = styled.img`
   width: 30px;
 `;
 
-const QRCodeModal = ({ className, walletConnectService: wcs, walletConnectState: state }) => {
-  const [view, setView] = useState('qr'); // qr, desktop
+const QRCodeModal = ({
+  className,
+  walletConnectService: wcs,
+  walletConnectState: state,
+  title,
+  options,
+}) => {
+  const [view, setView] = useState(options.includes('qr') ? 'qr' : 'desktop');
   const [copied, setCopied] = useState(false);
   const [timeoutInstance, setTimeoutInstance] = useState(null);
 
@@ -132,7 +135,7 @@ const QRCodeModal = ({ className, walletConnectService: wcs, walletConnectState:
 
   const renderQRView = () => (
     <>
-      <Text>Scan the QRCode with your Mobile Figure or Provenance wallet.</Text>
+      <Text>{title}</Text>
       <ImgContainer>
         <img src={QRCode} alt="WalletConnect QR Code" />
       </ImgContainer>
@@ -156,10 +159,15 @@ const QRCodeModal = ({ className, walletConnectService: wcs, walletConnectState:
   return showQRCodeModal ? (
     <QRCodeModalContainer className={className} onClick={() => wcs.showQRCode(false)}>
       <QRModalContent onClick={(e) => e.stopPropagation()}>
-        <CloseQRModal onClick={() => wcs.showQRCode(false)}>+</CloseQRModal>
+        <CloseQRModal onClick={() => wcs.showQRCode(false)}>
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1" height="1.4rem">
+          <path d="M8.99984 1L5.09375 5L8.99984 9" />
+          <path d="M1.00016 1L4.90625 5L1.00016 9" />
+        </svg>
+        </CloseQRModal>
         <Toggle>
-          <ToggleNotch active={view === 'qr'} onClick={() => setView('qr')}>QR Code</ToggleNotch>
-          <ToggleNotch active={view === 'desktop'} onClick={() => setView('desktop')}>Desktop</ToggleNotch>
+          {options.includes('qr') && <ToggleNotch active={view === 'qr'} onClick={() => setView('qr')}>QR Code</ToggleNotch>}
+          {options.includes('desktop') && <ToggleNotch active={view === 'desktop'} onClick={() => setView('desktop')}>Desktop</ToggleNotch>}
         </Toggle>
         { view === 'qr' ? renderQRView() : renderDesktopView() }
       </QRModalContent>
@@ -169,6 +177,10 @@ const QRCodeModal = ({ className, walletConnectService: wcs, walletConnectState:
 
 QRCodeModal.propTypes = {
   className: PropTypes.string,
+  title: PropTypes.string,
+  options: PropTypes.arrayOf(
+    PropTypes.oneOf(['qr', 'desktop']),
+  ),
   walletConnectService: PropTypes.shape({ showQRCode: PropTypes.func }).isRequired,
   walletConnectState: PropTypes.shape({
     showQRCodeModal: PropTypes.bool,
@@ -179,6 +191,8 @@ QRCodeModal.propTypes = {
 
 QRCodeModal.defaultProps = {
   className: '',
+  title: 'Scan the QRCode with your Mobile Provenance wallet.',
+  options: ['qr', 'desktop'],
 };
 
 export default QRCodeModal;
