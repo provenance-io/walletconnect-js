@@ -10,7 +10,7 @@ const WalletConnectContextProvider = ({ children, network }) => { // eslint-disa
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
     if (network) { walletConnectService.setNetwork(network)}
-    return () => walletConnectService.removeAllEventListeners();
+    return () => walletConnectService.removeAllListeners();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
