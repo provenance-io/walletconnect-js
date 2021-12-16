@@ -3,7 +3,7 @@ import { MessageService } from '@provenanceio/wallet-lib';
 
 export const sendHash = async (state, data) => {
   const {connector, address} = state;
-  const {to: toAddress, amount: sendAmount} = data;
+  const {to: toAddress, amount: sendAmount, denom: sendDenom = 'hash' } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
   
@@ -13,7 +13,7 @@ export const sendHash = async (state, data) => {
   const sendMessage = {
     fromAddress: address,
     toAddress,
-    amountList: [{ denom: "nhash", amount: sendAmount }],
+    amountList: [{ denom: sendDenom, amount: sendAmount }],
   };
   const messageMsgSend = messageService.buildMessage(type, sendMessage);
   const message = messageService.createAnyMessageBase64(type, messageMsgSend);
