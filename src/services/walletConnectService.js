@@ -7,8 +7,12 @@ import {
   signJWT as signJWTMethod,
   delegateHash as delegateHashMethod,
 } from './methods';
+import { getFromLocalStorage } from '../utils';
 
-const initialState = {
+// Check for existing values from sessionStorage or from URL params
+const existingState = getFromLocalStorage('walletconnect');
+
+const defaultState = {
   connected: false,
   connector: null,
   QRCode: '',
@@ -23,6 +27,23 @@ const initialState = {
   delegateHashLoading: false,
   assetsPending: false,
   assets: [],
+};
+
+const initialState = {
+  connected: existingState.connected || defaultState.connected,
+  connector: existingState.connector || defaultState.connector,
+  QRCode: existingState.QRCode || defaultState.QRCode,
+  showQRCodeModal: existingState.showQRCodeModal || defaultState.showQRCodeModal,
+  address: existingState.address || defaultState.address,
+  publicKey: existingState.publicKey || defaultState.publicKey,
+  peer: existingState.peer || defaultState.peer,
+  signedJWT: existingState.signedJWT || defaultState.signedJWT,
+  signJWTLoading: existingState.signJWTLoading || defaultState.signJWTLoading,
+  signMessageLoading: existingState.signMessageLoading || defaultState.signMessageLoading,
+  sendHashLoading: existingState.sendHashLoading || defaultState.sendHashLoading,
+  delegateHashLoading: existingState.delegateHashLoading || defaultState.delegateHashLoading,
+  assetsPending: existingState.assetsPending || defaultState.assetsPending,
+  assets: existingState.assets || defaultState.assets,
 };
 
 export class WalletConnectService {
