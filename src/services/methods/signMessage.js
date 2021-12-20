@@ -1,11 +1,9 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import { GET_PROVENANCE_NETWORK } from '../../consts';
 import { verifySignature } from '../../helpers';
 
-export const signMessage = async (state, message, networkName) => {
-  const { connector, address, publicKey } = state;
+export const signMessage = async (state, message) => {
+  const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
-  const network = GET_PROVENANCE_NETWORK(networkName);
   // const type = 'MsgSend';
 
   if (!connector) return { method, error: 'No wallet connected' };
@@ -33,7 +31,7 @@ export const signMessage = async (state, message, networkName) => {
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
-    const valid = await verifySignature(message, signature, publicKey, network);
+    const valid = await verifySignature(message, signature, pubKeyB64);
     return { method, valid, result, message };
   } catch (error) {
     return { method, valid: false, error };

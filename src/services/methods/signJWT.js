@@ -1,12 +1,10 @@
 import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import { GET_PROVENANCE_NETWORK } from '../../consts';
 import { verifySignature, sha256 } from '../../helpers';
 
-export const signJWT = async (state, networkName) => {
-  const { connector, address, publicKey } = state;
+export const signJWT = async (state, ) => {
+  const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
-  const network = GET_PROVENANCE_NETWORK(networkName);
 
   if (!connector) return { method, error: 'No wallet connected' };
   // Build JWT
@@ -14,9 +12,8 @@ export const signJWT = async (state, networkName) => {
   const expires = now + 900; // 900s (15min)
   const header = JSON.stringify({alg: 'ES256K', typ: 'JWT'});
   const headerEncoded = base64url(header);
-  const publicKeyEncoded = base64url(publicKey);
   const payload = JSON.stringify({
-    sub: publicKeyEncoded,
+    sub: pubKeyB64,
     iss: 'provenance.io',
     iat: now,
     exp: expires,
@@ -28,7 +25,7 @@ export const signJWT = async (state, networkName) => {
   const metadata = JSON.stringify({
     description: 'Sign JWT Token',
     address,
-    public_key_b64: publicKeyEncoded,
+    public_key_b64: pubKeyB64,
     whatever: {
       even_more: 'stuff',
     },
@@ -48,7 +45,7 @@ export const signJWT = async (state, networkName) => {
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
-    const valid = await verifySignature(jwtEncoded256, signature, publicKey, network);
+    const valid = await verifySignature(jwtEncoded256, signature, pubKeyB64);
     // const { signedPayload } = result?.message;
     // const signedPayloadEncoded = base64url(signedPayload);
     // const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;

@@ -33,7 +33,7 @@ const defaultState = {
 
 const initialState = {
   account: existingState.account || defaultState.account,
-  address: existingState?.accounts[0] || defaultState.address,
+  address: existingState?.accounts && existingState.accounts[0] || defaultState.address,
   assets: defaultState.assets,
   assetsPending: defaultState.assetsPending,
   connected: defaultState.connected,
@@ -41,7 +41,7 @@ const initialState = {
   delegateHashLoading: defaultState.delegateHashLoading,
   newAccount: existingState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
-  publicKey: existingState?.accounts[1] || defaultState.publicKey,
+  publicKey: existingState?.accounts && existingState.accounts[1] || defaultState.publicKey,
   QRCode: defaultState.QRCode,
   sendHashLoading: defaultState.sendHashLoading,
   showQRCodeModal: defaultState.showQRCodeModal,
