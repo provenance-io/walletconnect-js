@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import { verifySignature, sha256 } from '../../helpers';
+import { verifySignature } from '../../helpers';
 
 export const signJWT = async (state) => {
   const { connector, address, publicKey: pubKeyB64 } = state;
@@ -9,7 +9,7 @@ export const signJWT = async (state) => {
   if (!connector) return { method, error: 'No wallet connected' };
   // Build JWT
   const now = Math.floor(Date.now() / 1000); // Current time
-  const expires = now + 900; // 900s (15min)
+  const expires = now + 3600; // (60min)
   const header = JSON.stringify({alg: 'ES256K', typ: 'JWT'});
   const headerEncoded = base64url(header);
   const payload = JSON.stringify({
@@ -20,18 +20,15 @@ export const signJWT = async (state) => {
     addr: address,
   });
   const payloadEncoded = base64url(payload);
-  const jwtEncoded256 = sha256(`${headerEncoded}.${payloadEncoded}`);
+  const JWT = `${headerEncoded}.${payloadEncoded}`;
   // prov_sign params
   const metadata = JSON.stringify({
     description: 'Sign JWT Token',
     address,
     public_key_b64: pubKeyB64,
-    whatever: {
-      even_more: 'stuff',
-    },
   });
-  const hexJWT256 = convertUtf8ToHex(jwtEncoded256);
-  const msgParams = [metadata, hexJWT256];
+  const hexJWT = convertUtf8ToHex(JWT);
+  const msgParams = [metadata, hexJWT];
   // Custom Request
   const customRequest = {
     id: 1,
@@ -45,7 +42,7 @@ export const signJWT = async (state) => {
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
-    const valid = await verifySignature(jwtEncoded256, signature, pubKeyB64);
+    const valid = await verifySignature(JWT, signature, pubKeyB64);
     const signedPayloadEncoded = base64url(signature);
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     return { method, valid, result, signedJWT, address  };

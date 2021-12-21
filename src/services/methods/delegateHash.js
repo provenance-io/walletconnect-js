@@ -26,9 +26,6 @@ export const delegateHash = async (state, data) => {
   const metadata = JSON.stringify({
     description: 'Delegate Hash',
     address,
-    whatever: {
-      even_more: 'stuff',
-    }
   });
   // provenance_signTransaction params
   const msgParams = [metadata, hexMsg];
