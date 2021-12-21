@@ -63,6 +63,10 @@ export class WalletConnectService {
     if (network) {
       this.#network = network;
     }
+    // Check if we have an address and public key, if so, auto-reconnect to session
+    if (this.state.address && this.state.publicKey) {
+      this.connect();
+    }
   }
 
   // *** Event Listener *** (https://nodejs.org/api/events.html)
@@ -131,7 +135,7 @@ export class WalletConnectService {
     // Loading while we wait for mobile to respond
     this.setState({ signMessageLoading: true });
     // Get result back from mobile actions and wc
-    const result = await signMessageMethod(this.state, customMessage, this.#network);
+    const result = await signMessageMethod(this.state, customMessage);
     // No longer loading
     this.setState({ signMessageLoading: false });
     // Broadcast result of method
@@ -153,7 +157,7 @@ export class WalletConnectService {
   signJWT = async () => {
     // Loading while we wait for mobile to respond
     this.setState({ signJWTLoading: true });
-    const result = await signJWTMethod(this.state, this.#network);
+    const result = await signJWTMethod(this.state);
     // No longer loading
     this.setState({ signJWTLoading: false });
     // Broadcast result of method

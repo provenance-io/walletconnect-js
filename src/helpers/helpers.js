@@ -8,7 +8,7 @@ export const verifySignature = async (
   message, signature, pubKeyB64,
 ) => {
   const hash = sha256(message);
-  const pubKeyDecoded = base64url.decode(pubKeyB64);
+  const pubKeyDecoded = base64url.toBuffer(pubKeyB64);
 
   return ecdsaVerify(signature, hash, pubKeyDecoded)
 };

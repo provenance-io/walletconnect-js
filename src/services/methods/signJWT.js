@@ -2,7 +2,7 @@ import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature, sha256 } from '../../helpers';
 
-export const signJWT = async (state, ) => {
+export const signJWT = async (state) => {
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
 
@@ -46,10 +46,8 @@ export const signJWT = async (state, ) => {
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
     const valid = await verifySignature(jwtEncoded256, signature, pubKeyB64);
-    // const { signedPayload } = result?.message;
-    // const signedPayloadEncoded = base64url(signedPayload);
-    // const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
-    const signedJWT = `${headerEncoded}.${payloadEncoded}.${result}`;
+    const signedPayloadEncoded = base64url(signature);
+    const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     return { method, valid, result, signedJWT, address  };
   } catch (error) {
     return { method, valid: false, error };
