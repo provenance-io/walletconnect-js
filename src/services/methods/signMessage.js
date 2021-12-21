@@ -13,9 +13,6 @@ export const signMessage = async (state, message) => {
   const metadata = JSON.stringify({
     description: 'Sign Message',
     address,
-    whatever: {
-      even_more: 'stuff',
-    },
   });
   const msgParams = [metadata, hexMsg];
   // Custom Request

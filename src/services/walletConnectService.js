@@ -1,5 +1,5 @@
 import events from 'events';
-import { WINDOW_MESSAGES } from '../consts';
+import { WINDOW_MESSAGES, CONNECTIONTIMEOUT } from '../consts';
 import {
   connect as connectMethod,
   signMessage as signMessageMethod,
@@ -7,10 +7,10 @@ import {
   signJWT as signJWTMethod,
   delegateHash as delegateHashMethod,
 } from './methods';
-import { getFromLocalStorage } from '../utils';
+import { getFromLocalStorage, addToLocalStorage } from '../utils';
 
 // Check for existing values from sessionStorage or from URL params
-const existingState = getFromLocalStorage('walletconnect');
+const existingState = getFromLocalStorage();
 
 const defaultState = {
   account: '',
@@ -20,6 +20,7 @@ const defaultState = {
   assetsPending: false,
   connected: false,
   connector: null,
+  connectionIat: '',
   delegateHashLoading: false,
   peer: {},
   publicKey: '',
@@ -37,6 +38,7 @@ const initialState = {
   assets: defaultState.assets,
   assetsPending: defaultState.assetsPending,
   connected: defaultState.connected,
+  connectionIat: defaultState.connectionIat || existingState.connectionIat,
   connector: defaultState.connector,
   delegateHashLoading: defaultState.delegateHashLoading,
   newAccount: existingState.newAccount || defaultState.newAccount,
@@ -65,7 +67,15 @@ export class WalletConnectService {
     }
     // Check if we have an address and public key, if so, auto-reconnect to session
     if (this.state.address && this.state.publicKey) {
-      this.connect();
+      // Compare the "connection initialized at" time to current time
+      const now = Math.floor(Date.now() / 1000);
+      if (this.state.connectionIat && (now - this.state.connectionIat) < CONNECTIONTIMEOUT) {
+        // Reconnect the users walletconnect session
+        this.connect();
+      } else {
+        // If the time passed is greater than the allowed time then attempt to force a disconnect
+        this.disconnect();
+      }
     }
   }
 
@@ -121,8 +131,10 @@ export class WalletConnectService {
     this.updateState();
   };
   
-  connect = () => {
-    connectMethod(this.setState, this.resetState, this.#broadcastEvent);
+  connect = async () => {
+    await connectMethod(this.setState, this.resetState, this.#broadcastEvent);
+    // Update the "connection initialized at" value in the localStorage (Ability to check when entering another app)
+    addToLocalStorage('connectionIat', this.state.connectionIat);
   };
 
   disconnect = () => {

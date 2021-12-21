@@ -1,3 +1,5 @@
 export * from './urls';
 export * from './windowMessages';
-export * from './networks';
+
+export const LOCALSTORAGENAME = 'walletconnect';
+export const CONNECTIONTIMEOUT = 900; // 15min
