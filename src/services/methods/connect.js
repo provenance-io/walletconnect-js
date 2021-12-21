@@ -1,9 +1,11 @@
 import WalletConnectClient from "@walletconnect/client";
 import QRCode from 'qrcode';
-
 import { WALLETCONNECT_BRIDGE_URL, WINDOW_MESSAGES } from '../../consts';
+import { clearLocalStorage } from '../../utils';
 
 export const connect = async (setState, resetState, broadcast) => {
+  // Get current time (use time to auto-logout)
+  const connectionIat = Math.floor(Date.now() / 1000);
   // ----------------
   // SESSION UPDATE
   // ----------------
@@ -12,7 +14,6 @@ export const connect = async (setState, resetState, broadcast) => {
     const updatedAccounts = accounts || _accounts;
     const [address, publicKey] = updatedAccounts;
     setState({ address, publicKey, connected: true });
-    // await getAccountAssets(newAddress);
     broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
   };
   // ----------------
@@ -22,7 +23,7 @@ export const connect = async (setState, resetState, broadcast) => {
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
     const [address, publicKey] = accounts;
-    setState({ address, publicKey, peer, connected: true });
+    setState({ address, publicKey, peer, connected: true, connectionIat });
     broadcast(WINDOW_MESSAGES.CONNECTED, data);
   };
   // --------------------
@@ -31,6 +32,8 @@ export const connect = async (setState, resetState, broadcast) => {
   const onDisconnect = (payload) => {
     resetState();
     broadcast(WINDOW_MESSAGES.DISCONNECT, payload);
+    // Manually clear out all of walletconnect-js from localStorage
+    clearLocalStorage('walletconnect-js');
   };
   // --------------------------
   // SUBSCRIBE TO WC EVENTS

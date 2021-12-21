@@ -1,5 +1,5 @@
 import events from 'events';
-import { WINDOW_MESSAGES } from '../consts';
+import { WINDOW_MESSAGES, CONNECTIONTIMEOUT } from '../consts';
 import {
   connect as connectMethod,
   signMessage as signMessageMethod,
@@ -7,10 +7,11 @@ import {
   signJWT as signJWTMethod,
   delegateHash as delegateHashMethod,
 } from './methods';
-import { getFromLocalStorage } from '../utils';
+import { getFromLocalStorage, addToLocalStorage } from '../utils';
 
-// Check for existing values from sessionStorage or from URL params
-const existingState = getFromLocalStorage('walletconnect');
+// Check for existing values from localStorage
+const existingWCState = getFromLocalStorage('walletconnect');
+const existingWCJSState = getFromLocalStorage('walletconnect-js');
 
 const defaultState = {
   account: '',
@@ -20,6 +21,7 @@ const defaultState = {
   assetsPending: false,
   connected: false,
   connector: null,
+  connectionIat: '',
   delegateHashLoading: false,
   peer: {},
   publicKey: '',
@@ -32,16 +34,17 @@ const defaultState = {
 };
 
 const initialState = {
-  account: existingState.account || defaultState.account,
-  address: existingState?.accounts && existingState.accounts[0] || defaultState.address,
+  account: existingWCJSState.account || defaultState.account,
+  address: existingWCState?.accounts && existingWCState.accounts[0] || defaultState.address,
   assets: defaultState.assets,
   assetsPending: defaultState.assetsPending,
   connected: defaultState.connected,
+  connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connector: defaultState.connector,
   delegateHashLoading: defaultState.delegateHashLoading,
-  newAccount: existingState.newAccount || defaultState.newAccount,
+  newAccount: existingWCJSState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
-  publicKey: existingState?.accounts && existingState.accounts[1] || defaultState.publicKey,
+  publicKey: existingWCState?.accounts && existingWCState.accounts[1] || defaultState.publicKey,
   QRCode: defaultState.QRCode,
   sendHashLoading: defaultState.sendHashLoading,
   showQRCodeModal: defaultState.showQRCodeModal,
@@ -65,7 +68,13 @@ export class WalletConnectService {
     }
     // Check if we have an address and public key, if so, auto-reconnect to session
     if (this.state.address && this.state.publicKey) {
+      // Reconnect the users walletconnect session
       this.connect();
+      // Compare the "connection initialized at" time to current time
+      const now = Math.floor(Date.now() / 1000);
+      if (this.state.connectionIat && (now - this.state.connectionIat) > CONNECTIONTIMEOUT) {
+        this.disconnect();
+      }
     }
   }
 
@@ -119,10 +128,15 @@ export class WalletConnectService {
       this.state[key] = updatedState[key];
     }, this);
     this.updateState();
+    // Check to see if the connection initialized at time has changed
+    if (updatedState.connectionIat) {
+      // Update the "connection initialized at" value in the localStorage (Ability to check when entering another app)
+      addToLocalStorage('walletconnect-js', 'connectionIat', updatedState.connectionIat);
+    }
   };
   
   connect = () => {
-    connectMethod(this.setState, this.resetState, this.#broadcastEvent);
+    connectMethod(this.setState, this.resetState, this.#broadcastEvent);   
   };
 
   disconnect = () => {
