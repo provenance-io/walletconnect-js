@@ -118,7 +118,7 @@ export class WalletConnectService {
   };
 
   resetState = () => {
-    this.state = { ...initialState };
+    this.state = { ...defaultState };
     this.updateState();
   };
 
