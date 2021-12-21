@@ -16,7 +16,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
 Import the dependency
 
 ```bash
-npm install @provenaceio/walletconnect-js --save
+npm i @provenanceio/walletconnect-js
 ```
 
 Importable items:

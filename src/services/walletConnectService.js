@@ -7,22 +7,47 @@ import {
   signJWT as signJWTMethod,
   delegateHash as delegateHashMethod,
 } from './methods';
+import { getFromLocalStorage } from '../utils';
 
-const initialState = {
+// Check for existing values from sessionStorage or from URL params
+const existingState = getFromLocalStorage('walletconnect');
+
+const defaultState = {
+  account: '',
+  newAccount: false,
+  address: '',
+  assets: [],
+  assetsPending: false,
   connected: false,
   connector: null,
-  QRCode: '',
-  showQRCodeModal: false,
-  address: '',
-  publicKey: '',
+  delegateHashLoading: false,
   peer: {},
+  publicKey: '',
+  QRCode: '',
+  sendHashLoading: false,
+  showQRCodeModal: false,
   signedJWT: '',
   signJWTLoading: false,
   signMessageLoading: false,
-  sendHashLoading: false,
-  delegateHashLoading: false,
-  assetsPending: false,
-  assets: [],
+};
+
+const initialState = {
+  account: existingState.account || defaultState.account,
+  address: existingState?.accounts && existingState.accounts[0] || defaultState.address,
+  assets: defaultState.assets,
+  assetsPending: defaultState.assetsPending,
+  connected: defaultState.connected,
+  connector: defaultState.connector,
+  delegateHashLoading: defaultState.delegateHashLoading,
+  newAccount: existingState.newAccount || defaultState.newAccount,
+  peer: defaultState.peer,
+  publicKey: existingState?.accounts && existingState.accounts[1] || defaultState.publicKey,
+  QRCode: defaultState.QRCode,
+  sendHashLoading: defaultState.sendHashLoading,
+  showQRCodeModal: defaultState.showQRCodeModal,
+  signedJWT: defaultState.signedJWT,
+  signJWTLoading: defaultState.signJWTLoading,
+  signMessageLoading: defaultState.signMessageLoading,
 };
 
 export class WalletConnectService {
@@ -37,6 +62,10 @@ export class WalletConnectService {
   constructor(network) {
     if (network) {
       this.#network = network;
+    }
+    // Check if we have an address and public key, if so, auto-reconnect to session
+    if (this.state.address && this.state.publicKey) {
+      this.connect();
     }
   }
 
@@ -106,7 +135,7 @@ export class WalletConnectService {
     // Loading while we wait for mobile to respond
     this.setState({ signMessageLoading: true });
     // Get result back from mobile actions and wc
-    const result = await signMessageMethod(this.state, customMessage, this.#network);
+    const result = await signMessageMethod(this.state, customMessage);
     // No longer loading
     this.setState({ signMessageLoading: false });
     // Broadcast result of method
@@ -128,7 +157,7 @@ export class WalletConnectService {
   signJWT = async () => {
     // Loading while we wait for mobile to respond
     this.setState({ signJWTLoading: true });
-    const result = await signJWTMethod(this.state, this.#network);
+    const result = await signJWTMethod(this.state);
     // No longer loading
     this.setState({ signJWTLoading: false });
     // Broadcast result of method

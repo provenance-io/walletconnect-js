@@ -1,33 +1,37 @@
 import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import { GET_PROVENANCE_NETWORK } from '../../consts';
-import { verifySignature } from '../../helpers';
+import { verifySignature, sha256 } from '../../helpers';
 
-export const signJWT = async (state, networkName) => {
-  const { connector, address, publicKey } = state;
+export const signJWT = async (state) => {
+  const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
-  const network = GET_PROVENANCE_NETWORK(networkName);
 
   if (!connector) return { method, error: 'No wallet connected' };
   // Build JWT
-  const expires = Math.floor(Date.now() / 1000) + 900; // 900s (15min)
-  const header = JSON.stringify({alg: 'ES256', typ: 'JWT'});
+  const now = Math.floor(Date.now() / 1000); // Current time
+  const expires = now + 900; // 900s (15min)
+  const header = JSON.stringify({alg: 'ES256K', typ: 'JWT'});
   const headerEncoded = base64url(header);
-  const publicKeyEncoded = base64url(publicKey);
-  const payload = JSON.stringify({sub: `${publicKeyEncoded},${address}`, iss: 'provenance.io', iat: expires, exp: expires});
+  const payload = JSON.stringify({
+    sub: pubKeyB64,
+    iss: 'provenance.io',
+    iat: now,
+    exp: expires,
+    addr: address,
+  });
   const payloadEncoded = base64url(payload);
-  const jwtEncoded = base64url(`${header}.${payload}`);
+  const jwtEncoded256 = sha256(`${headerEncoded}.${payloadEncoded}`);
   // prov_sign params
   const metadata = JSON.stringify({
     description: 'Sign JWT Token',
     address,
-    public_key_b64: publicKeyEncoded,
+    public_key_b64: pubKeyB64,
     whatever: {
       even_more: 'stuff',
     },
   });
-  const hexJWT = convertUtf8ToHex(jwtEncoded);
-  const msgParams = [metadata, hexJWT];
+  const hexJWT256 = convertUtf8ToHex(jwtEncoded256);
+  const msgParams = [metadata, hexJWT256];
   // Custom Request
   const customRequest = {
     id: 1,
@@ -41,11 +45,9 @@ export const signJWT = async (state, networkName) => {
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
-    const valid = await verifySignature(jwtEncoded, signature, publicKey, network);
-    // const { signedPayload } = result?.message;
-    // const signedPayloadEncoded = base64url(signedPayload);
-    // const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
-    const signedJWT = `${headerEncoded}.${payloadEncoded}.${result}`;
+    const valid = await verifySignature(jwtEncoded256, signature, pubKeyB64);
+    const signedPayloadEncoded = base64url(signature);
+    const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     return { method, valid, result, signedJWT, address  };
   } catch (error) {
     return { method, valid: false, error };
