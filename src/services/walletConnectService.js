@@ -122,17 +122,29 @@ export class WalletConnectService {
     this.updateState();
   };
 
+  #updateLocalStorage = (updatedState) => {
+    // Special values to look for
+    const { connectionIat, account, newAccount } = updatedState;
+    // If the value was changed, add it to the localStorage updates
+    const storageUpdates = {
+      ...(connectionIat !== undefined && {connectionIat}),
+      ...(account !== undefined && {account}),
+      ...(newAccount !== undefined && {newAccount}),
+    };
+    // If we have updated 1 or more special values, update localStorage
+    if (Object.keys(storageUpdates).length) {
+      addToLocalStorage('walletconnect-js', storageUpdates);
+    }
+  };
+
   setState = (updatedState) => {
     // Loop through each to update
     Object.keys(updatedState).forEach((key) => {
       this.state[key] = updatedState[key];
     }, this);
     this.updateState();
-    // Check to see if the connection initialized at time has changed
-    if (updatedState.connectionIat) {
-      // Update the "connection initialized at" value in the localStorage (Ability to check when entering another app)
-      addToLocalStorage('walletconnect-js', 'connectionIat', updatedState.connectionIat);
-    }
+    // Write state changes into localStorage as needed
+    this.#updateLocalStorage(updatedState);
   };
   
   connect = () => {

@@ -8,17 +8,17 @@ export const getFromLocalStorage = (name, key) => {
 };
 
 // Ability to add single or array of items into current localStorage
-export const addToLocalStorage = (name, key, value) => {
+export const addToLocalStorage = (name, newData) => {
   // Pull from localStorage
   const rawData = window.localStorage.getItem(name) || '{}';
   // Parse to edit
   const data = JSON.parse(rawData);
   // Update key/value
-  data[key] = value;
+  const finalData = {...data, ...newData};
   // Stringify to save
-  const stringData = JSON.stringify(data);
+  const stringFinalData = JSON.stringify(finalData);
   // Save
-  window.localStorage.setItem(name, stringData);
+  window.localStorage.setItem(name, stringFinalData);
 };
 
 // Clear out all of the current localStorage for a specific name
