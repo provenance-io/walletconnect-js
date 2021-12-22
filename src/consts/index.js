@@ -1,4 +1,7 @@
 export * from './urls';
 export * from './windowMessages';
 
-export const CONNECTIONTIMEOUT = 900; // 15min
+export const CONNECTION_TIMEOUT = {
+  mainnet: 900, // 15 min
+  testnet: 99999, // 27 hours
+};

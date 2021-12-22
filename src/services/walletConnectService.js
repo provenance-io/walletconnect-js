@@ -1,5 +1,5 @@
 import events from 'events';
-import { WINDOW_MESSAGES, CONNECTIONTIMEOUT } from '../consts';
+import { WINDOW_MESSAGES, CONNECTION_TIMEOUT } from '../consts';
 import {
   connect as connectMethod,
   signMessage as signMessageMethod,
@@ -42,6 +42,7 @@ const initialState = {
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connector: defaultState.connector,
   delegateHashLoading: defaultState.delegateHashLoading,
+  figureConnected: existingWCJSState.account && defaultState.connected,
   newAccount: existingWCJSState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
   publicKey: existingWCState?.accounts && existingWCState.accounts[1] || defaultState.publicKey,
@@ -72,7 +73,7 @@ export class WalletConnectService {
       this.connect();
       // Compare the "connection initialized at" time to current time
       const now = Math.floor(Date.now() / 1000);
-      if (this.state.connectionIat && (now - this.state.connectionIat) > CONNECTIONTIMEOUT) {
+      if (this.state.connectionIat && (now - this.state.connectionIat) > CONNECTION_TIMEOUT[this.#network]) {
         this.disconnect();
       }
     }
