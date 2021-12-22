@@ -1,5 +1,5 @@
 import events from 'events';
-import { WINDOW_MESSAGES, CONNECTIONTIMEOUT } from '../consts';
+import { WINDOW_MESSAGES, CONNECTION_TIMEOUT } from '../consts';
 import {
   connect as connectMethod,
   signMessage as signMessageMethod,
@@ -23,6 +23,7 @@ const defaultState = {
   connector: null,
   connectionIat: '',
   delegateHashLoading: false,
+  figureConnected: false,
   peer: {},
   publicKey: '',
   QRCode: '',
@@ -42,6 +43,7 @@ const initialState = {
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connector: defaultState.connector,
   delegateHashLoading: defaultState.delegateHashLoading,
+  figureConnected: !!existingWCJSState.account && defaultState.connected,
   newAccount: existingWCJSState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
   publicKey: existingWCState?.accounts && existingWCState.accounts[1] || defaultState.publicKey,
@@ -72,7 +74,7 @@ export class WalletConnectService {
       this.connect();
       // Compare the "connection initialized at" time to current time
       const now = Math.floor(Date.now() / 1000);
-      if (this.state.connectionIat && (now - this.state.connectionIat) > CONNECTIONTIMEOUT) {
+      if (this.state.connectionIat && (now - this.state.connectionIat) > CONNECTION_TIMEOUT[this.#network]) {
         this.disconnect();
       }
     }
@@ -142,6 +144,8 @@ export class WalletConnectService {
     Object.keys(updatedState).forEach((key) => {
       this.state[key] = updatedState[key];
     }, this);
+    // Check if connected and account exists to update 'figureConnected' state
+    this.state.figureConnected = !!this.state.account && this.state.connected;
     this.updateState();
     // Write state changes into localStorage as needed
     this.#updateLocalStorage(updatedState);
