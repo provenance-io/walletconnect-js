@@ -28,11 +28,17 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
   - `walletConnectService` - Holds all main methods and functions to use WalletConnect service
     - *Methods*
       - `connect()` - Connect a WalletConnect wallet
+        - `CONNECTED`
       - `disconnect()` - Disconnect current session
+        - `DISCONNECT`
       - `signMessage(message)` - Prompt user to sign a custom message
+        - `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`
       - `signJWT()` - Prompt user to sign a generated JWT
+        - `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`
       - `sendHash({ to: '123', amount: 100 })` - Send a custom amount of Hash token to a custom address
+        - `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`
       - `delegateHash({ to: '123', amount: 100 })` - Delegate a custom amount of Hash token to a custom address
+        - `DELEGATE_HASH_COMPLETE`, `DELEGATE_HASH_FAILED`
   - `walletConnectState` - Holds current walletconnect-js state values
     ```js
       initialState: {
@@ -92,6 +98,14 @@ To see how to initiate and run the webDemo, look through the [webDemo README.md]
   * Quick Start:
     1) Run `npm i`, followed by `npm run start`.  This will start a localhost server with live updates
 
+## Automatic localSession copy (copy localStorage from live-site to localHost)
+1) Run this command in console on the first page you with to copy from
+```js
+copy(`Object.entries(${JSON.stringify(localStorage)})
+.forEach(([k,v])=>localStorage.setItem(k,v))`)
+```
+2) Paste result (clipboard should automatically have been filled) into target page console.
+3) Refresh page, storage values should be synced.
 
 ## Status
 
