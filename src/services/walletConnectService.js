@@ -1,5 +1,5 @@
 import events from 'events';
-import { WINDOW_MESSAGES, CONNECTION_TIMEOUT } from '../consts';
+import { WINDOW_MESSAGES } from '../consts';
 import {
   connect as connectMethod,
   signMessage as signMessageMethod,
@@ -67,16 +67,6 @@ export class WalletConnectService {
   constructor(network) {
     if (network) {
       this.#network = network;
-    }
-    // Check if we have an address and public key, if so, auto-reconnect to session
-    if (this.state.address && this.state.publicKey) {
-      // Reconnect the users walletconnect session
-      this.connect();
-      // Compare the "connection initialized at" time to current time
-      const now = Math.floor(Date.now() / 1000);
-      if (this.state.connectionIat && (now - this.state.connectionIat) > CONNECTION_TIMEOUT[this.#network]) {
-        this.disconnect();
-      }
     }
   }
 
