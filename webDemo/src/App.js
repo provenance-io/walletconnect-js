@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useWalletConnect, QRCodeModal } from '@provenanceio/walletconnect-js';
 import styled from 'styled-components';
 import {
-  Popup,
-  Disconnect,
+  AddMarker,
   Connect,
-  SignMessage,
-  SendHash,
   DelegateHash,
+  Disconnect,
+  Popup,
+  SendHash,
   SignJWT,
+  SignMessage,
 } from 'Components';
 import { REACT_APP_WCJS_VERSION } from './version'; // eslint-disable-line
 
@@ -48,13 +49,14 @@ export const App = () => {
   const [popupDuration, setPopupDuration] = useState(2500);
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const {
-    connected,
     address,
+    addMarkerLoading,
+    connected,
+    delegateHashLoading,
     peer,
     sendHashLoading,
-    signMessageLoading,
     signJWTLoading,
-    delegateHashLoading,
+    signMessageLoading,
   } = walletConnectState;
 
   const setPopup = (message, status, duration) => {
@@ -82,6 +84,7 @@ export const App = () => {
             <SignMessage walletConnectService={wcs} loading={signMessageLoading} setPopup={setPopup} />
             <SendHash walletConnectService={wcs} loading={sendHashLoading} setPopup={setPopup} />
             <DelegateHash walletConnectService={wcs} loading={delegateHashLoading} setPopup={setPopup} />
+            <AddMarker walletConnectService={wcs} loading={addMarkerLoading} setPopup={setPopup} />
             <SignJWT walletConnectService={wcs} loading={signJWTLoading} setPopup={setPopup} />
             <Disconnect walletConnectService={wcs} setPopup={setPopup} />
           </ConnectedContent>

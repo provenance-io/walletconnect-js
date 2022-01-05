@@ -4,14 +4,14 @@ import { verifySignature } from '../../helpers';
 export const signMessage = async (state, message) => {
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
-  // const type = 'MsgSend';
+  const description = 'Sign Message';
 
   if (!connector) return { method, error: 'No wallet connected' };
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
   // eth_sign params
   const metadata = JSON.stringify({
-    description: 'Sign Message',
+    description,
     address,
   });
   const msgParams = [metadata, hexMsg];

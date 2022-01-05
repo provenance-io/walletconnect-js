@@ -5,6 +5,7 @@ import { verifySignature } from '../../helpers';
 export const signJWT = async (state) => {
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
+  const description = 'Sign JWT Token';
 
   if (!connector) return { method, error: 'No wallet connected' };
   // Build JWT
@@ -23,7 +24,7 @@ export const signJWT = async (state) => {
   const JWT = `${headerEncoded}.${payloadEncoded}`;
   // prov_sign params
   const metadata = JSON.stringify({
-    description: 'Sign JWT Token',
+    description,
     address,
     public_key_b64: pubKeyB64,
   });

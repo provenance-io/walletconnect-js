@@ -1,11 +1,12 @@
 import events from 'events';
 import { WINDOW_MESSAGES } from '../consts';
 import {
+  addMarker as addMarkerMethod,
   connect as connectMethod,
-  signMessage as signMessageMethod,
+  delegateHash as delegateHashMethod,
   sendHash as sendHashMethod,
   signJWT as signJWTMethod,
-  delegateHash as delegateHashMethod,
+  signMessage as signMessageMethod,
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage } from '../utils';
 
@@ -15,15 +16,16 @@ const existingWCJSState = getFromLocalStorage('walletconnect-js');
 
 const defaultState = {
   account: '',
-  newAccount: false,
+  addMarkerLoading: false,
   address: '',
   assets: [],
   assetsPending: false,
   connected: false,
-  connector: null,
   connectionIat: '',
+  connector: null,
   delegateHashLoading: false,
   figureConnected: false,
+  newAccount: false,
   peer: {},
   publicKey: '',
   QRCode: '',
@@ -36,6 +38,7 @@ const defaultState = {
 
 const initialState = {
   account: existingWCJSState.account || defaultState.account,
+  addMarkerLoading: defaultState.addMarkerLoading,
   address: existingWCState?.accounts && existingWCState.accounts[0] || defaultState.address,
   assets: defaultState.assets,
   assetsPending: defaultState.assetsPending,
@@ -92,6 +95,8 @@ export class WalletConnectService {
   removeAllListeners(eventName) {
     this.#eventEmitter.removeAllListeners(eventName);
   }
+  
+  // Update the network by passing it through as a prop on the provider
 
   setNetwork(network) {
     this.#network = network;
@@ -140,27 +145,50 @@ export class WalletConnectService {
     // Write state changes into localStorage as needed
     this.#updateLocalStorage(updatedState);
   };
+
+  showQRCode = (value) => {
+    this.setState({ showQRCodeModal: value })
+  };
   
+  // All Wallet Methods here
+  // - Add Marker
+  // - Connect
+  // - Delegate Hash
+  // - Disconnect
+  // - Send Hash
+  // - Sign JWT
+  // - Sign Message
+  
+  addMarker = async (txData) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ addMarkerLoading: true });
+    const result = await addMarkerMethod(this.state, txData);
+    // No longer loading
+    this.setState({ addMarkerLoading: false });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.ADD_MARKER_FAILED : WINDOW_MESSAGES.ADD_MARKER_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  };
+
   connect = () => {
     connectMethod(this.setState, this.resetState, this.#broadcastEvent);   
+  };
+
+  delegateHash = async (txData) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ delegateHashLoading: true });
+    const result = await delegateHashMethod(this.state, txData);
+    // No longer loading
+    this.setState({ delegateHashLoading: false });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.DELEGATE_HASH_FAILED : WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
   };
 
   disconnect = () => {
     if (this?.state?.connector) {
       this.state.connector.killSession();
     }
-  };
-
-  signMessage = async (customMessage) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ signMessageLoading: true });
-    // Get result back from mobile actions and wc
-    const result = await signMessageMethod(this.state, customMessage);
-    // No longer loading
-    this.setState({ signMessageLoading: false });
-    // Broadcast result of method
-    const windowMessage = result.error ? WINDOW_MESSAGES.SIGNATURE_FAILED : WINDOW_MESSAGES.SIGNATURE_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
   };
 
   sendHash = async (txData) => {
@@ -185,18 +213,15 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
   };
 
-  delegateHash = async (txData) => {
+  signMessage = async (customMessage) => {
     // Loading while we wait for mobile to respond
-    this.setState({ delegateHashLoading: true });
-    const result = await delegateHashMethod(this.state, txData);
+    this.setState({ signMessageLoading: true });
+    // Get result back from mobile actions and wc
+    const result = await signMessageMethod(this.state, customMessage);
     // No longer loading
-    this.setState({ delegateHashLoading: false });
+    this.setState({ signMessageLoading: false });
     // Broadcast result of method
-    const windowMessage = result.error ? WINDOW_MESSAGES.DELEGATE_HASH_FAILED : WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE;
+    const windowMessage = result.error ? WINDOW_MESSAGES.SIGNATURE_FAILED : WINDOW_MESSAGES.SIGNATURE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
-  };
-
-  showQRCode = (value) => {
-    this.setState({ showQRCodeModal: value })
   };
 };

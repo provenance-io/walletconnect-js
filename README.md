@@ -26,28 +26,43 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
 ```
 * `useWalletConnect` - React hook which contains `walletConnectService` and `walletConnectState`
   - `walletConnectService` - Holds all main methods and functions to use WalletConnect service
-    - *Methods*
+    - *Methods* (and messages for each)
       - `connect()` - Connect a WalletConnect wallet
+        - `CONNECTED`
       - `disconnect()` - Disconnect current session
+        - `DISCONNECT`
       - `signMessage(message)` - Prompt user to sign a custom message
+        - `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`
       - `signJWT()` - Prompt user to sign a generated JWT
+        - `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`
       - `sendHash({ to: '123', amount: 100 })` - Send a custom amount of Hash token to a custom address
+        - `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`
       - `delegateHash({ to: '123', amount: 100 })` - Delegate a custom amount of Hash token to a custom address
+        - `DELEGATE_HASH_COMPLETE`, `DELEGATE_HASH_FAILED`
+      - `addMarker({ denom: 'myMarker', amount: 100 })` - Add a marker
+        - `ADD_MARKER_COMPLETE`, `ADD_MARKER_FAILED`
   - `walletConnectState` - Holds current walletconnect-js state values
     ```js
       initialState: {
-        connected: false,
-        connector: null,
+        account: '',
+        addMarkerLoading: false,
         address: '',
-        publicKey: '',
+        assets: [],
+        assetsPending: false,
+        connected: false,
+        connectionIat: '',
+        connector: null,
+        delegateHashLoading: false,
+        figureConnected: false,
+        newAccount: false,
         peer: {},
+        publicKey: '',
+        QRCode: '',
+        sendHashLoading: false,
+        showQRCodeModal: false,
         signedJWT: '',
         signJWTLoading: false,
         signMessageLoading: false,
-        sendHashLoading: false,
-        delegateHashLoading: false,
-        assetsPending: false,
-        assets: [],
       }
     ```
 * `WalletConnectContextProvider` - React context provider to supply state to every child within
@@ -69,7 +84,7 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
     ```
 * `WINDOW_MESSAGES` - Various messages broadcast out from walletconnect-js to the parent application
   - Use these messages to prompt or indicate status updates to the end user
-  - Current Messages: `CONNECTED`, `DISCONNECT`, `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`, `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `DELEGATE_HASH_COMPLETE`, and `DELEGATE_HASH_FAILED`.
+  - Current Messages: `CONNECTED`, `DISCONNECT`, `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`, `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `ADD_MARKER_COMPLETE`, `ADD_MARKER_FAILED`, `DELEGATE_HASH_COMPLETE`, and `DELEGATE_HASH_FAILED`.
   - Usage:  Currently there is are custom event listener methods on `walletConnectService`
     - These are `addListener(eventName, callback)`, `removeListener(eventName, callback)`, and `removeAllListeners(eventName)`
     - Note: All of these are based off Node.js Event Emitters, read more on that here: [https://nodejs.org/api/events.html#event-newlistener]
@@ -92,6 +107,14 @@ To see how to initiate and run the webDemo, look through the [webDemo README.md]
   * Quick Start:
     1) Run `npm i`, followed by `npm run start`.  This will start a localhost server with live updates
 
+## Automatic localSession copy (copy localStorage from live-site to localHost)
+1) Run this command in console on the first page you with to copy from
+```js
+copy(`Object.entries(${JSON.stringify(localStorage)})
+.forEach(([k,v])=>localStorage.setItem(k,v))`)
+```
+2) Paste result (clipboard should automatically have been filled) into target page console.
+3) Refresh page, storage values should be synced.
 
 ## Status
 
