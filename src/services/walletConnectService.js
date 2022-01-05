@@ -164,7 +164,7 @@ export class WalletConnectService {
     this.setState({ addMarkerLoading: true });
     const result = await addMarkerMethod(this.state, txData);
     // No longer loading
-    this.setState({ delegateHashLoading: false });
+    this.setState({ addMarkerLoading: false });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.ADD_MARKER_FAILED : WINDOW_MESSAGES.ADD_MARKER_COMPLETE;
     this.#broadcastEvent(windowMessage, result);

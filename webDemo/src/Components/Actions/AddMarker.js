@@ -17,7 +17,7 @@ export const AddMarker = ({ walletConnectService, loading, setPopup }) => {
       console.log('WalletConnectJS | AddMarker Complete | Result: ', result); // eslint-disable-line no-console
       setPopup(`AddMarker Complete! ${sendDetails}`, 'success', 5000);
     });
-    walletConnectService.addListener(WINDOW_MESSAGES.DELEGATE_HASH_FAILED, (result) => {
+    walletConnectService.addListener(WINDOW_MESSAGES.ADD_MARKER_FAILED, (result) => {
       const { error } = result;
       console.log('WalletConnectJS | AddMarker Failed | Result: ', result); // eslint-disable-line no-console
       setPopup(`AddMarker Failed! ${error}`, 'failure', 5000);

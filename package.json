@@ -25,16 +25,16 @@
   "homepage": "https://github.com/provenance-io/walletconnect-js#readme",
   "dependencies": {
     "@provenanceio/wallet-lib": "1.1.1",
-    "@walletconnect/client": "^1.6.5",
+    "@walletconnect/client": "1.6.5",
     "@walletconnect/utils": "1.6.6",
     "base64url": "3.0.1",
-    "bip32": "^2.0.6",
+    "bip32": "2.0.6",
     "google-protobuf": "3.19.1",
-    "qrcode":"^1.5.0",
-    "secp256k1": "^4.0.2",
-    "react":"^17.0.2",
-    "prop-types": "^15.7.2",
-    "styled-components":"^5.3.3"
+    "prop-types": "15.7.2",
+    "qrcode":"1.5.0",
+    "react":"17.0.2",
+    "secp256k1": "4.0.2",
+    "styled-components":"5.3.3"
   },
   "devDependencies": {
     "@babel/cli": "7.13.16",
@@ -51,7 +51,7 @@
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.2",
     "babel-plugin-styled-components": "1.12.0",
-    "concurrently":"^6.4.0",
+    "concurrently":"6.4.0",
     "env-cmd": "10.1.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "8.3.0",
@@ -61,7 +61,7 @@
     "eslint-plugin-react-hooks": "4.2.0",
     "eslint-plugin-react": "7.25.3",
     "eslint": "7.32.0",
-    "nodemon": "^2.0.15",
+    "nodemon": "2.0.15",
     "prettier": "2.4.1"
   },
   "scripts": {
