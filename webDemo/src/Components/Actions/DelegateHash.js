@@ -7,15 +7,17 @@ import { ActionContainer } from './ActionContainer';
 export const DelegateHash = ({ walletConnectService, loading, setPopup }) => {
   const color = '#FFAA66';
 
-  const [delegateTo, setDelegateTo] = useState('tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6');
-  const [delegateAmount, setDelegateAmount] = useState(100);
+  const [delegateTo, setDelegateTo] = useState('tpvaloper1tgq6cpu6hmsrvkvdu82j99tsxxw7qqajn843fe');
+  const [delegateAmount, setDelegateAmount] = useState(1);
 
   useEffect(() => {
     // Delegate Hash Events
     walletConnectService.addListener(WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE, (result) => {
       const { sendDetails } = result;
+      const { amount: amountObj, delegatorAddress, validatorAddress } = sendDetails;
+      const { denom, amount } = amountObj;
       console.log('WalletConnectJS | DelegateHash Complete | Result: ', result); // eslint-disable-line no-console
-      setPopup(`Delegation Complete! ${sendDetails.amountList[0].amount}${sendDetails.amountList[0].denom} delegated to ${sendDetails.toAddress}`, 'success', 5000);
+      setPopup(`Delegation Complete! ${delegatorAddress} delegated ${amount}${denom} to ${validatorAddress}`, 'success', 5000);
     });
     walletConnectService.addListener(WINDOW_MESSAGES.DELEGATE_HASH_FAILED, (result) => {
       const { error } = result;
@@ -48,7 +50,7 @@ export const DelegateHash = ({ walletConnectService, loading, setPopup }) => {
       <Button
         color={color}
         loading={loading}
-        onClick={() => walletConnectService.delegateHash(({ to: delegateTo, amount: delegateAmount }))}
+        onClick={() => walletConnectService.delegateHash(({ validatorAddress: delegateTo, amount: delegateAmount }))}
       >
         Delegate Hash
       </Button>

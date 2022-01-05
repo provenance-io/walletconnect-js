@@ -4,19 +4,22 @@ import { MessageService } from '@provenanceio/wallet-lib';
 // Wallet-lib delegate message proto:
 // https://github.com/provenance-io/wallet-lib/blob/bac70a7fe6a9ad784ff4cc7fe440b68cfe598c47/src/services/message-service.ts#L396
 export const delegateHash = async (state, data) => {
-  const method = 'provenance_delegate';
+  const method = 'provenance_sendTransaction';
   const type = 'MsgDelegate';
   const description = 'Delegate Hash';
   const {connector, address} = state;
-  const { validatorAddress, amount } = data;
+  const { validatorAddress, amount: sendAmountHash } = data;
   
   if (!connector) return { method, error: 'No wallet connected' };
+
+  // Convert hash amount to nhash (cannot send hash, can only send nhash)
+  const sendAmountNHash = sendAmountHash * (10 ** 9);
 
   const messageService = new MessageService();
   const sendMessage = {
     delegatorAddress: address,
     validatorAddress,
-    amount: { denom: "nhash", amount },
+    amount: { denom: "nhash", amount: sendAmountNHash },
   };
   const messageMsgSend = messageService.buildMessage(type, sendMessage);
   const message = messageService.createAnyMessageBase64(type, messageMsgSend);
@@ -42,7 +45,9 @@ export const delegateHash = async (state, data) => {
     const result = await connector.sendCustomRequest(customRequest);
     // TODO verify transaction ID
     const valid = !!result
+    // Convert the amountList back into Hash (was converted to nHash before sending)
+    const amountList = { denom: 'hash', amount: sendAmountHash};
     // result is a hex encoded signature
-    return { method, valid, result, message, sendDetails: sendMessage };
+    return { method, valid, result, message, sendDetails: {...sendMessage, amount: amountList} };
   } catch (error) { return { method, valid: false, error }; }
 };
