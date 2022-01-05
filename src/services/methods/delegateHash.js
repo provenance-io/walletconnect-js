@@ -6,6 +6,7 @@ import { MessageService } from '@provenanceio/wallet-lib';
 export const delegateHash = async (state, data) => {
   const method = 'provenance_delegate';
   const type = 'MsgDelegate';
+  const description = 'Delegate Hash';
   const {connector, address} = state;
   const { validatorAddress, amount } = data;
   
@@ -24,7 +25,7 @@ export const delegateHash = async (state, data) => {
   const hexMsg = convertUtf8ToHex(message);
 
   const metadata = JSON.stringify({
-    description: 'Delegate Hash',
+    description,
     address,
   });
   // provenance_signTransaction params

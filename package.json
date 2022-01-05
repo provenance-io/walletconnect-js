@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -24,11 +24,12 @@
   },
   "homepage": "https://github.com/provenance-io/walletconnect-js#readme",
   "dependencies": {
-    "@provenanceio/wallet-lib": "1.0.0",
+    "@provenanceio/wallet-lib": "1.1.1",
     "@walletconnect/client": "^1.6.5",
     "@walletconnect/utils": "1.6.6",
     "base64url": "3.0.1",
     "bip32": "^2.0.6",
+    "google-protobuf": "3.19.1",
     "qrcode":"^1.5.0",
     "secp256k1": "^4.0.2",
     "react":"^17.0.2",

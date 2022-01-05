@@ -6,6 +6,7 @@ export const sendHash = async (state, data) => {
   const {to: toAddress, amount: sendAmountHash } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
+  const description = 'Send Hash';
   
   if (!connector) return { method, error: 'No wallet connected' };
 
@@ -26,11 +27,8 @@ export const sendHash = async (state, data) => {
 
   // provenance_signTransaction params
   const metadata = JSON.stringify({
-    description: 'Send Hash',
+    description,
     address,
-    whatever: {
-      even_more: 'stuff',
-    }
   });
   const msgParams = [metadata, hexMsg];
   try {
