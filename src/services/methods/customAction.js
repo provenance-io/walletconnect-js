@@ -1,5 +1,3 @@
-import { convertUtf8ToHex } from "@walletconnect/utils";
-
 export const customAction = async (state, data) => {
   const { message, metadata, method = 'provenance_sendTransaction' } = data;
   const { connector } = state;
@@ -7,10 +5,9 @@ export const customAction = async (state, data) => {
   if (!connector) return { method, error: 'No wallet connected' };
 
   // encode message (hex)
-  const hexMsg = convertUtf8ToHex(message);
   const stringMetadata = JSON.stringify(metadata);
   // provenance_signTransaction params
-  const msgParams = [stringMetadata, hexMsg];
+  const msgParams = [stringMetadata, message];
   try {
     // Custom Request
     const customRequest = {
