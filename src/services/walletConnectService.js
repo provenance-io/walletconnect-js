@@ -3,6 +3,7 @@ import { WINDOW_MESSAGES } from '../consts';
 import {
   addMarker as addMarkerMethod,
   connect as connectMethod,
+  customAction as customActionMethod,
   delegateHash as delegateHashMethod,
   sendHash as sendHashMethod,
   signJWT as signJWTMethod,
@@ -23,6 +24,7 @@ const defaultState = {
   connected: false,
   connectionIat: '',
   connector: null,
+  customActionLoading: false,
   delegateHashLoading: false,
   figureConnected: false,
   newAccount: false,
@@ -45,6 +47,7 @@ const initialState = {
   connected: defaultState.connected,
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connector: defaultState.connector,
+  customActionLoading: defaultState.customActionMethod,
   delegateHashLoading: defaultState.delegateHashLoading,
   figureConnected: !!existingWCJSState.account && defaultState.connected,
   newAccount: existingWCJSState.newAccount || defaultState.newAccount,
@@ -153,6 +156,7 @@ export class WalletConnectService {
   // All Wallet Methods here
   // - Add Marker
   // - Connect
+  // - CustomAction
   // - Delegate Hash
   // - Disconnect
   // - Send Hash
@@ -172,6 +176,17 @@ export class WalletConnectService {
 
   connect = () => {
     connectMethod(this.setState, this.resetState, this.#broadcastEvent);   
+  };
+
+  customAction = async (data) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ customActionLoading: true });
+    const result = await customActionMethod(this.state, data);
+    // No longer loading
+    this.setState({ customActionLoading: false });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.CUSTOM_ACTION_FAILED : WINDOW_MESSAGES.CUSTOM_ACTION_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
   };
 
   delegateHash = async (txData) => {
