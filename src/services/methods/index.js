@@ -1,3 +1,4 @@
+export * from './activateRequest';
 export * from './addMarker';
 export * from './connect';
 export * from './customAction';
