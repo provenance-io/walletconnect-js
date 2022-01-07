@@ -5,7 +5,7 @@ import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 
 // Wallet-lib delegate message proto:
 // https://github.com/provenance-io/wallet-lib/blob/bac70a7fe6a9ad784ff4cc7fe440b68cfe598c47/src/services/message-service.ts#L396
-export const addMarker = async (state, data) => {
+export const activateRequest = async (state, data) => {
   const { connector, address } = state;
   const { denom, administrator } = data;
   const method = 'provenance_sendTransaction';

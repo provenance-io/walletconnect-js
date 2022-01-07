@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useWalletConnect, QRCodeModal } from '@provenanceio/walletconnect-js';
 import styled from 'styled-components';
 import {
+  ActivateRequest,
   AddMarker,
   Connect,
   DelegateHash,
@@ -49,6 +50,7 @@ export const App = () => {
   const [popupDuration, setPopupDuration] = useState(2500);
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const {
+    activateRequestLoading,
     address,
     addMarkerLoading,
     connected,
@@ -85,6 +87,7 @@ export const App = () => {
             <SendHash walletConnectService={wcs} loading={sendHashLoading} setPopup={setPopup} />
             <DelegateHash walletConnectService={wcs} loading={delegateHashLoading} setPopup={setPopup} />
             <AddMarker walletConnectService={wcs} loading={addMarkerLoading} setPopup={setPopup} />
+            <ActivateRequest walletConnectService={wcs} loading={activateRequestLoading} setPopup={setPopup} />
             <SignJWT walletConnectService={wcs} loading={signJWTLoading} setPopup={setPopup} />
             <Disconnect walletConnectService={wcs} setPopup={setPopup} />
           </ConnectedContent>

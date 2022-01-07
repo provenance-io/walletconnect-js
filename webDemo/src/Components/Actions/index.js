@@ -1,3 +1,4 @@
+export * from './ActivateRequest';
 export * from './AddMarker';
 export * from './Connect';
 export * from './DelegateHash';
