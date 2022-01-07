@@ -8,7 +8,7 @@ export const ActivateRequest = ({ walletConnectService, loading, setPopup }) => 
   const color = '#FFF2AF';
 
   const [denom, setDenom] = useState('myNewMarkerCoin');
-  const [administrator, setAdministrator] = useState('tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6');
+  const [administrator, setAdministrator] = useState('tp194r5us3l3yg7rpwepn9c7awgcesp5kp84r5lye');
 
   useEffect(() => {
     // Delegate Hash Events
