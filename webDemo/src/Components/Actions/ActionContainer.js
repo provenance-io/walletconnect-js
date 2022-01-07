@@ -11,7 +11,7 @@ const Container = styled.div`
   max-width: 100%;
   align-items: center;
   justify-content: ${({ justify }) => justify };
-  margin-bottom: 10px;
+  margin-bottom: 30px;
   box-shadow: 1px 1px 3px 1px ${({ color }) => color };
 `;
 
@@ -26,7 +26,7 @@ ActionContainer.propTypes = {
   loading: PropTypes.bool,
 };
 ActionContainer.defaultProps = {
-  color: '#DDDDDD',
+  color: '#42368E',
   children: null,
   justify: 'center',
   loading: false,
