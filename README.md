@@ -41,6 +41,8 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
         - `DELEGATE_HASH_COMPLETE`, `DELEGATE_HASH_FAILED`
       - `addMarker({ denom: 'myMarker', amount: 100 })` - Add a marker
         - `ADD_MARKER_COMPLETE`, `ADD_MARKER_FAILED`
+      - `activateRequest({ denom: 'myMarker', administrator: 'tp121331223fdsdaf1234' })` - Add a marker
+        - `ACTIVATE_REQUEST_COMPLETE`, `ACTIVATE_REQUEST_FAILED`
   - `walletConnectState` - Holds current walletconnect-js state values
     ```js
       initialState: {
@@ -84,7 +86,7 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
     ```
 * `WINDOW_MESSAGES` - Various messages broadcast out from walletconnect-js to the parent application
   - Use these messages to prompt or indicate status updates to the end user
-  - Current Messages: `CONNECTED`, `DISCONNECT`, `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`, `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `ADD_MARKER_COMPLETE`, `ADD_MARKER_FAILED`, `DELEGATE_HASH_COMPLETE`, and `DELEGATE_HASH_FAILED`.
+  - Current Messages: `CONNECTED`, `DISCONNECT`, `TRANSACTION_COMPLETE`, `TRANSACTION_FAILED`, `SIGNATURE_COMPLETE`, `SIGNATURE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `ADD_MARKER_COMPLETE`, `ADD_MARKER_FAILED`, `ACTIVATE_REQUEST_COMPLETE`, `ACTIVATE_REQUEST_FAILED`, `DELEGATE_HASH_COMPLETE`, and `DELEGATE_HASH_FAILED`.
   - Usage:  Currently there is are custom event listener methods on `walletConnectService`
     - These are `addListener(eventName, callback)`, `removeListener(eventName, callback)`, and `removeAllListeners(eventName)`
     - Note: All of these are based off Node.js Event Emitters, read more on that here: [https://nodejs.org/api/events.html#event-newlistener]
