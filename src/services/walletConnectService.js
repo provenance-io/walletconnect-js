@@ -1,6 +1,7 @@
 import events from 'events';
 import { WINDOW_MESSAGES } from '../consts';
 import {
+  activateRequest as activateRequestMethod,
   addMarker as addMarkerMethod,
   connect as connectMethod,
   customAction as customActionMethod,
@@ -17,6 +18,7 @@ const existingWCJSState = getFromLocalStorage('walletconnect-js');
 
 const defaultState = {
   account: '',
+  activateRequestLoading: false,
   addMarkerLoading: false,
   address: '',
   assets: [],
@@ -40,6 +42,7 @@ const defaultState = {
 
 const initialState = {
   account: existingWCJSState.account || defaultState.account,
+  activateRequestLoading: defaultState.activateRequestLoading,
   addMarkerLoading: defaultState.addMarkerLoading,
   address: existingWCState?.accounts && existingWCState.accounts[0] || defaultState.address,
   assets: defaultState.assets,
@@ -154,6 +157,7 @@ export class WalletConnectService {
   };
   
   // All Wallet Methods here
+  // - Activate Request
   // - Add Marker
   // - Connect
   // - CustomAction
@@ -162,6 +166,17 @@ export class WalletConnectService {
   // - Send Hash
   // - Sign JWT
   // - Sign Message
+  
+  activateRequest = async (data) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ activateRequestLoading: true });
+    const result = await activateRequestMethod(this.state, data);
+    // No longer loading
+    this.setState({ activateRequestLoading: false });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.ACTIVATE_REQUEST_FAILED : WINDOW_MESSAGES.ACTIVATE_REQUEST_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  };
   
   addMarker = async (txData) => {
     // Loading while we wait for mobile to respond
