@@ -49,7 +49,7 @@ export const ActivateRequest = ({ walletConnectService, loading, setPopup }) => 
       <Button
         color={color}
         loading={loading}
-        onClick={() => walletConnectService.addMarker(({ denom, administrator }))}
+        onClick={() => walletConnectService.activateRequest(({ denom, administrator }))}
       >
         Activate Request
       </Button>
@@ -59,7 +59,7 @@ export const ActivateRequest = ({ walletConnectService, loading, setPopup }) => 
 
 ActivateRequest.propTypes = {
   walletConnectService: PropTypes.shape({
-    addMarker: PropTypes.func,
+    activateRequest: PropTypes.func,
     addListener: PropTypes.func,
     removeAllListeners: PropTypes.func,
   }).isRequired,
