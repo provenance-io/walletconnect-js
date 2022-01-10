@@ -101,10 +101,7 @@ export const App = () => {
               <Disconnect walletConnectService={wcs} setPopup={setPopup} />
             </>
           ): (
-            <>
-              <Text>Use your phone to connect a Provenance.io wallet</Text>
-              <Connect walletConnectService={wcs} setPopup={setPopup} />
-            </>
+            <Connect walletConnectService={wcs} setPopup={setPopup} />
           )}
         </Content>
         <QRCodeModal

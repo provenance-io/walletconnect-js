@@ -10,12 +10,12 @@ const Container = styled.div`
   max-width: 100%;
   align-items: center;
   justify-content: ${({ justify }) => justify };
-  margin-bottom: 30px;
+  ${({ noMargin }) => !noMargin && 'margin-bottom: 30px;' }
   box-shadow: 1px 1px 3px 1px ${({ color }) => color };
 `;
 
-export const ActionContainer = ({ children, color, justify, loading }) => (
-  <Container color={color} justify={justify} isLoading={loading}>{children}</Container>
+export const ActionContainer = ({ children, color, justify, loading, noMargin }) => (
+  <Container color={color} justify={justify} isLoading={loading} noMargin={noMargin}>{children}</Container>
 );
 
 ActionContainer.propTypes = {
@@ -23,10 +23,12 @@ ActionContainer.propTypes = {
   children: PropTypes.node,
   justify: PropTypes.string,
   loading: PropTypes.bool,
+  noMargin: PropTypes.bool,
 };
 ActionContainer.defaultProps = {
   color: '#42368E',
   children: null,
   justify: 'center',
   loading: false,
+  noMargin: false,
 };
