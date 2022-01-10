@@ -1,5 +1,6 @@
 export * from './activateRequest';
 export * from './addMarker';
+export * from './cancelRequest';
 export * from './connect';
 export * from './customAction';
 export * from './delegateHash';

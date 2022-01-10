@@ -3,6 +3,7 @@ import { WINDOW_MESSAGES } from '../consts';
 import {
   activateRequest as activateRequestMethod,
   addMarker as addMarkerMethod,
+  cancelRequest as cancelRequestMethod,
   connect as connectMethod,
   customAction as customActionMethod,
   delegateHash as delegateHashMethod,
@@ -24,6 +25,7 @@ const defaultState = {
   address: '',
   assets: [],
   assetsPending: false,
+  cancelRequestLoading: false,
   connected: false,
   connectionIat: '',
   connector: null,
@@ -49,6 +51,7 @@ const initialState = {
   address: existingWCState?.accounts && existingWCState.accounts[0] || defaultState.address,
   assets: defaultState.assets,
   assetsPending: defaultState.assetsPending,
+  cancelRequestLoading: defaultState.cancelRequestLoading,
   connected: defaultState.connected,
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connector: defaultState.connector,
@@ -162,6 +165,7 @@ export class WalletConnectService {
   // All Wallet Methods here
   // - Activate Request
   // - Add Marker
+  // - Cancel Request
   // - Connect
   // - CustomAction
   // - Delegate Hash
@@ -190,6 +194,17 @@ export class WalletConnectService {
     this.setState({ addMarkerLoading: false });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.ADD_MARKER_FAILED : WINDOW_MESSAGES.ADD_MARKER_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  };
+
+  cancelRequest = async (data) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ cancelRequestLoading: true });
+    const result = await cancelRequestMethod(this.state, data);
+    // No longer loading
+    this.setState({ cancelRequestLoading: false });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.CANCEL_REQUEST_FAILED : WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
   };
 
