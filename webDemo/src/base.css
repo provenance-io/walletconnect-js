@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700&family=Poppins:wght@700&display=swap');
 
 html {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", 
+  Helvetica, Arial, "Lucida Grande", sans-serif;
   font-size: 62.5%; /* =10px and will allow for all rem sizing to be easier, 1.4 rem => 14px*/
   color: #30323F;
 };

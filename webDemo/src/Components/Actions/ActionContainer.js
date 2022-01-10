@@ -7,7 +7,6 @@ const Container = styled.div`
   background: ${({ color, isLoading }) => isLoading ? '#CCCCCC' : `${color}50` };
   border-radius: 5px;
   display: flex;
-  width: 500px;
   max-width: 100%;
   align-items: center;
   justify-content: ${({ justify }) => justify };
