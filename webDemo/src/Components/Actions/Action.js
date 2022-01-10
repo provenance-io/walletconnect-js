@@ -4,29 +4,14 @@ import PropTypes from 'prop-types';
 import { Button, Input } from 'Components';
 import { ActionContainer } from './ActionContainer';
 
-const windowMessageLookup = (method) => {
-  let name = '';
-  switch (method) {
-    case 'connect': name = 'CONNECTED'; break;
-    case 'activateRequest': name = 'ACTIVATE_REQUEST'; break;
-    case 'addMarker': name = 'ADD_MARKER'; break;
-    case 'customAction': name = 'CUSTOM_ACTION'; break;
-    case 'delegateHash': name = 'DELEGATE_HASH'; break;
-    case 'disconnect': name = 'DISCONNECT'; break;
-    case 'signJWT': name = 'SIGN_JWT'; break;
-    case 'signMessage': name = 'SIGNATURE'; break;
-    case 'sendHash': name = 'TRANSACTION'; break;
-    default: break;
-  }
-  return [`${WINDOW_MESSAGES[`${name}_COMPLETE`]}`, `${WINDOW_MESSAGES[`${name}_FAILED`]}`]
-};
+const windowMessageLookup = (windowMessage) => [`${WINDOW_MESSAGES[`${windowMessage}_COMPLETE`]}`, `${WINDOW_MESSAGES[`${windowMessage}_FAILED`]}`];
 
-export const Action = ({ method, setPopup, fields, buttonTxt }) => {
+export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) => {
   const { walletConnectService, walletConnectState } = useWalletConnect();
   // Get loading state for specific method
   const loading = walletConnectState[`${method}Loading`];
   // Get complete and failed messages
-  const [windowMsgComplete, windowMsgFailed] = windowMessageLookup(method);
+  const [windowMsgComplete, windowMsgFailed] = windowMessageLookup(windowMessage);
   // Build state object from fields data (fields are an array of obj, see propTypes)
   const initialInputValues = {};
   fields.forEach(({ name, value }) => {initialInputValues[name] = value});
@@ -96,6 +81,7 @@ Action.propTypes = {
     })
   ),
   buttonTxt: PropTypes.string.isRequired,
+  windowMessage: PropTypes.string.isRequired,
 };
 
 Action.defaultProps = {

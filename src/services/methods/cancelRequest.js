@@ -1,23 +1,23 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import { MsgActivateRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
+import { MsgCancelRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 
-export const activateRequest = async (state, data) => {
+export const cancelRequest = async (state, data) => {
   const { connector, address } = state;
   const { denom, administrator } = data;
   const method = 'provenance_sendTransaction';
-  const description = 'Activate Request';
-  const protoMessage = 'provenance.marker.v1.MsgActivateRequest';
+  const description = 'Cancel Request';
+  const protoMessage = 'provenance.marker.v1.MsgCancelRequest';
 
   if (!connector) return { method, error: 'No wallet connected' };
 
-  const msgActivateRequest = new MsgActivateRequest();
-  msgActivateRequest.setDenom(denom);
-  msgActivateRequest.setAdministrator(administrator);
+  const msgCancelRequest = new MsgCancelRequest();
+  msgCancelRequest.setDenom(denom);
+  msgCancelRequest.setAdministrator(administrator);
 
   /* Convert the add marker message to any bytes for signing */
   const msgAny = new GoogleProtobufAnyPb.Any();
-  msgAny.pack(msgActivateRequest.serializeBinary(), protoMessage, '/');
+  msgAny.pack(msgCancelRequest.serializeBinary(), protoMessage, '/');
   const binary = String.fromCharCode(...msgAny.serializeBinary());
   const message = btoa(binary);
 
