@@ -17,9 +17,6 @@ const HomeContainer = styled.div`
   flex-direction: column;
   align-items: center;
   max-width: 100%;
-  background: #ffffff;
-  border-radius: 4px;
-  padding: 60px 30px;
   position: relative;
 `;
 const Header = styled.h1`
@@ -34,11 +31,14 @@ const Header = styled.h1`
 const Text = styled.p`
   font-size: 1.6rem;
   line-height: 3rem;
-  width: 100%;
   margin: 0;
 `;
 const Content = styled.div`
   width: 600px;
+  padding: 30px 50px;
+  border-radius: 4px;
+  background: #ffffff;
+  margin-bottom: 40px;
 `;
 
 export const App = () => {
