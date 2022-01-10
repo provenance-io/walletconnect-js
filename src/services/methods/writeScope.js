@@ -1,23 +1,25 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import { MsgActivateRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
+import { MsgWriteScopeRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/tx_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 
-export const activateRequest = async (state, data) => {
+export const writeScope = async (state, data) => {
   const { connector, address } = state;
-  const { denom, administrator } = data;
+  const { scope, signersList, scopeUuid, specUuid } = data;
   const method = 'provenance_sendTransaction';
-  const description = 'Activate Request';
-  const protoMessage = 'provenance.marker.v1.MsgActivateRequest';
+  const description = 'Write Scope';
+  const protoMessage = 'provenance.marker.v1.MsgWriteScopeRequest';
 
   if (!connector) return { method, error: 'No wallet connected' };
 
-  const msgActivateRequest = new MsgActivateRequest();
-  msgActivateRequest.setDenom(denom);
-  msgActivateRequest.setAdministrator(administrator);
+  const msgWriteScopeRequest = new MsgWriteScopeRequest();
+  msgWriteScopeRequest.setScope(scope);
+  msgWriteScopeRequest.setSignersList(signersList);
+  msgWriteScopeRequest.setScopeUuid(scopeUuid);
+  msgWriteScopeRequest.setSpecUuid(specUuid);
 
   /* Convert the add marker message to any bytes for signing */
   const msgAny = new GoogleProtobufAnyPb.Any();
-  msgAny.pack(msgActivateRequest.serializeBinary(), protoMessage, '/');
+  msgAny.pack(msgWriteScopeRequest.serializeBinary(), protoMessage, '/');
   const binary = String.fromCharCode(...msgAny.serializeBinary());
   const message = btoa(binary);
 

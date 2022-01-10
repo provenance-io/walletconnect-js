@@ -6,3 +6,4 @@ export * from './delegateHash';
 export * from './sendHash';
 export * from './signJWT';
 export * from './signMessage';
+export * from './writeScope';

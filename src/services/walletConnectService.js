@@ -9,6 +9,7 @@ import {
   sendHash as sendHashMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
+  writeScope as writeScopeMethod,
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage } from '../utils';
 
@@ -38,6 +39,7 @@ const defaultState = {
   signedJWT: '',
   signJWTLoading: false,
   signMessageLoading: false,
+  writeScopeLoading: false,
 };
 
 const initialState = {
@@ -62,6 +64,7 @@ const initialState = {
   signedJWT: defaultState.signedJWT,
   signJWTLoading: defaultState.signJWTLoading,
   signMessageLoading: defaultState.signMessageLoading,
+  writeScopeLoading: defaultState.writeScopeLoading,
 };
 
 export class WalletConnectService {
@@ -166,6 +169,7 @@ export class WalletConnectService {
   // - Send Hash
   // - Sign JWT
   // - Sign Message
+  // - Write Scope
   
   activateRequest = async (data) => {
     // Loading while we wait for mobile to respond
@@ -178,10 +182,10 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
   };
   
-  addMarker = async (txData) => {
+  addMarker = async (data) => {
     // Loading while we wait for mobile to respond
     this.setState({ addMarkerLoading: true });
-    const result = await addMarkerMethod(this.state, txData);
+    const result = await addMarkerMethod(this.state, data);
     // No longer loading
     this.setState({ addMarkerLoading: false });
     // Broadcast result of method
@@ -204,10 +208,10 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
   };
 
-  delegateHash = async (txData) => {
+  delegateHash = async (data) => {
     // Loading while we wait for mobile to respond
     this.setState({ delegateHashLoading: true });
-    const result = await delegateHashMethod(this.state, txData);
+    const result = await delegateHashMethod(this.state, data);
     // No longer loading
     this.setState({ delegateHashLoading: false });
     // Broadcast result of method
@@ -221,10 +225,10 @@ export class WalletConnectService {
     }
   };
 
-  sendHash = async (txData) => {
+  sendHash = async (data) => {
     // Loading while we wait for mobile to respond
     this.setState({ sendHashLoading: true });
-    const result = await sendHashMethod(this.state, txData);
+    const result = await sendHashMethod(this.state, data);
     // No longer loading
     this.setState({ sendHashLoading: false });
     // Broadcast result of method
@@ -254,4 +258,15 @@ export class WalletConnectService {
     const windowMessage = result.error ? WINDOW_MESSAGES.SIGNATURE_FAILED : WINDOW_MESSAGES.SIGNATURE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
   };
+
+  writeScope = async (data) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ writeScopeLoading: true });
+    const result = await writeScopeMethod(this.state, data);
+    // No longer loading
+    this.setState({ writeScopeLoading: false });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.WRITE_SCOPE_FAILED : WINDOW_MESSAGES.WRITE_SCOPE_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  }
 };
