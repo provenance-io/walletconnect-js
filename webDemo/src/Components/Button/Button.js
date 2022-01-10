@@ -4,12 +4,13 @@ import { Loading } from 'Components';
 
 const StyledButton = styled.button`
   flex-basis: ${({ width }) => width };
-  ${({ width }) => width === 'auto' && 'min-width: 100px' };
+  ${({ width }) => width === 'auto' && 'min-width: 150px' };
   align-items: center;
   background: ${({ color }) => color };
   white-space: nowrap;
   border-radius: 6px;
   border: 1px solid ${({ color }) => color };
+  text-shadow: 0 1px 0px rgba(0, 0, 0, 0.5), 0 -1px 0px rgba(0, 0, 0, 0.5), 1px 0 0px rgba(0, 0, 0, 0.5), -1px 0 0px rgba(0, 0, 0, 0.5);
   color: white;
   cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer' };
   display: flex;
@@ -17,8 +18,9 @@ const StyledButton = styled.button`
   letter-spacing: 0.07rem;
   transition: 250ms all;
   user-select: none;
-  font-size: 1.0rem;
+  font-size: 1.2rem;
   height: 40px;
+  padding: 0 30px;
   &:hover:not(:disabled) {
     filter: contrast(200%);
   }
@@ -71,7 +73,7 @@ Button.propTypes = {
 };
 Button.defaultProps = {
   className: '',
-  color: '#dddddd',
+  color: '#42368E',
   onClick: () => {},
   disabled: false,
   width: 'auto',

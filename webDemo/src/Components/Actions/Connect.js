@@ -24,7 +24,7 @@ export const Connect = ({ walletConnectService, setPopup }) => {
   }, [walletConnectService, setPopup]);
 
   return (
-    <ActionContainer color={color}>
+    <ActionContainer color={color} noMargin>
       <Info>Connect Wallet</Info>
       <Button width="20%" color={color} onClick={walletConnectService.connect}>Connect</Button>
     </ActionContainer>
