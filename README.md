@@ -30,7 +30,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - [writeScope](#writeScope)
 6. [walletConnectState](#walletConnectState)
 7. [Web App](#Web-App)
-8. [Clone LocalStorage](#Automatic-localSession%-copy)
+8. [Clone LocalStorage](#Automatic-localSession-copy)
 9. [WalletConnect-js Status](#Status)
 
 ## Installation
