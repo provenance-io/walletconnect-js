@@ -14,7 +14,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
 
 ## Table of Contents
 1. [Installation](#Installation)
-2. [Window messages](#WINDOW_MESSAGES)
+2. [Window messages](#Window-Messages)
 3. [WalletConnectContextProvider](#WalletConnectContextProvider)
 4. [useWalletConnect](#useWalletConnect)
 5. [walletConnectService](#walletConnectService)
@@ -46,7 +46,7 @@ Importable items:
 ```js
 import { WINDOW_MESSAGES, WalletConnectContextProvider, useWalletConnect } from '@provenanceio/walletconnect-js';
 ```
-## WINDOW_MESSAGES
+## Window Messages
 Each method will return a window message indicating whether it failed or was completed as well as the result
 
 *Note A: See `walletConnectService` for all `WINDOW_MESSAGES` based on method.*
