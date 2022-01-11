@@ -9,7 +9,7 @@ const windowMessageLookup = (windowMessage) => [`${WINDOW_MESSAGES[`${windowMess
 export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) => {
   const { walletConnectService, walletConnectState } = useWalletConnect();
   // Get loading state for specific method
-  const loading = walletConnectState[`${method}Loading`];
+  const loading = walletConnectState.loading === method;
   // Get complete and failed messages
   const [windowMsgComplete, windowMsgFailed] = windowMessageLookup(windowMessage);
   // Build state object from fields data (fields are an array of obj, see propTypes)
