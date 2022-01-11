@@ -20,54 +20,38 @@ const existingWCJSState = getFromLocalStorage('walletconnect-js');
 
 const defaultState = {
   account: '',
-  activateRequestLoading: false,
-  addMarkerLoading: false,
   address: '',
   assets: [],
   assetsPending: false,
-  cancelRequestLoading: false,
   connected: false,
   connectionIat: '',
   connector: null,
-  customActionLoading: false,
-  delegateHashLoading: false,
   figureConnected: false,
   newAccount: false,
+  loading: '',
   peer: {},
   publicKey: '',
   QRCode: '',
-  sendHashLoading: false,
   showQRCodeModal: false,
   signedJWT: '',
-  signJWTLoading: false,
-  signMessageLoading: false,
-  writeScopeLoading: false,
 };
 
 const initialState = {
   account: existingWCJSState.account || defaultState.account,
-  activateRequestLoading: defaultState.activateRequestLoading,
-  addMarkerLoading: defaultState.addMarkerLoading,
   address: existingWCState?.accounts && existingWCState.accounts[0] || defaultState.address,
   assets: defaultState.assets,
   assetsPending: defaultState.assetsPending,
-  cancelRequestLoading: defaultState.cancelRequestLoading,
   connected: defaultState.connected,
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connector: defaultState.connector,
-  customActionLoading: defaultState.customActionMethod,
-  delegateHashLoading: defaultState.delegateHashLoading,
   figureConnected: !!existingWCJSState.account && defaultState.connected,
+  loading: defaultState.loading,
   newAccount: existingWCJSState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
   publicKey: existingWCState?.accounts && existingWCState.accounts[1] || defaultState.publicKey,
   QRCode: defaultState.QRCode,
-  sendHashLoading: defaultState.sendHashLoading,
   showQRCodeModal: defaultState.showQRCodeModal,
   signedJWT: defaultState.signedJWT,
-  signJWTLoading: defaultState.signJWTLoading,
-  signMessageLoading: defaultState.signMessageLoading,
-  writeScopeLoading: defaultState.writeScopeLoading,
 };
 
 export class WalletConnectService {
@@ -177,10 +161,10 @@ export class WalletConnectService {
   
   activateRequest = async (data) => {
     // Loading while we wait for mobile to respond
-    this.setState({ activateRequestLoading: true });
+    this.setState({ loading: 'activateRequest' });
     const result = await activateRequestMethod(this.state, data);
     // No longer loading
-    this.setState({ activateRequestLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.ACTIVATE_REQUEST_FAILED : WINDOW_MESSAGES.ACTIVATE_REQUEST_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
@@ -188,10 +172,10 @@ export class WalletConnectService {
   
   addMarker = async (data) => {
     // Loading while we wait for mobile to respond
-    this.setState({ addMarkerLoading: true });
+    this.setState({ loading: 'addMarker' });
     const result = await addMarkerMethod(this.state, data);
     // No longer loading
-    this.setState({ addMarkerLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.ADD_MARKER_FAILED : WINDOW_MESSAGES.ADD_MARKER_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
@@ -199,10 +183,10 @@ export class WalletConnectService {
 
   cancelRequest = async (data) => {
     // Loading while we wait for mobile to respond
-    this.setState({ cancelRequestLoading: true });
+    this.setState({ loading: 'cancelRequest' });
     const result = await cancelRequestMethod(this.state, data);
     // No longer loading
-    this.setState({ cancelRequestLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.CANCEL_REQUEST_FAILED : WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
@@ -214,10 +198,10 @@ export class WalletConnectService {
 
   customAction = async (data) => {
     // Loading while we wait for mobile to respond
-    this.setState({ customActionLoading: true });
+    this.setState({ loading: 'customAction' });
     const result = await customActionMethod(this.state, data);
     // No longer loading
-    this.setState({ customActionLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.CUSTOM_ACTION_FAILED : WINDOW_MESSAGES.CUSTOM_ACTION_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
@@ -225,10 +209,10 @@ export class WalletConnectService {
 
   delegateHash = async (data) => {
     // Loading while we wait for mobile to respond
-    this.setState({ delegateHashLoading: true });
+    this.setState({ loading: 'delegateHash' });
     const result = await delegateHashMethod(this.state, data);
     // No longer loading
-    this.setState({ delegateHashLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.DELEGATE_HASH_FAILED : WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
@@ -242,10 +226,10 @@ export class WalletConnectService {
 
   sendHash = async (data) => {
     // Loading while we wait for mobile to respond
-    this.setState({ sendHashLoading: true });
+    this.setState({ loading: 'sendHash' });
     const result = await sendHashMethod(this.state, data);
     // No longer loading
-    this.setState({ sendHashLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.TRANSACTION_FAILED : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
@@ -253,10 +237,10 @@ export class WalletConnectService {
 
   signJWT = async () => {
     // Loading while we wait for mobile to respond
-    this.setState({ signJWTLoading: true });
+    this.setState({ loading: 'signJWT' });
     const result = await signJWTMethod(this.state);
     // No longer loading
-    this.setState({ signJWTLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.SIGN_JWT_FAILED : WINDOW_MESSAGES.SIGN_JWT_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
@@ -264,11 +248,11 @@ export class WalletConnectService {
 
   signMessage = async (customMessage) => {
     // Loading while we wait for mobile to respond
-    this.setState({ signMessageLoading: true });
+    this.setState({ loading: 'signMessage' });
     // Get result back from mobile actions and wc
     const result = await signMessageMethod(this.state, customMessage);
     // No longer loading
-    this.setState({ signMessageLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.SIGNATURE_FAILED : WINDOW_MESSAGES.SIGNATURE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
@@ -276,10 +260,10 @@ export class WalletConnectService {
 
   writeScope = async (data) => {
     // Loading while we wait for mobile to respond
-    this.setState({ writeScopeLoading: true });
+    this.setState({ loading: 'writeScope' });
     const result = await writeScopeMethod(this.state, data);
     // No longer loading
-    this.setState({ writeScopeLoading: false });
+    this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.WRITE_SCOPE_FAILED : WINDOW_MESSAGES.WRITE_SCOPE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
