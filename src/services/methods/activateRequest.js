@@ -2,9 +2,8 @@ import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MsgActivateRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 
-export const activateRequest = async (state, data) => {
+export const activateRequest = async (state, denom) => {
   const { connector, address } = state;
-  const { denom, administrator } = data;
   const method = 'provenance_sendTransaction';
   const description = 'Activate Request';
   const protoMessage = 'provenance.marker.v1.MsgActivateRequest';
@@ -13,7 +12,7 @@ export const activateRequest = async (state, data) => {
 
   const msgActivateRequest = new MsgActivateRequest();
   msgActivateRequest.setDenom(denom);
-  msgActivateRequest.setAdministrator(administrator);
+  msgActivateRequest.setAdministrator(address);
 
   /* Convert the add marker message to any bytes for signing */
   const msgAny = new GoogleProtobufAnyPb.Any();
@@ -43,6 +42,6 @@ export const activateRequest = async (state, data) => {
     // TODO verify transaction ID
     const valid = !!result
     // result is a hex encoded signature
-    return { method, valid, result, message, sendDetails: data };
+    return { method, valid, result, message, sendDetails: denom };
   } catch (error) { return { method, valid: false, error }; }
 };

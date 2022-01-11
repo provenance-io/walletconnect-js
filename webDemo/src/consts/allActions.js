@@ -12,14 +12,6 @@ export const ALL_ACTIONS = [
         label: 'Marker Denom',
         value: 'myNewMarker',
         placeholder: 'Enter Marker Denom',
-        width: '30%',
-      },
-      {
-        name: 'administrator',
-        label: 'Administrator',
-        value: 'tp194r5us3l3yg7rpwepn9c7awgcesp5kp84r5lye',
-        placeholder: 'Enter Administrator Address',
-        width: '70%',
       },
     ],
   },
@@ -60,19 +52,11 @@ export const ALL_ACTIONS = [
         label: 'Marker Denom',
         value: 'myNewMarker',
         placeholder: 'Enter Marker Denom',
-        width: '30%',
-      },
-      {
-        name: 'administrator',
-        label: 'Administrator',
-        value: 'tp194r5us3l3yg7rpwepn9c7awgcesp5kp84r5lye',
-        placeholder: 'Enter Administrator Address',
-        width: '70%',
       },
     ],
   },
   // ------------------------------
-  // Cancel Request Method/Action
+  // Custom Action Method/Action
   // ------------------------------
   {
     windowMessage: 'CUSTOM_ACTION',
