@@ -27,7 +27,7 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
 * `useWalletConnect` - React hook which contains `walletConnectService` and `walletConnectState`
   - `walletConnectService` - Holds all main methods and functions to use WalletConnect service
     - *Methods* (and messages for each)
-      - `cancelRequest({ denom: 'myMarker', administrator: 'tp121331223fdsdaf1234' })` - Cancel a request
+      - `cancelRequest({ denom: 'myMarker' })` - Cancel a request
         - `CANCEL_REQUEST_COMPLETE`, `CANCEL_REQUEST_FAILED`
       - `connect()` - Connect a WalletConnect wallet
         - `CONNECTED`
@@ -43,7 +43,7 @@ import { useWalletConnect, WalletConnectContextProvider, WINDOW_MESSAGES } from 
         - `DELEGATE_HASH_COMPLETE`, `DELEGATE_HASH_FAILED`
       - `addMarker({ denom: 'myMarker', amount: 100 })` - Add a marker
         - `ADD_MARKER_COMPLETE`, `ADD_MARKER_FAILED`
-      - `activateRequest({ denom: 'myMarker', administrator: 'tp121331223fdsdaf1234' })` - Activate a request
+      - `activateRequest({ denom: 'myMarker' })` - Activate a request
         - `ACTIVATE_REQUEST_COMPLETE`, `ACTIVATE_REQUEST_FAILED`
       - `writeScope({ scope, signersList, scopeUuid, specUuid })` - Write to a scope
         - `WRITE_SCOPE_COMPLETE`, `WRITE_SCOPE_FAILED`

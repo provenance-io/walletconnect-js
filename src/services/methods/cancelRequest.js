@@ -2,9 +2,8 @@ import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MsgCancelRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 
-export const cancelRequest = async (state, data) => {
+export const cancelRequest = async (state, denom) => {
   const { connector, address } = state;
-  const { denom, administrator } = data;
   const method = 'provenance_sendTransaction';
   const description = 'Cancel Request';
   const protoMessage = 'provenance.marker.v1.MsgCancelRequest';
@@ -13,7 +12,7 @@ export const cancelRequest = async (state, data) => {
 
   const msgCancelRequest = new MsgCancelRequest();
   msgCancelRequest.setDenom(denom);
-  msgCancelRequest.setAdministrator(administrator);
+  msgCancelRequest.setAdministrator(address);
 
   /* Convert the add marker message to any bytes for signing */
   const msgAny = new GoogleProtobufAnyPb.Any();
@@ -43,6 +42,6 @@ export const cancelRequest = async (state, data) => {
     // TODO verify transaction ID
     const valid = !!result
     // result is a hex encoded signature
-    return { method, valid, result, message, sendDetails: data };
+    return { method, valid, result, message, sendDetails: denom };
   } catch (error) { return { method, valid: false, error }; }
 };
