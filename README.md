@@ -29,8 +29,8 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - [signMessage](#signMessage)
     - [writeScope](#writeScope)
 6. [walletConnectState](#walletConnectState)
-7. [Web App](#WebApp)
-8. [Clone LocalStorage](#Automatic_localSession_copy)
+7. [Web App](#Web%20App)
+8. [Clone LocalStorage](#Automatic%20localSession%20copy)
 9. [WalletConnect-js Status](#Status)
 
 ## Installation
