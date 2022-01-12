@@ -144,6 +144,51 @@ export const ALL_ACTIONS = [
     ],
   },
   // ------------------------------
+  // Write Record Method/Action
+  // ------------------------------
+  {
+    windowMessage: 'WRITE_RECORD',
+    method: 'writeRecord',
+    buttonTxt: 'Write Record',
+    fields: [
+      {
+        name: 'record',
+        label: 'Record',
+        value: '{}',
+        placeholder: 'Enter Record',
+        width: '20%',
+      },
+      {
+        name: 'signersList',
+        label: 'Signers List',
+        value: '[]',
+        placeholder: 'Enter Signers List',
+        width: '20%',
+      },
+      {
+        name: 'sessionIdComponents',
+        label: 'Session Id Components',
+        value: '{}',
+        placeholder: 'Enter Session Id Components',
+        width: '20%',
+      },
+      {
+        name: 'contractSpecUuid',
+        label: 'Contract Spec Uuid',
+        value: '',
+        placeholder: 'Enter Contract Spec Uuid',
+        width: '20%',
+      },
+      {
+        name: 'partiesList',
+        label: 'Parties List',
+        value: '[{}]',
+        placeholder: 'Enter Parties List',
+        width: '20%',
+      },
+    ],
+  },
+  // ------------------------------
   // Write Scope Method/Action
   // ------------------------------
   {
@@ -170,6 +215,44 @@ export const ALL_ACTIONS = [
         label: 'Scope Uuid',
         value: '',
         placeholder: 'Enter Scope Uuid',
+        width: '25%',
+      },
+      {
+        name: 'specUuid',
+        label: 'Spec Uuid',
+        value: '',
+        placeholder: 'Enter Spec Uuid',
+        width: '25%',
+      },
+    ],
+  },
+  // ------------------------------
+  // Write Session Method/Action
+  // ------------------------------
+  {
+    windowMessage: 'WRITE_SESSION',
+    method: 'writeSession',
+    buttonTxt: 'Write Session',
+    fields: [
+      {
+        name: 'session',
+        label: 'Session',
+        value: '{}',
+        placeholder: 'Enter Session',
+        width: '25%',
+      },
+      {
+        name: 'signersList',
+        label: 'Signers List',
+        value: '[]',
+        placeholder: 'Enter Signers List',
+        width: '25%',
+      },
+      {
+        name: 'sessionIdComponents',
+        label: 'Session Id Components',
+        value: '{}',
+        placeholder: 'Enter Session Id Components',
         width: '25%',
       },
       {
