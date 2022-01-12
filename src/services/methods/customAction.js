@@ -6,13 +6,12 @@ export const customAction = async (state, data) => {
   
   if (!connector) return { method, error: 'No wallet connected' };
 
-  // encode message (hex)
+  // Convert metadata to json string
   const stringMetadata = JSON.stringify(metadata);
-  // Base64 decode into binary  
-  const binary = String.fromCharCode(...b64Message.serializeBinary());
-  const message = btoa(binary);
+  // Base64 decode
+  const decodedMsg = atob(b64Message);
   // encode message (hex)
-  const hexMsg = convertUtf8ToHex(message);
+  const hexMsg = convertUtf8ToHex(decodedMsg);
 
   // provenance_signTransaction params
   const msgParams = [stringMetadata, hexMsg];
@@ -30,6 +29,6 @@ export const customAction = async (state, data) => {
     const valid = !!result
 
     // result is a hex encoded signature
-    return { method, valid, result, message };
+    return { method, valid, result, decodedMsg };
   } catch (error) { return { method, valid: false, error }; }
 };
