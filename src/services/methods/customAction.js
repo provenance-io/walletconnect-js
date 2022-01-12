@@ -10,10 +10,9 @@ export const customAction = async (state, data) => {
   const stringMetadata = JSON.stringify(metadata);
   // Base64 decode
   const decodedMsg = atob(b64Message);
-  // encode message (hex)
+  // Convert to hex
   const hexMsg = convertUtf8ToHex(decodedMsg);
-
-  // provenance_signTransaction params
+  // Final message params
   const msgParams = [stringMetadata, hexMsg];
   try {
     // Custom Request
