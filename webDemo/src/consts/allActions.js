@@ -62,6 +62,7 @@ export const ALL_ACTIONS = [
     windowMessage: 'CUSTOM_ACTION',
     method: 'customAction',
     buttonTxt: 'Run Custom Action',
+    json: true,
     fields: [
       {
         name: 'data',
@@ -150,6 +151,7 @@ export const ALL_ACTIONS = [
     windowMessage: 'WRITE_RECORD',
     method: 'writeRecord',
     buttonTxt: 'Write Record',
+    json: true,
     fields: [
       {
         name: 'record',
@@ -190,34 +192,31 @@ export const ALL_ACTIONS = [
     windowMessage: 'WRITE_SCOPE',
     method: 'writeScope',
     buttonTxt: 'Write Scope',
+    json: true,
     fields: [
       {
         name: 'scope',
         label: 'Scope',
         value: 'myScope',
         placeholder: 'Enter Scope',
-        width: '25%',
       },
       {
         name: 'signersList',
         label: 'Signers List',
         value: '[]',
         placeholder: 'Enter Signers List',
-        width: '25%',
       },
       {
         name: 'scopeUuid',
         label: 'Scope Uuid',
         value: '',
         placeholder: 'Enter Scope Uuid',
-        width: '25%',
       },
       {
         name: 'specUuid',
         label: 'Spec Uuid',
         value: '',
         placeholder: 'Enter Spec Uuid',
-        width: '25%',
       },
     ],
   },
@@ -228,34 +227,31 @@ export const ALL_ACTIONS = [
     windowMessage: 'WRITE_SESSION',
     method: 'writeSession',
     buttonTxt: 'Write Session',
+    json: true,
     fields: [
       {
         name: 'session',
         label: 'Session',
         value: '{}',
         placeholder: 'Enter Session',
-        width: '25%',
       },
       {
         name: 'signersList',
         label: 'Signers List',
         value: '[]',
         placeholder: 'Enter Signers List',
-        width: '25%',
       },
       {
         name: 'sessionIdComponents',
         label: 'Session Id Components',
         value: '{}',
         placeholder: 'Enter Session Id Components',
-        width: '25%',
       },
       {
         name: 'specUuid',
         label: 'Spec Uuid',
         value: '',
         placeholder: 'Enter Spec Uuid',
-        width: '25%',
       },
     ],
   },

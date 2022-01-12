@@ -1,10 +1,21 @@
 import { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
 import PropTypes from 'prop-types';
 import { Button, Input } from 'Components';
 import { ActionContainer } from './ActionContainer';
 
-export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) => {
+const Note = styled.div`
+  flex-basis: 100%;
+  font-size: 1.3rem;
+  font-weight: 400;
+  margin-bottom: 20px;
+  color: #42368E;
+  font-style: italic;
+  text-align: center;
+`;
+
+export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage, json }) => {
   const { walletConnectService, walletConnectState } = useWalletConnect();
 
   // Get loading state for specific method
@@ -39,6 +50,10 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) =
   }, [walletConnectService, setPopup, windowMsgComplete, windowMsgFailed, method]);
 
   const changeInputValue = (name, value) => {
+    // Values all come in as strings or numbers.  If the 'json' flag is set to true it means
+    // values can come in as objects, arrays, numbers, booleans, or strings
+    // With json: true, we will combine all input values into a json string object,
+    // then we will convert it to an object on submit
     const newInputValues = {...inputValues};
     newInputValues[name] = value;
     setInputValues(newInputValues);
@@ -61,6 +76,7 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) =
 
   return (
     <ActionContainer loading={loading} inputCount={fields.length}>
+      {json && <Note>Note: This method demo requires all fields to be entered as JSON strings</Note>}
       {renderInputs()}
       <Button
         loading={loading}
@@ -75,6 +91,7 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) =
 Action.propTypes = {
   method: PropTypes.string.isRequired,
   setPopup: PropTypes.func.isRequired,
+  json: PropTypes.bool,
   fields: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string,
@@ -90,4 +107,5 @@ Action.propTypes = {
 
 Action.defaultProps = {
   fields: [],
+  json: false,
 };
