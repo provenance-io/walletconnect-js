@@ -158,6 +158,17 @@ React hook which contains `walletConnectService` and `walletConnectState`
       // message: string | 'My Custom Message'
       // WINDOW_MESSAGES: SIGNATURE_COMPLETE, SIGNATURE_FAILED
     ```
+  - #### writeRecord
+    Write to a record
+    ```js
+      walletConnectService.writeScope({ record, signersList, sessionIdComponents, contractSpecUuid, partiesList });
+      // record: object | {}
+      // signersList: array | []
+      // sessionIdComponents: object | {}
+      // contractSpecUuid: string | '867B-5309-J3NNY'
+      // partiesList: array(objects) | [{}]
+      // WINDOW_MESSAGES: WRITE_RECORD_COMPLETE, WRITE_RECORD_FAILED
+    ```
   - #### writeScope
     Write to a scope
     ```js
