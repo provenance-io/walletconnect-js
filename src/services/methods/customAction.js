@@ -1,7 +1,7 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 
 export const customAction = async (state, data) => {
-  const { message: rawMessage, metadata, method = 'provenance_sendTransaction' } = data;
+  const { message: b64Message, metadata, method = 'provenance_sendTransaction' } = data;
   const { connector } = state;
   
   if (!connector) return { method, error: 'No wallet connected' };
@@ -9,7 +9,7 @@ export const customAction = async (state, data) => {
   // encode message (hex)
   const stringMetadata = JSON.stringify(metadata);
   // Base64 decode into binary  
-  const binary = String.fromCharCode(...rawMessage.serializeBinary());
+  const binary = String.fromCharCode(...b64Message.serializeBinary());
   const message = btoa(binary);
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
