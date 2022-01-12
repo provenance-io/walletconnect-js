@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 const Container = styled.div`
-  padding: 20px;
+  padding: ${({ inputCount }) => inputCount ? '34px 20px 20px 20px' : '20px' };
   border: 2px solid ${({ color }) => color };
   background: ${({ color, isLoading }) => isLoading ? '#CCCCCC' : `${color}50` };
   border-radius: 5px;
@@ -12,10 +12,11 @@ const Container = styled.div`
   justify-content: ${({ justify }) => justify };
   ${({ noMargin }) => !noMargin && 'margin-bottom: 30px;' }
   box-shadow: 1px 1px 3px 1px ${({ color }) => color };
+  flex-wrap: ${({ inputCount }) => inputCount > 2 ? 'wrap' : 'nowrap'};
 `;
 
-export const ActionContainer = ({ children, color, justify, loading, noMargin }) => (
-  <Container color={color} justify={justify} isLoading={loading} noMargin={noMargin}>{children}</Container>
+export const ActionContainer = ({ children, color, justify, loading, noMargin, inputCount }) => (
+  <Container inputCount={inputCount} color={color} justify={justify} isLoading={loading} noMargin={noMargin}>{children}</Container>
 );
 
 ActionContainer.propTypes = {
@@ -24,6 +25,7 @@ ActionContainer.propTypes = {
   justify: PropTypes.string,
   loading: PropTypes.bool,
   noMargin: PropTypes.bool,
+  inputCount: PropTypes.number,
 };
 ActionContainer.defaultProps = {
   color: '#42368E',
@@ -31,4 +33,5 @@ ActionContainer.defaultProps = {
   justify: 'center',
   loading: false,
   noMargin: false,
+  inputCount: 0,
 };

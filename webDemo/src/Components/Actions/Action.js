@@ -4,18 +4,21 @@ import PropTypes from 'prop-types';
 import { Button, Input } from 'Components';
 import { ActionContainer } from './ActionContainer';
 
-const windowMessageLookup = (windowMessage) => [`${WINDOW_MESSAGES[`${windowMessage}_COMPLETE`]}`, `${WINDOW_MESSAGES[`${windowMessage}_FAILED`]}`];
-
 export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) => {
   const { walletConnectService, walletConnectState } = useWalletConnect();
+
   // Get loading state for specific method
   const loading = walletConnectState.loading === method;
+
   // Get complete and failed messages
-  const [windowMsgComplete, windowMsgFailed] = windowMessageLookup(windowMessage);
+  const windowMsgComplete = `${WINDOW_MESSAGES[`${windowMessage}_COMPLETE`]}`;
+  const windowMsgFailed = `${WINDOW_MESSAGES[`${windowMessage}_FAILED`]}`;
+
   // Build state object from fields data (fields are an array of obj, see propTypes)
   const initialInputValues = {};
   fields.forEach(({ name, value }) => {initialInputValues[name] = value});
   const [inputValues, setInputValues] = useState(initialInputValues);
+
   // Create all event listeners for this method
   useEffect(() => {
     // Delegate Hash Events
@@ -49,6 +52,7 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) =
       label={label}
       placeholder={placeholder}
       onChange={(value) => changeInputValue(name, value)}
+      bottomGap={fields.length > 2 ? true : undefined}
     />
   ));
 
@@ -56,7 +60,7 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage }) =
   const getSendData = () => Object.keys(inputValues).length > 1 ? inputValues : inputValues[Object.keys(inputValues)[0]];
 
   return (
-    <ActionContainer loading={loading}>
+    <ActionContainer loading={loading} inputCount={fields.length}>
       {renderInputs()}
       <Button
         loading={loading}
