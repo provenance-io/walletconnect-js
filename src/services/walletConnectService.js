@@ -11,6 +11,7 @@ import {
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
   writeScope as writeScopeMethod,
+  writeSession as writeSessionMethod,
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage } from '../utils';
 
@@ -158,6 +159,7 @@ export class WalletConnectService {
   // - Sign JWT
   // - Sign Message
   // - Write Scope
+  // - Write Session
   
   activateRequest = async (data) => {
     // Loading while we wait for mobile to respond
@@ -267,5 +269,16 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.WRITE_SCOPE_FAILED : WINDOW_MESSAGES.WRITE_SCOPE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
-  }
+  };
+  
+  writeSession = async (data) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ loading: 'writeSession' });
+    const result = await writeSessionMethod(this.state, data);
+    // No longer loading
+    this.setState({ loading: '' });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.WRITE_SESSION_FAILED : WINDOW_MESSAGES.WRITE_SESSION_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  };
 };
