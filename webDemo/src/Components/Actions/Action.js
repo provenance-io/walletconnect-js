@@ -50,10 +50,6 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage, jso
   }, [walletConnectService, setPopup, windowMsgComplete, windowMsgFailed, method]);
 
   const changeInputValue = (name, value) => {
-    // Values all come in as strings or numbers.  If the 'json' flag is set to true it means
-    // values can come in as objects, arrays, numbers, booleans, or strings
-    // With json: true, we will combine all input values into a json string object,
-    // then we will convert it to an object on submit
     const newInputValues = {...inputValues};
     newInputValues[name] = value;
     setInputValues(newInputValues);
@@ -72,7 +68,31 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage, jso
   ));
 
   // If we only have a single, send the value it without the key (as itself, non obj)
-  const getSendData = () => Object.keys(inputValues).length > 1 ? inputValues : inputValues[Object.keys(inputValues)[0]];
+  const getSendData = () => {
+    const inputKeys = Object.keys(inputValues);
+    const jsonInputFilled = inputValues?.json;
+    const multipleInputs = inputKeys.length > 1 && !jsonInputFilled;
+    // When json, parse the data before submitting
+    if (json) {
+      if (multipleInputs) {
+        // Convert all data away from json string
+        const parsedData = { ...inputValues };
+        const parsedDataKeys = Object.keys(parsedData);
+        parsedDataKeys.forEach(key => {
+          const value = parsedData[key];
+          const destringValue = value.substring(1, value.length-1);
+          parsedData[key] = JSON.parse(destringValue);
+        });
+        return parsedData;
+      } 
+      // Return first item parsed (first item is either json, or customAction json)
+      const firstValue = inputValues[inputKeys[0]];
+      const destringFirstValue = firstValue.substring(1, firstValue.length-1);
+      return JSON.parse(destringFirstValue);
+    }
+    // If we just have a single input, we don't need the key, just submit with the first key value (non object)
+    return multipleInputs ? inputValues : inputValues[inputKeys[0]];
+  }
 
   return (
     <ActionContainer loading={loading} inputCount={fields.length}>

@@ -1,15 +1,23 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MsgWriteRecordRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/tx_pb";
+import { Record, Process, RecordInput, RecordOutput } from '@provenanceio/wallet-lib/lib/proto/provenance/metadata/v1/scope_pb';
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 
 export const writeRecord = async (state, data) => {
   const { connector, address } = state;
   const {
-    record,
+    recordName,
+    processName,
+    processHash,
+    processMethod = '',
+    sessionId,
     signersList,
     sessionIdComponents,
     contractSpecUuid,
     partiesList,
+    recordInputType,
+    recordOutputHash,
+    recordOutputStatus,
   } = data;
   const method = 'provenance_sendTransaction';
   const description = 'Write Session';
@@ -28,8 +36,14 @@ export const writeRecord = async (state, data) => {
         - hash [string]
         - name [string]
         - method [string]
-      - inputsList [array]
-      - outputsList [array]
+      - inputsList [array[object]]
+        - name: string,
+        - recordId: string,
+        - hash: string,
+        - status: string
+      - outputsList [array[object]]
+        - hash: string,
+        - status: string,
       - specificationId [string]
     setSignersList [array]
     setSessionIdComponents [object]
@@ -41,6 +55,29 @@ export const writeRecord = async (state, data) => {
       - address [string]
       - role [string]
   */
+    
+    // Build process
+    const process = new Process();
+    process.setAddress(address);
+    process.setHash(processHash);
+    process.setName(processName);
+    process.method(processMethod);
+    // Build RecordInput
+    const recordInput = new RecordInput();
+    recordInput.setName(recordName);
+    recordInput.setTypeName(recordInputType);
+    // Build RecordOutput
+    const recordOutput = new RecordOutput();
+    recordOutput.setHash(recordOutputHash);
+    recordOutput.setStatus(recordOutputStatus);
+    // Build record
+    const record = new Record();
+    record.setName(recordName);
+    record.setSessionId(sessionId);
+    record.setProcess(process);
+    record.setOutputsList(recordOutput);
+    record.setInputsList(recordInput);
+
     msgWriteRecordRequest.setRecord(record);
     msgWriteRecordRequest.setSignersList(signersList);
     msgWriteRecordRequest.setSessionIdComponents(sessionIdComponents);

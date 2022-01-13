@@ -154,6 +154,12 @@ export const ALL_ACTIONS = [
     json: true,
     fields: [
       {
+        name: 'json',
+        label: 'Full JSON (Optional)',
+        value: '',
+        placeholder: 'Optional full JSON',
+      },
+      {
         name: 'record',
         label: 'Record',
         value: '{}',
@@ -195,6 +201,12 @@ export const ALL_ACTIONS = [
     json: true,
     fields: [
       {
+        name: 'json',
+        label: 'Full JSON (Optional)',
+        value: '',
+        placeholder: 'Optional full JSON',
+      },
+      {
         name: 'scope',
         label: 'Scope',
         value: 'myScope',
@@ -230,6 +242,12 @@ export const ALL_ACTIONS = [
     json: true,
     fields: [
       {
+        name: 'json',
+        label: 'Full JSON (Optional)',
+        value: '',
+        placeholder: 'Optional full JSON',
+      },
+      {
         name: 'session',
         label: 'Session',
         value: '{}',
@@ -252,7 +270,7 @@ export const ALL_ACTIONS = [
         label: 'Spec Uuid',
         value: '',
         placeholder: 'Enter Spec Uuid',
-      },
+      }
     ],
   },
 ];
