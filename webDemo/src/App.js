@@ -75,7 +75,7 @@ export const App = () => {
   dropdownOptions.sort();
   dropdownOptions.unshift('Select Method/Action...');
 
-  const renderActions = () => ALL_ACTIONS.map(({ method, fields, buttonTxt, windowMessage }) => activeMethod === method ? (
+  const renderActions = () => ALL_ACTIONS.map(({ method, fields, buttonTxt, windowMessage, json }) => activeMethod === method ? (
     <Action
       key={method}
       method={method}
@@ -83,6 +83,7 @@ export const App = () => {
       fields={fields}
       buttonTxt={buttonTxt}
       windowMessage={windowMessage}
+      json={json}
     />
   ) : null);
 

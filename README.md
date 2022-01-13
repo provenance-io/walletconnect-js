@@ -28,6 +28,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - [signJWT](#signJWT)
     - [signMessage](#signMessage)
     - [writeScope](#writeScope)
+    - [writeSession](#writeSession)
 6. [walletConnectState](#walletConnectState)
 7. [Web App](#Web-App)
 8. [Clone LocalStorage](#Automatic-localSession-copy)
@@ -157,6 +158,17 @@ React hook which contains `walletConnectService` and `walletConnectState`
       // message: string | 'My Custom Message'
       // WINDOW_MESSAGES: SIGNATURE_COMPLETE, SIGNATURE_FAILED
     ```
+  - #### writeRecord
+    Write to a record
+    ```js
+      walletConnectService.writeScope({ record, signersList, sessionIdComponents, contractSpecUuid, partiesList });
+      // record: object | {}
+      // signersList: array | []
+      // sessionIdComponents: object | {}
+      // contractSpecUuid: string | '867B-5309-J3NNY'
+      // partiesList: array(objects) | [{}]
+      // WINDOW_MESSAGES: WRITE_RECORD_COMPLETE, WRITE_RECORD_FAILED
+    ```
   - #### writeScope
     Write to a scope
     ```js
@@ -166,6 +178,16 @@ React hook which contains `walletConnectService` and `walletConnectState`
       // scopeUuid: string | 'A8675-309-867A'
       // specUuid: string | '867B-5309-J3NNY'
       // WINDOW_MESSAGES: WRITE_SCOPE_COMPLETE, WRITE_SCOPE_FAILED
+    ```
+  - #### writeSession
+    Write to a session
+    ```js
+      walletConnectService.writeSession({ session, signersList, sessionIdComponents, specUuid });
+      // session: object | {}
+      // signersList: array | []
+      // sessionIdComponents: object | {}
+      // specUuid: string | '867B-5309-J3NNY'
+      // WINDOW_MESSAGES: WRITE_SESSION_COMPLETE, WRITE_SESSION_FAILED
     ```
 
 ## walletConnectState

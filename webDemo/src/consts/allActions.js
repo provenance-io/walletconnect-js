@@ -62,6 +62,7 @@ export const ALL_ACTIONS = [
     windowMessage: 'CUSTOM_ACTION',
     method: 'customAction',
     buttonTxt: 'Run Custom Action',
+    json: true,
     fields: [
       {
         name: 'data',
@@ -144,41 +145,132 @@ export const ALL_ACTIONS = [
     ],
   },
   // ------------------------------
-  // Write Scope Method/Action
+  // Write Record Method/Action
   // ------------------------------
   {
-    windowMessage: 'WRITE_SCOPE',
-    method: 'writeScope',
-    buttonTxt: 'Write Scope',
+    windowMessage: 'WRITE_RECORD',
+    method: 'writeRecord',
+    buttonTxt: 'Write Record',
+    json: true,
     fields: [
       {
-        name: 'scope',
-        label: 'Scope',
-        value: 'myScope',
-        placeholder: 'Enter Scope',
-        width: '25%',
+        name: 'json',
+        label: 'Full JSON (Optional)',
+        value: '',
+        placeholder: 'Optional full JSON',
+      },
+      {
+        name: 'record',
+        label: 'Record',
+        value: '{}',
+        placeholder: 'Enter Record',
       },
       {
         name: 'signersList',
         label: 'Signers List',
         value: '[]',
         placeholder: 'Enter Signers List',
-        width: '25%',
+      },
+      {
+        name: 'sessionIdComponents',
+        label: 'Session Id Components',
+        value: '{}',
+        placeholder: 'Enter Session Id Components',
+      },
+      {
+        name: 'contractSpecUuid',
+        label: 'Contract Spec Uuid',
+        value: '',
+        placeholder: 'Enter Contract Spec Uuid',
+      },
+      {
+        name: 'partiesList',
+        label: 'Parties List',
+        value: '[{}]',
+        placeholder: 'Enter Parties List',
+      },
+    ],
+  },
+  // ------------------------------
+  // Write Scope Method/Action
+  // ------------------------------
+  {
+    windowMessage: 'WRITE_SCOPE',
+    method: 'writeScope',
+    buttonTxt: 'Write Scope',
+    json: true,
+    fields: [
+      {
+        name: 'json',
+        label: 'Full JSON (Optional)',
+        value: '',
+        placeholder: 'Optional full JSON',
+      },
+      {
+        name: 'scope',
+        label: 'Scope',
+        value: 'myScope',
+        placeholder: 'Enter Scope',
+      },
+      {
+        name: 'signersList',
+        label: 'Signers List',
+        value: '[]',
+        placeholder: 'Enter Signers List',
       },
       {
         name: 'scopeUuid',
         label: 'Scope Uuid',
         value: '',
         placeholder: 'Enter Scope Uuid',
-        width: '25%',
       },
       {
         name: 'specUuid',
         label: 'Spec Uuid',
         value: '',
         placeholder: 'Enter Spec Uuid',
-        width: '25%',
       },
+    ],
+  },
+  // ------------------------------
+  // Write Session Method/Action
+  // ------------------------------
+  {
+    windowMessage: 'WRITE_SESSION',
+    method: 'writeSession',
+    buttonTxt: 'Write Session',
+    json: true,
+    fields: [
+      {
+        name: 'json',
+        label: 'Full JSON (Optional)',
+        value: '',
+        placeholder: 'Optional full JSON',
+      },
+      {
+        name: 'session',
+        label: 'Session',
+        value: '{}',
+        placeholder: 'Enter Session',
+      },
+      {
+        name: 'signersList',
+        label: 'Signers List',
+        value: '[]',
+        placeholder: 'Enter Signers List',
+      },
+      {
+        name: 'sessionIdComponents',
+        label: 'Session Id Components',
+        value: '{}',
+        placeholder: 'Enter Session Id Components',
+      },
+      {
+        name: 'specUuid',
+        label: 'Spec Uuid',
+        value: '',
+        placeholder: 'Enter Spec Uuid',
+      }
     ],
   },
 ];

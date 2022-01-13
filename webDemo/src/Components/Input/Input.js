@@ -5,6 +5,9 @@ const InputContainer = styled.div`
   position: relative;
   flex-basis: ${({ width }) => width};
   display: flex;
+  ${({ bottomGap }) => bottomGap && `
+    margin-bottom: 36px;
+  ` }
 `;
 const StyledInput = styled.input`
   padding: 4px 10px;
@@ -14,17 +17,18 @@ const StyledInput = styled.input`
   border-radius: 0;
   margin-right: 4px;
   border: 1px solid #DDDDDD;
+  border-radius: 4px;
 `;
 const Label = styled.label`
   font-size: 1.0rem;
   font-weight: 700;
   position: absolute;
-  top: -16px;
+  top: -20px;
   left: 0;
 `;
 
-const Input = ({ className, label, value, onChange, placeholder, width }) => (
-  <InputContainer width={width} className={className}>
+const Input = ({ className, label, value, onChange, placeholder, width, bottomGap }) => (
+  <InputContainer width={width} className={className} bottomGap={bottomGap}>
     {label && <Label>{label}</Label>}
     <StyledInput
       value={value}
@@ -41,6 +45,7 @@ Input.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   placeholder: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  bottomGap: PropTypes.bool,
 };
 Input.defaultProps = {
   className: '',
@@ -49,6 +54,7 @@ Input.defaultProps = {
   value: '',
   onChange: () => {},
   placeholder: 'Enter Value',
+  bottomGap: false,
 };
 
 export default Input;

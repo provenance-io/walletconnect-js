@@ -10,7 +10,9 @@ import {
   sendHash as sendHashMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
+  writeRecord as writeRecordMethod,
   writeScope as writeScopeMethod,
+  writeSession as writeSessionMethod,
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage } from '../utils';
 
@@ -157,7 +159,9 @@ export class WalletConnectService {
   // - Send Hash
   // - Sign JWT
   // - Sign Message
+  // - Write Record
   // - Write Scope
+  // - Write Session
   
   activateRequest = async (data) => {
     // Loading while we wait for mobile to respond
@@ -258,6 +262,17 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
   };
 
+  writeRecord = async (data) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ loading: 'writeRecord' });
+    const result = await writeRecordMethod(this.state, data);
+    // No longer loading
+    this.setState({ loading: '' });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.WRITE_RECORD_FAILED : WINDOW_MESSAGES.WRITE_RECORD_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  };
+  
   writeScope = async (data) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'writeScope' });
@@ -267,5 +282,16 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.WRITE_SCOPE_FAILED : WINDOW_MESSAGES.WRITE_SCOPE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
-  }
+  };
+  
+  writeSession = async (data) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ loading: 'writeSession' });
+    const result = await writeSessionMethod(this.state, data);
+    // No longer loading
+    this.setState({ loading: '' });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.WRITE_SESSION_FAILED : WINDOW_MESSAGES.WRITE_SESSION_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  };
 };
