@@ -14,9 +14,9 @@ export const customAction = async (state, data) => {
 
 
   // Base64 decode
-  const decodedMsg = atob(b64Message);
+  // const decodedMsg = atob(b64Message);
   // Convert to hex
-  const hexMsg = convertUtf8ToHex(decodedMsg);
+  const hexMsg = convertUtf8ToHex(b64Message);
   // Build metadata
   const metadata = JSON.stringify({
     description,
@@ -38,6 +38,6 @@ export const customAction = async (state, data) => {
     const valid = !!result
 
     // result is a hex encoded signature
-    return { method, valid, result, decodedMsg };
+    return { method, valid, result, b64Message };
   } catch (error) { return { method, valid: false, error }; }
 };
