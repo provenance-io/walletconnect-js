@@ -62,13 +62,24 @@ export const ALL_ACTIONS = [
     windowMessage: 'CUSTOM_ACTION',
     method: 'customAction',
     buttonTxt: 'Run Custom Action',
-    json: true,
     fields: [
       {
-        name: 'data',
-        label: 'Custom Data',
+        name: 'description',
+        label: 'Wallet message description',
         value: '',
-        placeholder: 'Enter Custom Data',
+        placeholder: 'Enter custom action description'
+      },
+      {
+        name: 'method',
+        label: 'Message method',
+        value: 'provenance_sendTransaction',
+        placeholder: 'Enter the message method'
+      },
+      {
+        name: 'message',
+        label: 'Base64 Encoded Message',
+        value: '',
+        placeholder: 'Enter Base64 Encoded Message',
       },
     ],
   },
