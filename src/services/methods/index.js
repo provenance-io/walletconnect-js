@@ -7,6 +7,3 @@ export * from './delegateHash';
 export * from './sendHash';
 export * from './signJWT';
 export * from './signMessage';
-export * from './writeRecord';
-export * from './writeScope';
-export * from './writeSession';
