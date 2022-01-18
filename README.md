@@ -22,13 +22,12 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - [addMarker](#addMarker)
     - [cancelRequest](#cancelRequest)
     - [connect](#connect)
+    - [customAction](#customAction)
     - [delegateHash](#delegateHash)
     - [disconnect](#disconnect)
     - [sendHash](#sendHash)
     - [signJWT](#signJWT)
     - [signMessage](#signMessage)
-    - [writeScope](#writeScope)
-    - [writeSession](#writeSession)
 6. [walletConnectState](#walletConnectState)
 7. [Web App](#Web-App)
 8. [Clone LocalStorage](#Automatic-localSession-copy)
@@ -99,96 +98,97 @@ React hook which contains `walletConnectService` and `walletConnectState`
     Activate a request
     ```js
       walletConnectService.activateRequest(denom);
-      // denom: string | 'My_Special_Marker'
       // WINDOW_MESSAGES: ACTIVATE_REQUEST_COMPLETE, ACTIVATE_REQUEST_FAILED
     ```
+    | Param 	| Type   	| Required 	| Default 	| Example               	| Info                  	|
+    |-------	|--------	|----------	|---------	|-----------------------	|-----------------------	|
+    | denom 	| string 	| yes      	| -       	| `'My_Special_Marker'` 	| Title of denomination 	|
+
   - #### addMarker
     Add a marker
     ```js
       walletConnectService.addMarker({ denom, amount });
-      // denom: string | 'My_Special_Marker'
-      // amount: number | 10
       // WINDOW_MESSAGES: ADD_MARKER_COMPLETE, ADD_MARKER_FAILED
     ```
+    | Param  	| Type   	| Required 	| Default 	| Example               	| Info                   	|
+    |--------	|--------	|----------	|---------	|-----------------------	|------------------------	|
+    | denom  	| string 	| yes      	| -       	| `'My_Special_Marker'` 	| Title of denomination  	|
+    | amount 	| number 	| yes      	| -       	| `10`                  	| Amount of denomination 	|
+
   - #### cancelRequest
     Cancels a request
     ```js
       walletConnectService.cancelRequest(denom);
-      // denom: string | 'My_Special_Marker'
       // WINDOW_MESSAGES: CANCEL_REQUEST_COMPLETE, CANCEL_REQUEST_FAILED
     ```
+    | Param 	| Type   	| Required 	| Default 	| Example               	| Info                  	|
+    |-------	|--------	|----------	|---------	|-----------------------	|-----------------------	|
+    | denom 	| string 	| yes      	| -       	| `'My_Special_Marker'` 	| Title of denomination 	|
+
   - #### connect
     Connect a WalletConnect wallet
     ```js
       walletConnectService.connect();
       // WINDOW_MESSAGE: CONNECTED
     ```
+
+  - #### customAction
+    Pass through a custom base64 encoded message
+    ```js
+      walletConnectService.customAction({ message, description, method });
+      // WINDOW_MESSAGES: CUSTOM_ACTION_COMPLETE, CUSTOM_ACTION_FAILED
+    ```
+    | Param       	| Type   	| Required 	| Default                        	| Example                        	| Info                                  	|
+    |-------------	|--------	|----------	|--------------------------------	|--------------------------------	|---------------------------------------	|
+    | message     	| string 	| yes      	| -                              	| `'CiwvcHJvdmVuYW5jZS5tZX...'`  	| B64 encoded Message to pass to wallet 	|
+    | description 	| string 	| no       	| `'Custom Action'`              	| `'My Custom Action'`           	| Prompt title on mobile wallet         	|
+    | method      	| string 	| no       	| `'provenance_sendTransaction'` 	| `'provenance_sendTransaction'` 	| Message method                        	|
+
   - #### delegateHash
     Delegate a custom amount of Hash token to a custom address
     ```js
       walletConnectService.delegateHash({ to, amount });
-      // to: string | 'tpa1b23'
-      // amount: number | 10
       // WINDOW_MESSAGES: DELEGATE_HASH_COMPLETE, DELEGATE_HASH_FAILED
     ```
+    | Param  	| Type   	| Required 	| Default 	| Example        	| Info                  	|
+    |--------	|--------	|----------	|---------	|----------------	|-----------------------	|
+    | to     	| string 	| yes      	| -       	| `'tpa1b23...'` 	| Target wallet address 	|
+    | amount 	| number 	| yes      	| -       	| `10`           	| Amount to use         	|
+
   - #### disconnect
     Disconnect current session
     ```js
       walletConnectService.disconnect();
       // WINDOW_MESSAGE: DISCONNECT
     ```
+
   - #### sendHash
     Send a custom amount of Hash token to a custom address
     ```js
       walletConnectService.sendHash({ to, amount });
-      // to: string | 'tpa1b23'
-      // amount: number | 10
       // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
     ```
+    | Param  	| Type   	| Required 	| Default 	| Example        	| Info                  	|
+    |--------	|--------	|----------	|---------	|----------------	|-----------------------	|
+    | to     	| string 	| yes      	| -       	| `'tpa1b23...'` 	| Target wallet address 	|
+    | amount 	| number 	| yes      	| -       	| `10`           	| Amount to use         	|
+
   - #### signJWT
     Prompt user to sign a generated JWT
     ```js
       walletConnectService.signJWT();
       // WINDOW_MESSAGES: SIGN_JWT_COMPLETE, SIGN_JWT_FAILED
     ```
+
   - #### signMessage
     Prompt user to sign a custom message
     ```js
       walletConnectService.signMessage(message);
-      // message: string | 'My Custom Message'
       // WINDOW_MESSAGES: SIGNATURE_COMPLETE, SIGNATURE_FAILED
     ```
-  - #### writeRecord
-    Write to a record
-    ```js
-      walletConnectService.writeScope({ record, signersList, sessionIdComponents, contractSpecUuid, partiesList });
-      // record: object | {}
-      // signersList: array | []
-      // sessionIdComponents: object | {}
-      // contractSpecUuid: string | '867B-5309-J3NNY'
-      // partiesList: array(objects) | [{}]
-      // WINDOW_MESSAGES: WRITE_RECORD_COMPLETE, WRITE_RECORD_FAILED
-    ```
-  - #### writeScope
-    Write to a scope
-    ```js
-      walletConnectService.writeScope({ scope, signersList, scopeUuid, specUuid });
-      // scope: object | {}
-      // signersList: array | []
-      // scopeUuid: string | 'A8675-309-867A'
-      // specUuid: string | '867B-5309-J3NNY'
-      // WINDOW_MESSAGES: WRITE_SCOPE_COMPLETE, WRITE_SCOPE_FAILED
-    ```
-  - #### writeSession
-    Write to a session
-    ```js
-      walletConnectService.writeSession({ session, signersList, sessionIdComponents, specUuid });
-      // session: object | {}
-      // signersList: array | []
-      // sessionIdComponents: object | {}
-      // specUuid: string | '867B-5309-J3NNY'
-      // WINDOW_MESSAGES: WRITE_SESSION_COMPLETE, WRITE_SESSION_FAILED
-    ```
+    | Param   	| Type   	| Required 	| Default 	| Example               	| Info                   	|
+    |---------	|--------	|----------	|---------	|-----------------------	|------------------------	|
+    | message 	| string 	| yes      	| -       	| `'My Custom Message'` 	| String message to send 	|
 
 ## walletConnectState
   - Holds current walletconnect-js state values

@@ -61,6 +61,7 @@ export const App = () => {
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const {
     address,
+    publicKey,
     connected,
     peer,
   } = walletConnectState;
@@ -98,6 +99,7 @@ export const App = () => {
             <>
               {peer?.name && <Text>Wallet: {peer.url ? <a href={peer.url} target="_blank" rel="noreferrer">{peer.name}</a> : peer.name}</Text>}
               <Text>Address: <a href={`https://explorer.provenance.io/accounts/${address}`} target="_blank" rel="noreferrer">{address}</a></Text>
+              {publicKey && <Text>Public Key (B64Url): {publicKey}</Text>}
               <Text>Select an action:</Text>
               <Dropdown name="actions" options={dropdownOptions} onChange={setActiveMethod} value={activeMethod} />
               {renderActions()}
