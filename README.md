@@ -30,8 +30,10 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - [signMessage](#signMessage)
 6. [walletConnectState](#walletConnectState)
 7. [Web App](#Web-App)
-8. [Clone LocalStorage](#Automatic-localSession-copy)
-9. [WalletConnect-js Status](#Status)
+8. [Non React Setup](#Non-React-Setup)
+9. [Webpack 5 Issues](#Webpack-5-Issues)
+10. [Clone LocalStorage](#Automatic-localSession-copy)
+11. [WalletConnect-js Status](#Status)
 
 ## Installation
 
@@ -204,8 +206,8 @@ React hook which contains `walletConnectService` and `walletConnectState`
       loading: '', // Are any methods currently loading/pending [string]
       newAccount: false, // Is this a newly created account
       peer: {}, // Connected wallet info [object]
-      publicKey: '', // Wallet public key
-      QRCode: '', // QR Code to connect to WalletConnect bridge [string]
+      publicKey: '', // Wallet public key (base64url encoded)
+      QRCode: '', // QRCode image data to connect to WalletConnect bridge [string]
       showQRCodeModal: false, // Should the QR modal be open [bool]
       signedJWT: '', // Signed JWT token [string]
     }
@@ -219,6 +221,83 @@ To see how to initiate and run the webDemo, look through the [webDemo README.md]
     1) Pull down the latest `walletconnect-js`.
     2) Run `npm i` to install all the required node packages
     3) Run `npm run start` to launch a localhost demo, live updates take place on each page reload.
+
+## Non React Setup
+This package works without react and with any other javascipt library/framework (tested with vanilla js)
+
+There are a few differences in getting setup and running:
+  1) Note [Webpack 5 Issues](#Webpack-5-Issues)
+  2) When connecting, you will need to manually generate the QR code image element (Component is only available to React.js apps)
+  - Pull `QRCode` from `WalletConnectService` state
+  - Use `QRCode` as image element `src`
+    ```js
+    const walletConnectService = new WalletConnectService();
+    const QRCodeData = walletConnectService.state.QRCode;
+    const QRImage = document.createElement('img');
+    QRImage.src = QRCodeData;
+
+    return QRImage;
+    ```
+  3) Don't forget to set up event and loading listeners.
+  
+## Webpack 5 Issues
+If you are on Webpack version 5+ (Note: Create React App 5+ uses Webpack 5+) then you will likely encounter a message like this:
+
+```
+BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+```
+
+To fix this issue, add the following plugins and module rules to your `webpack.config.js` (Note, having `file-loader` allows for svg logos to load):
+```js
+const webpack = require('webpack');
+...
+module.exports = {
+  ...
+  plugins: [
+    ...
+    // Work around for Buffer is undefined:
+    // https://github.com/webpack/changelog-v5/issues/10
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
+    new webpack.ProvidePlugin({
+        process: 'process/browser',
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.js'],
+    fallback: {
+      crypto: require.resolve('crypto-browserify'),
+      buffer: require.resolve("buffer/"),
+      util: require.resolve("util/"),
+      stream: require.resolve("stream-browserify")
+    },
+  },
+};
+```
+Next, make sure to have the following packages added into your `package.json` dependencies or devDependencies list:
+
+```json
+  "buffer",
+  "crypto-browserify",
+  "file-loader",
+  "process",
+  "stream-browserify",
+  "util"
+```
 
 ## Automatic localSession copy
 Copy `window.localStorage` values from one site to another (mainly, to `localHost`)
