@@ -113,6 +113,7 @@ const changeBridgeUrl = (value) => {
             </>
           ): (
             <>
+              <Text>Target Bridge:</Text>
               <Dropdown name="bridgeUrl" startEmpty={false} options={BRIDGE_URLS} onChange={changeBridgeUrl} value={bridgeUrl} />
               <Connect walletConnectService={wcs} setPopup={setPopup} />
             </>
@@ -123,7 +124,7 @@ const changeBridgeUrl = (value) => {
           walletConnectState={walletConnectState}
           title="Scan to initiate walletConnect-js session"
         />
-        <div>WalletConnect-JS Version: {REACT_APP_WCJS_VERSION || '??.??.??'}</div>
+        <div>WalletConnect-JS Version: <a href="https://www.npmjs.com/package/@provenanceio/walletconnect-js" target="_blank" rel="noreferrer">{REACT_APP_WCJS_VERSION || '??.??.??'}</a></div>
     </HomeContainer>
   );
 }
