@@ -65,9 +65,10 @@ const Dropdown = ({
   name,
   value: initialValue,
   onChange,
+  startEmpty,
 }) => {
   const renderOptions = () => options.map((title, index) => (
-    <option key={title} value={title} disabled={index === 0}>{title}</option>
+    <option key={title} value={title} disabled={startEmpty && index === 0}>{title}</option>
   ));
 
   return (
@@ -92,11 +93,13 @@ Dropdown.propTypes = {
   value: PropTypes.node,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  startEmpty: PropTypes.bool,
 };
 Dropdown.defaultProps = {
   className: '',
   label: '',
   value: null,
+  startEmpty: true,
 };
 
 export default Dropdown;

@@ -1,9 +1,9 @@
 import WalletConnectClient from "@walletconnect/client";
 import QRCode from 'qrcode';
-import { WALLETCONNECT_BRIDGE_URL, WINDOW_MESSAGES } from '../../consts';
+import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
 
-export const connect = async (setState, resetState, broadcast) => {
+export const connect = async (setState, resetState, broadcast, bridge) => {
   // Get current time (use time to auto-logout)
   const connectionIat = Math.floor(Date.now() / 1000);
   // ----------------
@@ -82,7 +82,7 @@ export const connect = async (setState, resetState, broadcast) => {
   };
   const qrcodeModal = new QRCodeModal();
   // create new connector
-  const newConnector = new WalletConnectClient({ bridge: WALLETCONNECT_BRIDGE_URL, qrcodeModal });
+  const newConnector = new WalletConnectClient({ bridge, qrcodeModal });
   // check if already connected
   if (!newConnector.connected) {
     // create new session

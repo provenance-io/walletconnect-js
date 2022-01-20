@@ -5,13 +5,17 @@ import { CONNECTION_TIMEOUT } from '../consts';
 const StateContext = createContext(undefined);
 const walletConnectService = new WalletConnectService();
 
-const WalletConnectContextProvider = ({ children, network }) => { // eslint-disable-line react/prop-types
+const WalletConnectContextProvider = ({ children, network, bridge }) => { // eslint-disable-line react/prop-types
   const [walletConnectState, setWalletConnectState] = useState({ ...walletConnectService.state });
 
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
     // If a network is passed in, update the default
     if (network) { walletConnectService.setNetwork(network) }
+    // If a bridge is passed in, update the default
+    if (bridge) {
+      walletConnectService.setBridge(bridge);
+    }
     // Check if we have an address and public key, if so, auto-reconnect to session
     if (walletConnectState.address && walletConnectState.publicKey) {
       // Reconnect the users walletconnect session

@@ -8,7 +8,7 @@ import {
   Dropdown,
   Popup,
 } from 'Components';
-import { ALL_ACTIONS } from 'consts';
+import { ALL_ACTIONS, BRIDGE_URLS } from 'consts';
 import { REACT_APP_WCJS_VERSION } from './version'; // eslint-disable-line
 
 const HomeContainer = styled.div`
@@ -48,6 +48,7 @@ export const App = () => {
   const [activeMethod, setActiveMethod] = useState('');
   const [randomColor, setRandomColor] = useState(`#${Math.floor(Math.random() * 2 ** 24).toString(16).padStart(6, '0')}`);
   const [colorInterval, setColorInterval] = useState(null);
+  const [bridgeUrl, setBridgeUrl] = useState(BRIDGE_URLS[0]);
 
   useEffect(() => {
     if (!colorInterval) {
@@ -87,8 +88,12 @@ export const App = () => {
       json={json}
     />
   ) : null);
-
 ;
+
+const changeBridgeUrl = (value) => {
+  setBridgeUrl(value);
+  wcs.setBridge(value);
+};
 
   return (
     <HomeContainer>
@@ -97,6 +102,7 @@ export const App = () => {
         <Content>
           {connected ? (
             <>
+              <Text>Bridge: {bridgeUrl}</Text>
               {peer?.name && <Text>Wallet: {peer.url ? <a href={peer.url} target="_blank" rel="noreferrer">{peer.name}</a> : peer.name}</Text>}
               <Text>Address: <a href={`https://explorer.provenance.io/accounts/${address}`} target="_blank" rel="noreferrer">{address}</a></Text>
               {publicKey && <Text>Public Key (B64Url): {publicKey}</Text>}
@@ -106,7 +112,10 @@ export const App = () => {
               <Disconnect walletConnectService={wcs} setPopup={setPopup} />
             </>
           ): (
-            <Connect walletConnectService={wcs} setPopup={setPopup} />
+            <>
+              <Dropdown name="bridgeUrl" startEmpty={false} options={BRIDGE_URLS} onChange={changeBridgeUrl} value={bridgeUrl} />
+              <Connect walletConnectService={wcs} setPopup={setPopup} />
+            </>
           )}
         </Content>
         <QRCodeModal
