@@ -1,5 +1,5 @@
 import events from 'events';
-import { WINDOW_MESSAGES } from '../consts';
+import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL } from '../consts';
 import {
   activateRequest as activateRequestMethod,
   addMarker as addMarkerMethod,
@@ -60,13 +60,9 @@ export class WalletConnectService {
   
   #network = 'mainnet';
 
+  #bridge = WALLETCONNECT_BRIDGE_URL;
+
   state = { ...initialState };
-  
-  constructor(network) {
-    if (network) {
-      this.#network = network;
-    }
-  }
 
   // *** Event Listener *** (https://nodejs.org/api/events.html)
   // Instead of having to use walletConnectService.eventEmitter.addListener()
@@ -91,10 +87,14 @@ export class WalletConnectService {
     this.#eventEmitter.removeAllListeners(eventName);
   }
   
-  // Update the network by passing it through as a prop on the provider
+  // Update the network and bridge by passing it through as a prop on the provider
 
   setNetwork(network) {
     this.#network = network;
+  };
+
+  setBridge(bridge) {
+    this.#bridge = bridge;
   };
 
   updateState() {
@@ -191,7 +191,7 @@ export class WalletConnectService {
   };
 
   connect = () => {
-    connectMethod(this.setState, this.resetState, this.#broadcastEvent);   
+    connectMethod(this.setState, this.resetState, this.#broadcastEvent, this.#bridge);   
   };
 
   customAction = async (data) => {
