@@ -1,21 +1,10 @@
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
 import PropTypes from 'prop-types';
 import { Button, Input } from 'Components';
 import { ActionContainer } from './ActionContainer';
 
-const Note = styled.div`
-  flex-basis: 100%;
-  font-size: 1.3rem;
-  font-weight: 400;
-  margin-bottom: 20px;
-  color: #42368E;
-  font-style: italic;
-  text-align: center;
-`;
-
-export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage, json }) => {
+export const Action = ({ method, setResults, fields, windowMessage }) => {
   const { walletConnectService, walletConnectState } = useWalletConnect();
 
   // Get loading state for specific method
@@ -34,20 +23,28 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage, jso
   useEffect(() => {
     // Delegate Hash Events
     walletConnectService.addListener(windowMsgComplete, (result) => {
-      console.log(`WalletConnectJS | ${method} Complete | Result: `, result); // eslint-disable-line no-console
-      setPopup(`${method} Complete! See console for result details`, 'success', 5000);
+      setResults({
+        action: method,
+        status: 'success',
+        message: `WalletConnectJS | ${method} Complete`,
+        data: result,
+      });
     });
     walletConnectService.addListener(windowMsgFailed, (result) => {
       const { error } = result;
-      console.log(`WalletConnectJS | ${method} Failed | Result: `, result); // eslint-disable-line no-console
-      setPopup(`${method} Failed! ${error} | See console for more details`, 'failure', 5000);
+      setResults({
+        action: method,
+        status: 'failed',
+        message: error.message,
+        data: result,
+      });
     });
 
     return () => {
       walletConnectService.removeAllListeners(windowMsgComplete);
       walletConnectService.removeAllListeners(windowMsgFailed);
     }
-  }, [walletConnectService, setPopup, windowMsgComplete, windowMsgFailed, method]);
+  }, [walletConnectService, setResults, windowMsgComplete, windowMsgFailed, method]);
 
   const changeInputValue = (name, value) => {
     const newInputValues = {...inputValues};
@@ -72,37 +69,18 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage, jso
     const inputKeys = Object.keys(inputValues);
     const jsonInputFilled = inputValues?.json;
     const multipleInputs = inputKeys.length > 1 && !jsonInputFilled;
-    // When json, parse the data before submitting
-    if (json) {
-      if (multipleInputs) {
-        // Convert all data away from json string
-        const parsedData = { ...inputValues };
-        const parsedDataKeys = Object.keys(parsedData);
-        parsedDataKeys.forEach(key => {
-          const value = parsedData[key];
-          const destringValue = value.substring(1, value.length-1);
-          parsedData[key] = JSON.parse(destringValue);
-        });
-        return parsedData;
-      } 
-      // Return first item parsed (first item is either json, or customAction json)
-      const firstValue = inputValues[inputKeys[0]];
-      const destringFirstValue = firstValue.substring(1, firstValue.length-1);
-      return JSON.parse(destringFirstValue);
-    }
     // If we just have a single input, we don't need the key, just submit with the first key value (non object)
     return multipleInputs ? inputValues : inputValues[inputKeys[0]];
   }
 
   return (
     <ActionContainer loading={loading} inputCount={fields.length}>
-      {json && <Note>Note: This method demo requires all fields to be entered as JSON strings</Note>}
       {renderInputs()}
       <Button
         loading={loading}
         onClick={() => walletConnectService[method]((getSendData()))}
       >
-        {buttonTxt}
+        Submit
       </Button>
     </ActionContainer>
   );
@@ -110,8 +88,7 @@ export const Action = ({ method, setPopup, fields, buttonTxt, windowMessage, jso
 
 Action.propTypes = {
   method: PropTypes.string.isRequired,
-  setPopup: PropTypes.func.isRequired,
-  json: PropTypes.bool,
+  setResults: PropTypes.func.isRequired,
   fields: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string,
@@ -121,11 +98,9 @@ Action.propTypes = {
       width: PropTypes.string,
     })
   ),
-  buttonTxt: PropTypes.string.isRequired,
   windowMessage: PropTypes.string.isRequired,
 };
 
 Action.defaultProps = {
   fields: [],
-  json: false,
 };

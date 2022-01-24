@@ -10,8 +10,8 @@ const InputContainer = styled.div`
   ` }
 `;
 const StyledInput = styled.input`
-  padding: 4px 10px;
-  height: 30px;
+  padding: 0 16px;
+  height: 40px;
   width: 100%;
   box-sizing: content-box;
   border-radius: 0;
