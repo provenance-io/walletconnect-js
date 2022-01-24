@@ -16,9 +16,12 @@ body {
   position:relative;
   background: #F5F7FD;
   line-height: 2rem;
-  padding: 30px;
+  margin: 0;
 }
 a {
   color: #3923A9;
   text-decoration: none;
+}
+p {
+  margin: 0;
 }

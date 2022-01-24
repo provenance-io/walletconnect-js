@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import ReactJson from 'react-json-view';
 import { useWalletConnect, QRCodeModal } from '@provenanceio/walletconnect-js';
 import styled from 'styled-components';
 import {
   Action,
+  Button,
   Connect,
-  Disconnect,
   Dropdown,
-  Popup,
+  Header,
 } from 'Components';
 import { ALL_ACTIONS, BRIDGE_URLS } from 'consts';
 import { REACT_APP_WCJS_VERSION } from './version'; // eslint-disable-line
@@ -19,71 +20,80 @@ const HomeContainer = styled.div`
   max-width: 100%;
   position: relative;
 `;
-const Header = styled.h1`
-  font-size: 3rem;
-  line-height: 3rem;
-  font-weight: bold;
-  letter-spacing: 0.25rem;
-  margin-bottom: 40px;
-  color: ${({ color }) => color };
-  transition: 6s all;
-`;
-const Text = styled.p`
-  font-size: 1.6rem;
-  line-height: 3rem;
-  margin: 0;
+const Title = styled.p`
+  font-weight: 700;
+  font-family: 'Poppins',sans-serif;
+  font-size: 2.25rem;
+  line-height: 3.2rem;
+  margin: 0 0 14px 0;
 `;
 const Content = styled.div`
-  width: 600px;
-  padding: 30px 50px;
-  border-radius: 4px;
+  width: 840px;
+  padding: 32px;
   background: #ffffff;
-  margin-bottom: 40px;
+  margin-top: 50px;
+`;
+const Error = styled.p`
+  font-size: 1.2rem;
+  font-weight: 400;
+  background: #ffdddd;
+  padding: 10px;
+  text-align: center;
+  border-radius: 6px;
+  margin-bottom: 26px;
+  font-style: italic;
+  color: #dd5555;
+`;
+const Results = styled.div`
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  padding: 10px;
+  position: relative;
+`;
+const ResultTitle = styled.span`
+  font-weight: bold;
+  min-width: 75px;
+  margin-right: 20px;
+  text-transform: capitalize;
+`;
+const ResultRow = styled.div`
+  display: flex;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+`;
+const ResultValue = styled.p`
+
+`;
+const FloatingButton = styled.p`
+  position: absolute;
+  top: 20px;
+  right: 20px;
 `;
 
 export const App = () => {
-  const [popupContent, setPopupContent] = useState('');
-  const [popupStatus, setPopupStatus] = useState('success');
-  const [popupDuration, setPopupDuration] = useState(2500);
-  const [activeMethod, setActiveMethod] = useState('');
-  const [randomColor, setRandomColor] = useState(`#${Math.floor(Math.random() * 2 ** 24).toString(16).padStart(6, '0')}`);
-  const [colorInterval, setColorInterval] = useState(null);
+  const [activeMethod, setActiveMethod] = useState(undefined);
   const [bridgeUrl, setBridgeUrl] = useState(BRIDGE_URLS[0]);
-
-  useEffect(() => {
-    if (!colorInterval) {
-      const newInterval = setInterval(() => {
-        setRandomColor(`#${Math.floor(Math.random() * 2 ** 24).toString(16).padStart(6, '0')}`);   
-      }, 6000);
-      setColorInterval(newInterval);
-    }
-  }, [colorInterval])
+  const [results, setResults] = useState(null);
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const {
-    address,
-    publicKey,
-    connected,
-    peer,
-  } = walletConnectState;
+  const { publicKey, connected } = walletConnectState;
 
-  const setPopup = (message, status, duration) => {
-    setPopupContent(message);
-    if (status) { setPopupStatus(status); }
-    if (duration) { setPopupDuration(duration); }
-  }
+  useEffect(() => {
+    // When disconnected, reset actions and results
+    if (!connected) {
+      setActiveMethod(undefined);
+      setResults(null);
+    }
+  }, [connected]);
 
-  const dropdownOptions = ALL_ACTIONS.map(({ method }) => method);
-  dropdownOptions.sort();
-  dropdownOptions.unshift('Select Method/Action...');
+  const dropdownOptions = ALL_ACTIONS.map(({ method }) => method).sort();
 
-  const renderActions = () => ALL_ACTIONS.map(({ method, fields, buttonTxt, windowMessage, json }) => activeMethod === method ? (
+  const renderActions = () => ALL_ACTIONS.map(({ method, fields, windowMessage, json }) => activeMethod === method ? (
     <Action
       key={method}
       method={method}
-      setPopup={setPopup}
+      setResults={setResults}
       fields={fields}
-      buttonTxt={buttonTxt}
       windowMessage={windowMessage}
       json={json}
     />
@@ -95,36 +105,65 @@ const changeBridgeUrl = (value) => {
   wcs.setBridge(value);
 };
 
-  return (
-    <HomeContainer>
-        {popupContent && <Popup delay={popupDuration} onClose={() => setPopupContent('')} status={popupStatus}>{popupContent}</Popup>}
-        <Header color={randomColor}>WalletConnect-JS | WebDemo</Header>
-        <Content>
-          {connected ? (
-            <>
-              <Text>Bridge: {bridgeUrl}</Text>
-              {peer?.name && <Text>Wallet: {peer.url ? <a href={peer.url} target="_blank" rel="noreferrer">{peer.name}</a> : peer.name}</Text>}
-              <Text>Address: <a href={`https://explorer.provenance.io/accounts/${address}`} target="_blank" rel="noreferrer">{address}</a></Text>
-              {publicKey && <Text>Public Key (B64Url): {publicKey}</Text>}
-              <Text>Select an action:</Text>
-              <Dropdown name="actions" options={dropdownOptions} onChange={setActiveMethod} value={activeMethod} />
-              {renderActions()}
-              <Disconnect walletConnectService={wcs} setPopup={setPopup} />
-            </>
-          ): (
-            <>
-              <Text>Target Bridge:</Text>
-              <Dropdown name="bridgeUrl" startEmpty={false} options={BRIDGE_URLS} onChange={changeBridgeUrl} value={bridgeUrl} />
-              <Connect walletConnectService={wcs} setPopup={setPopup} />
-            </>
-          )}
-        </Content>
-        <QRCodeModal
-          walletConnectService={wcs}
-          walletConnectState={walletConnectState}
-          title="Scan to initiate walletConnect-js session"
-        />
-        <div>WalletConnect-JS Version: <a href="https://www.npmjs.com/package/@provenanceio/walletconnect-js" target="_blank" rel="noreferrer">{REACT_APP_WCJS_VERSION || '??.??.??'}</a></div>
+const renderResults = () => {
+  const keys = Object.keys(results);
+  return keys.map(key => (
+    key === 'data' ?
+    <React.Fragment key={key}>
+      <ResultRow>
+        <ResultTitle>Raw Data:</ResultTitle>
+      </ResultRow>
+      <ReactJson src={results.data} collapsed />
+    </React.Fragment>
+    :
+    <ResultRow key={key}>
+      <ResultTitle>{key}:</ResultTitle>
+      <ResultValue>{results[key]}</ResultValue>
+    </ResultRow>
+  ))
+};
+
+return (
+  <HomeContainer>
+      <Header bridgeUrl={bridgeUrl} />
+      <Content>
+        {connected ? (
+          <>
+            {!publicKey && <Error>&#9888;  No public key found.  There&apos;s likely an issue with your connected wallet.&#9888;</Error>}
+            <Title>Select an Action</Title>
+            <Dropdown name="actions" options={dropdownOptions} onChange={setActiveMethod} value={activeMethod} />
+            {activeMethod && (
+              <>
+                <Title>Action Details</Title>
+                {renderActions()}
+              </>
+            )}
+            {results && (
+              <>
+                <Title>Last Action Result</Title>
+                <Results>
+                  {renderResults()}
+                  <FloatingButton>
+                    <Button onClick={() => setResults('')} type="button">Clear Results</Button>  
+                  </FloatingButton>
+                </Results>
+              </>
+            )}
+          </>
+        ): (
+          <>
+            <Title>Select Bridge</Title>
+            <Dropdown name="bridgeUrl" placeholder="Select Bridge" options={BRIDGE_URLS} onChange={changeBridgeUrl} value={BRIDGE_URLS[0]} />
+            <Title>Connect Wallet</Title>
+            <Connect walletConnectService={wcs} setResults={setResults} />
+          </>
+        )}
+      </Content>
+      <QRCodeModal
+        walletConnectService={wcs}
+        walletConnectState={walletConnectState}
+        title="Scan to initiate walletConnect-js session"
+      />
     </HomeContainer>
   );
 }

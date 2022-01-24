@@ -5,7 +5,6 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'ACTIVATE_REQUEST',
     method: 'activateRequest',
-    buttonTxt: 'Activate Request',
     fields: [
       {
         name: 'denom',
@@ -21,7 +20,6 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'ADD_MARKER',
     method: 'addMarker',
-    buttonTxt: 'Add Marker',
     fields: [
       {
         name: 'denom',
@@ -45,7 +43,6 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'CANCEL_REQUEST',
     method: 'cancelRequest',
-    buttonTxt: 'Cancel Request',
     fields: [
       {
         name: 'denom',
@@ -61,7 +58,6 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'CUSTOM_ACTION',
     method: 'customAction',
-    buttonTxt: 'Run Custom Action',
     fields: [
       {
         name: 'description',
@@ -89,7 +85,6 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'DELEGATE_HASH',
     method: 'delegateHash',
-    buttonTxt: 'Delegate Hash',
     fields: [
       {
         name: 'validatorAddress',
@@ -113,7 +108,6 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'TRANSACTION',
     method: 'sendHash',
-    buttonTxt: 'Send Hash',
     fields: [
       {
         name: 'to',
@@ -137,7 +131,6 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'SIGN_JWT',
     method: 'signJWT',
-    buttonTxt: 'Sign JWT',
   },
   // ----------------------------------
   // Sign Message Method/Action
@@ -145,7 +138,6 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'SIGNATURE',
     method: 'signMessage',
-    buttonTxt: 'Sign Message',
     fields: [
       {
         value: 'WalletConnect-JS | WebDemo | Sign Message',
