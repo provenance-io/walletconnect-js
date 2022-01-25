@@ -10,6 +10,7 @@ const Column = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  ${({ minWidth }) => minWidth && `min-width: ${minWidth}`};
   &:first-of-type {
     margin-right: 30px;
   }
@@ -18,7 +19,6 @@ const AccountRow = styled.div`
   display: flex;
   align-content: center;
   line-height: 14px;
-  min-width: 450px;
   ${({ end }) => end && 'justify-content: flex-end;' }
 `;
 const Title = styled.div`
@@ -32,7 +32,8 @@ const Value = styled.div`
 
 export const AccountInfo = ({ bridgeUrl }) => { // eslint-disable-line react/prop-types
   const { walletConnectService, walletConnectState } = useWalletConnect();
-  const { address, publicKey } = walletConnectState;
+  const { address, publicKey, peer } = walletConnectState;
+  const { name, description } = peer;
 
   const handleDisconnect = () => {
     walletConnectService.disconnect();
@@ -40,13 +41,21 @@ export const AccountInfo = ({ bridgeUrl }) => { // eslint-disable-line react/pro
 
   return (
     <AccountInfoContainer> 
-      <Column>
+      <Column minWidth="300px">
+        <AccountRow>
+          <img src={USER_ICON} alt="wallet name" />
+          <Title>Wallet Name:</Title>
+          <Value title={description}>{name || 'N/A'}</Value>
+          {name && <CopyValue value={name}/>}
+        </AccountRow>
         <AccountRow>
           <img src={USER_ICON} alt="address" />
-          <Title>Wallet:</Title>
+          <Title>Address:</Title>
           <Value>{address || 'N/A'}</Value>
           {address && <CopyValue value={address}/>}
         </AccountRow>
+      </Column>
+      <Column minWidth="425px">
         <AccountRow>
           <img src={USER_ICON} alt="public key" />
           <Title>Public Key:</Title>

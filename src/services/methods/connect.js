@@ -10,10 +10,11 @@ export const connect = async (setState, resetState, broadcast, bridge) => {
   // SESSION UPDATE
   // ----------------
   const onSessionUpdate = (newConnector) => {
-    const { accounts, _accounts } = newConnector;
+    const { accounts, _accounts, peerMeta: peer, _peerMeta: _peer } = newConnector;
     const updatedAccounts = accounts || _accounts;
-    const [address, publicKey] = updatedAccounts;
-    setState({ address, publicKey, connected: true });
+    const updatedPeer = peer || _peer;
+    const [address, publicKey, signedJWT] = updatedAccounts;
+    setState({ address, publicKey, connected: true, signedJWT, peer: updatedPeer });
     broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
   };
   // ----------------
@@ -22,8 +23,8 @@ export const connect = async (setState, resetState, broadcast, bridge) => {
   const onConnect = (payload) => {
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
-    const [address, publicKey] = accounts;
-    setState({ address, publicKey, peer, connected: true, connectionIat });
+    const [address, publicKey, signedJWT] = accounts;
+    setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT });
     broadcast(WINDOW_MESSAGES.CONNECTED, data);
   };
   // --------------------
@@ -56,15 +57,16 @@ export const connect = async (setState, resetState, broadcast, bridge) => {
       onDisconnect(payload);
     });
     // Latest values
-    const { accounts, _accounts } = newConnector;
+    const { accounts, _accounts, peerMeta: peer, _peerMeta: _peer } = newConnector;
     const updatedAccounts = accounts || _accounts;
-    const [address, publicKey] = updatedAccounts;
+    const updatedPeer = peer || _peer;
+    const [address, publicKey, signedJWT] = updatedAccounts;
     // Are we already connected
     if (newConnector.connected) {
       onSessionUpdate(newConnector);
     }
     // Update Connector
-    setState({ connector: newConnector, connected: !!address, address, publicKey });
+    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT, peer: updatedPeer });
   };
   // ----------------------------
   // CREATE NEW WC CONNECTION
