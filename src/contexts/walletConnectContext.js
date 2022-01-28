@@ -17,7 +17,7 @@ const WalletConnectContextProvider = ({ children, network, bridge }) => { // esl
       walletConnectService.setBridge(bridge);
     }
     // Check if we have an address and public key, if so, auto-reconnect to session
-    if (walletConnectState.address && walletConnectState.publicKey) {
+    if (walletConnectState.address) {
       // Reconnect the users walletconnect session
       walletConnectService.connect();
       // Compare the "connection initialized at" time to current time

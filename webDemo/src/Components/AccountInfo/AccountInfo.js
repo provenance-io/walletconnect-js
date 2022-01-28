@@ -5,6 +5,10 @@ import USER_ICON from 'img/userIcon.svg';
 
 const AccountInfoContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
+  @media (max-width: 1150px) {
+    margin-top: 20px;
+  }
 `;
 const Column = styled.div`
   display: flex;
@@ -18,6 +22,8 @@ const Column = styled.div`
 const AccountRow = styled.div`
   display: flex;
   align-content: center;
+  flex-wrap: wrap;
+  max-width: 100%;
   line-height: 14px;
   ${({ end }) => end && 'justify-content: flex-end;' }
 `;
