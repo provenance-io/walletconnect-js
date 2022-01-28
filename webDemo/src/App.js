@@ -16,7 +16,6 @@ const HomeContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  align-items: center;
   max-width: 100%;
   position: relative;
 `;
@@ -31,6 +30,7 @@ const Content = styled.div`
   width: 840px;
   padding: 32px;
   background: #ffffff;
+  margin: auto;
   margin-top: 50px;
 `;
 const Error = styled.p`

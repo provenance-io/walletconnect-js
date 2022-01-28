@@ -5,19 +5,22 @@ import { REACT_APP_WCJS_VERSION } from '../../version';
 
 const HeaderContainer = styled.header`
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
 `;
 const MainSection = styled.div`
-  flex-grow: 1;
   background: white;
-  padding: 0 40px;
+  padding: 20px 40px;
   height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  @media (max-width: 1280px) {
+    padding: 14px 20px;
+  }
+  @media (max-width: 1150px) {
+    justify-content: center;
+  }
 `;
 const Group = styled.div`
   display: flex;
@@ -39,6 +42,12 @@ const Title = styled.div`
   font-weight: 400;
   line-height: 2.0rem;
   color: #191C27;
+  @media (max-width: 1380px) {
+    font-size: 1.6rem;
+  }
+  @media (max-width: 1280px) {
+    font-size: 1.3rem;
+  }
 `;
 
 export const Header = ({ bridgeUrl }) => ( // eslint-disable-line react/prop-types
