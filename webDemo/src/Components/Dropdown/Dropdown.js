@@ -7,9 +7,11 @@ const SelectContainer = styled.div`
   flex-direction: column;
   position: relative;
   width: 300px;
+  max-width:100%;
 `;
 const StyledSelect = styled.select`
   width: 300px;
+  max-width: 100%;
   padding: 14px 18px;
   border-radius: 4px;
   margin: 0;

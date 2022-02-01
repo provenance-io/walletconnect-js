@@ -13,11 +13,19 @@ import { ALL_ACTIONS, BRIDGE_URLS } from 'consts';
 import { REACT_APP_WCJS_VERSION } from './version'; // eslint-disable-line
 
 const HomeContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  max-width: 100%;
   position: relative;
+  padding: 100px;
+  @media (max-width: 740px) {
+    padding: 100px 20px 20px 20px;
+  }
+`;
+const Content = styled.div`
+  max-width: 100%;
+  width: 840px;
+  padding: 32px;
+  background: #ffffff;
+  margin: auto;
+  margin-top: 50px;
 `;
 const Title = styled.p`
   font-weight: 700;
@@ -25,13 +33,6 @@ const Title = styled.p`
   font-size: 2.25rem;
   line-height: 3.2rem;
   margin: 0 0 14px 0;
-`;
-const Content = styled.div`
-  width: 840px;
-  padding: 32px;
-  background: #ffffff;
-  margin: auto;
-  margin-top: 50px;
 `;
 const Error = styled.p`
   font-size: 1.2rem;
@@ -61,9 +62,7 @@ const ResultRow = styled.div`
   font-size: 1.3rem;
   margin-bottom: 10px;
 `;
-const ResultValue = styled.p`
-
-`;
+const ResultValue = styled.p``;
 const FloatingButton = styled.p`
   position: absolute;
   top: 20px;

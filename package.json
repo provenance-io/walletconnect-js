@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "0.1.49",
+  "version": "0.1.50",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -63,7 +63,8 @@
     "eslint-plugin-react": "7.25.3",
     "eslint-plugin-react-hooks": "4.2.0",
     "nodemon": "2.0.15",
-    "prettier": "2.4.1"
+    "prettier": "2.4.1",
+    "stylelint":"14.3.0"
   },
   "scripts": {
     "clean": "rm -rf ./lib ./esm",

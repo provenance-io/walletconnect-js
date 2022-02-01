@@ -111,13 +111,13 @@ const QRCodeModal = ({
   walletConnectService: wcs,
   walletConnectState: state,
   title,
-  options,
 }) => {
-  const [view, setView] = useState(options.includes('qr') ? 'qr' : 'desktop');
+  const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
+  const options = ['qr', isMobile ? 'mobile' : 'desktop'];
+  const [view, setView] = useState('qr');
   const [copied, setCopied] = useState(false);
   const [timeoutInstance, setTimeoutInstance] = useState(null);
 
-  const { showQRCodeModal, QRCode, QRCodeUrl } = state;
   
   // Kill any times when unmounted (prevent memory leaks w/running timers)
   useEffect(() => () => { if (timeoutInstance) clearTimeout(timeoutInstance); }, [timeoutInstance]);
@@ -155,6 +155,15 @@ const QRCodeModal = ({
       </WalletRow>
     </>
   );
+  const renderMobileView = () => (
+    <>
+      <Text>Select app to use</Text>
+      <WalletRow href={`${PLUGIN_FIGURE_WALLET}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
+        <WalletTitle>Figure Mobile Wallet</WalletTitle>
+        <WalletIcon src={figureSvg} />
+      </WalletRow>
+    </>
+  );
 
   return showQRCodeModal ? (
     <QRCodeModalContainer className={className} onClick={() => wcs.showQRCode(false)}>
@@ -168,8 +177,11 @@ const QRCodeModal = ({
         <Toggle>
           {options.includes('qr') && <ToggleNotch active={view === 'qr'} onClick={() => setView('qr')}>QR Code</ToggleNotch>}
           {options.includes('desktop') && <ToggleNotch active={view === 'desktop'} onClick={() => setView('desktop')}>Desktop</ToggleNotch>}
+          {options.includes('mobile') && <ToggleNotch active={view === 'mobile'} onClick={() => setView('mobile')}>Mobile</ToggleNotch>}
         </Toggle>
-        { view === 'qr' ? renderQRView() : renderDesktopView() }
+        { view === 'qr' && renderQRView() }
+        { view === 'desktop' && renderDesktopView() }
+        { view === 'mobile' && renderMobileView() }
       </QRModalContent>
     </QRCodeModalContainer>
   ) : null;
@@ -178,9 +190,6 @@ const QRCodeModal = ({
 QRCodeModal.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string,
-  options: PropTypes.arrayOf(
-    PropTypes.oneOf(['qr', 'desktop']),
-  ),
   walletConnectService: PropTypes.shape({ showQRCode: PropTypes.func }).isRequired,
   walletConnectState: PropTypes.shape({
     showQRCodeModal: PropTypes.bool,
@@ -192,7 +201,6 @@ QRCodeModal.propTypes = {
 QRCodeModal.defaultProps = {
   className: '',
   title: 'Scan the QRCode with your Mobile Provenance wallet.',
-  options: ['qr', 'desktop'],
 };
 
 export default QRCodeModal;
