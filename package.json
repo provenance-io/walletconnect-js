@@ -63,8 +63,7 @@
     "eslint-plugin-react": "7.25.3",
     "eslint-plugin-react-hooks": "4.2.0",
     "nodemon": "2.0.15",
-    "prettier": "2.4.1",
-    "stylelint":"14.3.0"
+    "prettier": "2.4.1"
   },
   "scripts": {
     "clean": "rm -rf ./lib ./esm",
