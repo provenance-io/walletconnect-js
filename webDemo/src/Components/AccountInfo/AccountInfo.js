@@ -18,12 +18,14 @@ const Column = styled.div`
   &:first-of-type {
     margin-right: 30px;
   }
+  @media (max-width: 1150px) {
+    min-width: auto;
+  }
 `;
 const AccountRow = styled.div`
   display: flex;
-  align-content: center;
   flex-wrap: wrap;
-  max-width: 100%;
+  align-content: center;
   line-height: 14px;
   ${({ end }) => end && 'justify-content: flex-end;' }
 `;

@@ -203,6 +203,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
       connectionIat: null, // WalletConnect initialized at time [number]
       connector: null, // WalletConnect connector 
       figureConnected: false, // Account and address both exist [bool]
+      isMobile: false, // Is the connected browser a mobile device [bool]
       loading: '', // Are any methods currently loading/pending [string]
       newAccount: false, // Is this a newly created account
       peer: {}, // Connected wallet info [object]

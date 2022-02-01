@@ -3,14 +3,14 @@ import { AccountInfo } from 'Components';
 import FIGURE_LOGO from 'img/figureLogo.svg'
 import { REACT_APP_WCJS_VERSION } from '../../version';
 
-const HeaderContainer = styled.header`
-  width: 100%;
-`;
-const MainSection = styled.div`
+const Wrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   background: white;
   padding: 20px 40px;
-  height: 100%;
   width: 100%;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,6 +20,9 @@ const MainSection = styled.div`
   }
   @media (max-width: 1150px) {
     justify-content: center;
+  }
+  @media (max-width: 780px) {
+    padding: 6px;
   }
 `;
 const Group = styled.div`
@@ -51,20 +54,18 @@ const Title = styled.div`
 `;
 
 export const Header = ({ bridgeUrl }) => ( // eslint-disable-line react/prop-types
-  <HeaderContainer>
-    <MainSection>
-      <Group>
-        <Logo><img src={FIGURE_LOGO} alt="Figure Logo" /></Logo>
-        <Separator size="small">|</Separator>
-        <Title>Figure Tech</Title>
-        <Separator size="small">|</Separator>
-        <Title>WalletConnect-JS Demo</Title>
-        <Separator size="small">|</Separator>
-        <Title><a href="https://www.npmjs.com/package/@provenanceio/walletconnect-js" target="_blank" rel="noreferrer">v{REACT_APP_WCJS_VERSION || 'v??.??.??'}</a></Title>
-      </Group>
-      <Group>
-        <AccountInfo bridgeUrl={bridgeUrl} />
-      </Group>
-    </MainSection>
-  </HeaderContainer>
+  <Wrapper>
+    <Group>
+      <Logo><img src={FIGURE_LOGO} alt="Figure Logo" /></Logo>
+      <Separator size="small">|</Separator>
+      <Title>Figure Tech</Title>
+      <Separator size="small">|</Separator>
+      <Title>WalletConnect-JS Demo</Title>
+      <Separator size="small">|</Separator>
+      <Title><a href="https://www.npmjs.com/package/@provenanceio/walletconnect-js" target="_blank" rel="noreferrer">v{REACT_APP_WCJS_VERSION || 'v??.??.??'}</a></Title>
+    </Group>
+    <Group>
+      <AccountInfo bridgeUrl={bridgeUrl} />
+    </Group>
+  </Wrapper>
 );

@@ -11,7 +11,7 @@ import {
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
 } from './methods';
-import { getFromLocalStorage, addToLocalStorage } from '../utils';
+import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
 
 // Check for existing values from localStorage
 const existingWCState = getFromLocalStorage('walletconnect');
@@ -26,8 +26,9 @@ const defaultState = {
   connectionIat: '',
   connector: null,
   figureConnected: false,
-  newAccount: false,
+  isMobile: isMobile(),
   loading: '',
+  newAccount: false,
   peer: {},
   publicKey: '',
   QRCode: '',
@@ -44,6 +45,7 @@ const initialState = {
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connector: defaultState.connector,
   figureConnected: !!existingWCJSState.account && defaultState.connected,
+  isMobile: defaultState.isMobile,
   loading: defaultState.loading,
   newAccount: existingWCJSState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
