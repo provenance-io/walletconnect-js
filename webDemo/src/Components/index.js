@@ -6,3 +6,4 @@ export * from './AccountInfo';
 export * from './Actions';
 export * from './CopyValue';
 export * from './Header';
+export * from './MultiAction';
