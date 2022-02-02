@@ -8,6 +8,7 @@ import {
   Connect,
   Dropdown,
   Header,
+  MultiAction,
 } from 'Components';
 import { ALL_ACTIONS, BRIDGE_URLS } from 'consts';
 import { REACT_APP_WCJS_VERSION } from './version'; // eslint-disable-line
@@ -87,17 +88,21 @@ export const App = () => {
 
   const dropdownOptions = ALL_ACTIONS.map(({ method }) => method).sort();
 
-  const renderActions = () => ALL_ACTIONS.map(({ method, fields, windowMessage, json }) => activeMethod === method ? (
-    <Action
-      key={method}
-      method={method}
-      setResults={setResults}
-      fields={fields}
-      windowMessage={windowMessage}
-      json={json}
-    />
-  ) : null);
-;
+  const renderActions = () => ALL_ACTIONS.map(({ method, fields, windowMessage, json }) => {
+    if (activeMethod === method) {
+      return (method === 'multiAction') ? <MultiAction key="multiAction" setResults={setResults} /> : (
+        <Action
+          key={method}
+          method={method}
+          setResults={setResults}
+          fields={fields}
+          windowMessage={windowMessage}
+          json={json}
+        />
+      )
+    }
+    return null;
+  });
 
 const changeBridgeUrl = (value) => {
   setBridgeUrl(value);

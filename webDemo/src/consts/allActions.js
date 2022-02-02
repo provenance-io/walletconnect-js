@@ -102,6 +102,10 @@ export const ALL_ACTIONS = [
       },
     ],
   },
+  // // ----------------------------------
+  // // MultiAction
+  // // ----------------------------------
+  // { method: 'multiAction' },
   // ----------------------------------
   // Send Hash Method/Action
   // ----------------------------------
@@ -144,6 +148,58 @@ export const ALL_ACTIONS = [
         label: 'Message',
         placeholder: 'Enter Message',
         name: 'message',
+      },
+    ],
+  },
+  // ----------------------------------
+  // Chained Message Signing
+  // ----------------------------------
+  {
+    windowMessage: 'SIGNATURE',
+    method: 'signMessage_multicall',
+    fields: [
+      {
+        value: 'WalletConnect-JS | WebDemo | Sign Message',
+        label: 'Message',
+        placeholder: 'Enter Message',
+        name: 'message',
+      },
+      {
+        value: 2,
+        label: 'Repeat',
+        placeholder: 'Enter Repeat Count',
+        name: 'repeat',
+        width: '10%',
+      },
+    ],
+  },
+  // ----------------------------------
+  // Chained Hash Send
+  // ----------------------------------
+  {
+    windowMessage: 'TRANSACTION',
+    method: 'sendHash_multicall',
+    fields: [
+      {
+        name: 'to',
+        label: 'Hash To',
+        value: 'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6',
+        placeholder: 'Enter Address',
+        width: '70%',
+      },
+      {
+        name: 'amount',
+        label: 'Amount',
+        value: '1',
+        placeholder: 'Enter Send Amount',
+        width: '20%',
+      },
+      {
+        value: 2,
+        label: 'Repeat',
+        placeholder: 'Enter Repeat Count',
+        name: 'repeat',
+        width: '10%',
       },
     ],
   },
