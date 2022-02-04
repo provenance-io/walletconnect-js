@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
 import PropTypes from 'prop-types';
-import { Button, Input } from 'Components';
+import { Button, InputB64, Input } from 'Components';
 import { ActionContainer } from './ActionContainer';
 
 export const Action = ({ method: rawMethod, setResults, fields, windowMessage, multiAction }) => {
@@ -10,6 +10,7 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
   // If it's a multicall, clean up the method.
   const method = isMulticall ? rawMethod.split('_multicall')[0] : rawMethod;
   const [multicallNo, setMulticallNo] = useState(1);
+  const [decodeOpen, setDecodeOpen] = useState(false);
 
   const { walletConnectService, walletConnectState } = useWalletConnect();
 
@@ -58,16 +59,30 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
     setInputValues(newInputValues);
   };
 
-  const renderInputs = () => fields.map(({ name, width, label, placeholder }) => (
-    <Input
-      key={name}
-      width={width}
-      value={inputValues[name]}
-      label={label}
-      placeholder={placeholder}
-      onChange={(value) => changeInputValue(name, value)}
-      bottomGap={fields.length > 2 ? true : undefined}
-    />
+  const renderInputs = () => fields.map(({ name, width, label, placeholder, base64 }) => (
+    base64 ? (
+      <InputB64
+        key={name}
+        width={width}
+        value={inputValues[name]}
+        label={label}
+        placeholder={placeholder}
+        onChange={(value) => changeInputValue(name, value)}
+        bottomGap={fields.length > 2 ? true : undefined}
+        decodeOpen={decodeOpen}
+        setDecodeOpen={setDecodeOpen}
+      />
+    ) : (
+      <Input
+        key={name}
+        width={width}
+        value={inputValues[name]}
+        label={label}
+        placeholder={placeholder}
+        onChange={(value) => changeInputValue(name, value)}
+        bottomGap={fields.length > 2 ? true : undefined}
+      />
+    )
   ));
 
   // If we only have a single, send the value it without the key (as itself, non obj)
@@ -106,6 +121,7 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
       <Button
         loading={loading}
         onClick={handleSubmit}
+        disabled={decodeOpen}
       >
         {multiAction ? 'Add' : 'Submit'}
       </Button>

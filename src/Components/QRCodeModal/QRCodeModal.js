@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { PLUGIN_FIGURE_WALLET, PLUGIN_PROVENANCE_WALLET } from '../../consts';
+import { PLUGIN_FIGURE_WALLET, PLUGIN_PROVENANCE_WALLET, UNICORN_WALLET_URL } from '../../consts';
 import provenanceSvg from '../../images/provenance.svg';
 import figureSvg from '../../images/figure.svg';
+import unicornPng from '../../images/unicorn.png';
 
 const QRCodeModalContainer = styled.div`
   top: 0;
@@ -101,7 +102,6 @@ const WalletTitle = styled.div`
 const WalletIcon = styled.img`
   background: #FFFFFF;
   border-radius: 4px;
-  padding: 10px;
   height: 30px;
   width: 30px;
 `;
@@ -158,9 +158,9 @@ const QRCodeModal = ({
   const renderMobileView = () => (
     <>
       <Text>Select app to use</Text>
-      <WalletRow href={`${PLUGIN_FIGURE_WALLET}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
-        <WalletTitle>Figure Mobile Wallet</WalletTitle>
-        <WalletIcon src={figureSvg} />
+      <WalletRow href={`${UNICORN_WALLET_URL}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
+        <WalletTitle>Unicorn Mobile Wallet</WalletTitle>
+        <WalletIcon src={unicornPng} />
       </WalletRow>
     </>
   );

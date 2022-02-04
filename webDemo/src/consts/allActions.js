@@ -76,6 +76,7 @@ export const ALL_ACTIONS = [
         label: 'Base64 Encoded Message',
         value: '',
         placeholder: 'Enter Base64 Encoded Message',
+        base64: true,
       },
     ],
   },
