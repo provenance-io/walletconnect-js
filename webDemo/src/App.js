@@ -90,7 +90,8 @@ export const App = () => {
 
   const renderActions = () => ALL_ACTIONS.map(({ method, fields, windowMessage, json }) => {
     if (activeMethod === method) {
-      return (method === 'multiAction') ? <MultiAction key="multiAction" setResults={setResults} /> : (
+      if (method === 'multiAction') return <MultiAction key="multiAction" setResults={setResults} />
+      return (
         <Action
           key={method}
           method={method}

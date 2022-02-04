@@ -27,13 +27,14 @@ const Label = styled.label`
   left: 0;
 `;
 
-const Input = ({ className, label, value, onChange, placeholder, width, bottomGap }) => (
+const Input = ({ className, label, value, onChange, placeholder, width, bottomGap, disabled }) => (
   <InputContainer width={width} className={className} bottomGap={bottomGap}>
     {label && <Label>{label}</Label>}
     <StyledInput
       value={value}
       placeholder={placeholder}
       onChange={({ target }) => onChange(target.value)}
+      disabled={disabled}
     />
   </InputContainer>
 );
@@ -46,6 +47,7 @@ Input.propTypes = {
   onChange: PropTypes.func,
   placeholder: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   bottomGap: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 Input.defaultProps = {
   className: '',
@@ -55,6 +57,7 @@ Input.defaultProps = {
   onChange: () => {},
   placeholder: 'Enter Value',
   bottomGap: false,
+  disabled: false,
 };
 
 export default Input;
