@@ -11,6 +11,13 @@ const Container = styled.div`
   justify-content: center;
   ${({ noMargin }) => !noMargin && 'margin-bottom: 30px;' }
   flex-wrap: ${({ inputCount }) => inputCount > 2 ? 'wrap' : 'nowrap'};
+  @media (max-width: 1150px) {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    input {
+      margin-bottom: 10px;
+    }
+  }
 `;
 
 export const ActionContainer = ({ children, loading, inputCount }) => (

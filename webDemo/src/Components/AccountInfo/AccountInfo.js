@@ -7,7 +7,7 @@ const AccountInfoContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   @media (max-width: 1150px) {
-    margin-top: 20px;
+    margin-top: 6px;
   }
 `;
 const Column = styled.div`
@@ -28,11 +28,17 @@ const AccountRow = styled.div`
   align-content: center;
   line-height: 14px;
   ${({ end }) => end && 'justify-content: flex-end;' }
+  @media (max-width: 1150px) {
+    margin-bottom: 6px;
+  }
 `;
 const Title = styled.div`
   font-weight: bold;
   margin: 0 6px;
   min-width: 75px;
+  @media (max-width: 1150px) {
+    min-width: 50px;
+  }
 `;
 const Value = styled.div`
   margin-right: 4px;

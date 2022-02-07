@@ -17,7 +17,7 @@ const HomeContainer = styled.div`
   position: relative;
   padding: 100px;
   @media (max-width: 740px) {
-    padding: 100px 20px 20px 20px;
+    padding: 100px 12px 20px 12px;
   }
 `;
 const Content = styled.div`
@@ -27,6 +27,10 @@ const Content = styled.div`
   background: #ffffff;
   margin: auto;
   margin-top: 50px;
+  @media (max-width: 1150px) {
+    margin-top: 92px;
+    padding: 12px;
+  }
 `;
 const Title = styled.p`
   font-weight: 700;
@@ -68,6 +72,16 @@ const FloatingButton = styled.p`
   position: absolute;
   top: 20px;
   right: 20px;
+  @media (max-width: 1150px) {
+    top: -20px;
+    right: 0;
+    button {
+      min-width: 10px;
+      padding: 2px 10px;
+      font-size: 0.9rem;
+      height: auto;
+    }
+  }
 `;
 
 export const App = () => {
