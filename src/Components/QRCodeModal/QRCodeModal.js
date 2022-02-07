@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { PLUGIN_FIGURE_WALLET, PLUGIN_PROVENANCE_WALLET, UNICORN_WALLET_URL } from '../../consts';
+import { PLUGIN_FIGURE_WALLET, PLUGIN_PROVENANCE_WALLET, UNICORN_SPARKLE_WALLET_URL } from '../../consts';
 import provenanceSvg from '../../images/provenance.svg';
 import figureSvg from '../../images/figure.svg';
 import unicornPng from '../../images/unicorn.png';
@@ -144,7 +144,7 @@ const QRCodeModal = ({
   );
   const renderDesktopView = () => (
     <>
-      <Text>Select a wallet to use</Text>
+      <Text>Select wallet</Text>
       <WalletRow href={`${PLUGIN_FIGURE_WALLET}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
         <WalletTitle>Figure</WalletTitle>
         <WalletIcon src={figureSvg} />
@@ -157,9 +157,9 @@ const QRCodeModal = ({
   );
   const renderMobileView = () => (
     <>
-      <Text>Select app to use</Text>
-      <WalletRow href={`${UNICORN_WALLET_URL}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
-        <WalletTitle>Unicorn Mobile Wallet</WalletTitle>
+      <Text>Select wallet</Text>
+      <WalletRow href={`${UNICORN_SPARKLE_WALLET_URL}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
+        <WalletTitle>Unicorn Sparkle Wallet</WalletTitle>
         <WalletIcon src={unicornPng} />
       </WalletRow>
     </>
