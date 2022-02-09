@@ -142,7 +142,7 @@ const QRCodeModal = ({
         body: JSON.stringify({
           dynamicLinkInfo: {
             domainUriPrefix: 'https://provenancewallet.page.link',
-            link: `https://provenance.io/wallet-connect?data='${QRCodeUrl}'`,
+            link: `https://provenance.io/wallet-connect?data=${encodeURIComponent(decodeURIComponent(QRCodeUrl))}`,
             androidInfo: { androidPackageName: 'io.provenance.wallet' },
             iosInfo: { iosBundleId: 'io.provenance.wallet', iosAppStoreId: '1606428494' },
             navigationInfo: { enableForcedRedirect: true },
