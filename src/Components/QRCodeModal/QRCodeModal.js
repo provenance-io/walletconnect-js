@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { PLUGIN_FIGURE_WALLET, PLUGIN_PROVENANCE_WALLET, UNICORN_SPARKLE_WALLET_URL } from '../../consts';
+import {
+  PLUGIN_FIGURE_WALLET,
+  PLUGIN_PROVENANCE_WALLET,
+  UNICORN_SPARKLE_WALLET_URL,
+  FIREBASE_FETCH_WALLET_URL,
+} from '../../consts';
 import provenanceSvg from '../../images/provenance.svg';
 import figureSvg from '../../images/figure.svg';
 import unicornPng from '../../images/unicorn.png';
@@ -117,10 +122,33 @@ const QRCodeModal = ({
   const [view, setView] = useState('qr');
   const [copied, setCopied] = useState(false);
   const [timeoutInstance, setTimeoutInstance] = useState(null);
-
+  const [fetchingProvenanceWalletUrl, setFetchingProvenanceWalletUrl] = useState('');
+  const [provenanceWalletAppUrl, setProvenanceWalletAppUrl] = useState('');
   
   // Kill any times when unmounted (prevent memory leaks w/running timers)
   useEffect(() => () => { if (timeoutInstance) clearTimeout(timeoutInstance); }, [timeoutInstance]);
+
+  // Attempt to grab the mobile app url from firebase if we're on a mobile device
+  useEffect(() => {
+    if (!provenanceWalletAppUrl && !fetchingProvenanceWalletUrl && isMobile) {
+      setFetchingProvenanceWalletUrl(true);
+      fetch(FIREBASE_FETCH_WALLET_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          dynamicLinkInfo: {
+            domainUriPrefix: 'https://provenancewallet.page.link',
+            link: `https://provenance.io/wallet-connect?data='${QRCodeUrl}'`,
+            androidInfo: { androidPackageName: 'io.provenance.wallet' },
+            iosInfo: { iosBundleId: 'io.provenance.wallet', iosAppStoreId: '1606428494' },
+            navigationInfo: { enableForcedRedirect: true },
+          }
+        })
+      })
+        .then((response) => response.json())
+        .then(data => { setProvenanceWalletAppUrl(data.shortLink); })
+        .catch(() => { setFetchingProvenanceWalletUrl(false); })
+    }
+  }, [provenanceWalletAppUrl, fetchingProvenanceWalletUrl, isMobile, QRCodeUrl]);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(QRCodeUrl).then(() => {
@@ -162,6 +190,12 @@ const QRCodeModal = ({
         <WalletTitle>Unicorn Sparkle Wallet</WalletTitle>
         <WalletIcon src={unicornPng} />
       </WalletRow>
+      {provenanceWalletAppUrl && (
+        <WalletRow href={provenanceWalletAppUrl} rel="noopener noreferrer" target="_blank">
+          <WalletTitle>Provenance Mobile Wallet</WalletTitle>
+          <WalletIcon src={provenanceSvg} />
+        </WalletRow>
+      )}
     </>
   );
 
