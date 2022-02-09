@@ -130,7 +130,12 @@ const QRCodeModal = ({
 
   // Attempt to grab the mobile app url from firebase if we're on a mobile device
   useEffect(() => {
-    if (!provenanceWalletAppUrl && !fetchingProvenanceWalletUrl && isMobile) {
+    if (
+      !provenanceWalletAppUrl
+      && !fetchingProvenanceWalletUrl
+      && isMobile
+      && QRCodeUrl
+    ) {
       setFetchingProvenanceWalletUrl(true);
       fetch(FIREBASE_FETCH_WALLET_URL, {
         method: 'POST',
