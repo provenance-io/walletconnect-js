@@ -6,6 +6,7 @@ import {
   PLUGIN_PROVENANCE_WALLET,
   UNICORN_SPARKLE_WALLET_URL,
   FIREBASE_FETCH_WALLET_URL,
+  DYNAMIC_LINK_INFO,
 } from '../../consts';
 import provenanceSvg from '../../images/provenance.svg';
 import figureSvg from '../../images/figure.svg';
@@ -137,16 +138,14 @@ const QRCodeModal = ({
       && QRCodeUrl
     ) {
       setFetchingProvenanceWalletUrl(true);
+      const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
       fetch(FIREBASE_FETCH_WALLET_URL, {
         method: 'POST',
         body: JSON.stringify({
           dynamicLinkInfo: {
-            domainUriPrefix: 'https://provenancewallet.page.link',
-            link: `https://provenance.io/wallet-connect?data=${encodeURIComponent(decodeURIComponent(QRCodeUrl))}`,
-            androidInfo: { androidPackageName: 'io.provenance.wallet' },
-            iosInfo: { iosBundleId: 'io.provenance.wallet', iosAppStoreId: '1606428494' },
-            navigationInfo: { enableForcedRedirect: true },
-          }
+            ...DYNAMIC_LINK_INFO,
+            link: `${DYNAMIC_LINK_INFO.link}?data=${linkData}`,
+          },
         })
       })
         .then((response) => response.json())
