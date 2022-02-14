@@ -138,10 +138,11 @@ export class WalletConnectService {
       this.state[key] = updatedState[key];
     }, this);
     // Check if connected and account exists to update 'figureConnected' state
-    this.state.figureConnected = !!this.state.account && this.state.connected;
+    const figureConnected = !!this.state.account && this.state.connected;
+    this.state.figureConnected = figureConnected;
     this.updateState();
     // Write state changes into localStorage as needed
-    this.#updateLocalStorage(updatedState);
+    this.#updateLocalStorage({...updatedState, figureConnected});
   };
 
   showQRCode = (value) => {
