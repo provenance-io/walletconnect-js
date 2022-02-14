@@ -118,12 +118,13 @@ export class WalletConnectService {
 
   #updateLocalStorage = (updatedState) => {
     // Special values to look for
-    const { connectionIat, account, newAccount } = updatedState;
+    const { connectionIat, account, newAccount, figureConnected } = updatedState;
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
       ...(connectionIat !== undefined && {connectionIat}),
       ...(account !== undefined && {account}),
       ...(newAccount !== undefined && {newAccount}),
+      ...(figureConnected !== undefined && {figureConnected}),
     };
     // If we have updated 1 or more special values, update localStorage
     if (Object.keys(storageUpdates).length) {
