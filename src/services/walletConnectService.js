@@ -118,12 +118,13 @@ export class WalletConnectService {
 
   #updateLocalStorage = (updatedState) => {
     // Special values to look for
-    const { connectionIat, account, newAccount } = updatedState;
+    const { connectionIat, account, newAccount, figureConnected } = updatedState;
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
       ...(connectionIat !== undefined && {connectionIat}),
       ...(account !== undefined && {account}),
       ...(newAccount !== undefined && {newAccount}),
+      ...(figureConnected !== undefined && {figureConnected}),
     };
     // If we have updated 1 or more special values, update localStorage
     if (Object.keys(storageUpdates).length) {
@@ -137,10 +138,11 @@ export class WalletConnectService {
       this.state[key] = updatedState[key];
     }, this);
     // Check if connected and account exists to update 'figureConnected' state
-    this.state.figureConnected = !!this.state.account && this.state.connected;
+    const figureConnected = !!this.state.account && this.state.connected;
+    this.state.figureConnected = figureConnected;
     this.updateState();
     // Write state changes into localStorage as needed
-    this.#updateLocalStorage(updatedState);
+    this.#updateLocalStorage({...updatedState, figureConnected});
   };
 
   showQRCode = (value) => {
