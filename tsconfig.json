@@ -9,22 +9,26 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "checkJs": false,
+    "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
+    "downlevelIteration": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx"
   },
   "include": [
     "src",
-    "custom.d.ts"
+    "custom.d.ts",
+    "declarations.d.ts"
   ],
 }

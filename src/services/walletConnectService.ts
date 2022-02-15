@@ -44,7 +44,8 @@ export interface State {
   signedJWT: string,
 }
 
-export type SetState = (state: State) => void;
+export type SetState = (state: Partial<State>) => void;
+export type SetFullState = (state:State) => void;
 
 const defaultState: State = {
   account: '',
@@ -89,7 +90,7 @@ const initialState: State = {
 export class WalletConnectService {
   #eventEmitter = new events.EventEmitter();
 
-  #setWalletConnectState: SetState | undefined = undefined;
+  #setWalletConnectState: SetFullState | undefined = undefined;
   
   #network = 'mainnet';
 
@@ -140,7 +141,7 @@ export class WalletConnectService {
     }
   }
 
-  setStateUpdater(setWalletConnectState: SetState): void {
+  setStateUpdater(setWalletConnectState: SetFullState): void {
     this.#setWalletConnectState = setWalletConnectState;
   }
 
@@ -165,7 +166,7 @@ export class WalletConnectService {
     }
   }
 
-  setState = (updatedState: Partial<State>) => {
+  setState: SetState = (updatedState) => {
     // Check if connected and account exists to update 'figureConnected' state
     const figureConnected = (!!this.state.account || !!updatedState.account) && (!!this.state.connected || !!updatedState.connected);
     // Loop through each to update

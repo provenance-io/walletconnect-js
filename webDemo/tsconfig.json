@@ -3,7 +3,7 @@
     "baseUrl": "./src",
     "rootDir": "./src",
     "outDir": "./public",
-    "target": "es5",
+    "target": "ES2015",
     "lib": [
       "dom",
       "dom.iterable",
@@ -24,6 +24,8 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
-  ]
+    "src",
+    "custom.d.ts",
+    "react-app-env.d.ts"
+  ],
 }

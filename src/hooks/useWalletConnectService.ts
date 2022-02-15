@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'; // eslint-disable-line import/no-extraneous-dependencies, no-unused-vars
+import { useEffect, useRef, useState } from 'react'; // eslint-disable-line import/no-extraneous-dependencies, no-unused-vars
 import { WalletConnectService } from '../services';
 
 export const useWalletConnectService = () => {
