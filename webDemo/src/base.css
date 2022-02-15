@@ -5,8 +5,13 @@ html {
   Helvetica, Arial, "Lucida Grande", sans-serif;
   font-size: 62.5%; /* =10px and will allow for all rem sizing to be easier, 1.4 rem => 14px*/
   color: #30323F;
-};
+  max-width: 100%;
+  overflow-x: hidden;
+}
 html, *, ::after, ::before {
+  box-sizing: border-box;
+}
+div {
   box-sizing: border-box;
 }
 body {
@@ -16,9 +21,14 @@ body {
   position:relative;
   background: #F5F7FD;
   line-height: 2rem;
-  padding: 30px;
+  margin: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 a {
   color: #3923A9;
   text-decoration: none;
+}
+p {
+  margin: 0;
 }
