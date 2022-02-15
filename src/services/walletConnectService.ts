@@ -30,7 +30,7 @@ export interface State {
   assets: string[],
   assetsPending: boolean,
   connected: boolean,
-  connectionIat: string
+  connectionIat: number | null,
   connector: WalletConnectClient | null,
   figureConnected: boolean,
   isMobile: boolean,
@@ -52,7 +52,7 @@ const defaultState: State = {
   assets: [],
   assetsPending: false,
   connected: false,
-  connectionIat: '',
+  connectionIat: null,
   connector: null,
   figureConnected: false,
   isMobile: isMobile(),
@@ -116,8 +116,10 @@ export class WalletConnectService {
     this.#eventEmitter.removeListener(eventName, callback);
   }
 
-  removeAllListeners(eventName: string) {
-    this.#eventEmitter.removeAllListeners(eventName);
+  removeAllListeners() {
+    this.#eventEmitter.eventNames().forEach(eventName => {
+      this.#eventEmitter.removeAllListeners(eventName);
+    })
   }
   
   // Update the network and bridge by passing it through as a prop on the provider

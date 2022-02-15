@@ -57,7 +57,7 @@
     "react/no-unused-prop-types": "warn",
     "react/prefer-stateless-function": "warn",
     "react/prop-types": "warn",
-    "react/require-default-props": "warn"
+    "react/require-default-props": "off"
   },
   "env": {
     "browser": true,

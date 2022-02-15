@@ -1,18 +1,23 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { WalletConnectService } from '../services';
+import React, { createContext, useContext, useEffect, useState, ReactElement } from 'react';
+import { WalletConnectService, State } from '../services';
 import { CONNECTION_TIMEOUT } from '../consts';
 
-const StateContext = createContext(undefined);
+interface ProviderState {
+  walletConnectService: WalletConnectService,
+  walletConnectState: State
+}
+
+const StateContext = createContext<ProviderState | undefined>(undefined);
 const walletConnectService = new WalletConnectService();
 
 interface Props {
-  children: ReactNode,
-  network?: string,
+  children: ReactElement,
+  network?: 'testnet' | 'mainnet',
   bridge?: string,
 }
 
-const WalletConnectContextProvider = ({ children, network, bridge }: Props) => {
-  const [walletConnectState, setWalletConnectState] = useState({ ...walletConnectService.state });
+const WalletConnectContextProvider:React.FC<Props> = ({ children, network, bridge }) => {
+  const [walletConnectState, setWalletConnectState] = useState<State>({ ...walletConnectService.state });
 
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
