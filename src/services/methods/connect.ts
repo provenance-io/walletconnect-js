@@ -1,26 +1,26 @@
 import WalletConnectClient from "@walletconnect/client";
 import QRCode from 'qrcode';
+import { Broadcast } from 'types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
+import { SetState } from '../walletConnectService';
 
-export const connect = async (setState, resetState, broadcast, bridge) => {
+export const connect = async (setState: SetState, resetState: () => void, broadcast: Broadcast, bridge: string) => {
   // Get current time (use time to auto-logout)
   const connectionIat = Math.floor(Date.now() / 1000);
   // ----------------
   // SESSION UPDATE
   // ----------------
-  const onSessionUpdate = (newConnector) => {
-    const { accounts, _accounts, peerMeta: peer, _peerMeta: _peer } = newConnector;
-    const updatedAccounts = accounts || _accounts;
-    const updatedPeer = peer || _peer;
-    const [address, publicKey, signedJWT] = updatedAccounts;
-    setState({ address, publicKey, connected: true, signedJWT, peer: updatedPeer });
+  const onSessionUpdate = (newConnector: WalletConnectClient) => {
+    const { accounts, peerMeta: peer } = newConnector;
+    const [address, publicKey, signedJWT] = accounts;
+    setState({ address, publicKey, connected: true, signedJWT, peer });
     broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
   };
   // ----------------
   // CONNECTED
   // ----------------
-  const onConnect = (payload) => {
+  const onConnect = (payload: any | null) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
     const [address, publicKey, signedJWT] = accounts;
@@ -30,16 +30,16 @@ export const connect = async (setState, resetState, broadcast, bridge) => {
   // --------------------
   // WALLET DISCONNECT
   // --------------------
-  const onDisconnect = (payload) => {
+  const onDisconnect = () => {
     resetState();
-    broadcast(WINDOW_MESSAGES.DISCONNECT, payload);
+    broadcast(WINDOW_MESSAGES.DISCONNECT);
     // Manually clear out all of walletconnect-js from localStorage
     clearLocalStorage('walletconnect-js');
   };
   // --------------------------
   // SUBSCRIBE TO WC EVENTS
   // --------------------------
-  const subscribeToEvents = (newConnector) => {
+  const subscribeToEvents = (newConnector: WalletConnectClient) => {
     if (!newConnector) return;
     // Session Update
     newConnector.on("session_update", (error) => {
@@ -52,28 +52,26 @@ export const connect = async (setState, resetState, broadcast, bridge) => {
       onConnect(payload);
     });
     // Disconnect
-    newConnector.on("disconnect", (error, payload) => {
+    newConnector.on("disconnect", (error) => {
       if (error) throw error;
-      onDisconnect(payload);
+      onDisconnect();
     });
     // Latest values
-    const { accounts, _accounts, peerMeta: peer, _peerMeta: _peer } = newConnector;
-    const updatedAccounts = accounts || _accounts;
-    const updatedPeer = peer || _peer;
-    const [address, publicKey, signedJWT] = updatedAccounts;
+    const { accounts, peerMeta: peer } = newConnector;
+    const [address, publicKey, signedJWT] = accounts;
     // Are we already connected
     if (newConnector.connected) {
       onSessionUpdate(newConnector);
     }
     // Update Connector
-    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT, peer: updatedPeer });
-  };
+    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT, peer });
+  }
   // ----------------------------
   // CREATE NEW WC CONNECTION
   // ----------------------------
   // Create custom QRCode modal
   class QRCodeModal {
-    open = async (data) => {
+    open = async (data: string) => {
       const qrcode = await QRCode.toDataURL(data);
       setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: true });
     }
@@ -81,7 +79,7 @@ export const connect = async (setState, resetState, broadcast, bridge) => {
     close = () => {
       setState({ showQRCodeModal: false });
     }
-  };
+  }
   const qrcodeModal = new QRCodeModal();
   // create new connector
   const newConnector = new WalletConnectClient({ bridge, qrcodeModal });

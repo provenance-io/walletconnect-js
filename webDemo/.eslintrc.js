@@ -3,13 +3,13 @@ module.exports = {
     'airbnb',
     'airbnb/hooks',
     'eslint:recommended',
+    'react-app',
     'prettier',
   ],
   parser: 'babel-eslint',
   rules: {
     'arrow-body-style': ['warn', 'as-needed'],
     'consistent-return': 'warn',
-    'import/no-extraneous-dependencies': 'off',
     'import/newline-after-import': 'error',
     'import/order': ['error', { groups: [['builtin', 'external', 'internal']] }],
     'import/prefer-default-export': 0,
@@ -31,6 +31,7 @@ module.exports = {
     'react/prefer-stateless-function': 'warn',
     'react/prop-types': 'warn',
     'react/require-default-props': 'warn',
+    'import/no-extraneous-dependencies': 'off'
   },
   plugins: ['prettier', 'react-hooks'],
   env: {

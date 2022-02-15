@@ -1,16 +1,19 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MessageService } from '@provenanceio/wallet-lib';
+import { SendHashData } from 'types';
+import { State } from '../walletConnectService';
 
 // Wallet-lib delegate message proto:
 // https://github.com/provenance-io/wallet-lib/blob/bac70a7fe6a9ad784ff4cc7fe440b68cfe598c47/src/services/message-service.ts#L396
-export const delegateHash = async (state, data) => {
+export const delegateHash = async (state: State, data: SendHashData) => {
+  let valid = false;
   const method = 'provenance_sendTransaction';
   const type = 'MsgDelegate';
   const description = 'Delegate Hash';
   const {connector, address} = state;
   const { validatorAddress, amount: sendAmountHash } = data;
   
-  if (!connector) return { method, error: 'No wallet connected' };
+  if (!connector) return { method, valid, error: 'No wallet connected' };
 
   // Convert hash amount to nhash (cannot send hash, can only send nhash)
   const sendAmountNHash = sendAmountHash * (10 ** 9);
@@ -44,10 +47,10 @@ export const delegateHash = async (state, data) => {
     // send message
     const result = await connector.sendCustomRequest(customRequest);
     // TODO verify transaction ID
-    const valid = !!result
+    valid = !!result
     // Convert the amountList back into Hash (was converted to nHash before sending)
     const amountList = { denom: 'hash', amount: sendAmountHash};
     // result is a hex encoded signature
     return { method, valid, result, message, sendDetails: {...sendMessage, amount: amountList} };
-  } catch (error) { return { method, valid: false, error }; }
+  } catch (error) { return { method, valid, error }; }
 };

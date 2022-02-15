@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
+import { WalletConnectService } from 'services';
 import {
   PLUGIN_FIGURE_WALLET,
   PLUGIN_PROVENANCE_WALLET,
@@ -63,7 +63,7 @@ const Toggle = styled.div`
   background: #DDDDDD;
   margin-bottom: 20px;
 `;
-const ToggleNotch = styled.div`
+const ToggleNotch = styled.div<{active?: boolean}>`
   color: #5588DD;
   transition: 500ms all;
   padding: 4px 10px;
@@ -75,7 +75,7 @@ const ToggleNotch = styled.div`
   text-align: center;
   user-select: none;
 `;
-const Text = styled.p`
+const Text = styled.p<{link?: boolean}>`
   font-size: 1.6rem;
   margin: 0;
   ${({ link }) => link && `
@@ -112,18 +112,24 @@ const WalletIcon = styled.img`
   width: 30px;
 `;
 
-const QRCodeModal = ({
+interface Props {
+  className: string,
+  walletConnectService: WalletConnectService,
+  title: string
+}
+
+const QRCodeModal:React.FC<Props> = ({
   className,
   walletConnectService: wcs,
-  walletConnectState: state,
-  title,
+  title = 'Scan the QRCode with your Mobile Provenance wallet.',
 }) => {
+  const { state } = wcs;
   const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
   const options = ['qr', isMobile ? 'mobile' : 'desktop'];
   const [view, setView] = useState('qr');
   const [copied, setCopied] = useState(false);
-  const [timeoutInstance, setTimeoutInstance] = useState(null);
-  const [fetchingProvenanceWalletUrl, setFetchingProvenanceWalletUrl] = useState('');
+  const [timeoutInstance, setTimeoutInstance] = useState<number>(-1);
+  const [fetchingProvenanceWalletUrl, setFetchingProvenanceWalletUrl] = useState(false);
   const [provenanceWalletAppUrl, setProvenanceWalletAppUrl] = useState('');
   
   // Kill any times when unmounted (prevent memory leaks w/running timers)
@@ -158,7 +164,7 @@ const QRCodeModal = ({
     navigator.clipboard.writeText(QRCodeUrl).then(() => {
       clearTimeout(timeoutInstance);
       setCopied(true);
-      const newTimeoutInstance = setTimeout(() => {
+      const newTimeoutInstance = window.setTimeout(() => {
         setCopied(false);
       }, 3000);
       setTimeoutInstance(newTimeoutInstance);
@@ -223,22 +229,6 @@ const QRCodeModal = ({
       </QRModalContent>
     </QRCodeModalContainer>
   ) : null;
-};
-
-QRCodeModal.propTypes = {
-  className: PropTypes.string,
-  title: PropTypes.string,
-  walletConnectService: PropTypes.shape({ showQRCode: PropTypes.func }).isRequired,
-  walletConnectState: PropTypes.shape({
-    showQRCodeModal: PropTypes.bool,
-    QRCode: PropTypes.string,
-    QRCodeUrl: PropTypes.string,
-  }).isRequired,
-};
-
-QRCodeModal.defaultProps = {
-  className: '',
-  title: 'Scan the QRCode with your Mobile Provenance wallet.',
 };
 
 export default QRCodeModal;
