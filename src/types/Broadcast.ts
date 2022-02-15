@@ -6,5 +6,5 @@ import { SignJWTResult } from './SignJWTResult'
 
 export type Broadcast = (
   eventName: string,
-  params: MarkerResults | WalletConnectClient | CustomActionResults | SignJWTResult
+  params?: MarkerResults | WalletConnectClient | CustomActionResults | SignJWTResult
 ) => void
