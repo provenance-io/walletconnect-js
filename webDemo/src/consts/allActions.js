@@ -5,6 +5,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'ACTIVATE_REQUEST',
     method: 'activateRequest',
+    buttonTxt: 'Activate Request',
     fields: [
       {
         name: 'denom',
@@ -20,6 +21,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'ADD_MARKER',
     method: 'addMarker',
+    buttonTxt: 'Add Marker',
     fields: [
       {
         name: 'denom',
@@ -43,6 +45,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'CANCEL_REQUEST',
     method: 'cancelRequest',
+    buttonTxt: 'Cancel Request',
     fields: [
       {
         name: 'denom',
@@ -58,25 +61,13 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'CUSTOM_ACTION',
     method: 'customAction',
+    buttonTxt: 'Run Custom Action',
     fields: [
       {
-        name: 'description',
-        label: 'Wallet message description',
+        name: 'data',
+        label: 'Custom Data',
         value: '',
-        placeholder: 'Enter custom action description'
-      },
-      {
-        name: 'method',
-        label: 'Message method',
-        value: 'provenance_sendTransaction',
-        placeholder: 'Enter the message method'
-      },
-      {
-        name: 'message',
-        label: 'Base64 Encoded Message',
-        value: '',
-        placeholder: 'Enter Base64 Encoded Message',
-        base64: true,
+        placeholder: 'Enter Custom Data',
       },
     ],
   },
@@ -86,6 +77,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'DELEGATE_HASH',
     method: 'delegateHash',
+    buttonTxt: 'Delegate Hash',
     fields: [
       {
         name: 'validatorAddress',
@@ -103,16 +95,13 @@ export const ALL_ACTIONS = [
       },
     ],
   },
-  // // ----------------------------------
-  // // MultiAction
-  // // ----------------------------------
-  // { method: 'multiAction' },
   // ----------------------------------
   // Send Hash Method/Action
   // ----------------------------------
   {
     windowMessage: 'TRANSACTION',
     method: 'sendHash',
+    buttonTxt: 'Send Hash',
     fields: [
       {
         name: 'to',
@@ -136,6 +125,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'SIGN_JWT',
     method: 'signJWT',
+    buttonTxt: 'Sign JWT',
   },
   // ----------------------------------
   // Sign Message Method/Action
@@ -143,6 +133,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'SIGNATURE',
     method: 'signMessage',
+    buttonTxt: 'Sign Message',
     fields: [
       {
         value: 'WalletConnect-JS | WebDemo | Sign Message',
@@ -152,55 +143,41 @@ export const ALL_ACTIONS = [
       },
     ],
   },
-  // ----------------------------------
-  // Chained Message Signing
-  // ----------------------------------
+  // ------------------------------
+  // Write Scope Method/Action
+  // ------------------------------
   {
-    windowMessage: 'SIGNATURE',
-    method: 'signMessage_multicall',
+    windowMessage: 'WRITE_SCOPE',
+    method: 'writeScope',
+    buttonTxt: 'Write Scope',
     fields: [
       {
-        value: 'WalletConnect-JS | WebDemo | Sign Message',
-        label: 'Message',
-        placeholder: 'Enter Message',
-        name: 'message',
+        name: 'scope',
+        label: 'Scope',
+        value: 'myScope',
+        placeholder: 'Enter Scope',
+        width: '25%',
       },
       {
-        value: 2,
-        label: 'Repeat',
-        placeholder: 'Enter Repeat Count',
-        name: 'repeat',
-        width: '10%',
-      },
-    ],
-  },
-  // ----------------------------------
-  // Chained Hash Send
-  // ----------------------------------
-  {
-    windowMessage: 'TRANSACTION',
-    method: 'sendHash_multicall',
-    fields: [
-      {
-        name: 'to',
-        label: 'Hash To',
-        value: 'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6',
-        placeholder: 'Enter Address',
-        width: '70%',
+        name: 'signersList',
+        label: 'Signers List',
+        value: '[]',
+        placeholder: 'Enter Signers List',
+        width: '25%',
       },
       {
-        name: 'amount',
-        label: 'Amount',
-        value: '1',
-        placeholder: 'Enter Send Amount',
-        width: '20%',
+        name: 'scopeUuid',
+        label: 'Scope Uuid',
+        value: '',
+        placeholder: 'Enter Scope Uuid',
+        width: '25%',
       },
       {
-        value: 2,
-        label: 'Repeat',
-        placeholder: 'Enter Repeat Count',
-        name: 'repeat',
-        width: '10%',
+        name: 'specUuid',
+        label: 'Spec Uuid',
+        value: '',
+        placeholder: 'Enter Spec Uuid',
+        width: '25%',
       },
     ],
   },

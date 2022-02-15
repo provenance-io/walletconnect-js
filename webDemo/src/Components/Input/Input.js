@@ -5,36 +5,31 @@ const InputContainer = styled.div`
   position: relative;
   flex-basis: ${({ width }) => width};
   display: flex;
-  ${({ bottomGap }) => bottomGap && `
-    margin-bottom: 36px;
-  ` }
 `;
 const StyledInput = styled.input`
-  padding: 0 16px;
-  height: 40px;
+  padding: 4px 10px;
+  height: 30px;
   width: 100%;
   box-sizing: content-box;
   border-radius: 0;
   margin-right: 4px;
   border: 1px solid #DDDDDD;
-  border-radius: 4px;
 `;
 const Label = styled.label`
   font-size: 1.0rem;
   font-weight: 700;
   position: absolute;
-  top: -20px;
+  top: -16px;
   left: 0;
 `;
 
-const Input = ({ className, label, value, onChange, placeholder, width, bottomGap, disabled }) => (
-  <InputContainer width={width} className={className} bottomGap={bottomGap}>
+const Input = ({ className, label, value, onChange, placeholder, width }) => (
+  <InputContainer width={width} className={className}>
     {label && <Label>{label}</Label>}
     <StyledInput
       value={value}
       placeholder={placeholder}
       onChange={({ target }) => onChange(target.value)}
-      disabled={disabled}
     />
   </InputContainer>
 );
@@ -46,8 +41,6 @@ Input.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   placeholder: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  bottomGap: PropTypes.bool,
-  disabled: PropTypes.bool,
 };
 Input.defaultProps = {
   className: '',
@@ -56,8 +49,6 @@ Input.defaultProps = {
   value: '',
   onChange: () => {},
   placeholder: 'Enter Value',
-  bottomGap: false,
-  disabled: false,
 };
 
 export default Input;

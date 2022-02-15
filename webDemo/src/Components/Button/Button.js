@@ -10,6 +10,7 @@ const StyledButton = styled.button`
   white-space: nowrap;
   border-radius: 6px;
   border: 1px solid ${({ color }) => color };
+  text-shadow: 0 1px 0px rgba(0, 0, 0, 0.5), 0 -1px 0px rgba(0, 0, 0, 0.5), 1px 0 0px rgba(0, 0, 0, 0.5), -1px 0 0px rgba(0, 0, 0, 0.5);
   color: white;
   cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer' };
   display: flex;
