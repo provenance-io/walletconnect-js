@@ -114,7 +114,7 @@ export class WalletConnectService {
     this.#eventEmitter.addListener(eventName, callback);
   }
 
-  removeListener(eventName: string, callback: () => void) {
+  removeListener(eventName: string, callback: (results: BroadcastResults) => void) {
     this.#eventEmitter.removeListener(eventName, callback);
   }
 
