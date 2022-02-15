@@ -1,9 +1,12 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
+import { CustomActionData } from 'types';
+import { State } from '../walletConnectService';
 
-export const customAction = async (state, data) => {
+export const customAction = async (state: State, data: CustomActionData) => {
+  let valid = false;
   const { message: b64Message, description = 'Custom Action', method = 'provenance_sendTransaction' } = data;
   const { connector, address } = state;
-  if (!connector) return { method, error: 'No wallet connected' };
+  if (!connector) return { method, valid, error: 'No wallet connected' };
   // Convert to hex
   const hexMsg = convertUtf8ToHex(b64Message);
   // Build metadata
@@ -24,9 +27,9 @@ export const customAction = async (state, data) => {
     // send message
     const result = await connector.sendCustomRequest(customRequest);
     // TODO verify transaction ID
-    const valid = !!result
+    valid = !!result
 
     // result is a hex encoded signature
     return { method, valid, result, b64Message };
-  } catch (error) { return { method, valid: false, error }; }
+  } catch (error) { return { method, valid, error }; }
 };

@@ -4,17 +4,19 @@ import { MarkerStatus, MarkerType } from "@provenanceio/wallet-lib/lib/proto/pro
 import { MsgAddMarkerRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import { Coin } from "@provenanceio/wallet-lib/lib/proto/cosmos/base/v1beta1/coin_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
+import { State } from '../walletConnectService';
 
 // Wallet-lib delegate message proto:
 // https://github.com/provenance-io/wallet-lib/blob/bac70a7fe6a9ad784ff4cc7fe440b68cfe598c47/src/services/message-service.ts#L396
-export const addMarker = async (state, data) => {
+export const addMarker = async (state: State, data: { denom: string, amount: number }) => {
+  let valid = false;
   const { connector, address } = state;
   const { denom, amount } = data;
   const method = 'provenance_sendTransaction';
   const description = 'Add Marker';
   const markerMsg = 'provenance.marker.v1.MsgAddMarkerRequest';
 
-  if (!connector) return { method, error: 'No wallet connected' };
+  if (!connector) return { method, valid, error: 'No wallet connected' };
 
   /* Build the Provnance blockchain add marker msg */
   const accessGrant = new AccessGrant();
@@ -67,8 +69,8 @@ export const addMarker = async (state, data) => {
     // send message
     const result = await connector.sendCustomRequest(customRequest);
     // TODO verify transaction ID
-    const valid = !!result
+    valid = !!result
     // result is a hex encoded signature
     return { method, valid, result, message, sendDetails: data };
-  } catch (error) { return { method, valid: false, error }; }
+  } catch (error) { return { method, valid, error }; }
 };
