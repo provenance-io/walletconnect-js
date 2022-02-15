@@ -4,7 +4,8 @@ import {
   Broadcast,
   IClientMeta,
   CustomActionData,
-  SendHashData
+  SendHashData,
+  BroadcastResults,
 } from 'types';
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL } from '../consts';
 import {
@@ -105,7 +106,7 @@ export class WalletConnectService {
     this.#eventEmitter.emit(eventName, params);
   }
   
-  addListener(eventName: string, callback: () => void) {
+  addListener(eventName: string, callback: (results: BroadcastResults) => void) {
     this.#eventEmitter.addListener(eventName, callback);
   }
 
