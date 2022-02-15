@@ -1,5 +1,11 @@
 import events from 'events';
-import WalletConnect from "@walletconnect/client";
+import WalletConnectClient from "@walletconnect/client";
+import {
+  Broadcast,
+  IClientMeta,
+  CustomActionData,
+  SendHashData
+} from 'types';
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL } from '../consts';
 import {
   activateRequest as activateRequestMethod,
@@ -25,12 +31,12 @@ export interface State {
   assetsPending: boolean,
   connected: boolean,
   connectionIat: string
-  connector: WalletConnect | null,
+  connector: WalletConnectClient | null,
   figureConnected: boolean,
   isMobile: boolean,
   loading: string,
   newAccount: boolean,
-  peer: Record<string, unknown>,
+  peer: IClientMeta | null,
   publicKey: string,
   QRCode: string
   QRCodeUrl: string,
@@ -38,7 +44,7 @@ export interface State {
   signedJWT: string,
 }
 
-type SetState = (state: State) => void;
+export type SetState = (state: State) => void;
 
 const defaultState: State = {
   account: '',
@@ -52,7 +58,7 @@ const defaultState: State = {
   isMobile: isMobile(),
   loading: '',
   newAccount: false,
-  peer: {},
+  peer: null,
   publicKey: '',
   QRCode: '',
   QRCodeUrl: '',
@@ -94,7 +100,7 @@ export class WalletConnectService {
   // *** Event Listener *** (https://nodejs.org/api/events.html)
   // Instead of having to use walletConnectService.eventEmitter.addListener()
   // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
-  #broadcastEvent = (eventName: string, params: Record<string, unknown>) => {
+  #broadcastEvent: Broadcast = (eventName, params) => {
     this.#eventEmitter.emit(eventName, params);
   }
   
@@ -220,7 +226,7 @@ export class WalletConnectService {
     connectMethod(this.setState, this.resetState, this.#broadcastEvent, this.#bridge);   
   }
 
-  customAction = async (data: { message: string, description: string, method: string }) => {
+  customAction = async (data: CustomActionData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'customAction' });
     const result = await customActionMethod(this.state, data);
@@ -231,7 +237,7 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
   }
 
-  delegateHash = async (data: {validatorAddress: string, amount: number }) => {
+  delegateHash = async (data: SendHashData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'delegateHash' });
     const result = await delegateHashMethod(this.state, data);
@@ -248,7 +254,7 @@ export class WalletConnectService {
     }
   }
 
-  sendHash = async (data: {to: string, amount: number }) => {
+  sendHash = async (data: SendHashData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendHash' });
     const result = await sendHashMethod(this.state, data);

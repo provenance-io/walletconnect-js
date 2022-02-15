@@ -1,12 +1,14 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { verifySignature } from '../../helpers';
+import { State } from '../walletConnectService';
 
-export const signMessage = async (state, message) => {
+export const signMessage = async (state: State, message: string) => {
+  let valid = false;
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
   const description = 'Sign Message';
 
-  if (!connector) return { method, error: 'No wallet connected' };
+  if (!connector) return { method, valid, error: 'No wallet connected' };
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
   // eth_sign params
@@ -28,9 +30,9 @@ export const signMessage = async (state, message) => {
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
-    const valid = await verifySignature(message, signature, pubKeyB64);
+    valid = await verifySignature(message, signature, pubKeyB64);
     return { method, valid, result, message };
   } catch (error) {
-    return { method, valid: false, error };
+    return { method, valid, error };
   }
 };

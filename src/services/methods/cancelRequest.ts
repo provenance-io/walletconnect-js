@@ -4,12 +4,13 @@ import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 import { State } from '../walletConnectService';
 
 export const cancelRequest = async (state: State, denom: string) => {
+  let valid = false;
   const { connector, address } = state;
   const method = 'provenance_sendTransaction';
   const description = 'Cancel Request';
   const protoMessage = 'provenance.marker.v1.MsgCancelRequest';
 
-  if (!connector) return { method, error: 'No wallet connected' };
+  if (!connector) return { method, valid, error: 'No wallet connected' };
 
   const msgCancelRequest = new MsgCancelRequest();
   msgCancelRequest.setDenom(denom);
@@ -41,8 +42,8 @@ export const cancelRequest = async (state: State, denom: string) => {
     // send message
     const result = await connector.sendCustomRequest(customRequest);
     // TODO verify transaction ID
-    const valid = !!result
+    valid = !!result
     // result is a hex encoded signature
     return { method, valid, result, message, sendDetails: denom };
-  } catch (error) { return { method, valid: false, error }; }
+  } catch (error) { return { method, valid, error }; }
 };
