@@ -1,8 +1,9 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MsgActivateRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
+import { State } from '../walletConnectService';
 
-export const activateRequest = async (state, denom) => {
+export const activateRequest = async (state: State, denom: string) => {
   const { connector, address } = state;
   const method = 'provenance_sendTransaction';
   const description = 'Activate Request';

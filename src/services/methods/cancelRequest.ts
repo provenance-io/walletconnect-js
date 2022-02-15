@@ -1,8 +1,9 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MsgCancelRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
+import { State } from '../walletConnectService';
 
-export const cancelRequest = async (state, denom) => {
+export const cancelRequest = async (state: State, denom: string) => {
   const { connector, address } = state;
   const method = 'provenance_sendTransaction';
   const description = 'Cancel Request';

@@ -1,4 +1,5 @@
 import events from 'events';
+import WalletConnect from "@walletconnect/client";
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL } from '../consts';
 import {
   activateRequest as activateRequestMethod,
@@ -17,25 +18,27 @@ import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
 const existingWCState = getFromLocalStorage('walletconnect');
 const existingWCJSState = getFromLocalStorage('walletconnect-js');
 
-interface State {
+export interface State {
   account: string,
   address: string,
   assets: string[],
   assetsPending: boolean,
   connected: boolean,
   connectionIat: string
-  connector: null,
+  connector: WalletConnect | null,
   figureConnected: boolean,
   isMobile: boolean,
   loading: string,
   newAccount: boolean,
-  peer: {},
+  peer: Record<string, unknown>,
   publicKey: string,
   QRCode: string
   QRCodeUrl: string,
   showQRCodeModal: boolean,
   signedJWT: string,
 }
+
+type SetState = (state: State) => void;
 
 const defaultState: State = {
   account: '',
@@ -80,18 +83,18 @@ const initialState: State = {
 export class WalletConnectService {
   #eventEmitter = new events.EventEmitter();
 
-  #setWalletConnectState = undefined;
+  #setWalletConnectState: SetState | undefined = undefined;
   
   #network = 'mainnet';
 
-  #bridge = WALLETCONNECT_BRIDGE_URL;
+  #bridge: string = WALLETCONNECT_BRIDGE_URL;
 
-  state = { ...initialState };
+  state: State = { ...initialState };
 
   // *** Event Listener *** (https://nodejs.org/api/events.html)
   // Instead of having to use walletConnectService.eventEmitter.addListener()
   // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
-  #broadcastEvent = (eventName: string, params) => {
+  #broadcastEvent = (eventName: string, params: Record<string, unknown>) => {
     this.#eventEmitter.emit(eventName, params);
   }
   
@@ -121,7 +124,7 @@ export class WalletConnectService {
     this.#bridge = bridge;
   }
 
-  updateState() {
+  updateState(): void {
     if (this.#setWalletConnectState) {
       this.#setWalletConnectState({
         ...this.state,
@@ -129,7 +132,7 @@ export class WalletConnectService {
     }
   }
 
-  setStateUpdater(setWalletConnectState) {
+  setStateUpdater(setWalletConnectState: SetState): void {
     this.#setWalletConnectState = setWalletConnectState;
   }
 
@@ -138,14 +141,15 @@ export class WalletConnectService {
     this.updateState();
   }
 
-  #updateLocalStorage = (updatedState: State) => {
+  #updateLocalStorage = (updatedState: Partial<State>) => {
     // Special values to look for
-    const { connectionIat, account, newAccount } = updatedState;
+    const { connectionIat, account, newAccount, figureConnected } = updatedState;
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
       ...(connectionIat !== undefined && {connectionIat}),
       ...(account !== undefined && {account}),
       ...(newAccount !== undefined && {newAccount}),
+      ...(figureConnected !== undefined && {figureConnected}),
     };
     // If we have updated 1 or more special values, update localStorage
     if (Object.keys(storageUpdates).length) {
@@ -153,16 +157,14 @@ export class WalletConnectService {
     }
   }
 
-  setState = (updatedState: State) => {
-    // Loop through each to update
-    Object.keys(updatedState).forEach((key) => {
-      this.state[key] = updatedState[key];
-    }, this);
+  setState = (updatedState: Partial<State>) => {
     // Check if connected and account exists to update 'figureConnected' state
-    this.state.figureConnected = !!this.state.account && this.state.connected;
+    const figureConnected = (!!this.state.account || !!updatedState.account) && (!!this.state.connected || !!updatedState.connected);
+    // Loop through each to update
+    this.state =  {...this.state, ...updatedState, figureConnected};
     this.updateState();
     // Write state changes into localStorage as needed
-    this.#updateLocalStorage(updatedState);
+    this.#updateLocalStorage({...updatedState, figureConnected});
   };
 
   showQRCode = (value: boolean) => {
