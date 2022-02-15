@@ -3,7 +3,6 @@ import { MarkerResults } from './MarkerResults'
 import { CustomActionResults } from './CustomActionResults'
 import { SignJWTResult } from './SignJWTResult'
 
-export type Broadcast = (
-  eventName: string,
+export type BroadcastResults = {
   params?: MarkerResults | WalletConnectClient | CustomActionResults | SignJWTResult
-) => void
+}

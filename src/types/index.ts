@@ -5,3 +5,4 @@ export * from './CustomActionData';
 export * from './CustomActionResults';
 export * from './SendHashData';
 export * from './SignJWTResult';
+export * from './BroadcastResults';
