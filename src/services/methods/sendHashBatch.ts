@@ -37,7 +37,6 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
   const metadata = JSON.stringify({
     description,
     address,
-    messages,
   });
 
   try {
@@ -46,7 +45,7 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
       id: 1,
       jsonrpc: '2.0',
       method,
-      params: [metadata]
+      params: [metadata, ...messages]
     };
     // send message
     const result = await connector.sendCustomRequest(customRequest);
