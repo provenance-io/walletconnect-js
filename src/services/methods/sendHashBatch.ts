@@ -40,15 +40,13 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
     messages,
   });
 
-  const msgParams = [metadata, messages];
-
   try {
     // Custom Request
     const customRequest = {
       id: 1,
       jsonrpc: '2.0',
       method,
-      params: msgParams,
+      params: [metadata]
     };
     // send message
     const result = await connector.sendCustomRequest(customRequest);
