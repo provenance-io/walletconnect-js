@@ -1,5 +1,5 @@
 export type CustomActionData = {
-  message: string,
+  message: string | string[],
   description: string,
   method: string
 }
