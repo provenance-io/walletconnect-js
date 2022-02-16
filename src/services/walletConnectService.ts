@@ -5,6 +5,7 @@ import {
   IClientMeta,
   CustomActionData,
   SendHashData,
+  SendHashBatchData,
   BroadcastResults,
 } from 'types';
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL } from '../consts';
@@ -18,6 +19,7 @@ import {
   sendHash as sendHashMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
+  sendHashBatch as sendHashBatchMethod,
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
 
@@ -262,6 +264,17 @@ export class WalletConnectService {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendHash' });
     const result = await sendHashMethod(this.state, data);
+    // No longer loading
+    this.setState({ loading: '' });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.TRANSACTION_FAILED : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  }
+  
+  sendHashBatch = async (data: SendHashBatchData) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ loading: 'sendHashBatch' });
+    const result = await sendHashBatchMethod(this.state, data);
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method

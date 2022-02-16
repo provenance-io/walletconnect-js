@@ -175,11 +175,11 @@ export const ALL_ACTIONS = [
     ],
   },
   // ----------------------------------
-  // Chained Hash Send
+  // Batch Hash Send
   // ----------------------------------
   {
     windowMessage: 'TRANSACTION',
-    method: 'sendHash_multicall',
+    method: 'sendHashBatch',
     fields: [
       {
         name: 'to',
@@ -197,9 +197,9 @@ export const ALL_ACTIONS = [
       },
       {
         value: 2,
-        label: 'Repeat',
+        label: 'Count',
         placeholder: 'Enter Repeat Count',
-        name: 'repeat',
+        name: 'count',
         width: '10%',
       },
     ],
