@@ -12,3 +12,7 @@ interface SendData extends Amount {
 }
 
 export type SendHashData = DelegateHashData | SendData
+
+export type SendHashBatchData = (DelegateHashData | SendData) & {
+  count: number
+}
