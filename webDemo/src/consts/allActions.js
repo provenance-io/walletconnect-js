@@ -103,10 +103,36 @@ export const ALL_ACTIONS = [
       },
     ],
   },
-  // // ----------------------------------
-  // // MultiAction
-  // // ----------------------------------
-  // { method: 'multiAction' },
+  // ----------------------------------
+  // Send Coin Method/Action
+  // ----------------------------------
+  {
+    windowMessage: 'TRANSACTION',
+    method: 'sendCoin',
+    fields: [
+      {
+        name: 'denom',
+        label: 'Coin Denom',
+        value: 'Hash',
+        placeholder: 'Enter Coin Denom',
+        width: '20%',
+      },
+      {
+        name: 'to',
+        label: 'Coin To',
+        value: 'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6',
+        placeholder: 'Enter Address',
+        width: '70%',
+      },
+      {
+        name: 'amount',
+        label: 'Amount',
+        value: '10',
+        placeholder: 'Enter Send Amount',
+        width: '10%',
+      },
+    ],
+  },
   // ----------------------------------
   // Send Hash Method/Action
   // ----------------------------------
@@ -149,28 +175,6 @@ export const ALL_ACTIONS = [
         label: 'Message',
         placeholder: 'Enter Message',
         name: 'message',
-      },
-    ],
-  },
-  // ----------------------------------
-  // Chained Message Signing
-  // ----------------------------------
-  {
-    windowMessage: 'SIGNATURE',
-    method: 'signMessage_multicall',
-    fields: [
-      {
-        value: 'WalletConnect-JS | WebDemo | Sign Message',
-        label: 'Message',
-        placeholder: 'Enter Message',
-        name: 'message',
-      },
-      {
-        value: 2,
-        label: 'Repeat',
-        placeholder: 'Enter Repeat Count',
-        name: 'repeat',
-        width: '10%',
       },
     ],
   },

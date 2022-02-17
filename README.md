@@ -25,6 +25,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - [customAction](#customAction)
     - [delegateHash](#delegateHash)
     - [disconnect](#disconnect)
+    - [sendCoin](#sendCoin)
     - [sendHash](#sendHash)
     - [signJWT](#signJWT)
     - [signMessage](#signMessage)
@@ -140,11 +141,11 @@ React hook which contains `walletConnectService` and `walletConnectState`
       walletConnectService.customAction({ message, description, method });
       // WINDOW_MESSAGES: CUSTOM_ACTION_COMPLETE, CUSTOM_ACTION_FAILED
     ```
-    | Param       	| Type   	| Required 	| Default                        	| Example                        	| Info                                  	|
-    |-------------	|--------	|----------	|--------------------------------	|--------------------------------	|---------------------------------------	|
-    | message     	| string 	| yes      	| -                              	| `'CiwvcHJvdmVuYW5jZS5tZX...'`  	| B64 encoded Message to pass to wallet 	|
-    | description 	| string 	| no       	| `'Custom Action'`              	| `'My Custom Action'`           	| Prompt title on mobile wallet         	|
-    | method      	| string 	| no       	| `'provenance_sendTransaction'` 	| `'provenance_sendTransaction'` 	| Message method                        	|
+    | Param       	| Type   	        | Required 	| Default                        	| Example                        	| Info                                   	  |
+    |-------------	|---------------	|----------	|--------------------------------	|--------------------------------	|-----------------------------------------  |
+    | message     	| string / array 	| yes      	| -                              	| `'CiwvcHJvdmVuYW5jZS5tZX...'`  	| B64 encoded Message(s) to pass to wallet 	|
+    | description 	| string 	        | no       	| `'Custom Action'`              	| `'My Custom Action'`           	| Prompt title on mobile wallet         	  |
+    | method      	| string 	        | no       	| `'provenance_sendTransaction'` 	| `'provenance_sendTransaction'` 	| Message method                        	  |
 
   - #### delegateHash
     Delegate a custom amount of Hash token to a custom address
@@ -163,6 +164,18 @@ React hook which contains `walletConnectService` and `walletConnectState`
       walletConnectService.disconnect();
       // WINDOW_MESSAGE: DISCONNECT
     ```
+
+  - #### sendCoin
+    Send amount of custom coin to an address
+    ```js
+      walletConnectService.sendCoin({ to, amount, denom });
+      // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
+    ```
+    | Param  	| Type   	| Required 	| Default 	| Example        	| Info                  	|
+    |--------	|--------	|----------	|---------	|----------------	|-----------------------	|
+    | to     	| string 	| yes      	| -       	| `'tpa1b23...'` 	| Target wallet address 	|
+    | amount 	| number 	| yes      	| -       	| `10`           	| Amount to use         	|
+    | denom 	| string 	| no      	| `'Hash'` 	| `'Hash'`       	| Coin's Denom          	|
 
   - #### sendHash
     Send a custom amount of Hash token to a custom address

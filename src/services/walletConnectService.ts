@@ -4,6 +4,7 @@ import {
   Broadcast,
   IClientMeta,
   CustomActionData,
+  SendCoinData,
   SendHashData,
   SendHashBatchData,
   BroadcastResults,
@@ -16,6 +17,7 @@ import {
   connect as connectMethod,
   customAction as customActionMethod,
   delegateHash as delegateHashMethod,
+  sendCoin as sendCoinMethod,
   sendHash as sendHashMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
@@ -260,6 +262,17 @@ export class WalletConnectService {
     }
   }
 
+  sendCoin = async (data: SendCoinData) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ loading: 'sendCoin' });
+    const result = await sendCoinMethod(this.state, data);
+    // No longer loading
+    this.setState({ loading: '' });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.TRANSACTION_FAILED : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+  }
+  
   sendHash = async (data: SendHashData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendHash' });
