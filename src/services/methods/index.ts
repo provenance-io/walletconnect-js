@@ -4,6 +4,7 @@ export * from './cancelRequest';
 export * from './connect';
 export * from './customAction';
 export * from './delegateHash';
+export * from './sendCoin';
 export * from './sendHash';
 export * from './signJWT';
 export * from './signMessage';

@@ -1,30 +1,33 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MessageService } from '@provenanceio/wallet-lib';
-import { SendHashData } from 'types';
+import { SendCoinData } from 'types';
 import { State } from '../walletConnectService';
 
-/**
- * @deprecated Use sendCoin instead of sendHash
- */
-export const sendHash = async (state: State, data: SendHashData) => {
+export const sendCoin = async (state: State, data: SendCoinData) => {
   let valid = false;
   const {connector, address} = state;
-  const {to: toAddress, amount: sendAmountHash } = data;
+  const {to: toAddress, amount: initialAmount, denom: initialDenom = 'hash' } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
-  const description = 'Send Hash';
   
   if (!connector) return { method, valid, error: 'No wallet connected' };
-
-  // Convert hash amount to nhash (cannot send hash, can only send nhash)
-  const sendAmountNHash = `${sendAmountHash * (10 ** 9)}`;
-
+  let amount = initialAmount;
+  let denom = initialDenom.toLowerCase();
+  if (denom === 'hash') {
+    // Convert hash amount to nhash (cannot send hash, can only send nhash)
+    amount = initialAmount * (10 ** 9);
+    denom = 'nhash';
+  }
+  // Set amount to string value
+  const amountString = `${amount}`;
+  const description = `Send Coin (${denom})`;
   const messageService = new MessageService();
   const sendMessage = {
     fromAddress: address,
     toAddress,
-    amountList: [{ denom: 'nhash', amount: sendAmountNHash }],
+    amountList: [{ denom, amount: amountString }],
   };
+
   const messageMsgSend = messageService.buildMessage(type, sendMessage);
   const message = messageService.createAnyMessageBase64(type, messageMsgSend);
 
@@ -50,7 +53,7 @@ export const sendHash = async (state: State, data: SendHashData) => {
     // TODO verify transaction ID
     valid = !!result
     // Convert the amountList back into Hash (was converted to nHash before sending)
-    const amountList = [{ denom: 'hash', amount: sendAmountHash}];
+    const amountList = [{ denom, amount: amountString }];
     // result is a hex encoded signature
     return { method, valid, result, message, sendDetails: {...sendMessage, amountList} };
   } catch (error) { return { method, valid, error }; }
