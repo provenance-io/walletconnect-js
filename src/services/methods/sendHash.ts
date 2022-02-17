@@ -3,6 +3,9 @@ import { MessageService } from '@provenanceio/wallet-lib';
 import { SendHashData } from 'types';
 import { State } from '../walletConnectService';
 
+/**
+ * @deprecated Use sendCoin instead of sendHash
+ */
 export const sendHash = async (state: State, data: SendHashData) => {
   let valid = false;
   const {connector, address} = state;

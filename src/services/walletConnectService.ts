@@ -273,6 +273,9 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
   }
   
+  /**
+   * @deprecated The method should no longer used, use sendCoin instead
+   */
   sendHash = async (data: SendHashData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendHash' });

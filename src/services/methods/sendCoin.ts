@@ -27,7 +27,7 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
     toAddress,
     amountList: [{ denom, amount: amountString }],
   };
-  console.log('sendMessage :', sendMessage);
+
   const messageMsgSend = messageService.buildMessage(type, sendMessage);
   const message = messageService.createAnyMessageBase64(type, messageMsgSend);
 
