@@ -11,22 +11,23 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   const type = 'MsgSend';
   
   if (!connector) return { method, valid, error: 'No wallet connected' };
-  // Set amount to string value
-  let amount = `${initialAmount}`;
-  let denom = initialDenom;
-  if (initialDenom === 'hash') {
+  let amount = initialAmount;
+  let denom = initialDenom.toLowerCase();
+  if (denom === 'hash') {
     // Convert hash amount to nhash (cannot send hash, can only send nhash)
-    amount = `${initialAmount * (10 ** 9)}`;
+    amount = initialAmount * (10 ** 9);
     denom = 'nhash';
   }
-  
+  // Set amount to string value
+  const amountString = `${amount}`;
   const description = `Send Coin (${denom})`;
   const messageService = new MessageService();
   const sendMessage = {
     fromAddress: address,
     toAddress,
-    amountList: [{ denom, amount }],
+    amountList: [{ denom, amount: amountString }],
   };
+  console.log('sendMessage :', sendMessage);
   const messageMsgSend = messageService.buildMessage(type, sendMessage);
   const message = messageService.createAnyMessageBase64(type, messageMsgSend);
 
@@ -52,7 +53,7 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
     // TODO verify transaction ID
     valid = !!result
     // Convert the amountList back into Hash (was converted to nHash before sending)
-    const amountList = [{ denom, amount }];
+    const amountList = [{ denom, amount: amountString }];
     // result is a hex encoded signature
     return { method, valid, result, message, sendDetails: {...sendMessage, amountList} };
   } catch (error) { return { method, valid, error }; }
