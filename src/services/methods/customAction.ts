@@ -32,6 +32,6 @@ export const customAction = async (state: State, data: CustomActionData) => {
     valid = !!result
 
     // result is a hex encoded signature
-    return { method, valid, result, b64MessageArray };
-  } catch (error) { return { method, valid, error }; }
+    return { method, valid, result, b64MessageArray, description };
+  } catch (error) { return { method, valid, error, description }; }
 };
