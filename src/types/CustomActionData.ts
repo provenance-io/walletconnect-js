@@ -2,5 +2,5 @@ export type CustomActionData = {
   message: string | string[],
   description: string,
   method: string
-  gasPrice?: number,
+  gasPrice?: { gasPrice: number, gasPriceDenom: string }
 }

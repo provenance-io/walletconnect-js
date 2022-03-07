@@ -102,7 +102,7 @@ export const App = () => {
 
   const dropdownOptions = ALL_ACTIONS.map(({ method }) => method).sort();
 
-  const renderActions = () => ALL_ACTIONS.map(({ method, fields, windowMessage, json }) => {
+  const renderActions = () => ALL_ACTIONS.map(({ method, fields, windowMessage, json, gas }) => {
     if (activeMethod === method) {
       if (method === 'multiAction') return <MultiAction key="multiAction" setResults={setResults} />
       return (
@@ -113,6 +113,7 @@ export const App = () => {
           fields={fields}
           windowMessage={windowMessage}
           json={json}
+          gas={gas}
         />
       )
     }

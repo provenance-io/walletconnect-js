@@ -1,6 +1,6 @@
 interface Amount {
   amount: number
-  gasPrice?: number
+  gasPrice?: { gasPrice: number, gasPriceDenom: string }
 }
 
 interface DelegateHashData extends Amount {
