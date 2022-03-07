@@ -58,6 +58,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'CUSTOM_ACTION',
     method: 'customAction',
+    gas: true,
     fields: [
       {
         name: 'description',
@@ -70,6 +71,18 @@ export const ALL_ACTIONS = [
         label: 'Message method',
         value: 'provenance_sendTransaction',
         placeholder: 'Enter the message method'
+      },
+      {
+        name: 'gasPrice',
+        label: 'Gas Price',
+        value: '',
+        placeholder: 'Gas Price (Defaults to Figure Gas Price)',
+      },
+      {
+        name: 'gasPriceDenom',
+        label: 'Gas Denom',
+        value: '',
+        placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
       },
       {
         name: 'message',
