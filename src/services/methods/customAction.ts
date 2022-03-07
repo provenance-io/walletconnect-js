@@ -4,7 +4,7 @@ import { State } from '../walletConnectService';
 
 export const customAction = async (state: State, data: CustomActionData) => {
   let valid = false;
-  const { message: rawB64Message, description = 'Custom Action', method = 'provenance_sendTransaction' } = data;
+  const { message: rawB64Message, description = 'Custom Action', method = 'provenance_sendTransaction', gasPrice } = data;
   const { connector, address } = state;
   if (!connector) return { method, valid, error: 'No wallet connected' };
   // If message isn't an array, turn it into one
@@ -15,6 +15,7 @@ export const customAction = async (state: State, data: CustomActionData) => {
   const metadata = JSON.stringify({
     description,
     address,
+    gasPrice,
   });
   // Final message params
   const msgParams = [metadata, ...hexMsgArray];

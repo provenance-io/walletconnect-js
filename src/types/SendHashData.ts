@@ -1,5 +1,6 @@
 interface Amount {
   amount: number
+  gasPrice?: number
 }
 
 interface DelegateHashData extends Amount {

@@ -6,7 +6,7 @@ import { State } from '../walletConnectService';
 export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
   let valid = false;
   const {connector, address} = state;
-  const {to: toAddress, amount: sendAmountHash, count } = data;
+  const {to: toAddress, amount: sendAmountHash, count, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
   const description = 'Send Hash';
@@ -37,6 +37,7 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
   const metadata = JSON.stringify({
     description,
     address,
+    gasPrice,
   });
 
   try {

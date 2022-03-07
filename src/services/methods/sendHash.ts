@@ -9,7 +9,7 @@ import { State } from '../walletConnectService';
 export const sendHash = async (state: State, data: SendHashData) => {
   let valid = false;
   const {connector, address} = state;
-  const {to: toAddress, amount: sendAmountHash } = data;
+  const {to: toAddress, amount: sendAmountHash, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
   const description = 'Send Hash';
@@ -35,6 +35,7 @@ export const sendHash = async (state: State, data: SendHashData) => {
   const metadata = JSON.stringify({
     description,
     address,
+    gasPrice,
   });
   const msgParams = [metadata, hexMsg];
   try {

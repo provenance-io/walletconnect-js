@@ -6,7 +6,7 @@ import { State } from '../walletConnectService';
 export const sendCoin = async (state: State, data: SendCoinData) => {
   let valid = false;
   const {connector, address} = state;
-  const {to: toAddress, amount: initialAmount, denom: initialDenom = 'hash' } = data;
+  const {to: toAddress, amount: initialAmount, denom: initialDenom = 'hash', gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
   
@@ -38,6 +38,7 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   const metadata = JSON.stringify({
     description,
     address,
+    gasPrice,
   });
   const msgParams = [metadata, hexMsg];
   try {
