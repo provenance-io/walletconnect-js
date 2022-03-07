@@ -11,7 +11,7 @@ export const delegateHash = async (state: State, data: SendHashData) => {
   const type = 'MsgDelegate';
   const description = 'Delegate Hash';
   const {connector, address} = state;
-  const { validatorAddress, amount: sendAmountHash } = data;
+  const { validatorAddress, amount: sendAmountHash, gasPrice } = data;
   
   if (!connector) return { method, valid, error: 'No wallet connected' };
 
@@ -33,6 +33,7 @@ export const delegateHash = async (state: State, data: SendHashData) => {
   const metadata = JSON.stringify({
     description,
     address,
+    gasPrice,
   });
   // provenance_signTransaction params
   const msgParams = [metadata, hexMsg];
