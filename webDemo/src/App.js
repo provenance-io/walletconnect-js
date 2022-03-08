@@ -8,6 +8,7 @@ import {
   Connect,
   Dropdown,
   Header,
+  Subheader,
   MultiAction,
 } from 'Components';
 import { ALL_ACTIONS, BRIDGE_URLS } from 'consts';
@@ -90,7 +91,7 @@ export const App = () => {
   const [results, setResults] = useState(null);
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { publicKey, connected } = walletConnectState;
+  const { publicKey, connected, signedJWT, address } = walletConnectState;
 
   useEffect(() => {
     // When disconnected, reset actions and results
@@ -146,6 +147,7 @@ const renderResults = () => {
 return (
   <HomeContainer>
       <Header bridgeUrl={bridgeUrl} />
+      {signedJWT && <Subheader signedJWT={signedJWT} address={address} />}
       <Content>
         {connected ? (
           <>

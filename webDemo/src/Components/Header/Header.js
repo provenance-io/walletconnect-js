@@ -15,6 +15,7 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+  z-index:100;
   @media (max-width: 1280px) {
     padding: 14px 20px;
   }
