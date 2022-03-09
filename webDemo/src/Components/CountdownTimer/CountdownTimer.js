@@ -13,8 +13,8 @@ const Time = styled.div`
 
 export const CountdownTimer = ({ expires, onEnd, timeEvents }) => {
   // Get current time in seconds and compare it to expiration
-  // const timeNow = Math.ceil(new Date().getTime() / 1000);
-  const timeNow = expires - 305; // TEMP TESTING ***REMOVE ME***
+  const timeNow = Math.ceil(new Date().getTime() / 1000);
+  // const timeNow = expires - 305; // TEMP TESTING ***REMOVE ME***
   const initialStartTime = expires - timeNow;
   const [currentTime, setCurrentTime] = useState(initialStartTime);
   const [countdownState, setCountdownState] = useState('init'); // init => start => running => end
