@@ -68,8 +68,8 @@ export const CountdownTimer = ({ start, onEnd, timeEvents }) => {
       // Start loop with passed in initial start time
       countdownLoop(currentTime, cleanedTimeEvents);
     }
-    // When unmounted, clear the timeout (no leaking)
-    return () => { if (timeoutInstance) {clearTimeout(timeoutInstance)}}
+    // When unmounted, clear the timeout (no leaking) ** RETURN HERE - WORKS W/OUT, BUT IS MEMORY LEAK, WITH IT STOPS WITH MODAL CLOSE :(
+    // return () => { if (timeoutInstance) {clearTimeout(timeoutInstance)}}
   }, [timeoutInstance, onEnd, currentTime, countdownState, cleanedTimeEvents]);
 
   return <Time>{formatSeconds(currentTime)}</Time>
@@ -83,5 +83,5 @@ CountdownTimer.propTypes = {
 
 CountdownTimer.defaultProps = {
   onEnd: () => {},
-  timeEvents: null,
+  timeEvents: {},
 };

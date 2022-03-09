@@ -10,3 +10,4 @@ export * from './Subheader';
 export * from './CountdownTimer';
 export * from './MultiAction';
 export * from './InputB64';
+export * from './Modal';

@@ -147,7 +147,7 @@ const renderResults = () => {
 return (
   <HomeContainer>
       <Header bridgeUrl={bridgeUrl} />
-      {signedJWT && <Subheader signedJWT={signedJWT} address={address} />}
+      {signedJWT && <Subheader signedJWT={signedJWT} address={address} getSignedJWT={wcs.signJWT} />}
       <Content>
         {connected ? (
           <>
