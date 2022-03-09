@@ -8,6 +8,7 @@ import {
   Connect,
   Dropdown,
   Header,
+  Subheader,
   MultiAction,
 } from 'Components';
 import { ALL_ACTIONS, BRIDGE_URLS } from 'consts';
@@ -146,6 +147,7 @@ const renderResults = () => {
 return (
   <HomeContainer>
       <Header bridgeUrl={bridgeUrl} />
+      <Subheader />
       <Content>
         {connected ? (
           <>

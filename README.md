@@ -58,14 +58,14 @@ Each method will return a window message indicating whether it failed or was com
 // (Example using cancelRequest)
 
 // Listen for complete/success
-walletConnectService.addListener(WINDOW_MESSAGE.CANCEL_REQUEST_COMPLETE, (result) => {
+walletConnectService.addListener(WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE, (result) => {
   console.log(`WalletConnectJS | Complete | Result: `, result);
-};
+});
 // Listen for error/failure
-walletConnectService.addListener(WINDOW_MESSAGE.CANCEL_REQUEST_FAILED, (result) => {
+walletConnectService.addListener(WINDOW_MESSAGES.CANCEL_REQUEST_FAILED, (result) => {
   const { error } = result;
   console.log(`WalletConnectJS | Failed | result, error: `, result, error);
-};
+});
 ```
 
 ## WalletConnectContextProvider

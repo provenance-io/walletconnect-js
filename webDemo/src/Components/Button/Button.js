@@ -21,7 +21,7 @@ const StyledButton = styled.button`
   height: 40px;
   padding: 0 30px;
   &:hover:not(:disabled) {
-    filter: contrast(200%);
+    filter: saturate(175%);
   }
   &:active:not(:disabled) {
     filter: contrast(90%);
@@ -32,7 +32,7 @@ const StyledButton = styled.button`
 `;
 const ButtonContent = styled.div``;
 
-const Button = ({ className, color, onClick, children, disabled, width, title, type, loading }) => {
+export const Button = ({ className, color, onClick, children, disabled, width, title, type, loading }) => {
   const handleClick = () => {
     if (!disabled) {
       onClick();
@@ -80,5 +80,3 @@ Button.defaultProps = {
   type: 'button',
   loading: false,
 };
-
-export default Button;

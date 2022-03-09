@@ -77,12 +77,14 @@ export const ALL_ACTIONS = [
         label: 'Gas Price',
         value: '',
         placeholder: 'Gas Price (Defaults to Figure Gas Price)',
+        width: '50%',
       },
       {
         name: 'gasPriceDenom',
         label: 'Gas Denom',
         value: '',
         placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
+        width: '50%',
       },
       {
         name: 'message',
@@ -99,6 +101,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'DELEGATE_HASH',
     method: 'delegateHash',
+    gas: true,
     fields: [
       {
         name: 'validatorAddress',
@@ -114,6 +117,20 @@ export const ALL_ACTIONS = [
         placeholder: 'Enter Delegation Amount',
         width: '20%',
       },
+      {
+        name: 'gasPrice',
+        label: 'Gas Price',
+        value: '',
+        placeholder: 'Gas Price (Defaults to Figure Gas Price)',
+        width: '50%',
+      },
+      {
+        name: 'gasPriceDenom',
+        label: 'Gas Denom',
+        value: '',
+        placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
+        width: '50%',
+      },
     ],
   },
   // ----------------------------------
@@ -122,6 +139,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'TRANSACTION',
     method: 'sendCoin',
+    gas: true,
     fields: [
       {
         name: 'denom',
@@ -144,6 +162,20 @@ export const ALL_ACTIONS = [
         placeholder: 'Enter Send Amount',
         width: '10%',
       },
+      {
+        name: 'gasPrice',
+        label: 'Gas Price',
+        value: '',
+        placeholder: 'Gas Price (Defaults to Figure Gas Price)',
+        width: '50%',
+      },
+      {
+        name: 'gasPriceDenom',
+        label: 'Gas Denom',
+        value: '',
+        placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
+        width: '50%',
+      },
     ],
   },
   // ----------------------------------
@@ -152,6 +184,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'TRANSACTION',
     method: 'sendHash',
+    gas: true,
     fields: [
       {
         name: 'to',
@@ -166,6 +199,20 @@ export const ALL_ACTIONS = [
         value: '10',
         placeholder: 'Enter Send Amount',
         width: '20%',
+      },
+      {
+        name: 'gasPrice',
+        label: 'Gas Price',
+        value: '',
+        placeholder: 'Gas Price (Defaults to Figure Gas Price)',
+        width: '50%',
+      },
+      {
+        name: 'gasPriceDenom',
+        label: 'Gas Denom',
+        value: '',
+        placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
+        width: '50%',
       },
     ],
   },

@@ -8,6 +8,7 @@ import './base.css';
 ReactDOM.render(
   <StrictMode>
     <WalletConnectContextProvider network="testnet">
+      <div id="portal" />
       <App />
     </WalletConnectContextProvider>
   </StrictMode>,
