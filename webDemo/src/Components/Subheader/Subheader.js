@@ -1,9 +1,10 @@
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useWalletConnect, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
+import { useEffect, useState } from 'react';
 import { decodeJWT } from 'utils';
 import { CountdownTimer } from '../CountdownTimer';
 import { Modal } from '../Modal';
+import { Button } from '../Button';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -41,6 +42,10 @@ const ModalContent = styled.div`
   min-height: 300px;
   max-width: 500px;
   position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 `;
 const ModalClose = styled.div`
   color: #333333;
@@ -55,69 +60,90 @@ const ModalClose = styled.div`
 const ModalText = styled.div`
   font-size: 1.6rem;
   text-align: center;
+  width: 100%;
 `;
 
-
-export const Subheader = ({ signedJWT, address, getSignedJWT }) => {
+export const Subheader = () => {
   const [showModal, setShowModal] = useState(false);
-  const [sessionStatus, setSessionStatus] = useState('');
-  // Need to decode signedJWT and note the expiration time
-  const { payload: signedJWTPayload, valid: signedJWTValid } = decodeJWT(signedJWT, { addr: address });
-  // Pull out expiration date for jwt (in seconds)
-  const { exp: signedJWTExpiration } = signedJWTPayload;
-  // Get current time in seconds and compare it to expiration
-  const timeNow = Math.ceil(new Date().getTime() / 1000);
-  const expiresIn = signedJWTExpiration - timeNow;
-  // const expiresIn = 305; // Temp testing, just set to 5min10sec ***REMOVE ME***
+  const [modalMessage, setModalMessage] = useState('');
+  const [expires, setExpires] = useState(0);
+  const [JWTValid, setJWTValid] = useState(false);
+  const [error, setError] = useState('');
+  const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
+  const { signedJWT, address, loading } = walletConnectState;
+  // Listen for window events for signing JWT
+  useEffect(() => {
+    // Sign JWT Success
+    const successEvent = (result) => {
+      setShowModal(false);
+      setModalMessage('');
+      setError('');
+    };
+    const failEvent = (result) => {
+      setError(result?.error?.message || 'Failed to sign JWT, try again later.');
+    }
+    wcs.addListener(WINDOW_MESSAGES.SIGN_JWT_COMPLETE, successEvent);
+    wcs.addListener(WINDOW_MESSAGES.SIGN_JWT_FAILED, failEvent);
+
+    return () => {
+      wcs.removeListener(WINDOW_MESSAGES.SIGN_JWT_COMPLETE, successEvent);
+      wcs.removeListener(WINDOW_MESSAGES.SIGN_JWT_FAILED, failEvent);
+    }
+  }, [wcs]);
+
+
+  // Every time the Signed JWT changes, reset/restart the timer
+  useEffect(() => {
+    if (signedJWT) {
+      // Need to decode signedJWT and note the expiration time
+      const { payload: signedJWTPayload, valid: signedJWTValid } = decodeJWT(signedJWT, { addr: address });
+      // Pull out expiration date for jwt (in seconds)
+      const { exp: signedJWTExpiration } = signedJWTPayload;
+      setExpires(signedJWTExpiration);
+      setJWTValid(signedJWTValid);
+    }
+  }, [signedJWT, address]);
+
+  // This component requires a signedJWT, if it doesn't exist we need to nope-out and return null
+  if (!signedJWT) return null;
   
   const closeModal = () => {
     setShowModal(false);
   };
 
   const sessionWarning = () => {
-    setSessionStatus('warning');
+    setModalMessage('Your Signed JWT will expire soon, click the button below to re-sign.');
     setShowModal(true);
   };
   const sessionExpired = () => {
-    setSessionStatus('expired');
+    setModalMessage('Your Signed JWT has expired, click the button below to re-sign.');
     setShowModal(true);
   }
 
   return (
-    signedJWTValid ? (
+    JWTValid ? (
       <Wrapper>
         <Title>Signed JWT Expires In:</Title>
         <CountdownTimer
-          start={expiresIn}
+          expires={expires}
           onEnd={sessionExpired}
           timeEvents={{
             300: sessionWarning,
+            310: sessionWarning,
           }}
         />
         <Modal isOpen={showModal} close={closeModal}>
           <ModalContent>
             <ModalClose onClick={closeModal}>+</ModalClose>
-            {sessionStatus === 'warning' ? (
               <ModalText>
-                Your Signed JWT will expire soon, click the button below to re-sign.
-                <button type="button" onClick={getSignedJWT}>Get SignedJWT</button>
+                {loading === 'signJWT' ? 'Waiting on approval in wallet device...' : null}
+                {error}
+                {!loading && !error ? modalMessage : null}
               </ModalText>
-            ) : null}
-            {sessionStatus === 'error' ? (
-              <ModalText>
-                Your Signed JWT has expired, click the button below to re-sign.
-                <button type="button" onClick={getSignedJWT}>Get SignedJWT</button>
-              </ModalText>
-            ) : null}
+              <Button onClick={wcs.signJWT} loading={loading === 'signJWT'}>{loading === 'signJWT' ? 'Waiting...' : 'Sign New JWT'}</Button>
           </ModalContent>
         </Modal>
       </Wrapper>
     ) : null
   );
 };
-
-Subheader.propTypes = {
-  signedJWT: PropTypes.string.isRequired,
-  address: PropTypes.string.isRequired,
-  getSignedJWT: PropTypes.func.isRequired,
-}

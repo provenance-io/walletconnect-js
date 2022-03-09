@@ -89,7 +89,7 @@ const initialState: State = {
   QRCode: defaultState.QRCode,
   QRCodeUrl: defaultState.QRCodeUrl,
   showQRCodeModal: defaultState.showQRCodeModal,
-  signedJWT: defaultState.signedJWT,
+  signedJWT: existingWCJSState.signedJWT || defaultState.signedJWT,
 };
 
 export class WalletConnectService {
@@ -157,13 +157,14 @@ export class WalletConnectService {
 
   #updateLocalStorage = (updatedState: Partial<State>) => {
     // Special values to look for
-    const { connectionIat, account, newAccount, figureConnected } = updatedState;
+    const { connectionIat, account, newAccount, figureConnected, signedJWT } = updatedState;
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
       ...(connectionIat !== undefined && {connectionIat}),
       ...(account !== undefined && {account}),
       ...(newAccount !== undefined && {newAccount}),
       ...(figureConnected !== undefined && {figureConnected}),
+      ...(signedJWT !== undefined && {signedJWT}),
     };
     // If we have updated 1 or more special values, update localStorage
     if (Object.keys(storageUpdates).length) {
@@ -231,7 +232,7 @@ export class WalletConnectService {
   }
 
   connect = () => {
-    connectMethod(this.setState, this.resetState, this.#broadcastEvent, this.#bridge);   
+    connectMethod(this.state, this.setState, this.resetState, this.#broadcastEvent, this.#bridge);   
   }
 
   customAction = async (data: CustomActionData) => {
@@ -301,7 +302,7 @@ export class WalletConnectService {
   signJWT = async () => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'signJWT' });
-    const result = await signJWTMethod(this.state);
+    const result = await signJWTMethod(this.state, this.setState);
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method

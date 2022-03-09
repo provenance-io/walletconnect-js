@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 import styled from 'styled-components';
 import Input from '../Input';
-import Button from '../Button';
+import { Button } from '../Button';
 
 const Wrapper = styled.div`
   position: relative;

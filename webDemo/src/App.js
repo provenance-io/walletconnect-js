@@ -91,7 +91,7 @@ export const App = () => {
   const [results, setResults] = useState(null);
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { publicKey, connected, signedJWT, address } = walletConnectState;
+  const { publicKey, connected } = walletConnectState;
 
   useEffect(() => {
     // When disconnected, reset actions and results
@@ -147,7 +147,7 @@ const renderResults = () => {
 return (
   <HomeContainer>
       <Header bridgeUrl={bridgeUrl} />
-      {signedJWT && <Subheader signedJWT={signedJWT} address={address} getSignedJWT={wcs.signJWT} />}
+      <Subheader />
       <Content>
         {connected ? (
           <>

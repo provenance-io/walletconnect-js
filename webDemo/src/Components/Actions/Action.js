@@ -53,16 +53,15 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
 
   // Create all event listeners for this method
   useEffect(() => {
-    // Delegate Hash Events
-    walletConnectService.addListener(windowMsgComplete, (result) => {
+    const completeEvent = (result) => {
       setResults({
         action: rawMethod,
         status: 'success',
         message: `WalletConnectJS | ${rawMethod} ${isMulticall ? `#${multicallNo}` : ''} Complete`,
         data: result,
       });
-    });
-    walletConnectService.addListener(windowMsgFailed, (result) => {
+    };
+    const failEvent = (result) => {
       const { error } = result;
       setResults({
         action: rawMethod,
@@ -70,39 +69,15 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
         message: error.message,
         data: result,
       });
-    });
+    }
+    walletConnectService.addListener(windowMsgComplete, completeEvent);
+    walletConnectService.addListener(windowMsgFailed, failEvent);
 
     return () => {
-      walletConnectService.removeAllListeners(windowMsgComplete);
-      walletConnectService.removeAllListeners(windowMsgFailed);
+      walletConnectService.removeListener(windowMsgComplete, completeEvent);
+      walletConnectService.removeListener(windowMsgFailed, failEvent);
     }
   }, [walletConnectService, setResults, windowMsgComplete, windowMsgFailed, rawMethod, isMulticall, multicallNo]);
-
-  // const renderInputs = () => fields.map(({ name, width, label, placeholder, base64 }) => (
-  //   base64 ? (
-  //     <InputB64
-  //       key={name}
-  //       width={width}
-  //       value={inputValues[name]}
-  //       label={label}
-  //       placeholder={placeholder}
-  //       onChange={(value) => changeInputValue(name, value)}
-  //       bottomGap={fields.length > 2 ? true : undefined}
-  //       decodeOpen={decodeOpen}
-  //       setDecodeOpen={setDecodeOpen}
-  //     />
-  //   ) : (
-  //     <Input
-  //       key={name}
-  //       width={width}
-  //       value={inputValues[name]}
-  //       label={label}
-  //       placeholder={placeholder}
-  //       onChange={(value) => changeInputValue(name, value)}
-  //       bottomGap={fields.length > 2 ? true : undefined}
-  //     />
-  //   )
-  // ));
 
   const renderInputs = () => fields.map(({ name, width, label, placeholder, base64 }) => {
     if (base64) return (

@@ -3,9 +3,9 @@ import QRCode from 'qrcode';
 import { Broadcast } from 'types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
-import { SetState } from '../walletConnectService';
+import { SetState, State } from '../walletConnectService';
 
-export const connect = async (setState: SetState, resetState: () => void, broadcast: Broadcast, bridge: string) => {
+export const connect = async (state: State, setState: SetState, resetState: () => void, broadcast: Broadcast, bridge: string) => {
   // Get current time (use time to auto-logout)
   const connectionIat = Math.floor(Date.now() / 1000);
   // ----------------
@@ -13,7 +13,8 @@ export const connect = async (setState: SetState, resetState: () => void, broadc
   // ----------------
   const onSessionUpdate = (newConnector: WalletConnectClient) => {
     const { accounts, peerMeta: peer } = newConnector;
-    const [address, publicKey, signedJWT] = accounts;
+    const [address, publicKey, lastConnectJWT] = accounts;
+    const signedJWT = state.signedJWT || lastConnectJWT;
     setState({ address, publicKey, connected: true, signedJWT, peer });
     broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
   };
@@ -58,7 +59,8 @@ export const connect = async (setState: SetState, resetState: () => void, broadc
     });
     // Latest values
     const { accounts, peerMeta: peer } = newConnector;
-    const [address, publicKey, signedJWT] = accounts;
+    const [address, publicKey, lastConnectJWT] = accounts;
+    const signedJWT = state.signedJWT || lastConnectJWT;
     // Are we already connected
     if (newConnector.connected) {
       onSessionUpdate(newConnector);

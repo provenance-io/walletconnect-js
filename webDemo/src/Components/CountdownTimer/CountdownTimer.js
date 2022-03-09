@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { formatSeconds } from 'utils';
+import { useInterval } from 'hooks';
 
 const Time = styled.div`
   font-family: 'Courier New', Courier, monospace;
@@ -10,73 +11,74 @@ const Time = styled.div`
   margin-top: 2px;
 `;
 
-export const CountdownTimer = ({ start, onEnd, timeEvents }) => {
-  const [currentTime, setCurrentTime] = useState(start);
-  const [timeoutInstance, setTimeoutInstance] = useState(null);
-  const [countdownState, setCountdownState] = useState('init');
-  const refreshRate = 1000;
-  // Remove any special time events that may have already happened
-  const cleanedTimeEvents = useMemo(() => ({ ...timeEvents }), [timeEvents]);
-  Object.keys(timeEvents).forEach(eventTime => {
-    if (start < eventTime) delete cleanedTimeEvents[eventTime];
-  });
+export const CountdownTimer = ({ expires, onEnd, timeEvents }) => {
+  // Get current time in seconds and compare it to expiration
+  // const timeNow = Math.ceil(new Date().getTime() / 1000);
+  const timeNow = expires - 305; // TEMP TESTING ***REMOVE ME***
+  const initialStartTime = expires - timeNow;
+  const [currentTime, setCurrentTime] = useState(initialStartTime);
+  const [countdownState, setCountdownState] = useState('init'); // init => start => running => end
+  const [remainingTimeEvents, setRemainingTimeEvents] = useState(timeEvents);
+  let refreshRate = 1000;
 
-  // When component loads, start the timer if not already started
+  // Detect change to start time (refreshed/new JWT)
   useEffect(() => {
-    // Loop to continuously count down
-    const countdownLoop = (time, remainingTimeEvents) => {
-      const cleanRemainingTimeEvents = remainingTimeEvents ? { ...remainingTimeEvents } : null;
-      // If special time events exist
-      if (cleanRemainingTimeEvents && Object.keys(cleanRemainingTimeEvents).length) {
-        const timeEventTimes = Object.keys(cleanRemainingTimeEvents); // Keys are the special times (in seconds)
-        // Look through each special event time to see if we need to trigger it
-        timeEventTimes.forEach(eventTime => {
-          // Trigger any special time events if they have occured
-          if (time < eventTime) {
-            // Run special event
-            cleanRemainingTimeEvents[eventTime]();
-            // Remove special event
-            delete cleanRemainingTimeEvents[eventTime];
-          }
-        });
-      }
-      // Make sure not expired
-      if (time > 0) {
-        // Create new timeout
-        const newTimeout = setTimeout(() => {
-          // Take 1 second off of current time
-          const newTime = time - 1;
-          // Save new current time
-          setCurrentTime(newTime);
-          countdownLoop(newTime, cleanRemainingTimeEvents);
-        }, refreshRate);
-        // Save this timeout to the state
-        setTimeoutInstance(newTimeout);
-      } else {
-        // Clear current timeout
-        clearTimeout(timeoutInstance);
-        // Countdown is now off
-        setCountdownState('end');
-        // If expired, run callback onEnd function
-        onEnd();
-      }
-    };
-    // Start the loop if it hasn't been started yet
-    if (countdownState === 'init') {
-      // Set as started
+    // We handle the first init in the next use effect, this is for a new change/refresh
+    setCountdownState('start');
+  }, [expires]);
+
+  // Initial start to timer
+  useEffect(() => {
+    if (countdownState === 'start') {
       setCountdownState('running');
-      // Start loop with passed in initial start time
-      countdownLoop(currentTime, cleanedTimeEvents);
+      // reset/update currentTime
+      setCurrentTime(initialStartTime);
+      // Clean up the already expired timed events
+      const cleanedTimeEvents = { ...timeEvents };
+      Object.keys(cleanedTimeEvents).forEach(eventTime => {
+        if (initialStartTime <= eventTime) delete cleanedTimeEvents[eventTime];
+      });
+      setRemainingTimeEvents(cleanedTimeEvents);
     }
-    // When unmounted, clear the timeout (no leaking) ** RETURN HERE - WORKS W/OUT, BUT IS MEMORY LEAK, WITH IT STOPS WITH MODAL CLOSE :(
-    // return () => { if (timeoutInstance) {clearTimeout(timeoutInstance)}}
-  }, [timeoutInstance, onEnd, currentTime, countdownState, cleanedTimeEvents]);
+  }, [initialStartTime, currentTime, countdownState, timeEvents]);
+
+  useInterval(() => {
+    // ----------------------------------
+    // Loop through special time events
+    // ----------------------------------
+    // Keys are the special times (in seconds)
+    const eventTimeValues = Object.keys(remainingTimeEvents);
+    // Look through each special event time to see if we need to trigger it
+    eventTimeValues.forEach(eventTime => {
+      // Trigger any special time events if they have occured
+      if ((currentTime -1) <= eventTime) {
+        // Run special event
+        remainingTimeEvents[eventTime]();
+        // Remove special event
+        const cleanedTimeEvents = { ...remainingTimeEvents };
+        delete cleanedTimeEvents[eventTime];
+        setRemainingTimeEvents(cleanedTimeEvents);
+      }
+    });
+    // --------------------------------------------------
+    // Update the current time, trigger end if needed
+    // --------------------------------------------------
+    if (currentTime > 0) setCurrentTime(currentTime - 1);
+    if (currentTime <= 1) { // Time has reached zero/expired
+      // Clear the current interval
+      refreshRate = null;
+      // Update countdown state to ended
+      setCountdownState('end');
+      // Run onEnd callback function
+      onEnd();
+    }
+  }, refreshRate, countdownState === 'end');
 
   return <Time>{formatSeconds(currentTime)}</Time>
 };
 
 CountdownTimer.propTypes = {
-  start: PropTypes.number.isRequired,
+  expires: PropTypes.number.isRequired,
   onEnd: PropTypes.func,
   timeEvents: PropTypes.object,
 };

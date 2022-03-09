@@ -1,9 +1,9 @@
 import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
-import { State } from '../walletConnectService';
+import { State, SetState } from '../walletConnectService';
 
-export const signJWT = async (state: State) => {
+export const signJWT = async (state: State, setState: SetState) => {
   let valid = false;
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
@@ -49,6 +49,8 @@ export const signJWT = async (state: State) => {
     valid = await verifySignature(JWT, signature, pubKeyB64);
     const signedPayloadEncoded = base64url(signature);
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
+    // Update JWT within the wcjs state
+    setState({ signedJWT })
     return { method, valid, result, signedJWT, address  };
   } catch (error) {
     return { method, valid, error };
