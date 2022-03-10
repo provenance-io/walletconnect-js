@@ -222,6 +222,14 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'SIGN_JWT',
     method: 'signJWT',
+    fields: [
+      {
+        value: '',
+        label: 'Custom JWT Expiration',
+        placeholder: 'Enter custom expiration (seconds)',
+        name: 'expires',
+      },
+    ],
   },
   // ----------------------------------
   // Sign Message Method/Action

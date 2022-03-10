@@ -2,8 +2,9 @@ import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
 import { State, SetState } from '../walletConnectService';
+import { SignJWTData } from '../../types';
 
-export const signJWT = async (state: State, setState: SetState) => {
+export const signJWT = async (state: State, setState: SetState, expires: SignJWTData) => {
   let valid = false;
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
@@ -12,14 +13,15 @@ export const signJWT = async (state: State, setState: SetState) => {
   if (!connector) return { method, valid, error: 'No wallet connected' };
   // Build JWT
   const now = Math.floor(Date.now() / 1000); // Current time
-  const expires = now + 3600; // (60min)
+  const defaultExpires = now + 86400; // (24hours)
+  const finalExpires = expires || defaultExpires;
   const header = JSON.stringify({alg: 'ES256K', typ: 'JWT'});
   const headerEncoded = base64url(header);
   const payload = JSON.stringify({
     sub: pubKeyB64,
     iss: 'provenance.io',
     iat: now,
-    exp: expires,
+    exp: finalExpires,
     addr: address,
   });
   const payloadEncoded = base64url(payload);

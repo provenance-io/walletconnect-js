@@ -8,6 +8,7 @@ import {
   SendHashData,
   SendHashBatchData,
   BroadcastResults,
+  SignJWTData,
 } from 'types';
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL } from '../consts';
 import {
@@ -33,7 +34,6 @@ export interface State {
   account: string,
   address: string,
   assets: string[],
-  assetsPending: boolean,
   connected: boolean,
   connectionIat: number | null,
   connector: WalletConnectClient | null,
@@ -56,7 +56,6 @@ const defaultState: State = {
   account: '',
   address: '',
   assets: [],
-  assetsPending: false,
   connected: false,
   connectionIat: null,
   connector: null,
@@ -76,7 +75,6 @@ const initialState: State = {
   account: existingWCJSState.account || defaultState.account,
   address: existingWCState?.accounts && existingWCState.accounts[0] || defaultState.address,
   assets: defaultState.assets,
-  assetsPending: defaultState.assetsPending,
   connected: defaultState.connected,
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connector: defaultState.connector,
@@ -299,10 +297,10 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
   }
 
-  signJWT = async () => {
+  signJWT = async (expires: SignJWTData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'signJWT' });
-    const result = await signJWTMethod(this.state, this.setState);
+    const result = await signJWTMethod(this.state, this.setState, expires);
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method
