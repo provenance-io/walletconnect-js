@@ -42,6 +42,18 @@ export const connect = async (state: State, setState: SetState, resetState: () =
   // --------------------------
   const subscribeToEvents = (newConnector: WalletConnectClient) => {
     if (!newConnector) return;
+    /* Pulled RESERVED_EVENTS from wallet connect:
+      "session_request",
+      "session_update", [used]
+      "exchange_key",
+      "connect", [used]
+      "disconnect", [used]
+      "display_uri",
+      "modal_closed",
+      "transport_open",
+      "transport_close",
+      "transport_error",
+    */
     // Session Update
     newConnector.on("session_update", (error) => {
       if (error) throw error;

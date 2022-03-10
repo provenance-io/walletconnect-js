@@ -140,7 +140,7 @@ export const Subheader = () => {
                 {error}
                 {!loading && !error ? modalMessage : null}
               </ModalText>
-              <Button onClick={wcs.signJWT} loading={loading === 'signJWT'}>{loading === 'signJWT' ? 'Waiting...' : 'Sign New JWT'}</Button>
+              <Button onClick={wcs.signJWT} loading={loading === 'signJWT'}>{loading === 'signJWT' ? 'Waiting...' : 'Sign New JWT (24 Hours)'}</Button>
           </ModalContent>
         </Modal>
       </Wrapper>
