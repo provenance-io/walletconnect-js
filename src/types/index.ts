@@ -7,3 +7,4 @@ export * from './SendCoinData';
 export * from './SendHashData';
 export * from './SignJWTResult';
 export * from './BroadcastResults';
+export * from './SignJWTData';

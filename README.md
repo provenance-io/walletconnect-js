@@ -58,25 +58,22 @@ Each method will return a window message indicating whether it failed or was com
 // (Example using cancelRequest)
 
 // Listen for complete/success
-walletConnectService.addListener(WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE, (result) => {
-  console.log(`WalletConnectJS | Complete | Result: `, result);
-});
+const successAction = (result) => { console.log(`WalletConnectJS | Complete | Result: `, result); }
+walletConnectService.addListener(WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE, successAction);
 // Listen for error/failure
-walletConnectService.addListener(WINDOW_MESSAGES.CANCEL_REQUEST_FAILED, (result) => {
-  const { error } = result;
-  console.log(`WalletConnectJS | Failed | result, error: `, result, error);
-});
+const failAction = (result) => { const { error } = result; console.log(`WalletConnectJS | Failed | result, error: `, result, error); }
+walletConnectService.addListener(WINDOW_MESSAGES.CANCEL_REQUEST_FAILED, failAction);
+
+// Unmount listeners once they are no longer needed (typically in useEffect return)
+// Remove event listeners once no longer needed (Node: Each requires specific function to remove, see Note B above)
+walletConnectService.removeListener(WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE, successAction);
+walletConnectService.removeListener(WINDOW_MESSAGES.CANCEL_REQUEST_FAILED, failAction);
 ```
 
 ## WalletConnectContextProvider
 React context provider to supply state to every child within
   - Include as parent to all Components using `walletconnect-js`
   - Takes in an optional `network` prop of `"mainnet"` or `"testnet"` (default `"mainnet"`)
-    ```js
-      // Controls the automatic session logout / idle time
-      mainnet: 900, // 15 min
-      testnet: 99999, // 27 hours
-    ```
   - Usage Example (w/React.js):
     ```js
     // index.js
@@ -141,11 +138,12 @@ React hook which contains `walletConnectService` and `walletConnectState`
       walletConnectService.customAction({ message, description, method });
       // WINDOW_MESSAGES: CUSTOM_ACTION_COMPLETE, CUSTOM_ACTION_FAILED
     ```
-    | Param       	| Type   	        | Required 	| Default                        	| Example                        	| Info                                   	  |
-    |-------------	|---------------	|----------	|--------------------------------	|--------------------------------	|-----------------------------------------  |
-    | message     	| string / array 	| yes      	| -                              	| `'CiwvcHJvdmVuYW5jZS5tZX...'`  	| B64 encoded Message(s) to pass to wallet 	|
-    | description 	| string 	        | no       	| `'Custom Action'`              	| `'My Custom Action'`           	| Prompt title on mobile wallet         	  |
-    | method      	| string 	        | no       	| `'provenance_sendTransaction'` 	| `'provenance_sendTransaction'` 	| Message method                        	  |
+    | Param       	| Type   	        | Required 	| Default                        	                                    | Example                        	              | Info                                   	  |
+    |-------------	|---------------	|----------	|-------------------------------------------------------------------- |---------------------------------------------	|-----------------------------------------  |
+    | message     	| string / array 	| yes      	| -                              	                                    | `'CiwvcHJvdmVuYW5jZS5tZX...'`  	              | B64 encoded Message(s) to pass to wallet 	|
+    | description 	| string 	        | no       	| `'Custom Action'`              	                                    | `'My Custom Action'`           	              | Prompt title on mobile wallet         	  |
+    | method      	| string 	        | no       	| `'provenance_sendTransaction'` 	                                    | `'provenance_sendTransaction'` 	              | Message method                        	  |
+    | gasPrice      | object 	        | no       	| `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` 	| `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` 	| Optional gasPrice object, defaults to Figure values |
 
   - #### delegateHash
     Delegate a custom amount of Hash token to a custom address
@@ -171,11 +169,12 @@ React hook which contains `walletConnectService` and `walletConnectState`
       walletConnectService.sendCoin({ to, amount, denom });
       // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
     ```
-    | Param  	| Type   	| Required 	| Default 	| Example        	| Info                  	|
-    |--------	|--------	|----------	|---------	|----------------	|-----------------------	|
-    | to     	| string 	| yes      	| -       	| `'tpa1b23...'` 	| Target wallet address 	|
-    | amount 	| number 	| yes      	| -       	| `10`           	| Amount to use         	|
-    | denom 	| string 	| no      	| `'Hash'` 	| `'Hash'`       	| Coin's Denom          	|
+    | Param  	 | Type   	| Required 	| Default 	                                                          | Example        	                              | Info                  	|
+    |--------- |--------	|----------	|-------------------------------------------------------------------- |---------------------------------------------	|-----------------------	|
+    | to     	 | string 	| yes      	| -       	                                                          | `'tpa1b23...'` 	                              | Target wallet address 	|
+    | amount 	 | number 	| yes      	| -       	                                                          | `10`           	                              | Amount to use         	|
+    | denom 	 | string 	| no      	| `'Hash'` 	                                                          | `'Hash'`       	                              | Coin's Denom          	|
+    | gasPrice | object 	| no       	| `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` 	| `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` 	| Optional gasPrice object, defaults to Figure values |
 
   - #### sendHash
     Send a custom amount of Hash token to a custom address
@@ -183,17 +182,21 @@ React hook which contains `walletConnectService` and `walletConnectState`
       walletConnectService.sendHash({ to, amount });
       // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
     ```
-    | Param  	| Type   	| Required 	| Default 	| Example        	| Info                  	|
-    |--------	|--------	|----------	|---------	|----------------	|-----------------------	|
-    | to     	| string 	| yes      	| -       	| `'tpa1b23...'` 	| Target wallet address 	|
-    | amount 	| number 	| yes      	| -       	| `10`           	| Amount to use         	|
+    | Param  	 | Type   	| Required 	| Default 	                                                          | Example        	                              | Info                  	|
+    |--------- |--------	|----------	|-------------------------------------------------------------------	|---------------------------------------------	|-----------------------	|
+    | to     	 | string 	| yes      	| -       	                                                          | `'tpa1b23...'` 	                              | Target wallet address 	|
+    | amount 	 | number 	| yes      	| -       	                                                          | `10`           	                              | Amount to use         	|
+    | gasPrice | object 	| no       	| `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` 	| `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` 	| Optional gasPrice object, defaults to Figure values |
 
   - #### signJWT
     Prompt user to sign a generated JWT
     ```js
-      walletConnectService.signJWT();
+      walletConnectService.signJWT(expire);
       // WINDOW_MESSAGES: SIGN_JWT_COMPLETE, SIGN_JWT_FAILED
     ```
+    | Param  	| Type   	| Required 	| Default               	| Example        	| Info                  	                  |
+    |--------	|--------	|----------	|-----------------------	|----------------	|-----------------------------------------	|
+    | expire  | number 	| no      	| 24 hours (now + 86400) 	| `1647020269` 	  | Custom expiration date (seconds) of JWT 	|
 
   - #### signMessage
     Prompt user to sign a custom message
@@ -222,6 +225,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
       peer: {}, // Connected wallet info [object]
       publicKey: '', // Wallet public key (base64url encoded)
       QRCode: '', // QRCode image data to connect to WalletConnect bridge [string]
+      QRCodeUrl: '', // QRCode url contained within image [string]
       showQRCodeModal: false, // Should the QR modal be open [bool]
       signedJWT: '', // Signed JWT token [string]
     }

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactElement } from 'react';
 import { WalletConnectService, State } from '../services';
-import { CONNECTION_TIMEOUT } from '../consts';
+// import { CONNECTION_TIMEOUT } from '../consts';
 
 interface ProviderState {
   walletConnectService: WalletConnectService,
@@ -31,12 +31,13 @@ const WalletConnectContextProvider:React.FC<Props> = ({ children, network, bridg
     if (walletConnectState.address) {
       // Reconnect the users walletconnect session
       walletConnectService.connect();
+      // Note: Removed timeout feature in v0.2.11, timeout disconnects will be handled via bridge instead
       // Compare the "connection initialized at" time to current time
-      const now = Math.floor(Date.now() / 1000);
-      const timeout = network ? CONNECTION_TIMEOUT[network] : CONNECTION_TIMEOUT.mainnet;
-      if (walletConnectState.connectionIat && (now - walletConnectState.connectionIat) > timeout) {
-        walletConnectService.disconnect();
-      }
+      // const now = Math.floor(Date.now() / 1000);
+      // const timeout = network ? CONNECTION_TIMEOUT[network] : CONNECTION_TIMEOUT.mainnet;
+      // if (walletConnectState.connectionIat && (now - walletConnectState.connectionIat) > timeout) {
+      //   walletConnectService.disconnect();
+      // }
     }
     return () => walletConnectService.removeAllListeners();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
