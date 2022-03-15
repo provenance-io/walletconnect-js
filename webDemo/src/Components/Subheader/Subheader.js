@@ -57,6 +57,11 @@ const ModalClose = styled.div`
   right: 10px;
   cursor: pointer;
 `;
+const Item = styled.div`
+  margin: 0 10px;
+  display: flex;
+  align-items: center;
+`;
 const ModalText = styled.div`
   font-size: 1.6rem;
   text-align: center;
@@ -70,7 +75,12 @@ export const Subheader = () => {
   const [JWTValid, setJWTValid] = useState(false);
   const [error, setError] = useState('');
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { signedJWT, address, loading } = walletConnectState;
+  const {
+    signedJWT,
+    address,
+    loading,
+    connectionEat,
+  } = walletConnectState;
   // Listen for window events for signing JWT
   useEffect(() => {
     // Sign JWT Success
@@ -121,17 +131,27 @@ export const Subheader = () => {
   }
 
   return (
-    JWTValid ? (
+    (JWTValid || connectionEat) ? (
       <Wrapper>
-        <Title>Signed JWT Expires In:</Title>
-        <CountdownTimer
-          expires={expires}
-          onEnd={sessionExpired}
-          timeEvents={{
-            300: sessionWarning,
-            310: sessionWarning,
-          }}
-        />
+        {JWTValid && (
+          <Item>
+            <Title>Signed JWT Expires In:</Title>
+            <CountdownTimer
+              expires={expires}
+              onEnd={sessionExpired}
+              timeEvents={{
+                300: sessionWarning,
+                310: sessionWarning,
+              }}
+            />
+          </Item>
+        )}
+        {connectionEat && (
+          <Item>
+            <Title>Wallet Connect Session Expires In:</Title>
+            <CountdownTimer expires={connectionEat} />
+          </Item>
+        )}
         <Modal isOpen={showModal} close={closeModal}>
           <ModalContent>
             <ModalClose onClick={closeModal}>+</ModalClose>
