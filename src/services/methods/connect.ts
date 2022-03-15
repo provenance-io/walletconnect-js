@@ -5,9 +5,26 @@ import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
 import { SetState, State } from '../walletConnectService';
 
-export const connect = async (state: State, setState: SetState, resetState: () => void, broadcast: Broadcast, bridge: string) => {
-  // Get current time (use time to auto-logout)
+interface ConnectProps {
+  state: State,
+  setState: SetState,
+  resetState: () => void,
+  broadcast: Broadcast,
+  bridge: string,
+  startConnectionTimer: () => void,
+}
+
+export const connect = async ({
+  state,
+  setState,
+  resetState,
+  broadcast,
+  bridge,
+  startConnectionTimer,
+}: ConnectProps) => {
+  // Get connection issued/expires times (auto-logout)
   const connectionIat = Math.floor(Date.now() / 1000);
+  const connectionEat = state.connectionTimeout + connectionIat;
   // ----------------
   // SESSION UPDATE
   // ----------------
@@ -15,8 +32,10 @@ export const connect = async (state: State, setState: SetState, resetState: () =
     const { accounts, peerMeta: peer } = newConnector;
     const [address, publicKey, lastConnectJWT] = accounts;
     const signedJWT = state.signedJWT || lastConnectJWT;
-    setState({ address, publicKey, connected: true, signedJWT, peer });
+    setState({ address, publicKey, connected: true, signedJWT, peer, connectionIat });
     broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
+    // Start the auto-logoff timer
+    startConnectionTimer();
   };
   // ----------------
   // CONNECTED
@@ -25,8 +44,10 @@ export const connect = async (state: State, setState: SetState, resetState: () =
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
     const [address, publicKey, signedJWT] = accounts;
-    setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT });
+    setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT, connectionEat });
     broadcast(WINDOW_MESSAGES.CONNECTED, data);
+    // Start the auto-logoff timer
+    startConnectionTimer();
   };
   // --------------------
   // WALLET DISCONNECT
