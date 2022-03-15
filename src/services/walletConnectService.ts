@@ -35,7 +35,9 @@ export interface State {
   address: string,
   assets: string[],
   connected: boolean,
+  connectionTimeout: number,
   connectionIat: number | null,
+  connectionEat: number | null,
   connector: WalletConnectClient | null,
   figureConnected: boolean,
   isMobile: boolean,
@@ -57,7 +59,9 @@ const defaultState: State = {
   address: '',
   assets: [],
   connected: false,
+  connectionTimeout: CONNECTION_TIMEOUT,
   connectionIat: null,
+  connectionEat: null,
   connector: null,
   figureConnected: false,
   isMobile: isMobile(),
@@ -76,7 +80,9 @@ const initialState: State = {
   address: existingWCState?.accounts && existingWCState.accounts[0] || defaultState.address,
   assets: defaultState.assets,
   connected: defaultState.connected,
+  connectionTimeout: existingWCJSState.connectionTimeout || defaultState.connectionTimeout,
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
+  connectionEat: existingWCJSState.connectionEat || defaultState.connectionEat,
   connector: defaultState.connector,
   figureConnected: !!existingWCJSState.account && defaultState.connected,
   isMobile: defaultState.isMobile,
@@ -97,7 +103,7 @@ export class WalletConnectService {
   
   #network = 'mainnet';
 
-  #connectionTimeout = CONNECTION_TIMEOUT;
+  #connectionTimer = 0;
 
   #bridge: string = WALLETCONNECT_BRIDGE_URL;
 
@@ -128,6 +134,35 @@ export class WalletConnectService {
     })
   }
   
+  // Control auto-disconnect / timeout
+  #startConnectionTimer = () => {
+    // Can't start a timer if one is already running (make sure we have Eat and Iat too)
+    if (!this.#connectionTimer && this.state.connectionEat && this.state.connectionIat) {
+      // Get the time until expiration (typically this.state.connectionTimeout, but might not be if session restored from refresh)
+      const connectionTimeout = this.state.connectionEat - this.state.connectionIat; 
+      // Create a new timer
+      const newConnectionTimer = window.setTimeout(() => {
+        // When this timer expires, kill the session
+        this.disconnect();
+      }, (connectionTimeout * 1000)); // Convert to ms (timeout takes ms)
+      // Save this timer (so it can be deleted on a reset)
+      this.#connectionTimer = newConnectionTimer;
+    }
+  }
+
+  #resetConnectionTimeout = () => {
+    // Kill the last timer (if it exists)
+    if (this.#connectionTimer) window.clearTimeout(this.#connectionTimer);
+    // Build a new connectionIat (time now in seconds)
+    const connectionIat = Math.floor(Date.now() / 1000);
+    // Build a new connectionEat (Iat + connectionTimeout)
+    const connectionEat = this.state.connectionTimeout + connectionIat;
+    // Save these new values (needed for session restore functionality/page refresh)
+    this.setState({ connectionIat, connectionEat });
+    // Start a new timer
+    this.#startConnectionTimer();
+  }
+
   // Update the network and bridge by passing it through as a prop on the provider
 
   setNetwork(network: string) {
@@ -136,10 +171,6 @@ export class WalletConnectService {
 
   setBridge(bridge: string) {
     this.#bridge = bridge;
-  }
-
-  setConnectionTimeout(timeout: number) {
-    this.#connectionTimeout = timeout;
   }
 
   updateState(): void {
@@ -161,10 +192,20 @@ export class WalletConnectService {
 
   #updateLocalStorage = (updatedState: Partial<State>) => {
     // Special values to look for
-    const { connectionIat, account, newAccount, figureConnected, signedJWT } = updatedState;
+    const {
+      connectionIat,
+      connectionEat,
+      connectionTimeout,
+      account,
+      newAccount,
+      figureConnected,
+      signedJWT,
+    } = updatedState;
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
       ...(connectionIat !== undefined && {connectionIat}),
+      ...(connectionEat !== undefined && {connectionEat}),
+      ...(connectionTimeout !== undefined && {connectionTimeout}),
       ...(account !== undefined && {account}),
       ...(newAccount !== undefined && {newAccount}),
       ...(figureConnected !== undefined && {figureConnected}),
@@ -211,6 +252,8 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.ACTIVATE_REQUEST_FAILED : WINDOW_MESSAGES.ACTIVATE_REQUEST_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
   
   addMarker = async (data: { denom: string, amount: number }) => {
@@ -222,6 +265,8 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.ADD_MARKER_FAILED : WINDOW_MESSAGES.ADD_MARKER_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
 
   cancelRequest = async (denom: string) => {
@@ -233,10 +278,19 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.CANCEL_REQUEST_FAILED : WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
 
   connect = () => {
-    connectMethod(this.state, this.setState, this.resetState, this.#broadcastEvent, this.#bridge);   
+    connectMethod({
+      state: this.state,
+      setState: this.setState,
+      resetState: this.resetState,
+      broadcast: this.#broadcastEvent,
+      bridge: this.#bridge,
+      startConnectionTimer: this.#startConnectionTimer,
+    });
   }
 
   customAction = async (data: CustomActionData) => {
@@ -248,6 +302,8 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.CUSTOM_ACTION_FAILED : WINDOW_MESSAGES.CUSTOM_ACTION_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
 
   delegateHash = async (data: SendHashData) => {
@@ -259,6 +315,8 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.DELEGATE_HASH_FAILED : WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
 
   disconnect = () => {
@@ -276,6 +334,8 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.TRANSACTION_FAILED : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
   
   /**
@@ -290,6 +350,8 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.TRANSACTION_FAILED : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
   
   sendHashBatch = async (data: SendHashBatchData) => {
@@ -301,6 +363,8 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.TRANSACTION_FAILED : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
 
   signJWT = async (expires: SignJWTData) => {
@@ -312,6 +376,8 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.SIGN_JWT_FAILED : WINDOW_MESSAGES.SIGN_JWT_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
 
   signMessage = async (customMessage: string) => {
@@ -324,5 +390,7 @@ export class WalletConnectService {
     // Broadcast result of method
     const windowMessage = result.error ? WINDOW_MESSAGES.SIGNATURE_FAILED : WINDOW_MESSAGES.SIGNATURE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
   }
 }

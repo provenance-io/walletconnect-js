@@ -220,6 +220,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
       assets: [], // Wallet assets [array]
       connected: false, // WalletConnect connected [bool]
       connectionIat: null, // WalletConnect initialized at time [number]
+      connectionEat: null, // WalletConnect expires at time [number]
       connector: null, // WalletConnect connector 
       figureConnected: false, // Account and address both exist [bool]
       isMobile: false, // Is the connected browser a mobile device [bool]
