@@ -10,7 +10,7 @@ import {
   BroadcastResults,
   SignJWTData,
 } from 'types';
-import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL } from '../consts';
+import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL, CONNECTION_TIMEOUT } from '../consts';
 import {
   activateRequest as activateRequestMethod,
   addMarker as addMarkerMethod,
@@ -97,6 +97,8 @@ export class WalletConnectService {
   
   #network = 'mainnet';
 
+  #connectionTimeout = CONNECTION_TIMEOUT;
+
   #bridge: string = WALLETCONNECT_BRIDGE_URL;
 
   state: State = { ...initialState };
@@ -134,6 +136,10 @@ export class WalletConnectService {
 
   setBridge(bridge: string) {
     this.#bridge = bridge;
+  }
+
+  setConnectionTimeout(timeout: number) {
+    this.#connectionTimeout = timeout;
   }
 
   updateState(): void {

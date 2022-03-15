@@ -73,7 +73,10 @@ walletConnectService.removeListener(WINDOW_MESSAGES.CANCEL_REQUEST_FAILED, failA
 ## WalletConnectContextProvider
 React context provider to supply state to every child within
   - Include as parent to all Components using `walletconnect-js`
-  - Takes in an optional `network` prop of `"mainnet"` or `"testnet"` (default `"mainnet"`)
+  - Takes in optional params:
+    - `network`: Chain network of `"mainnet"` or `"testnet"` [`string`] (default: `"mainnet"`)
+    - `bridge`: WalletConnect bridge [`string`] (default: `"'wss://test.figure.tech/service-wallet-connect-bridge/ws/external'"`)
+    - `timeout`: Session timeout, seconds [`number`] (default: `1800`)
   - Usage Example (w/React.js):
     ```js
     // index.js
