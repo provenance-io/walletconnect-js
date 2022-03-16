@@ -8,15 +8,12 @@ import { SendHashData } from './SendHashData';
 export type BaseResults = {
   valid: boolean
   result?: Record<string, unknown>
-  data: MarkerData | MarkerAddData | CustomActionData | SendCoinData | SignJWTData | SendHashData
+  data: MarkerData | MarkerAddData | CustomActionData | SendCoinData | SignJWTData | SendHashData | string
   error?: string | Error | unknown
   request?: {
     id: number
     jsonrpc: string
     method: string
-    params: [
-      metadata: string,
-      hexMsg: string
-    ],
+    params: string[],
   },
 };
