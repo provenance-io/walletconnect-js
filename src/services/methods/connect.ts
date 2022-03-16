@@ -1,6 +1,6 @@
 import WalletConnectClient from "@walletconnect/client";
 import QRCode from 'qrcode';
-import { Broadcast } from 'types';
+import { Broadcast, ConnectData } from 'types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
 import { SetState, State } from '../walletConnectService';
@@ -33,19 +33,31 @@ export const connect = async ({
     const [address, publicKey, lastConnectJWT] = accounts;
     const signedJWT = state.signedJWT || lastConnectJWT;
     setState({ address, publicKey, connected: true, signedJWT, peer, connectionIat });
-    broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
+    const broadcastData = {
+      data: newConnector,
+      connectionIat,
+      connectionEat: state.connectionEat,
+      connectionType: 'existing session'
+    };
+    broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
     // Start the auto-logoff timer
     startConnectionTimer();
   };
   // ----------------
   // CONNECTED
   // ----------------
-  const onConnect = (payload: any | null) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const onConnect = (payload: ConnectData) => {
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
     const [address, publicKey, signedJWT] = accounts;
     setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT, connectionEat });
-    broadcast(WINDOW_MESSAGES.CONNECTED, data);
+    const broadcastData = {
+      data: payload,
+      connectionIat,
+      connectionEat,
+      connectionType: 'new session'
+    };
+    broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
     // Start the auto-logoff timer
     startConnectionTimer();
   };

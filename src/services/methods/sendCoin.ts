@@ -9,8 +9,6 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   const {to: toAddress, amount: initialAmount, denom: initialDenom = 'hash', gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
-  
-  if (!connector) return { method, valid, error: 'No wallet connected' };
   let amount = initialAmount;
   let denom = initialDenom.toLowerCase();
   if (denom === 'hash') {
@@ -28,34 +26,33 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
     amountList: [{ denom, amount: amountString }],
   };
 
-  const messageMsgSend = messageService.buildMessage(type, sendMessage);
-  const message = messageService.createAnyMessageBase64(type, messageMsgSend);
-
-  // encode message (hex)
-  const hexMsg = convertUtf8ToHex(message);
-
-  // provenance_signTransaction params
   const metadata = JSON.stringify({
     description,
     address,
     gasPrice,
   });
-  const msgParams = [metadata, hexMsg];
+  // Custom Request
+  const request = {
+    id: 1,
+    jsonrpc: "2.0",
+    method,
+    params: [metadata],
+  };
+
+  if (!connector) return { valid, data, request, error: 'No wallet connected' };
+
+  const messageMsgSend = messageService.buildMessage(type, sendMessage);
+  const message = messageService.createAnyMessageBase64(type, messageMsgSend);
+
+  // encode message (hex)
+  const hexMsg = convertUtf8ToHex(message);
+  request.params.push(hexMsg);
   try {
-    // Custom Request
-    const customRequest = {
-      id: 1,
-      jsonrpc: "2.0",
-      method,
-      params: msgParams,
-    };
     // send message
-    const result = await connector.sendCustomRequest(customRequest);
+    const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
     valid = !!result
-    // Convert the amountList back into Hash (was converted to nHash before sending)
-    const amountList = [{ denom, amount: amountString }];
     // result is a hex encoded signature
-    return { method, valid, result, message, sendDetails: {...sendMessage, amountList} };
-  } catch (error) { return { method, valid, error }; }
+    return { valid, result, data, request };
+  } catch (error) { return { valid, error, data, request }; }
 };

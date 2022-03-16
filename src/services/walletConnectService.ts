@@ -2,18 +2,20 @@ import events from 'events';
 import WalletConnectClient from "@walletconnect/client";
 import {
   Broadcast,
-  IClientMeta,
-  CustomActionData,
-  SendCoinData,
-  SendHashData,
-  SendHashBatchData,
   BroadcastResults,
+  CustomActionData,
+  IClientMeta,
+  MarkerAddData,
+  MarkerData,
+  SendCoinData,
+  SendHashBatchData,
+  SendHashData,
   SignJWTData,
 } from 'types';
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL, CONNECTION_TIMEOUT } from '../consts';
 import {
-  activateRequest as activateRequestMethod,
-  addMarker as addMarkerMethod,
+  markerActivate as markerActivateMethod,
+  markerAdd as markerAddMethod,
   cancelRequest as cancelRequestMethod,
   connect as connectMethod,
   customAction as customActionMethod,
@@ -23,6 +25,7 @@ import {
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
   sendHashBatch as sendHashBatchMethod,
+  markerFinalize as markerFinalizeMethod,
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
 
@@ -112,8 +115,8 @@ export class WalletConnectService {
   // *** Event Listener *** (https://nodejs.org/api/events.html)
   // Instead of having to use walletConnectService.eventEmitter.addListener()
   // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
-  #broadcastEvent: Broadcast = (eventName, params) => {
-    this.#eventEmitter.emit(eventName, params);
+  #broadcastEvent: Broadcast = (eventName, data) => {
+    this.#eventEmitter.emit(eventName, data);
   }
   
   addListener(eventName: string, callback: (results: BroadcastResults) => void) {
@@ -232,8 +235,8 @@ export class WalletConnectService {
   }
   
   // All Wallet Methods here
-  // - Activate Request
-  // - Add Marker
+  // - Marker Activate
+  // - Marker Add
   // - Cancel Request
   // - Connect
   // - CustomAction
@@ -243,27 +246,40 @@ export class WalletConnectService {
   // - Sign JWT
   // - Sign Message
   
-  activateRequest = async (denom: string) => {
+  markerActivate = async (data: MarkerData) => {
     // Loading while we wait for mobile to respond
-    this.setState({ loading: 'activateRequest' });
-    const result = await activateRequestMethod(this.state, denom);
+    this.setState({ loading: 'markerActivate' });
+    const result = await markerActivateMethod(this.state, data);
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method
-    const windowMessage = result.error ? WINDOW_MESSAGES.ACTIVATE_REQUEST_FAILED : WINDOW_MESSAGES.ACTIVATE_REQUEST_COMPLETE;
+    const windowMessage = result.error ? WINDOW_MESSAGES.MARKER_ACTIVATE_FAILED : WINDOW_MESSAGES.MARKER_ACTIVATE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.#resetConnectionTimeout();
   }
   
-  addMarker = async (data: { denom: string, amount: number }) => {
+  markerFinalize = async (data: MarkerData) => {
     // Loading while we wait for mobile to respond
-    this.setState({ loading: 'addMarker' });
-    const result = await addMarkerMethod(this.state, data);
+    this.setState({ loading: 'markerFinalize' });
+    const result = await markerFinalizeMethod(this.state, data);
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method
-    const windowMessage = result.error ? WINDOW_MESSAGES.ADD_MARKER_FAILED : WINDOW_MESSAGES.ADD_MARKER_COMPLETE;
+    const windowMessage = result.error ? WINDOW_MESSAGES.MARKER_FINALIZE_FAILED : WINDOW_MESSAGES.MARKER_FINALIZE_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.#resetConnectionTimeout();
+  }
+  
+  markerAdd = async (data: MarkerAddData) => {
+    // Loading while we wait for mobile to respond
+    this.setState({ loading: 'markerAdd' });
+    const result = await markerAddMethod(this.state, data);
+    // No longer loading
+    this.setState({ loading: '' });
+    // Broadcast result of method
+    const windowMessage = result.error ? WINDOW_MESSAGES.MARKER_ADD_FAILED : WINDOW_MESSAGES.MARKER_ADD_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.#resetConnectionTimeout();

@@ -13,8 +13,20 @@ export const sendHash = async (state: State, data: SendHashData) => {
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
   const description = 'Send Hash';
-  
-  if (!connector) return { method, valid, error: 'No wallet connected' };
+  const metadata = JSON.stringify({
+    description,
+    address,
+    gasPrice,
+  });
+  // Custom Request
+  const request = {
+    id: 1,
+    jsonrpc: "2.0",
+    method,
+    params: [metadata],
+  };
+
+  if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // Convert hash amount to nhash (cannot send hash, can only send nhash)
   const sendAmountNHash = `${sendAmountHash * (10 ** 9)}`;
@@ -30,29 +42,15 @@ export const sendHash = async (state: State, data: SendHashData) => {
 
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
-
-  // provenance_signTransaction params
-  const metadata = JSON.stringify({
-    description,
-    address,
-    gasPrice,
-  });
-  const msgParams = [metadata, hexMsg];
+  request.params.push(hexMsg);
+  // Convert the amountList back into Hash (was converted to nHash before sending)
+  const sentAmount = [{ denom: 'hash', amount: sendAmountHash}];
   try {
-    // Custom Request
-    const customRequest = {
-      id: 1,
-      jsonrpc: "2.0",
-      method,
-      params: msgParams,
-    };
     // send message
-    const result = await connector.sendCustomRequest(customRequest);
+    const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
     valid = !!result
-    // Convert the amountList back into Hash (was converted to nHash before sending)
-    const amountList = [{ denom: 'hash', amount: sendAmountHash}];
     // result is a hex encoded signature
-    return { method, valid, result, message, sendDetails: {...sendMessage, amountList} };
-  } catch (error) { return { method, valid, error }; }
+    return { valid, result, data: { ...data, sentAmount }, request };
+  } catch (error) { return { valid, error, data: { ...data, sentAmount }, request }; }
 };
