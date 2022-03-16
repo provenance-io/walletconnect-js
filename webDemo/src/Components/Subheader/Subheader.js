@@ -148,7 +148,7 @@ export const Subheader = () => {
         )}
         {connectionEat && (
           <Item>
-            <Title>Wallet Connect Session Expires In:</Title>
+            <Title>WalletConnect Session Expires In:</Title>
             <CountdownTimer expires={connectionEat} />
           </Item>
         )}
