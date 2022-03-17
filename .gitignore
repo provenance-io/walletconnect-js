@@ -37,4 +37,3 @@ ignored/
 .eslintcache
 
 *.d.ts
-commentSniffer.ts

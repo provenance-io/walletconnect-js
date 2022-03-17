@@ -71,7 +71,7 @@ const ToggleNotch = styled.div<{active?: boolean}>`
   ${({ active }) => active && 'background: #FFFFFF;'}
   flex-basis: 50%;
   border-radius: 4px;
-  cursor: pointer; // TEMP TEST VALUE *TEST*
+  cursor: pointer;
   text-align: center;
   user-select: none;
 `;
