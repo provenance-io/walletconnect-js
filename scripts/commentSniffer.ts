@@ -8,7 +8,17 @@ const getDirectories = function (src, callback) {
 };
 
 const fileTypes = ['.ts', '.tsx', '.js', '.jsx'];
-const comments = ['*TEMP*', '*REMOVE*', '*REMOVE ME*', '*TESTING*', '*TEST*', '*FIX*'];
+const comments = [
+  'TEMP:',
+  'TEMPONLY:',
+  'TESTING:',
+  'TEST:',
+  'TESTONLY:',
+  'TESTINGONLY:',
+  'REMOVEME:',
+  'REMOVE:',
+  'HACK:',
+];
 const rootDirs = ['src', 'webDemo/src'];
 
 const checkIfValidFile = function (fileSrc) {
@@ -49,9 +59,9 @@ module.exports.commentSniffer = function () {
     });
   })
   if (allErrors.length) {
-    let message = 'Dev Local Only Comments Found!  Please Fix/Remove:';
+    let message = 'Dev Local Only Comments Found!  Please Fix/Remove:\n --------------------------------------------------\n';
     allErrors.forEach(msg => {
-      message += ` \n ${msg}`;
+      message += ` \n • ${msg}`;
     });
     const pe = new PrettyError();
     pe.appendStyle({
@@ -59,7 +69,7 @@ module.exports.commentSniffer = function () {
       'pretty-error > header > colon': { display: 'none' },
       'pretty-error > header > message': {
         color: 'bright-white',
-        background: 'bright-red',
+        background: 'red',
         padding: '0 1',
       },
       'pretty-error > trace > item': { display: 'none' },

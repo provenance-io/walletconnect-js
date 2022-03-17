@@ -71,6 +71,7 @@
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-react": "7.28.0",
     "eslint-plugin-react-hooks": "4.2.0",
+    "husky": "7.0.4",
     "json-schema-to-typescript": "10.1.4",
     "nodemon": "2.0.15",
     "pre-commit": "1.2.2",
@@ -90,15 +91,10 @@
     "start:watch": "nodemon -e js --watch src --exec 'npm run build'",
     "start": "concurrently \"npm run start:watch\" \"npm run start:webdemo\"",
     "test": "",
-    "commentSniff": "node -e 'require(\"./commentSniffer.ts\").commentSniffer()'",
+    "commentSniff": "node -e 'require(\"./scripts/commentSniffer.ts\").commentSniffer()'",
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "tsc:commonjs": "tsc --module commonjs --outDir lib"
   },
-  "pre-commit": [
-    "lint",
-    "test",
-    "commentSniff"
-  ],
   "browserslist": {
     "production": [
       ">0.2%",
