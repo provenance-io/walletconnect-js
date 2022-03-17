@@ -352,7 +352,7 @@ Current development is being supported by [Figure Technologies](https://figure.c
 
 
 
-
+// REMOVEME: This is just for local notes...
 Suite of Marker messages:
  * Marker Add (MsgAddMarkerRequest) [DONE/WORKING]
  * Marker Activate (MsgActivateRequest) [DONE/WORKING]
