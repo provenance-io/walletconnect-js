@@ -22,26 +22,30 @@ export const connect = async ({
   bridge,
   startConnectionTimer,
 }: ConnectProps) => {
-  // Get connection issued/expires times (auto-logout)
-  const connectionIat = Math.floor(Date.now() / 1000);
-  const connectionEat = state.connectionTimeout + connectionIat;
   // ----------------
   // SESSION UPDATE
   // ----------------
   const onSessionUpdate = (newConnector: WalletConnectClient) => {
-    const { accounts, peerMeta: peer } = newConnector;
-    const [address, publicKey, lastConnectJWT] = accounts;
-    const signedJWT = state.signedJWT || lastConnectJWT;
-    setState({ address, publicKey, connected: true, signedJWT, peer, connectionIat });
-    const broadcastData = {
-      data: newConnector,
-      connectionIat,
-      connectionEat: state.connectionEat,
-      connectionType: 'existing session'
-    };
-    broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
-    // Start the auto-logoff timer
-    startConnectionTimer();
+    // Get connection issued time
+    const connectionIat = Math.floor(Date.now() / 1000);
+    const connectionEat = state.connectionEat;
+    // If the session is already expired (re-opened closed/idle tab), kill the session
+    if (!connectionEat || connectionIat >= connectionEat) newConnector.killSession();
+    else {
+      const { accounts, peerMeta: peer } = newConnector;
+      const [address, publicKey, lastConnectJWT] = accounts;
+      const signedJWT = state.signedJWT || lastConnectJWT;
+      setState({ address, publicKey, connected: true, signedJWT, peer, connectionIat });
+      const broadcastData = {
+        data: newConnector,
+        connectionIat,
+        connectionEat: state.connectionEat,
+        connectionType: 'existing session'
+      };
+      broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
+      // Start the auto-logoff timer
+      startConnectionTimer();
+    }
   };
   // ----------------
   // CONNECTED
@@ -50,6 +54,9 @@ export const connect = async ({
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
     const [address, publicKey, signedJWT] = accounts;
+    // Get connection issued/expires times (auto-logout)
+    const connectionIat = Math.floor(Date.now() / 1000);
+    const connectionEat = state.connectionTimeout + connectionIat;
     setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT, connectionEat });
     const broadcastData = {
       data: payload,

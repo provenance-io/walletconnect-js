@@ -18,6 +18,7 @@ interface Props {
 
 const WalletConnectContextProvider:React.FC<Props> = ({ children, network, bridge, timeout }) => {
   const [walletConnectState, setWalletConnectState] = useState<State>({ ...walletConnectService.state });
+  const { address } = walletConnectState;
 
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
@@ -26,10 +27,7 @@ const WalletConnectContextProvider:React.FC<Props> = ({ children, network, bridg
     if (bridge) { walletConnectService.setBridge(bridge) }
     if (timeout) { walletConnectService.setState({ connectionTimeout: timeout }) }
     // Check if we have an address and public key, if so, auto-reconnect to session
-    if (walletConnectState.address) {
-      // Reconnect the users walletconnect session
-      walletConnectService.connect();
-    }
+    if (address) walletConnectService.connect();
     return () => walletConnectService.removeAllListeners();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -336,9 +336,7 @@ export class WalletConnectService {
   }
 
   disconnect = () => {
-    if (this?.state?.connector) {
-      this.state.connector.killSession();
-    }
+    if (this?.state?.connector) this.state.connector.killSession();
   }
 
   sendCoin = async (data: SendCoinData) => {

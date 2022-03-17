@@ -73,6 +73,7 @@
     "eslint-plugin-react-hooks": "4.2.0",
     "json-schema-to-typescript": "10.1.4",
     "nodemon": "2.0.15",
+    "pre-commit":"1.2.2",
     "prettier": "2.4.1",
     "typescript": "4.5.5"
   },
@@ -87,9 +88,14 @@
     "start:watch": "nodemon -e js --watch src --exec 'npm run build'",
     "start": "concurrently \"npm run start:watch\" \"npm run start:webdemo\"",
     "test": "",
+    "tempComments": "echo 'No Special Comments Found...'",
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "tsc:commonjs": "tsc --module commonjs --outDir lib"
   },
+  "pre-commit": [
+    "test",
+    "tempComments"
+  ],
   "browserslist": {
     "production": [
       ">0.2%",
