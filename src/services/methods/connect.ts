@@ -6,6 +6,20 @@ import { clearLocalStorage } from '../../utils';
 import { SetState } from '../walletConnectService';
 
 export const connect = async (setState: SetState, resetState: () => void, broadcast: Broadcast, bridge: string) => {
+
+  const parseAccounts = (accounts:string[]) => {
+    let retObj = Object();
+    if(accounts.length == 1) {
+      //new style accounts
+      retObj = accounts[0];
+    } else if (accounts.length > 1) {
+      //old style accounts
+      const [ address, publicKey, jwt ] = accounts;
+      retObj = { address, publicKey, jwt };
+    }
+    return retObj;
+  };
+
   // Get current time (use time to auto-logout)
   const connectionIat = Math.floor(Date.now() / 1000);
   // ----------------
@@ -13,8 +27,8 @@ export const connect = async (setState: SetState, resetState: () => void, broadc
   // ----------------
   const onSessionUpdate = (newConnector: WalletConnectClient) => {
     const { accounts, peerMeta: peer } = newConnector;
-    const [address, publicKey, signedJWT] = accounts;
-    setState({ address, publicKey, connected: true, signedJWT, peer });
+    const { address, publicKey, jwt } = parseAccounts(accounts);
+    setState({ address, publicKey, connected: true, signedJWT: jwt, peer });
     broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
   };
   // ----------------
@@ -23,8 +37,8 @@ export const connect = async (setState: SetState, resetState: () => void, broadc
   const onConnect = (payload: any | null) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
-    const [address, publicKey, signedJWT] = accounts;
-    setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT });
+    const { address, publicKey, jwt } = parseAccounts(accounts);
+    setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT: jwt });
     broadcast(WINDOW_MESSAGES.CONNECTED, data);
   };
   // --------------------
@@ -58,13 +72,13 @@ export const connect = async (setState: SetState, resetState: () => void, broadc
     });
     // Latest values
     const { accounts, peerMeta: peer } = newConnector;
-    const [address, publicKey, signedJWT] = accounts;
+    const { address, publicKey, jwt } = parseAccounts(accounts);
     // Are we already connected
     if (newConnector.connected) {
       onSessionUpdate(newConnector);
     }
     // Update Connector
-    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT, peer });
+    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT: jwt, peer });
   }
   // ----------------------------
   // CREATE NEW WC CONNECTION
