@@ -1,9 +1,13 @@
 export type ConnectData = {
   params: [
     {
-      accounts: [
-        address: string, publicKey: string, signedJwt: string,
-      ],
+      accounts: string[] | {
+        address: string, publicKey: string, jwt: string, walletInfo: {
+          coin?: string,
+          id?: number,
+          name?: string,
+        }
+      },
       peerMeta: {
         description: string,
         url: string,

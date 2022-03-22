@@ -52,6 +52,11 @@ export interface State {
   QRCodeUrl: string,
   showQRCodeModal: boolean,
   signedJWT: string,
+  walletInfo: {
+    coin?: string,
+    id?: number,
+    name?: string,
+  },
 }
 
 export type SetState = (state: Partial<State>) => void;
@@ -76,6 +81,7 @@ const defaultState: State = {
   QRCodeUrl: '',
   showQRCodeModal: false,
   signedJWT: '',
+  walletInfo: {},
 };
 
 const initialState: State = {
@@ -97,6 +103,7 @@ const initialState: State = {
   QRCodeUrl: defaultState.QRCodeUrl,
   showQRCodeModal: defaultState.showQRCodeModal,
   signedJWT: existingWCJSState.signedJWT || defaultState.signedJWT,
+  walletInfo: defaultState.walletInfo,
 };
 
 export class WalletConnectService {

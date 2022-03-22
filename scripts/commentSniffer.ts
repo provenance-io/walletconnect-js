@@ -7,7 +7,7 @@ const getDirectories = function (src, callback) {
   callback(res);
 };
 
-const fileTypes = ['.ts', '.tsx', '.js', '.jsx'];
+const fileTypes = ['.ts', '.tsx', '.js', '.jsx', '.md', '.mdx'];
 const comments = [
   'TEMP:',
   'TEMPONLY:',
@@ -19,7 +19,7 @@ const comments = [
   'REMOVE:',
   'HACK:',
 ];
-const rootDirs = ['src', 'webDemo/src', 'README.md'];
+const rootDirs = ['src', 'webDemo/src'];
 
 const checkIfValidFile = function (fileSrc) {
   let valid = false;
@@ -44,9 +44,12 @@ const checkIfCommentMatches = function (fileData) {
 module.exports.commentSniffer = function () {
   const allErrors = [];
   rootDirs.forEach(rootDir => {
+    console.log('rootDir :', rootDir);
     getDirectories(rootDir, function (res) {
+      console.log('res :', res);
       // Look at each file
       res.forEach(fileLocation => {
+        console.log('fileLocation :', fileLocation);
         const valid = checkIfValidFile(fileLocation);
         if (valid) {
           const data = fs.readFileSync(fileLocation);
