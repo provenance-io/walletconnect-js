@@ -1,6 +1,6 @@
 import WalletConnectClient from "@walletconnect/client";
 import QRCode from 'qrcode';
-import { Broadcast } from 'types';
+import { Broadcast, ConnectData } from 'types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
 import { SetState, State } from '../walletConnectService';
@@ -14,6 +14,17 @@ interface ConnectProps {
   startConnectionTimer: () => void,
 }
 
+type AccountInfo = string[] | {
+  address?: string,
+  jwt?: string,
+  publicKey?: string,
+  walletInfo?: {
+    coin?: string,
+    id?: number,
+    name?: string,
+  }
+};
+
 export const connect = async ({
   state,
   setState,
@@ -22,30 +33,65 @@ export const connect = async ({
   bridge,
   startConnectionTimer,
 }: ConnectProps) => {
-  // Get connection issued/expires times (auto-logout)
-  const connectionIat = Math.floor(Date.now() / 1000);
-  const connectionEat = state.connectionTimeout + connectionIat;
+  // -------------------
+  // PULL ACCOUNT INFO
+  // -------------------
+  const getAccountInfo = (source: AccountInfo) => {
+    // Account info can come from an array or object
+    const isArray = Array.isArray(source);
+    // If it's an array, return data in the form of [address, publicKey, lastConnectJWT]
+    if (isArray) {
+      const [address, publicKey, jwt] = source;
+      // No walletInfo will be available on the old accounts array
+      return { address, publicKey, jwt, walletInfo: {} };
+    }
+    // Data is in an object, pull keys from it
+    const { address, publicKey, jwt, walletInfo } = source;
+    return { address, publicKey, jwt, walletInfo };
+  };
   // ----------------
   // SESSION UPDATE
   // ----------------
   const onSessionUpdate = (newConnector: WalletConnectClient) => {
-    const { accounts, peerMeta: peer } = newConnector;
-    const [address, publicKey, lastConnectJWT] = accounts;
-    const signedJWT = state.signedJWT || lastConnectJWT;
-    setState({ address, publicKey, connected: true, signedJWT, peer, connectionIat });
-    broadcast(WINDOW_MESSAGES.CONNECTED, newConnector);
-    // Start the auto-logoff timer
-    startConnectionTimer();
+    // Get connection issued time
+    const connectionIat = Math.floor(Date.now() / 1000);
+    const connectionEat = state.connectionEat;
+    // If the session is already expired (re-opened closed/idle tab), kill the session
+    if (!connectionEat || connectionIat >= connectionEat) newConnector.killSession();
+    else {
+      const { accounts, peerMeta: peer } = newConnector;
+      const { address, publicKey, jwt: lastConnectJWT, walletInfo } = getAccountInfo(accounts);
+      const signedJWT = state.signedJWT || lastConnectJWT;
+      setState({ address, publicKey, connected: true, signedJWT, peer, connectionIat, walletInfo });
+      const broadcastData = {
+        data: newConnector,
+        connectionIat,
+        connectionEat: state.connectionEat,
+        connectionType: 'existing session'
+      };
+      broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
+      // Start the auto-logoff timer
+      startConnectionTimer();
+    }
   };
   // ----------------
   // CONNECTED
   // ----------------
-  const onConnect = (payload: any | null) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const onConnect = (payload: ConnectData) => {
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
-    const [address, publicKey, signedJWT] = accounts;
-    setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT, connectionEat });
-    broadcast(WINDOW_MESSAGES.CONNECTED, data);
+    const { address, publicKey, jwt: signedJWT, walletInfo } = getAccountInfo(accounts);
+    // Get connection issued/expires times (auto-logout)
+    const connectionIat = Math.floor(Date.now() / 1000);
+    const connectionEat = state.connectionTimeout + connectionIat;
+    setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT, connectionEat, walletInfo });
+    const broadcastData = {
+      data: payload,
+      connectionIat,
+      connectionEat,
+      connectionType: 'new session'
+    };
+    broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
     // Start the auto-logoff timer
     startConnectionTimer();
   };
@@ -92,14 +138,14 @@ export const connect = async ({
     });
     // Latest values
     const { accounts, peerMeta: peer } = newConnector;
-    const [address, publicKey, lastConnectJWT] = accounts;
+    const { address, publicKey, jwt: lastConnectJWT, walletInfo } = getAccountInfo(accounts);
     const signedJWT = state.signedJWT || lastConnectJWT;
     // Are we already connected
     if (newConnector.connected) {
       onSessionUpdate(newConnector);
     }
     // Update Connector
-    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT, peer });
+    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT, peer, walletInfo });
   }
   // ----------------------------
   // CREATE NEW WC CONNECTION

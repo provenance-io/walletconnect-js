@@ -1,17 +1,20 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import { MsgCancelRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
+import { MsgFinalizeRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
+import { MarkerData } from 'types';
 import { State } from '../walletConnectService';
 
-export const cancelRequest = async (state: State, denom: string) => {
+export const markerFinalize = async (state: State, data: MarkerData) => {
   let valid = false;
   const { connector, address } = state;
+  const { denom, gasPrice } = data;
   const method = 'provenance_sendTransaction';
-  const description = 'Cancel Request';
-  const protoMessage = 'provenance.marker.v1.MsgCancelRequest';
+  const description = 'Finalize Marker';
+  const protoMessage = 'provenance.marker.v1.MsgFinalizeRequest';
   const metadata = JSON.stringify({
     description,
     address,
+    gasPrice,
   });
   // Custom Request
   const request = {
@@ -21,15 +24,15 @@ export const cancelRequest = async (state: State, denom: string) => {
     params: [metadata],
   };
 
-  if (!connector) return { valid, data: denom, request, error: 'No wallet connected' };
+  if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
-  const msgCancelRequest = new MsgCancelRequest();
-  msgCancelRequest.setDenom(denom);
-  msgCancelRequest.setAdministrator(address);
+  const msgFinalizeRequest = new MsgFinalizeRequest();
+  msgFinalizeRequest.setDenom(denom);
+  msgFinalizeRequest.setAdministrator(address);
 
   /* Convert the add marker message to any bytes for signing */
   const msgAny = new GoogleProtobufAnyPb.Any();
-  msgAny.pack(msgCancelRequest.serializeBinary(), protoMessage, '/');
+  msgAny.pack(msgFinalizeRequest.serializeBinary(), protoMessage, '/');
   const binary = String.fromCharCode(...msgAny.serializeBinary());
   const message = window.btoa(binary);
 
@@ -42,6 +45,6 @@ export const cancelRequest = async (state: State, denom: string) => {
     // TODO verify transaction ID
     valid = !!result
     // result is a hex encoded signature
-    return { valid, result, data: denom, request };
-  } catch (error) { return { valid, error, data: denom, request }; }
+    return { valid, result, data, request };
+  } catch (error) { return { valid, error, data, request }; }
 };

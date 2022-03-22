@@ -88,31 +88,9 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
         label={label}
         placeholder={placeholder}
         onChange={(value) => changeInputValue(name, value)}
-        bottomGap={fields.length > 2 ? true : undefined}
+        bottomGap={gas || fields.length > 2 ? true : undefined}
         decodeOpen={decodeOpen}
         setDecodeOpen={setDecodeOpen}
-      />
-    )
-    if (name === 'gasPrice') return (
-      <Input
-        key={name}
-        width={width}
-        value={inputValues[name]}
-        label={`Gas Price (${Number(inputValues[name]) === figureGasPrice.gasPrice || inputValues[name] === '' ? 'Figure Gas Price' : 'Custom Gas Price'})`}
-        placeholder={placeholder}
-        onChange={(value) => changeInputValue(name, value)}
-        bottomGap={fields.length > 2 ? true : undefined}
-      />
-    )
-    if (name === 'gasPriceDenom') return (
-      <Input
-        key={name}
-        width={width}
-        value={inputValues[name]}
-        label={`Gas Denom (${inputValues[name] === figureGasPrice.gasPriceDenom || inputValues[name] === '' ? 'Figure Gas Denom' : 'Custom Gas Denom'})`}
-        placeholder={placeholder}
-        onChange={(value) => changeInputValue(name, value)}
-        bottomGap={fields.length > 2 ? true : undefined}
       />
     )
     return (
@@ -123,7 +101,7 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
         label={label}
         placeholder={placeholder}
         onChange={(value) => changeInputValue(name, value)}
-        bottomGap={fields.length > 2 ? true : undefined}
+        bottomGap={gas || fields.length > 2 ? true : undefined}
       />
     )
   });
@@ -148,10 +126,33 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
 
     const inputKeys = Object.keys(cleanInputValues);
     const jsonInputFilled = cleanInputValues?.json;
-    const multipleInputs = inputKeys.length > 1 && !jsonInputFilled;
+    const multipleInputs = (inputKeys.length > 1 || gas) && !jsonInputFilled; // gas will always set the inputs to 3+
     // If we just have a single input, we don't need the key, just submit with the first key value (non object)
     return multipleInputs ? cleanInputValues : cleanInputValues[inputKeys[0]];
   }
+
+  const renderGasInputs = () => (
+    <>
+      <Input
+        key="gasPrice"
+        width="50%"
+        value={inputValues.gasPrice}
+        label={`Gas Price (${Number(inputValues.gasPrice) === figureGasPrice.gasPrice || inputValues.gasPrice === '' ? 'Figure Gas Price' : 'Custom Gas Price'})`}
+        placeholder="Gas Price (Defaults to Figure Gas Price)"
+        onChange={(value) => changeInputValue('gasPrice', value)}
+        bottomGap
+      />
+      <Input
+        key="gasPriceDenom"
+        width="50%"
+        value={inputValues.gasPriceDenom}
+        label={`Gas Denom (${inputValues.gasPriceDenom === figureGasPrice.gasPriceDenom || inputValues.gasPriceDenom === '' ? 'Figure Gas Denom' : 'Custom Gas Denom'})`}
+        placeholder="Gas Denom (Defaults to Figure Gas Denom)"
+        onChange={(value) => changeInputValue('gasPriceDenom', value)}
+        bottomGap
+      />
+    </>
+  );
 
   const handleSubmit = async () => {
     if (isMulticall) {
@@ -171,8 +172,9 @@ export const Action = ({ method: rawMethod, setResults, fields, windowMessage, m
   };
 
   return (
-    <ActionContainer loading={loading} inputCount={fields.length}>
+    <ActionContainer loading={loading} inputCount={gas ? 3 : fields.length}>
       {renderInputs()}
+      {gas && renderGasInputs()}
       <Button
         loading={loading}
         onClick={handleSubmit}

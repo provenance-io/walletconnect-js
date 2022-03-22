@@ -80,6 +80,7 @@ export const Subheader = () => {
     address,
     loading,
     connectionEat,
+    connected,
   } = walletConnectState;
   // Listen for window events for signing JWT
   useEffect(() => {
@@ -131,7 +132,7 @@ export const Subheader = () => {
   }
 
   return (
-    (JWTValid || connectionEat) ? (
+    (connected) ? (
       <Wrapper>
         {JWTValid && (
           <Item>
@@ -146,9 +147,9 @@ export const Subheader = () => {
             />
           </Item>
         )}
-        {connectionEat && (
+        {connected && connectionEat && (
           <Item>
-            <Title>Wallet Connect Session Expires In:</Title>
+            <Title>WalletConnect Session Expires In:</Title>
             <CountdownTimer expires={connectionEat} />
           </Item>
         )}

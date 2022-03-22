@@ -46,7 +46,8 @@ const Value = styled.div`
 
 export const AccountInfo = ({ bridgeUrl }) => { // eslint-disable-line react/prop-types
   const { walletConnectService, walletConnectState } = useWalletConnect();
-  const { address, publicKey, peer = {}, connected } = walletConnectState;
+  const { address, publicKey, walletInfo, connected } = walletConnectState;
+  const { name: walletName } = walletInfo;
 
   const handleDisconnect = () => {
     walletConnectService.disconnect();
@@ -58,8 +59,8 @@ export const AccountInfo = ({ bridgeUrl }) => { // eslint-disable-line react/pro
         <AccountRow>
           <img src={USER_ICON} alt="wallet name" />
           <Title>Wallet Name:</Title>
-          <Value title={peer?.description || 'N/A'}>{peer?.name || 'N/A'}</Value>
-          {peer?.name && <CopyValue value={peer?.name}/>}
+          <Value title={walletName || 'N/A'}>{walletName || 'N/A'}</Value>
+          {walletName && <CopyValue value={walletName}/>}
         </AccountRow>
         <AccountRow>
           <img src={USER_ICON} alt="address" />

@@ -1,10 +1,27 @@
 export const ALL_ACTIONS = [
   // ----------------------------------
-  // Activate Request Method/Action
+  // Activate Marker Method/Action
   // ----------------------------------
   {
-    windowMessage: 'ACTIVATE_REQUEST',
-    method: 'activateRequest',
+    windowMessage: 'MARKER_ACTIVATE',
+    method: 'markerActivate',
+    gas: true,
+    fields: [
+      {
+        name: 'denom',
+        label: 'Marker Denom',
+        value: 'myNewMarker',
+        placeholder: 'Enter Marker Denom',
+      },
+    ],
+  },
+  // ----------------------------------
+  // Finalize Marker Method/Action
+  // ----------------------------------
+  {
+    windowMessage: 'MARKER_FINALIZE',
+    method: 'markerFinalize',
+    gas: true,
     fields: [
       {
         name: 'denom',
@@ -18,8 +35,9 @@ export const ALL_ACTIONS = [
   // Add Marker Method/Action
   // ----------------------------------
   {
-    windowMessage: 'ADD_MARKER',
-    method: 'addMarker',
+    windowMessage: 'MARKER_ADD',
+    method: 'markerAdd',
+    gas: true,
     fields: [
       {
         name: 'denom',
@@ -43,6 +61,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'CANCEL_REQUEST',
     method: 'cancelRequest',
+    gas: true,
     fields: [
       {
         name: 'denom',
@@ -71,20 +90,6 @@ export const ALL_ACTIONS = [
         label: 'Message method',
         value: 'provenance_sendTransaction',
         placeholder: 'Enter the message method'
-      },
-      {
-        name: 'gasPrice',
-        label: 'Gas Price',
-        value: '',
-        placeholder: 'Gas Price (Defaults to Figure Gas Price)',
-        width: '50%',
-      },
-      {
-        name: 'gasPriceDenom',
-        label: 'Gas Denom',
-        value: '',
-        placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
-        width: '50%',
       },
       {
         name: 'message',
@@ -117,20 +122,6 @@ export const ALL_ACTIONS = [
         placeholder: 'Enter Delegation Amount',
         width: '20%',
       },
-      {
-        name: 'gasPrice',
-        label: 'Gas Price',
-        value: '',
-        placeholder: 'Gas Price (Defaults to Figure Gas Price)',
-        width: '50%',
-      },
-      {
-        name: 'gasPriceDenom',
-        label: 'Gas Denom',
-        value: '',
-        placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
-        width: '50%',
-      },
     ],
   },
   // ----------------------------------
@@ -162,20 +153,6 @@ export const ALL_ACTIONS = [
         placeholder: 'Enter Send Amount',
         width: '10%',
       },
-      {
-        name: 'gasPrice',
-        label: 'Gas Price',
-        value: '',
-        placeholder: 'Gas Price (Defaults to Figure Gas Price)',
-        width: '50%',
-      },
-      {
-        name: 'gasPriceDenom',
-        label: 'Gas Denom',
-        value: '',
-        placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
-        width: '50%',
-      },
     ],
   },
   // ----------------------------------
@@ -199,20 +176,6 @@ export const ALL_ACTIONS = [
         value: '10',
         placeholder: 'Enter Send Amount',
         width: '20%',
-      },
-      {
-        name: 'gasPrice',
-        label: 'Gas Price',
-        value: '',
-        placeholder: 'Gas Price (Defaults to Figure Gas Price)',
-        width: '50%',
-      },
-      {
-        name: 'gasPriceDenom',
-        label: 'Gas Denom',
-        value: '',
-        placeholder: 'Gas Denom (Defaults to Figure Gas Denom)',
-        width: '50%',
       },
     ],
   },
@@ -252,6 +215,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'TRANSACTION',
     method: 'sendHashBatch',
+    gas: true,
     fields: [
       {
         name: 'to',

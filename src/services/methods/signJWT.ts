@@ -9,8 +9,19 @@ export const signJWT = async (state: State, setState: SetState, expires: SignJWT
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
   const description = 'Sign JWT Token';
+  const metadata = JSON.stringify({
+    description,
+    address,
+  });
+  // Custom Request
+  const request = {
+    id: 1,
+    jsonrpc: "2.0",
+    method,
+    params: [metadata],
+  };
 
-  if (!connector) return { method, valid, error: 'No wallet connected' };
+  if (!connector) return { valid, data: expires, request, error: 'No wallet connected' };
   // Build JWT
   const now = Math.floor(Date.now() / 1000); // Current time
   const defaultExpires = now + 86400; // (24hours)
@@ -26,24 +37,13 @@ export const signJWT = async (state: State, setState: SetState, expires: SignJWT
   });
   const payloadEncoded = base64url(payload);
   const JWT = `${headerEncoded}.${payloadEncoded}`;
-  // prov_sign params
-  const metadata = JSON.stringify({
-    description,
-    address,
-    public_key_b64: pubKeyB64,
-  });
+  
   const hexJWT = convertUtf8ToHex(JWT);
-  const msgParams = [metadata, hexJWT];
-  // Custom Request
-  const customRequest = {
-    id: 1,
-    jsonrpc: "2.0",
-    method,
-    params: msgParams,
-  };
+  request.params.push(hexJWT);
+  
   try {
     // send message
-    const result = await connector.sendCustomRequest(customRequest);
+    const result = await connector.sendCustomRequest(request);
     // result is a hex encoded signature
     // const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     const signature = Buffer.from(result, 'hex');
@@ -53,8 +53,8 @@ export const signJWT = async (state: State, setState: SetState, expires: SignJWT
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     // Update JWT within the wcjs state
     setState({ signedJWT })
-    return { method, valid, result, signedJWT, address  };
+    return { valid, result, data: expires, signedJWT, request  };
   } catch (error) {
-    return { method, valid, error };
+    return { valid, error, data: expires, request };
   }
 };
