@@ -19,7 +19,7 @@ const comments = [
   'REMOVE:',
   'HACK:',
 ];
-const rootDirs = ['src', 'webDemo/src'];
+const rootDirs = ['src', 'webDemo/src', 'README.md'];
 
 const checkIfValidFile = function (fileSrc) {
   let valid = false;
