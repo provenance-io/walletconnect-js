@@ -133,7 +133,7 @@ export const connect = async ({
       onSessionUpdate(newConnector);
     }
     // Update Connector
-    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT: jwt, peer });
+    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT, peer });
   }
   // ----------------------------
   // CREATE NEW WC CONNECTION
