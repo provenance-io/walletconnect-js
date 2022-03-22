@@ -1,5 +1,8 @@
+import { GasPrice } from './GasPriceType'
+
 export type CustomActionData = {
-  message: string,
+  message: string | string[],
   description: string,
   method: string
+  gasPrice?: GasPrice,
 }

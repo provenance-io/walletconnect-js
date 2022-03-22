@@ -8,6 +8,7 @@ import {
   Connect,
   Dropdown,
   Header,
+  Subheader,
   MultiAction,
 } from 'Components';
 import { ALL_ACTIONS, BRIDGE_URLS } from 'consts';
@@ -55,6 +56,7 @@ const Results = styled.div`
   border-radius: 4px;
   padding: 10px;
   position: relative;
+  overflow: scroll;
 `;
 const ResultTitle = styled.span`
   font-weight: bold;
@@ -102,7 +104,7 @@ export const App = () => {
 
   const dropdownOptions = ALL_ACTIONS.map(({ method }) => method).sort();
 
-  const renderActions = () => ALL_ACTIONS.map(({ method, fields, windowMessage, json }) => {
+  const renderActions = () => ALL_ACTIONS.map(({ method, fields, windowMessage, json, gas }) => {
     if (activeMethod === method) {
       if (method === 'multiAction') return <MultiAction key="multiAction" setResults={setResults} />
       return (
@@ -113,6 +115,7 @@ export const App = () => {
           fields={fields}
           windowMessage={windowMessage}
           json={json}
+          gas={gas}
         />
       )
     }
@@ -145,6 +148,7 @@ const renderResults = () => {
 return (
   <HomeContainer>
       <Header bridgeUrl={bridgeUrl} />
+      <Subheader />
       <Content>
         {connected ? (
           <>

@@ -25,6 +25,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - [customAction](#customAction)
     - [delegateHash](#delegateHash)
     - [disconnect](#disconnect)
+    - [sendCoin](#sendCoin)
     - [sendHash](#sendHash)
     - [signJWT](#signJWT)
     - [signMessage](#signMessage)
@@ -57,25 +58,25 @@ Each method will return a window message indicating whether it failed or was com
 // (Example using cancelRequest)
 
 // Listen for complete/success
-walletConnectService.addListener(WINDOW_MESSAGE.CANCEL_REQUEST_COMPLETE, (result) => {
-  console.log(`WalletConnectJS | Complete | Result: `, result);
-};
+const successAction = (result) => { console.log(`WalletConnectJS | Complete | Result: `, result); }
+walletConnectService.addListener(WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE, successAction);
 // Listen for error/failure
-walletConnectService.addListener(WINDOW_MESSAGE.CANCEL_REQUEST_FAILED, (result) => {
-  const { error } = result;
-  console.log(`WalletConnectJS | Failed | result, error: `, result, error);
-};
+const failAction = (result) => { const { error } = result; console.log(`WalletConnectJS | Failed | result, error: `, result, error); }
+walletConnectService.addListener(WINDOW_MESSAGES.CANCEL_REQUEST_FAILED, failAction);
+
+// Unmount listeners once they are no longer needed (typically in useEffect return)
+// Remove event listeners once no longer needed (Node: Each requires specific function to remove, see Note B above)
+walletConnectService.removeListener(WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE, successAction);
+walletConnectService.removeListener(WINDOW_MESSAGES.CANCEL_REQUEST_FAILED, failAction);
 ```
 
 ## WalletConnectContextProvider
 React context provider to supply state to every child within
   - Include as parent to all Components using `walletconnect-js`
-  - Takes in an optional `network` prop of `"mainnet"` or `"testnet"` (default `"mainnet"`)
-    ```js
-      // Controls the automatic session logout / idle time
-      mainnet: 900, // 15 min
-      testnet: 99999, // 27 hours
-    ```
+  - Takes in optional params:
+    - `network`: Chain network of `"mainnet"` or `"testnet"` [`string`] (default: `"mainnet"`)
+    - `bridge`: WalletConnect bridge [`string`] (default: `"'wss://test.figure.tech/service-wallet-connect-bridge/ws/external'"`)
+    - `timeout`: Session timeout, seconds [`number`] (default: `1800`)
   - Usage Example (w/React.js):
     ```js
     // index.js
@@ -140,11 +141,12 @@ React hook which contains `walletConnectService` and `walletConnectState`
       walletConnectService.customAction({ message, description, method });
       // WINDOW_MESSAGES: CUSTOM_ACTION_COMPLETE, CUSTOM_ACTION_FAILED
     ```
-    | Param       	| Type   	| Required 	| Default                        	| Example                        	| Info                                  	|
-    |-------------	|--------	|----------	|--------------------------------	|--------------------------------	|---------------------------------------	|
-    | message     	| string 	| yes      	| -                              	| `'CiwvcHJvdmVuYW5jZS5tZX...'`  	| B64 encoded Message to pass to wallet 	|
-    | description 	| string 	| no       	| `'Custom Action'`              	| `'My Custom Action'`           	| Prompt title on mobile wallet         	|
-    | method      	| string 	| no       	| `'provenance_sendTransaction'` 	| `'provenance_sendTransaction'` 	| Message method                        	|
+    | Param       	| Type   	        | Required 	| Default                        	                                    | Example                        	              | Info                                   	  |
+    |-------------	|---------------	|----------	|-------------------------------------------------------------------- |---------------------------------------------	|-----------------------------------------  |
+    | message     	| string / array 	| yes      	| -                              	                                    | `'CiwvcHJvdmVuYW5jZS5tZX...'`  	              | B64 encoded Message(s) to pass to wallet 	|
+    | description 	| string 	        | no       	| `'Custom Action'`              	                                    | `'My Custom Action'`           	              | Prompt title on mobile wallet         	  |
+    | method      	| string 	        | no       	| `'provenance_sendTransaction'` 	                                    | `'provenance_sendTransaction'` 	              | Message method                        	  |
+    | gasPrice      | object 	        | no       	| `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` 	| `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` 	| Optional gasPrice object, defaults to Figure values |
 
   - #### delegateHash
     Delegate a custom amount of Hash token to a custom address
@@ -164,23 +166,40 @@ React hook which contains `walletConnectService` and `walletConnectState`
       // WINDOW_MESSAGE: DISCONNECT
     ```
 
+  - #### sendCoin
+    Send amount of custom coin to an address
+    ```js
+      walletConnectService.sendCoin({ to, amount, denom });
+      // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
+    ```
+    | Param  	 | Type   	| Required 	| Default 	                                                          | Example        	                              | Info                  	|
+    |--------- |--------	|----------	|-------------------------------------------------------------------- |---------------------------------------------	|-----------------------	|
+    | to     	 | string 	| yes      	| -       	                                                          | `'tpa1b23...'` 	                              | Target wallet address 	|
+    | amount 	 | number 	| yes      	| -       	                                                          | `10`           	                              | Amount to use         	|
+    | denom 	 | string 	| no      	| `'Hash'` 	                                                          | `'Hash'`       	                              | Coin's Denom          	|
+    | gasPrice | object 	| no       	| `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` 	| `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` 	| Optional gasPrice object, defaults to Figure values |
+
   - #### sendHash
     Send a custom amount of Hash token to a custom address
     ```js
       walletConnectService.sendHash({ to, amount });
       // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
     ```
-    | Param  	| Type   	| Required 	| Default 	| Example        	| Info                  	|
-    |--------	|--------	|----------	|---------	|----------------	|-----------------------	|
-    | to     	| string 	| yes      	| -       	| `'tpa1b23...'` 	| Target wallet address 	|
-    | amount 	| number 	| yes      	| -       	| `10`           	| Amount to use         	|
+    | Param  	 | Type   	| Required 	| Default 	                                                          | Example        	                              | Info                  	|
+    |--------- |--------	|----------	|-------------------------------------------------------------------	|---------------------------------------------	|-----------------------	|
+    | to     	 | string 	| yes      	| -       	                                                          | `'tpa1b23...'` 	                              | Target wallet address 	|
+    | amount 	 | number 	| yes      	| -       	                                                          | `10`           	                              | Amount to use         	|
+    | gasPrice | object 	| no       	| `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` 	| `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` 	| Optional gasPrice object, defaults to Figure values |
 
   - #### signJWT
     Prompt user to sign a generated JWT
     ```js
-      walletConnectService.signJWT();
+      walletConnectService.signJWT(expire);
       // WINDOW_MESSAGES: SIGN_JWT_COMPLETE, SIGN_JWT_FAILED
     ```
+    | Param  	| Type   	| Required 	| Default               	| Example        	| Info                  	                  |
+    |--------	|--------	|----------	|-----------------------	|----------------	|-----------------------------------------	|
+    | expire  | number 	| no      	| 24 hours (now + 86400) 	| `1647020269` 	  | Custom expiration date (seconds) of JWT 	|
 
   - #### signMessage
     Prompt user to sign a custom message
@@ -201,6 +220,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
       assets: [], // Wallet assets [array]
       connected: false, // WalletConnect connected [bool]
       connectionIat: null, // WalletConnect initialized at time [number]
+      connectionEat: null, // WalletConnect expires at time [number]
       connector: null, // WalletConnect connector 
       figureConnected: false, // Account and address both exist [bool]
       isMobile: false, // Is the connected browser a mobile device [bool]
@@ -209,6 +229,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
       peer: {}, // Connected wallet info [object]
       publicKey: '', // Wallet public key (base64url encoded)
       QRCode: '', // QRCode image data to connect to WalletConnect bridge [string]
+      QRCodeUrl: '', // QRCode url contained within image [string]
       showQRCodeModal: false, // Should the QR modal be open [bool]
       signedJWT: '', // Signed JWT token [string]
     }
@@ -327,3 +348,18 @@ Copy `window.localStorage` values from one site to another (mainly, to `localHos
 
 This application is under heavy development. The upcoming public blockchain is the evolution of the private Provenance network blockchain started in 2018.
 Current development is being supported by [Figure Technologies](https://figure.com).
+
+
+
+
+
+Suite of Marker messages:
+ * Marker Add (MsgAddMarkerRequest) [DONE/WORKING]
+ * Marker Activate (MsgActivateRequest) [DONE/WORKING]
+ * Marker Finalize (MsgFinalizeMarker) [IN-PROGRESS]
+ * Marker Add Access (MsgAddAccessRequest)
+ * Marker Delete Access (MsgDeleteAccessRequest)
+ * Marker Mint (MsgMintRequest)
+ * Marker Burn (MsgBurnRequest)
+ * Marker Cancel (MsgCancelRequest)
+ * Marker Delete (MsgDeleteRequest)

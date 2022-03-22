@@ -1,10 +1,27 @@
 export const ALL_ACTIONS = [
   // ----------------------------------
-  // Activate Request Method/Action
+  // Activate Marker Method/Action
   // ----------------------------------
   {
-    windowMessage: 'ACTIVATE_REQUEST',
-    method: 'activateRequest',
+    windowMessage: 'MARKER_ACTIVATE',
+    method: 'markerActivate',
+    gas: true,
+    fields: [
+      {
+        name: 'denom',
+        label: 'Marker Denom',
+        value: 'myNewMarker',
+        placeholder: 'Enter Marker Denom',
+      },
+    ],
+  },
+  // ----------------------------------
+  // Finalize Marker Method/Action
+  // ----------------------------------
+  {
+    windowMessage: 'MARKER_FINALIZE',
+    method: 'markerFinalize',
+    gas: true,
     fields: [
       {
         name: 'denom',
@@ -18,8 +35,9 @@ export const ALL_ACTIONS = [
   // Add Marker Method/Action
   // ----------------------------------
   {
-    windowMessage: 'ADD_MARKER',
-    method: 'addMarker',
+    windowMessage: 'MARKER_ADD',
+    method: 'markerAdd',
+    gas: true,
     fields: [
       {
         name: 'denom',
@@ -43,6 +61,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'CANCEL_REQUEST',
     method: 'cancelRequest',
+    gas: true,
     fields: [
       {
         name: 'denom',
@@ -58,6 +77,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'CUSTOM_ACTION',
     method: 'customAction',
+    gas: true,
     fields: [
       {
         name: 'description',
@@ -86,6 +106,7 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'DELEGATE_HASH',
     method: 'delegateHash',
+    gas: true,
     fields: [
       {
         name: 'validatorAddress',
@@ -103,16 +124,44 @@ export const ALL_ACTIONS = [
       },
     ],
   },
-  // // ----------------------------------
-  // // MultiAction
-  // // ----------------------------------
-  // { method: 'multiAction' },
+  // ----------------------------------
+  // Send Coin Method/Action
+  // ----------------------------------
+  {
+    windowMessage: 'TRANSACTION',
+    method: 'sendCoin',
+    gas: true,
+    fields: [
+      {
+        name: 'denom',
+        label: 'Coin Denom',
+        value: 'Hash',
+        placeholder: 'Enter Coin Denom',
+        width: '20%',
+      },
+      {
+        name: 'to',
+        label: 'Coin To',
+        value: 'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6',
+        placeholder: 'Enter Address',
+        width: '70%',
+      },
+      {
+        name: 'amount',
+        label: 'Amount',
+        value: '10',
+        placeholder: 'Enter Send Amount',
+        width: '10%',
+      },
+    ],
+  },
   // ----------------------------------
   // Send Hash Method/Action
   // ----------------------------------
   {
     windowMessage: 'TRANSACTION',
     method: 'sendHash',
+    gas: true,
     fields: [
       {
         name: 'to',
@@ -136,6 +185,14 @@ export const ALL_ACTIONS = [
   {
     windowMessage: 'SIGN_JWT',
     method: 'signJWT',
+    fields: [
+      {
+        value: '',
+        label: 'Custom JWT Expiration',
+        placeholder: 'Enter custom expiration (seconds)',
+        name: 'expires',
+      },
+    ],
   },
   // ----------------------------------
   // Sign Message Method/Action
@@ -153,33 +210,12 @@ export const ALL_ACTIONS = [
     ],
   },
   // ----------------------------------
-  // Chained Message Signing
-  // ----------------------------------
-  {
-    windowMessage: 'SIGNATURE',
-    method: 'signMessage_multicall',
-    fields: [
-      {
-        value: 'WalletConnect-JS | WebDemo | Sign Message',
-        label: 'Message',
-        placeholder: 'Enter Message',
-        name: 'message',
-      },
-      {
-        value: 2,
-        label: 'Repeat',
-        placeholder: 'Enter Repeat Count',
-        name: 'repeat',
-        width: '10%',
-      },
-    ],
-  },
-  // ----------------------------------
   // Batch Hash Send
   // ----------------------------------
   {
     windowMessage: 'TRANSACTION',
     method: 'sendHashBatch',
+    gas: true,
     fields: [
       {
         name: 'to',

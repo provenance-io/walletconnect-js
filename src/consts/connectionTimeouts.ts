@@ -1,4 +1,1 @@
-export const CONNECTION_TIMEOUT = {
-  mainnet: 900, // 15 min
-  testnet: 99999, // 27 hours
-};
+export const CONNECTION_TIMEOUT = 1800; // 30min

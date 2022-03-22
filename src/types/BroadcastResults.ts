@@ -1,8 +1,12 @@
 import WalletConnectClient from "@walletconnect/client";
-import { MarkerResults } from './MarkerResults'
-import { CustomActionResults } from './CustomActionResults'
-import { SignJWTResult } from './SignJWTResult'
+import { BaseResults } from './BaseResults';
+import { ConnectData } from './ConnectData';
 
-export type BroadcastResults = {
-  params?: MarkerResults | WalletConnectClient | CustomActionResults | SignJWTResult
+type ConnectResults = {
+  data: WalletConnectClient | ConnectData,
+  connectionIat: number,
+  connectionEat: number | null,
+  connectionType: string,
 }
+
+export type BroadcastResults = ConnectResults | BaseResults;

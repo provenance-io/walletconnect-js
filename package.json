@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "0.2.3",
+  "version": "0.2.13",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -71,9 +71,11 @@
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-react": "7.28.0",
     "eslint-plugin-react-hooks": "4.2.0",
+    "husky": "4.3.0",
     "json-schema-to-typescript": "10.1.4",
     "nodemon": "2.0.15",
     "prettier": "2.4.1",
+    "pretty-error": "4.0.0",
     "typescript": "4.5.5"
   },
   "scripts": {
@@ -81,12 +83,14 @@
     "build": "npm run clean && npm run build:commonjs && npm run build:esm && npm run tsc:esm && npm run tsc:commonjs",
     "build:esm": "BABEL_ENV=esm babel src -d esm --extensions \".js,.jsx,.ts,.tsx\" --copy-files",
     "build:commonjs": "BABEL_ENV=cjs babel ./src --extensions \".js,.jsx,.ts,.tsx\" -d lib --copy-files",
+    "lint": "eslint src && eslint webDemo",
     "prebuild": "npm run test",
     "prepare": "npm run build",
     "start:webdemo": "cd webDemo && npm i && npm run start",
     "start:watch": "nodemon -e js --watch src --exec 'npm run build'",
     "start": "concurrently \"npm run start:watch\" \"npm run start:webdemo\"",
     "test": "",
+    "commentSniff": "node -e 'require(\"./scripts/commentSniffer.ts\").commentSniffer()'",
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "tsc:commonjs": "tsc --module commonjs --outDir lib"
   },

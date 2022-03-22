@@ -1,47 +1,49 @@
 import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
-import { State } from '../walletConnectService';
+import { State, SetState } from '../walletConnectService';
+import { SignJWTData } from '../../types';
 
-export const signJWT = async (state: State) => {
+export const signJWT = async (state: State, setState: SetState, expires: SignJWTData) => {
   let valid = false;
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';
   const description = 'Sign JWT Token';
+  const metadata = JSON.stringify({
+    description,
+    address,
+  });
+  // Custom Request
+  const request = {
+    id: 1,
+    jsonrpc: "2.0",
+    method,
+    params: [metadata],
+  };
 
-  if (!connector) return { method, valid, error: 'No wallet connected' };
+  if (!connector) return { valid, data: expires, request, error: 'No wallet connected' };
   // Build JWT
   const now = Math.floor(Date.now() / 1000); // Current time
-  const expires = now + 3600; // (60min)
+  const defaultExpires = now + 86400; // (24hours)
+  const finalExpires = expires || defaultExpires;
   const header = JSON.stringify({alg: 'ES256K', typ: 'JWT'});
   const headerEncoded = base64url(header);
   const payload = JSON.stringify({
     sub: pubKeyB64,
     iss: 'provenance.io',
     iat: now,
-    exp: expires,
+    exp: finalExpires,
     addr: address,
   });
   const payloadEncoded = base64url(payload);
   const JWT = `${headerEncoded}.${payloadEncoded}`;
-  // prov_sign params
-  const metadata = JSON.stringify({
-    description,
-    address,
-    public_key_b64: pubKeyB64,
-  });
+  
   const hexJWT = convertUtf8ToHex(JWT);
-  const msgParams = [metadata, hexJWT];
-  // Custom Request
-  const customRequest = {
-    id: 1,
-    jsonrpc: "2.0",
-    method,
-    params: msgParams,
-  };
+  request.params.push(hexJWT);
+  
   try {
     // send message
-    const result = await connector.sendCustomRequest(customRequest);
+    const result = await connector.sendCustomRequest(request);
     // result is a hex encoded signature
     // const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     const signature = Buffer.from(result, 'hex');
@@ -49,8 +51,10 @@ export const signJWT = async (state: State) => {
     valid = await verifySignature(JWT, signature, pubKeyB64);
     const signedPayloadEncoded = base64url(signature);
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
-    return { method, valid, result, signedJWT, address  };
+    // Update JWT within the wcjs state
+    setState({ signedJWT })
+    return { valid, result, data: expires, signedJWT, request  };
   } catch (error) {
-    return { method, valid, error };
+    return { valid, error, data: expires, request };
   }
 };

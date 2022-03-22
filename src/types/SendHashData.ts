@@ -1,5 +1,8 @@
+import { GasPrice } from './GasPriceType'
+
 interface Amount {
   amount: number
+  gasPrice?: GasPrice,
 }
 
 interface DelegateHashData extends Amount {
