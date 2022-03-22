@@ -44,12 +44,9 @@ const checkIfCommentMatches = function (fileData) {
 module.exports.commentSniffer = function () {
   const allErrors = [];
   rootDirs.forEach(rootDir => {
-    console.log('rootDir :', rootDir);
     getDirectories(rootDir, function (res) {
-      console.log('res :', res);
       // Look at each file
       res.forEach(fileLocation => {
-        console.log('fileLocation :', fileLocation);
         const valid = checkIfValidFile(fileLocation);
         if (valid) {
           const data = fs.readFileSync(fileLocation);
@@ -80,5 +77,19 @@ module.exports.commentSniffer = function () {
     const renderedError = pe.render(new Error(message));
     console.log(renderedError);
     process.exit(1);
+  } else {
+    const pe = new PrettyError();
+    pe.appendStyle({
+      'pretty-error > header > title > kind': { display: 'none' },
+      'pretty-error > header > colon': { display: 'none' },
+      'pretty-error > header > message': {
+        color: 'bright-white',
+        background: 'green',
+        padding: '0 1',
+      },
+      'pretty-error > trace > item': { display: 'none' },
+    });
+    const renderedSuccess = pe.render(new Error('All comment checks passed'));
+    console.log(renderedSuccess);
   }
 };
