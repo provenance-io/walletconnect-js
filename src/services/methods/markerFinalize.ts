@@ -10,7 +10,7 @@ export const markerFinalize = async (state: State, data: MarkerData) => {
   const { denom, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const description = 'Finalize Marker';
-  const protoMessage = 'provenance.marker.v1.MsgFinalizeMarker';
+  const protoMessage = 'provenance.marker.v1.MsgFinalizeRequest';
   const metadata = JSON.stringify({
     description,
     address,

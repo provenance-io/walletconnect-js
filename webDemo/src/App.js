@@ -56,7 +56,7 @@ const Results = styled.div`
   border-radius: 4px;
   padding: 10px;
   position: relative;
-  overflow: scroll;
+  overflow: auto;
 `;
 const ResultTitle = styled.span`
   font-weight: bold;

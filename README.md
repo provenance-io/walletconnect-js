@@ -348,18 +348,3 @@ Copy `window.localStorage` values from one site to another (mainly, to `localHos
 
 This application is under heavy development. The upcoming public blockchain is the evolution of the private Provenance network blockchain started in 2018.
 Current development is being supported by [Figure Technologies](https://figure.com).
-
-
-
-
-// REMOVEME: This is just for local notes...
-Suite of Marker messages:
- * Marker Add (MsgAddMarkerRequest) [DONE/WORKING]
- * Marker Activate (MsgActivateRequest) [DONE/WORKING]
- * Marker Finalize (MsgFinalizeMarker) [IN-PROGRESS]
- * Marker Add Access (MsgAddAccessRequest)
- * Marker Delete Access (MsgDeleteAccessRequest)
- * Marker Mint (MsgMintRequest)
- * Marker Burn (MsgBurnRequest)
- * Marker Cancel (MsgCancelRequest)
- * Marker Delete (MsgDeleteRequest)
