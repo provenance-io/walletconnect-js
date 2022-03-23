@@ -46,7 +46,7 @@ const Value = styled.div`
 
 export const AccountInfo = ({ bridgeUrl }) => { // eslint-disable-line react/prop-types
   const { walletConnectService, walletConnectState } = useWalletConnect();
-  const { address, publicKey, walletInfo, connected } = walletConnectState;
+  const { address, publicKey, walletInfo = {}, connected } = walletConnectState;
   const { name: walletName } = walletInfo;
 
   const handleDisconnect = () => {
