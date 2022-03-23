@@ -23,6 +23,7 @@ const QRCodeModalContainer = styled.div`
   align-items: center;
   background: rgba(0, 0, 0, 0.50);
   color: #444444;
+  z-index: 1000;
 `;
 const QRModalContent = styled.div`
   /* min-height: 400px; */

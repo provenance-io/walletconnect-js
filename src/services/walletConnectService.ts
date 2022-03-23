@@ -84,9 +84,26 @@ const defaultState: State = {
   walletInfo: {},
 };
 
+// Pull values out of local storage if they exist
+const getAccountItem = (itemName: string) => {
+  const accounts = existingWCState.accounts;
+  // Make sure accounts exist
+  if (!accounts || !Array.isArray(accounts) || !accounts.length) return null;
+  // Check the accounts type, array of strings vs array of single object
+  const firstValue = accounts[0];
+  const accountArrayType = typeof firstValue === 'string'; // [ address, publicKey, jwt ]
+  switch (itemName) {
+    case 'address': return accountArrayType ? firstValue : firstValue.address;
+    case 'publicKey': return accountArrayType ? accounts[1] : firstValue.publicKey;
+    case 'jwt': return accountArrayType ? accounts[2] : firstValue.jwt;
+    case 'walletInfo': return accountArrayType ? {} : firstValue.walletInfo; // No walletInfo in old array method
+    default: return null;
+  }
+}
+
 const initialState: State = {
   account: existingWCJSState.account || defaultState.account,
-  address: existingWCState?.accounts && existingWCState.accounts[0] || defaultState.address,
+  address: getAccountItem('address') || defaultState.address,
   assets: defaultState.assets,
   connected: defaultState.connected,
   connectionTimeout: existingWCJSState.connectionTimeout || defaultState.connectionTimeout,
@@ -98,12 +115,12 @@ const initialState: State = {
   loading: defaultState.loading,
   newAccount: existingWCJSState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
-  publicKey: existingWCState?.accounts && existingWCState.accounts[1] || defaultState.publicKey,
+  publicKey: getAccountItem('publicKey') || defaultState.publicKey,
   QRCode: defaultState.QRCode,
   QRCodeUrl: defaultState.QRCodeUrl,
   showQRCodeModal: defaultState.showQRCodeModal,
-  signedJWT: existingWCJSState.signedJWT || defaultState.signedJWT,
-  walletInfo: defaultState.walletInfo,
+  signedJWT: getAccountItem('jwt') || defaultState.signedJWT,
+  walletInfo: getAccountItem('walletInfo') || defaultState.walletInfo,
 };
 
 export class WalletConnectService {
