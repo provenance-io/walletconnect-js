@@ -26,14 +26,14 @@ export const connect = async ({
   // PULL ACCOUNT INFO
   // -------------------
   const getAccountInfo = (accounts: AccountInfo) => {
-    if (!accounts) return {};
+    if (!accounts || !Array.isArray(accounts) || !accounts.length) return {};
     const firstAccount = accounts[0];
     // Accounts can either be an array of strings or an array of objects
     // Check the first value in the array to determine to type of data
     const isString = typeof firstAccount === 'string';
     // If it's a string, return data in the form of [address, publicKey, lastConnectJWT] from accounts
     if (isString) {
-      const [address, publicKey, jwt] = accounts;
+      const [address, publicKey, jwt] = accounts as string[];
       // No walletInfo will be available on the old accounts array
       return { address, publicKey, jwt, walletInfo: {} };
     }
