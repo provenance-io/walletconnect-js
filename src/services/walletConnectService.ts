@@ -11,6 +11,9 @@ import {
   SendHashBatchData,
   SendHashData,
   SignJWTData,
+  AccountInfo,
+  AccountObject,
+  WalletInfo
 } from 'types';
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL, CONNECTION_TIMEOUT } from '../consts';
 import {
@@ -29,9 +32,19 @@ import {
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
 
+interface WCJSState {
+  account: string,
+  connectionEat: number,
+  connectionIat: number,
+  connectionTimeout: number,
+  figureConnected: boolean,
+  newAccount: false,
+  signedJWT: string,
+}
+
 // Check for existing values from localStorage
-const existingWCState = getFromLocalStorage('walletconnect');
-const existingWCJSState = getFromLocalStorage('walletconnect-js');
+const existingWCState:WalletConnectClient = getFromLocalStorage('walletconnect');
+const existingWCJSState: WCJSState = getFromLocalStorage('walletconnect-js');
 
 export interface State {
   account: string,
@@ -52,11 +65,7 @@ export interface State {
   QRCodeUrl: string,
   showQRCodeModal: boolean,
   signedJWT: string,
-  walletInfo: {
-    coin?: string,
-    id?: number,
-    name?: string,
-  },
+  walletInfo: WalletInfo,
 }
 
 export type SetState = (state: Partial<State>) => void;
@@ -85,25 +94,31 @@ const defaultState: State = {
 };
 
 // Pull values out of local storage if they exist
-const getAccountItem = (itemName: string) => {
-  const accounts = existingWCState.accounts;
+const getAccountItem = (itemName: keyof AccountObject) => {
+  const accounts = existingWCState.accounts as AccountInfo;
   // Make sure accounts exist
-  if (!accounts || !Array.isArray(accounts) || !accounts.length) return null;
+  if (!accounts || !Array.isArray(accounts) || !accounts.length) return '';
   // Check the accounts type, array of strings vs array of single object
   const firstValue = accounts[0];
   const accountArrayType = typeof firstValue === 'string'; // [ address, publicKey, jwt ]
-  switch (itemName) {
-    case 'address': return accountArrayType ? firstValue : firstValue.address;
-    case 'publicKey': return accountArrayType ? accounts[1] : firstValue.publicKey;
-    case 'jwt': return accountArrayType ? accounts[2] : firstValue.jwt;
-    case 'walletInfo': return accountArrayType ? {} : firstValue.walletInfo; // No walletInfo in old array method
-    default: return null;
+  if (accountArrayType) {
+    const accountsArray = accounts as string[];
+    switch (itemName) {
+      case 'address': return accountsArray[0];
+      case 'publicKey': return accountsArray[1];
+      case 'jwt': return accountsArray[2];
+      // No walletInfo in old array method
+      case 'walletInfo': return {};
+      default: return '';
+    }
   }
+  const accountsObj = accounts[0] as AccountObject;
+  return accountsObj[itemName];
 }
 
 const initialState: State = {
   account: existingWCJSState.account || defaultState.account,
-  address: getAccountItem('address') || defaultState.address,
+  address: getAccountItem('address') as string || defaultState.address,
   assets: defaultState.assets,
   connected: defaultState.connected,
   connectionTimeout: existingWCJSState.connectionTimeout || defaultState.connectionTimeout,
@@ -115,12 +130,12 @@ const initialState: State = {
   loading: defaultState.loading,
   newAccount: existingWCJSState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
-  publicKey: getAccountItem('publicKey') || defaultState.publicKey,
+  publicKey: getAccountItem('publicKey') as string || defaultState.publicKey,
   QRCode: defaultState.QRCode,
   QRCodeUrl: defaultState.QRCodeUrl,
   showQRCodeModal: defaultState.showQRCodeModal,
-  signedJWT: getAccountItem('jwt') || defaultState.signedJWT,
-  walletInfo: getAccountItem('walletInfo') || defaultState.walletInfo,
+  signedJWT: getAccountItem('jwt') as string || defaultState.signedJWT,
+  walletInfo: getAccountItem('walletInfo') as WalletInfo || defaultState.walletInfo,
 };
 
 export class WalletConnectService {
