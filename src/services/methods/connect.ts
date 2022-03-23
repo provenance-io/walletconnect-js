@@ -1,6 +1,6 @@
 import WalletConnectClient from "@walletconnect/client";
 import QRCode from 'qrcode';
-import { Broadcast, ConnectData } from 'types';
+import { Broadcast, ConnectData, AccountInfo } from 'types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
 import { SetState, State } from '../walletConnectService';
@@ -14,17 +14,6 @@ interface ConnectProps {
   startConnectionTimer: () => void,
 }
 
-type AccountInfo = string[] | {
-  address?: string,
-  jwt?: string,
-  publicKey?: string,
-  walletInfo?: {
-    coin?: string,
-    id?: number,
-    name?: string,
-  }
-};
-
 export const connect = async ({
   state,
   setState,
@@ -36,17 +25,20 @@ export const connect = async ({
   // -------------------
   // PULL ACCOUNT INFO
   // -------------------
-  const getAccountInfo = (source: AccountInfo) => {
-    // Account info can come from an array or object
-    const isArray = Array.isArray(source);
-    // If it's an array, return data in the form of [address, publicKey, lastConnectJWT]
-    if (isArray) {
-      const [address, publicKey, jwt] = source;
+  const getAccountInfo = (accounts: AccountInfo) => {
+    if (!accounts || !Array.isArray(accounts) || !accounts.length) return {};
+    const firstAccount = accounts[0];
+    // Accounts can either be an array of strings or an array of objects
+    // Check the first value in the array to determine to type of data
+    const isString = typeof firstAccount === 'string';
+    // If it's a string, return data in the form of [address, publicKey, lastConnectJWT] from accounts
+    if (isString) {
+      const [address, publicKey, jwt] = accounts as string[];
       // No walletInfo will be available on the old accounts array
       return { address, publicKey, jwt, walletInfo: {} };
     }
-    // Data is in an object, pull keys from it
-    const { address, publicKey, jwt, walletInfo } = source;
+    // Data is in an object, pull keys from first item
+    const { address, publicKey, jwt, walletInfo } = firstAccount;
     return { address, publicKey, jwt, walletInfo };
   };
   // ----------------

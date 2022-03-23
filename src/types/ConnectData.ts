@@ -1,13 +1,20 @@
+type AccountObject = {
+  address: string,
+  jwt: string,
+  publicKey: string,
+  walletInfo: {
+    coin?: string,
+    id?: number,
+    name?: string,
+  };
+}
+
+export type AccountInfo = string[] | AccountObject[] | undefined;
+
 export type ConnectData = {
   params: [
     {
-      accounts: string[] | {
-        address: string, publicKey: string, jwt: string, walletInfo: {
-          coin?: string,
-          id?: number,
-          name?: string,
-        }
-      },
+      accounts: AccountInfo,
       peerMeta: {
         description: string,
         url: string,
