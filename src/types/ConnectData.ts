@@ -1,12 +1,14 @@
-type AccountObject = {
+export type WalletInfo = {
+  coin?: string,
+    id?: number,
+    name?: string,
+}
+
+export type AccountObject = {
   address: string,
   jwt: string,
   publicKey: string,
-  walletInfo: {
-    coin?: string,
-    id?: number,
-    name?: string,
-  };
+  walletInfo: WalletInfo,
 }
 
 export type AccountInfo = string[] | AccountObject[] | undefined;
