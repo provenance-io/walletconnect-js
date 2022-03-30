@@ -6,7 +6,8 @@ import {
   PLUGIN_PROVENANCE_WALLET,
   UNICORN_SPARKLE_WALLET_URL,
   FIREBASE_FETCH_WALLET_URL,
-  DYNAMIC_LINK_INFO,
+  DYNAMIC_LINK_INFO_PROD,
+  DYNAMIC_LINK_INFO_DEV,
 } from '../../consts';
 import provenanceSvg from '../../images/provenance.svg';
 import figureSvg from '../../images/figure.svg';
@@ -130,36 +131,54 @@ const QRCodeModal:React.FC<Props> = ({
   const [view, setView] = useState('qr');
   const [copied, setCopied] = useState(false);
   const [timeoutInstance, setTimeoutInstance] = useState<number>(-1);
-  const [fetchingProvenanceWalletUrl, setFetchingProvenanceWalletUrl] = useState(false);
-  const [provenanceWalletAppUrl, setProvenanceWalletAppUrl] = useState('');
+  const [urlsLoading, setUrlsLoading] = useState(false);
+  const [appUrlProd, setAppUrlProd] = useState('');
+  const [appUrlDev, setAppUrlDev] = useState('');
   
   // Kill any times when unmounted (prevent memory leaks w/running timers)
   useEffect(() => () => { if (timeoutInstance) clearTimeout(timeoutInstance); }, [timeoutInstance]);
 
   // Attempt to grab the mobile app url from firebase if we're on a mobile device
   useEffect(() => {
+    const urlExists = appUrlProd || appUrlDev;
     if (
-      !provenanceWalletAppUrl
-      && !fetchingProvenanceWalletUrl
+      !urlExists
+      && !urlsLoading
       && isMobile
       && QRCodeUrl
     ) {
-      setFetchingProvenanceWalletUrl(true);
-      const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
-      fetch(FIREBASE_FETCH_WALLET_URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          dynamicLinkInfo: {
-            ...DYNAMIC_LINK_INFO,
-            link: `${DYNAMIC_LINK_INFO.link}?data=${linkData}`,
-          },
+      const fetchFirebase = () => {
+        // Set is loading
+        setUrlsLoading(true);
+        const url = FIREBASE_FETCH_WALLET_URL;
+        const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
+        const linkProd = `${DYNAMIC_LINK_INFO_PROD.link}?data=${linkData}`;
+        const linkDev = `${DYNAMIC_LINK_INFO_DEV.link}?data=${linkData}`;
+        // First fetch prod, then dev
+        fetch(url, {
+          method: 'POST',
+          body: JSON.stringify({ dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD, link: linkProd } })
         })
-      })
         .then((response) => response.json())
-        .then(data => { setProvenanceWalletAppUrl(data.shortLink); })
-        .catch(() => { setFetchingProvenanceWalletUrl(false); })
+        .then(({ shortLink }) => { setAppUrlProd(shortLink) })
+        .then(() => {
+          // Fetch dev
+          fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_DEV, link: linkDev } })
+          })
+          .then((response) => response.json())
+          .then(({ shortLink }) => { setAppUrlDev(shortLink) })
+        })
+        .catch(() => {
+          // Remove env from loading list
+          setUrlsLoading(false);
+        })
+      };
+      // Fetch both dev and prod firebase dynamic url data
+      fetchFirebase();
     }
-  }, [provenanceWalletAppUrl, fetchingProvenanceWalletUrl, isMobile, QRCodeUrl]);
+  }, [isMobile, QRCodeUrl, appUrlDev, appUrlProd, urlsLoading]);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(QRCodeUrl).then(() => {
@@ -201,9 +220,15 @@ const QRCodeModal:React.FC<Props> = ({
         <WalletTitle>Unicorn Sparkle Wallet</WalletTitle>
         <WalletIcon src={unicornPng} />
       </WalletRow>
-      {provenanceWalletAppUrl && (
-        <WalletRow href={provenanceWalletAppUrl} rel="noopener noreferrer" target="_blank">
-          <WalletTitle>Provenance Mobile Wallet</WalletTitle>
+      {appUrlDev && (
+        <WalletRow href={appUrlDev} rel="noopener noreferrer" target="_blank">
+          <WalletTitle>Provenance Mobile Wallet (Dev)</WalletTitle>
+          <WalletIcon src={provenanceSvg} />
+        </WalletRow>
+      )}
+      {appUrlProd && (
+        <WalletRow href={appUrlProd} rel="noopener noreferrer" target="_blank">
+          <WalletTitle>Provenance Mobile Wallet (Prod)</WalletTitle>
           <WalletIcon src={provenanceSvg} />
         </WalletRow>
       )}

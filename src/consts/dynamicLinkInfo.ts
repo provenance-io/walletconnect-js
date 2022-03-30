@@ -1,4 +1,19 @@
-export const DYNAMIC_LINK_INFO = {
+export const DYNAMIC_LINK_INFO_PROD = {
+  domainUriPrefix: 'https://provenancewallet.page.link',
+  link: `https://provenance.io/wallet-connect`,
+  androidInfo: {
+    androidPackageName: 'io.provenance.wallet',
+  },
+  iosInfo: {
+    iosBundleId: 'io.provenance.wallet',
+    iosAppStoreId: '1606428494',
+  },
+  navigationInfo: {
+    enableForcedRedirect: true,
+  },
+};
+
+export const DYNAMIC_LINK_INFO_DEV = {
   domainUriPrefix: 'https://provenancewallet.page.link',
   link: `https://provenance.io/wallet-connect`,
   androidInfo: {
