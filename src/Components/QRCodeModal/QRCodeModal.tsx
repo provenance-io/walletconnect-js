@@ -148,7 +148,6 @@ const QRCodeModal:React.FC<Props> = ({
       && QRCodeUrl
     ) {
       const fetchFirebase = () => {
-        console.log('fetch firebase');
         // Set is loading
         setUrlsLoading(true);
         const url = FIREBASE_FETCH_WALLET_URL;
@@ -156,7 +155,6 @@ const QRCodeModal:React.FC<Props> = ({
         const linkProd = `${DYNAMIC_LINK_INFO_PROD.link}?data=${linkData}`;
         const linkDev = `${DYNAMIC_LINK_INFO_DEV.link}?data=${linkData}`;
         // First fetch prod, then dev
-        console.log('fetching prod');
         fetch(url, {
           method: 'POST',
           body: JSON.stringify({ dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD, link: linkProd } })
@@ -164,7 +162,6 @@ const QRCodeModal:React.FC<Props> = ({
         .then((response) => response.json())
         .then(({ shortLink }) => { setAppUrlProd(shortLink) })
         .then(() => {
-          console.log('fetching dev');
           // Fetch dev
           fetch(url, {
             method: 'POST',
