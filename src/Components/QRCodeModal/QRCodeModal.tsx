@@ -113,33 +113,6 @@ const WalletIcon = styled.img`
   height: 30px;
   width: 30px;
 `;
-const InProgress = styled.div`
-  position: absolute;
-  top: 0;
-  right: 40px;
-  font-size: 11px;
-  text-align: center;
-  font-weight: bold;
-  color: white;
-`;
-const FlagIcon = styled.div`
-  width: 110px;
-  height: 86px;
-  padding-top: 20px;
-  position: relative;
-  background: #4A76D4;
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0;
-    height: 0;
-    border-bottom: 13px solid #EEEEEE;
-    border-left: 55px solid transparent;
-    border-right: 55px solid transparent;
-  }
-`;
 
 interface Props {
   className: string,
@@ -265,7 +238,6 @@ const QRCodeModal:React.FC<Props> = ({
   return showQRCodeModal ? (
     <QRCodeModalContainer className={className} onClick={() => wcs.showQRCode(false)}>
       <QRModalContent onClick={(e) => e.stopPropagation()}>
-        <InProgress><FlagIcon>Wallet Coming Soon!</FlagIcon></InProgress>
         <CloseQRModal onClick={() => wcs.showQRCode(false)}>
         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1" height="1.4rem">
           <path d="M8.99984 1L5.09375 5L8.99984 9" />
