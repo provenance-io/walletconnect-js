@@ -134,7 +134,8 @@ const QRCodeModal:React.FC<Props> = ({
   const [urlsLoading, setUrlsLoading] = useState(false);
   const [appUrlProd, setAppUrlProd] = useState('');
   const [appUrlDev, setAppUrlDev] = useState('');
-  
+  const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
+
   // Kill any times when unmounted (prevent memory leaks w/running timers)
   useEffect(() => () => { if (timeoutInstance) clearTimeout(timeoutInstance); }, [timeoutInstance]);
 
@@ -181,7 +182,7 @@ const QRCodeModal:React.FC<Props> = ({
   }, [isMobile, QRCodeUrl, appUrlDev, appUrlProd, urlsLoading]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(QRCodeUrl).then(() => {
+    navigator.clipboard.writeText(encodedQRCodeUrl).then(() => {
       clearTimeout(timeoutInstance);
       setCopied(true);
       const newTimeoutInstance = window.setTimeout(() => {
@@ -203,11 +204,11 @@ const QRCodeModal:React.FC<Props> = ({
   const renderDesktopView = () => (
     <>
       <Text>Select wallet</Text>
-      <WalletRow href={`${PLUGIN_FIGURE_WALLET}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
+      <WalletRow href={`${PLUGIN_FIGURE_WALLET}${encodedQRCodeUrl}`} rel="noopener noreferrer" target="_blank">
         <WalletTitle>Figure</WalletTitle>
         <WalletIcon src={figureSvg} />
       </WalletRow>
-      <WalletRow href={`${PLUGIN_PROVENANCE_WALLET}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
+      <WalletRow href={`${PLUGIN_PROVENANCE_WALLET}${encodedQRCodeUrl}`} rel="noopener noreferrer" target="_blank">
         <WalletTitle>Provenance</WalletTitle>
         <WalletIcon src={provenanceSvg} />
       </WalletRow>
@@ -216,7 +217,7 @@ const QRCodeModal:React.FC<Props> = ({
   const renderMobileView = () => (
     <>
       <Text>Select wallet</Text>
-      <WalletRow href={`${UNICORN_SPARKLE_WALLET_URL}${QRCodeUrl}`} rel="noopener noreferrer" target="_blank">
+      <WalletRow href={`${UNICORN_SPARKLE_WALLET_URL}${encodedQRCodeUrl}`} rel="noopener noreferrer" target="_blank">
         <WalletTitle>Unicorn Sparkle Wallet</WalletTitle>
         <WalletIcon src={unicornPng} />
       </WalletRow>
