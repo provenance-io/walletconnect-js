@@ -2,16 +2,12 @@ import React, { useState, useEffect } from 'react'; // eslint-disable-line no-un
 import styled from 'styled-components';
 import { WalletConnectService } from 'services';
 import {
-  PLUGIN_FIGURE_WALLET,
   PLUGIN_PROVENANCE_WALLET,
-  UNICORN_SPARKLE_WALLET_URL,
   FIREBASE_FETCH_WALLET_URL,
   DYNAMIC_LINK_INFO_PROD,
   DYNAMIC_LINK_INFO_DEV,
 } from '../../consts';
 import provenanceSvg from '../../images/provenance.svg';
-import figureSvg from '../../images/figure.svg';
-import unicornPng from '../../images/unicorn.png';
 
 const QRCodeModalContainer = styled.div`
   top: 0;
@@ -99,6 +95,21 @@ const WalletRow = styled.a`
   border-radius: 4px;
   padding: 10px 18px;
   transition: 500ms all;
+  &:hover {
+    background: #FFFFFF;
+  }
+`;
+const WalletRowNonLink = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  flex-basis: 100%;
+  color: #333333;
+  border-radius: 4px;
+  padding: 10px 18px;
+  transition: 500ms all;
+  cursor: pointer;
   &:hover {
     background: #FFFFFF;
   }
@@ -201,26 +212,24 @@ const QRCodeModal:React.FC<Props> = ({
       { copied ? <Text>Copied to clipboard!</Text> : <Text link onClick={copyToClipboard}>Copy to clipboard</Text> }
     </>
   );
+
+  const handleExtensionAppOpen = () => {
+    const data = { uri: encodedQRCodeUrl };
+    window?.chrome.runtime.sendMessage(PLUGIN_PROVENANCE_WALLET, data);
+  };
+
   const renderDesktopView = () => (
     <>
       <Text>Select wallet</Text>
-      <WalletRow href={`${PLUGIN_FIGURE_WALLET}${encodedQRCodeUrl}`} rel="noopener noreferrer" target="_blank">
-        <WalletTitle>Figure</WalletTitle>
-        <WalletIcon src={figureSvg} />
-      </WalletRow>
-      <WalletRow href={`${PLUGIN_PROVENANCE_WALLET}${encodedQRCodeUrl}`} rel="noopener noreferrer" target="_blank">
+      <WalletRowNonLink onClick={handleExtensionAppOpen}>
         <WalletTitle>Provenance</WalletTitle>
         <WalletIcon src={provenanceSvg} />
-      </WalletRow>
+      </WalletRowNonLink>
     </>
   );
   const renderMobileView = () => (
     <>
       <Text>Select wallet</Text>
-      <WalletRow href={`${UNICORN_SPARKLE_WALLET_URL}${encodedQRCodeUrl}`} rel="noopener noreferrer" target="_blank">
-        <WalletTitle>Unicorn Sparkle Wallet</WalletTitle>
-        <WalletIcon src={unicornPng} />
-      </WalletRow>
       {appUrlDev && (
         <WalletRow href={appUrlDev} rel="noopener noreferrer" target="_blank">
           <WalletTitle>Provenance Mobile Wallet (Dev)</WalletTitle>
