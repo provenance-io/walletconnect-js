@@ -109,6 +109,7 @@ const WalletRowNonLink = styled.div`
   border-radius: 4px;
   padding: 10px 18px;
   transition: 500ms all;
+  cursor: pointer;
   &:hover {
     background: #FFFFFF;
   }
@@ -213,9 +214,8 @@ const QRCodeModal:React.FC<Props> = ({
   );
 
   const handleExtensionAppOpen = () => {
-    // Make a simple request:
-    console.log('handleExtensionAppOpen: ', PLUGIN_PROVENANCE_WALLET, encodedQRCodeUrl);
-    window?.chrome.runtime.sendMessage(PLUGIN_PROVENANCE_WALLET, {openUrlInEditor: encodedQRCodeUrl});
+    const data = { uri: encodedQRCodeUrl };
+    window?.chrome.runtime.sendMessage(PLUGIN_PROVENANCE_WALLET, data);
   };
 
   const renderDesktopView = () => (
