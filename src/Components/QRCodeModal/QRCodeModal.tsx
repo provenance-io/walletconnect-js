@@ -109,14 +109,25 @@ const WalletRowNonLink = styled.div`
   border-radius: 4px;
   padding: 10px 18px;
   transition: 500ms all;
+  flex-wrap: wrap;
   cursor: pointer;
+  input {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #aaaaaa;
+    color: #444444;
+  }
   &:hover {
     background: #FFFFFF;
   }
 `;
-const WalletTitle = styled.div`
+const WalletTitle = styled.div<{custom?: boolean}>`
   font-weight: 900;
   font-size: 2rem;
+  color: ${({ custom }) => custom ? '#4889fa' : '#333333' };
+  user-select: none;
 `;
 const WalletIcon = styled.img`
   background: #FFFFFF;
@@ -140,12 +151,15 @@ const QRCodeModal:React.FC<Props> = ({
   const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
   const options = ['qr', isMobile ? 'mobile' : 'desktop'];
   const [view, setView] = useState('qr');
+  const [provExtId, setProvExtId] = useState(PLUGIN_PROVENANCE_WALLET);
+  const [showProvExtId, setShowProvExtId] = useState(false);
   const [copied, setCopied] = useState(false);
   const [timeoutInstance, setTimeoutInstance] = useState<number>(-1);
   const [urlsLoading, setUrlsLoading] = useState(false);
   const [appUrlProd, setAppUrlProd] = useState('');
   const [appUrlDev, setAppUrlDev] = useState('');
   const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
+  const customProvExtId = provExtId !== PLUGIN_PROVENANCE_WALLET;
 
   // Kill any times when unmounted (prevent memory leaks w/running timers)
   useEffect(() => () => { if (timeoutInstance) clearTimeout(timeoutInstance); }, [timeoutInstance]);
@@ -213,17 +227,33 @@ const QRCodeModal:React.FC<Props> = ({
     </>
   );
 
-  const handleExtensionAppOpen = () => {
-    const data = { uri: encodedQRCodeUrl };
-    window?.chrome.runtime.sendMessage(PLUGIN_PROVENANCE_WALLET, data);
+  const handleExtensionAppOpen = (event:React.MouseEvent) => {
+    const shiftKeyPressed = event.shiftKey;
+    if (shiftKeyPressed) {
+      if (showProvExtId) { setProvExtId(PLUGIN_PROVENANCE_WALLET) } // reset value when closing
+      setShowProvExtId(!showProvExtId);
+    } else if (provExtId) {
+      const data = { uri: encodedQRCodeUrl };
+      window?.chrome.runtime.sendMessage(provExtId, data);
+    }
   };
 
   const renderDesktopView = () => (
     <>
       <Text>Select wallet</Text>
       <WalletRowNonLink onClick={handleExtensionAppOpen}>
-        <WalletTitle>Provenance</WalletTitle>
+        <WalletTitle custom={customProvExtId}>Provenance {customProvExtId && '(Custom ID)'}</WalletTitle>
         <WalletIcon src={provenanceSvg} />
+        {showProvExtId && (
+          <input
+            value={provExtId}
+            placeholder="Extension ID"
+            onChange={({ target }) => {
+              setProvExtId(target.value)
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        )}
       </WalletRowNonLink>
     </>
   );
