@@ -233,7 +233,9 @@ const QRCodeModal:React.FC<Props> = ({
       if (showProvExtId) { setProvExtId(PLUGIN_PROVENANCE_WALLET) } // reset value when closing
       setShowProvExtId(!showProvExtId);
     } else if (provExtId) {
-      const data = { uri: encodedQRCodeUrl };
+      // Set the extension id into the walletconnect-js state
+      wcs.setState({ extensionId: provExtId });
+      const data = { uri: encodedQRCodeUrl, event: 'walletconnect_init' };
       window?.chrome.runtime.sendMessage(provExtId, data);
     }
   };
