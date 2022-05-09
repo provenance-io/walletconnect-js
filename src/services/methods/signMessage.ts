@@ -4,7 +4,7 @@ import { State } from '../walletConnectService';
 
 export const signMessage = async (state: State, message: string) => {
   let valid = false;
-  const { connector, address, publicKey: pubKeyB64 } = state;
+  const { connector, address, publicKey: pubKeyB64, connectionType, extensionId } = state;
   const method = 'provenance_sign';
   const description = 'Sign Message';
   const metadata = JSON.stringify({
@@ -24,6 +24,11 @@ export const signMessage = async (state: State, message: string) => {
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   try {
+    // If we are using a browser extension wallet, pop open the notification page before sending the request
+    if (connectionType === 'extension') {
+      const data = { event: 'walletconnect_event' };
+      window?.chrome.runtime.sendMessage(extensionId, data);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // result is a hex encoded signature
