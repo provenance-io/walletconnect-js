@@ -8,6 +8,8 @@ import {
   DYNAMIC_LINK_INFO_DEV,
 } from '../../consts';
 import provenanceSvg from '../../images/provenance.svg';
+import appStoreImg from '../../images/appStoreBadge.svg';
+import googlePlayImg from '../../images/googlePlayBadge.png';
 
 const QRCodeModalContainer = styled.div`
   top: 0;
@@ -135,6 +137,7 @@ const WalletIcon = styled.img`
   height: 30px;
   width: 30px;
 `;
+const AppStoreIcons = styled.div``;
 
 interface Props {
   className: string,
@@ -224,6 +227,10 @@ const QRCodeModal:React.FC<Props> = ({
         <img src={QRCode} alt="WalletConnect QR Code" />
       </ImgContainer>
       { copied ? <Text>Copied to clipboard!</Text> : <Text link onClick={copyToClipboard}>Copy to clipboard</Text> }
+      <AppStoreIcons>
+        <img src={appStoreImg} />
+        <img src={googlePlayImg} />
+      </AppStoreIcons>
     </>
   );
 
