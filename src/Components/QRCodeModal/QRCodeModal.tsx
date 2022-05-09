@@ -5,6 +5,7 @@ import {
   PLUGIN_PROVENANCE_WALLET,
   FIREBASE_FETCH_WALLET_URL,
   DYNAMIC_LINK_INFO_PROD,
+  DYNAMIC_LINK_INFO_DEV,
   APP_STORE_GOOGLE_PLAY,
   APP_STORE_APPLE,
 } from '../../consts';
@@ -158,7 +159,7 @@ interface Props {
 const QRCodeModal:React.FC<Props> = ({
   className,
   walletConnectService: wcs,
-  title = 'Scan the QRCode with your mobile Provenance Blockchain Wallet.',
+  title = 'Scan the QRCode with your Mobile Provenance wallet.',
 }) => {
   const { state } = wcs;
   const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
@@ -170,6 +171,7 @@ const QRCodeModal:React.FC<Props> = ({
   const [timeoutInstance, setTimeoutInstance] = useState<number>(-1);
   const [urlsLoading, setUrlsLoading] = useState(false);
   const [appUrlProd, setAppUrlProd] = useState('');
+  const [appUrlDev, setAppUrlDev] = useState('');
   const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
   const customProvExtId = provExtId !== PLUGIN_PROVENANCE_WALLET;
 
@@ -178,7 +180,7 @@ const QRCodeModal:React.FC<Props> = ({
 
   // Attempt to grab the mobile app url from firebase if we're on a mobile device
   useEffect(() => {
-    const urlExists = appUrlProd;
+    const urlExists = appUrlProd || appUrlDev;
     if (
       !urlExists
       && !urlsLoading
@@ -191,6 +193,7 @@ const QRCodeModal:React.FC<Props> = ({
         const url = FIREBASE_FETCH_WALLET_URL;
         const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
         const linkProd = `${DYNAMIC_LINK_INFO_PROD.link}?data=${linkData}`;
+        const linkDev = `${DYNAMIC_LINK_INFO_DEV.link}?data=${linkData}`;
         // First fetch prod, then dev
         fetch(url, {
           method: 'POST',
@@ -198,6 +201,15 @@ const QRCodeModal:React.FC<Props> = ({
         })
         .then((response) => response.json())
         .then(({ shortLink }) => { setAppUrlProd(shortLink) })
+        .then(() => {
+          // Fetch dev
+          fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_DEV, link: linkDev } })
+          })
+          .then((response) => response.json())
+          .then(({ shortLink }) => { setAppUrlDev(shortLink) })
+        })
         .catch(() => {
           // Remove env from loading list
           setUrlsLoading(false);
@@ -206,7 +218,7 @@ const QRCodeModal:React.FC<Props> = ({
       // Fetch both dev and prod firebase dynamic url data
       fetchFirebase();
     }
-  }, [isMobile, QRCodeUrl, appUrlProd, urlsLoading]);
+  }, [isMobile, QRCodeUrl, appUrlDev, appUrlProd, urlsLoading]);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(encodedQRCodeUrl).then(() => {
@@ -243,9 +255,7 @@ const QRCodeModal:React.FC<Props> = ({
       if (showProvExtId) { setProvExtId(PLUGIN_PROVENANCE_WALLET) } // reset value when closing
       setShowProvExtId(!showProvExtId);
     } else if (provExtId) {
-      // Set the extension id into the walletconnect-js state
-      wcs.setState({ extensionId: provExtId });
-      const data = { uri: encodedQRCodeUrl, event: 'walletconnect_init' };
+      const data = { uri: encodedQRCodeUrl };
       window?.chrome.runtime.sendMessage(provExtId, data);
     }
   };
@@ -272,9 +282,15 @@ const QRCodeModal:React.FC<Props> = ({
   const renderMobileView = () => (
     <>
       <Text>Select wallet</Text>
+      {appUrlDev && (
+        <WalletRow href={appUrlDev} rel="noopener noreferrer" target="_blank">
+          <WalletTitle>Provenance Mobile Wallet (Dev)</WalletTitle>
+          <WalletIcon src={provenanceSvg} />
+        </WalletRow>
+      )}
       {appUrlProd && (
         <WalletRow href={appUrlProd} rel="noopener noreferrer" target="_blank">
-          <WalletTitle>Provenance Mobile Wallet</WalletTitle>
+          <WalletTitle>Provenance Mobile Wallet (Prod)</WalletTitle>
           <WalletIcon src={provenanceSvg} />
         </WalletRow>
       )}
