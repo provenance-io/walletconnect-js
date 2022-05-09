@@ -6,8 +6,12 @@ import {
   FIREBASE_FETCH_WALLET_URL,
   DYNAMIC_LINK_INFO_PROD,
   DYNAMIC_LINK_INFO_DEV,
+  APP_STORE_GOOGLE_PLAY,
+  APP_STORE_APPLE,
 } from '../../consts';
 import provenanceSvg from '../../images/provenance.svg';
+import appleAppStoreImg from '../../images/appStoreBadge.svg';
+import googlePlayImg from '../../images/googlePlayBadge.png';
 
 const QRCodeModalContainer = styled.div`
   top: 0;
@@ -135,6 +139,16 @@ const WalletIcon = styled.img`
   height: 30px;
   width: 30px;
 `;
+const AppStoreIcons = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+`;
+const AppIcon = styled.a`
+  margin: 0 6px;
+`;
 
 interface Props {
   className: string,
@@ -224,6 +238,14 @@ const QRCodeModal:React.FC<Props> = ({
         <img src={QRCode} alt="WalletConnect QR Code" />
       </ImgContainer>
       { copied ? <Text>Copied to clipboard!</Text> : <Text link onClick={copyToClipboard}>Copy to clipboard</Text> }
+      <AppStoreIcons>
+        <AppIcon href={APP_STORE_APPLE} target="_blank" rel="no-referrer" title="Get the Provenance Blockchain Wallet in the Apple App store.">
+          <img src={appleAppStoreImg} height="42px" alt="Apple App Store badge" />
+        </AppIcon>
+        <AppIcon href={APP_STORE_GOOGLE_PLAY} target="_blank" rel="no-referrer" title="Get the Provenance Blockchain Wallet in the Google Play store.">
+          <img src={googlePlayImg}  height="42px" alt="Google Play Store badge" />
+        </AppIcon>
+      </AppStoreIcons>
     </>
   );
 
