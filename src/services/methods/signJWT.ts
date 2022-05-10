@@ -2,9 +2,8 @@ import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
 import { State, SetState } from '../walletConnectService';
-import { SignJWTData } from '../../types';
 
-export const signJWT = async (state: State, setState: SetState, expires: SignJWTData) => {
+export const signJWT = async (state: State, setState: SetState, expires: number) => {
   let valid = false;
   const { connector, address, publicKey: pubKeyB64 } = state;
   const method = 'provenance_sign';

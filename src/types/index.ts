@@ -8,4 +8,3 @@ export * from './MarkerAddData';
 export * from './MarkerData';
 export * from './SendCoinData';
 export * from './SendHashData';
-export * from './SignJWTData';

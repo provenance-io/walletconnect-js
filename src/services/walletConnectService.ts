@@ -10,7 +10,6 @@ import {
   SendCoinData,
   SendHashBatchData,
   SendHashData,
-  SignJWTData,
   AccountInfo,
   AccountObject,
   WalletInfo
@@ -420,10 +419,10 @@ export class WalletConnectService {
     this.#resetConnectionTimeout();
   }
 
-  signJWT = async (expires: SignJWTData) => {
+  signJWT = async (expires: string) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'signJWT' });
-    const result = await signJWTMethod(this.state, this.setState, expires);
+    const result = await signJWTMethod(this.state, this.setState, +expires);
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method
