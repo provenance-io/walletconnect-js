@@ -76,12 +76,24 @@ export const connect = async ({
     // Get connection issued/expires times (auto-logout)
     const connectionIat = Math.floor(Date.now() / 1000);
     const connectionEat = state.connectionTimeout + connectionIat;
-    setState({ address, publicKey, peer, connected: true, connectionIat, signedJWT, connectionEat, walletInfo });
+    // If the peer is a chrome-extension, note it
+    const connectionType = peer?.url?.startsWith('chrome-extension') ? 'extension' : 'mobile';
+    setState({
+      address,
+      publicKey,
+      peer,
+      connected: true,
+      connectionIat,
+      signedJWT,
+      connectionEat,
+      walletInfo,
+      connectionType
+    });
     const broadcastData = {
       data: payload,
       connectionIat,
       connectionEat,
-      connectionType: 'new session'
+      connectionType: `new session (${connectionType})`,
     };
     broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
     // Start the auto-logoff timer

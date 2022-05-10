@@ -185,7 +185,6 @@ return (
       <QRCodeModal
         walletConnectService={wcs}
         walletConnectState={walletConnectState}
-        title="Scan to initiate walletConnect-js session"
       />
     </HomeContainer>
   );
