@@ -2,13 +2,12 @@ import { MarkerData } from './MarkerData';
 import { MarkerAddData } from './MarkerAddData';
 import { CustomActionData } from './CustomActionData';
 import { SendCoinData } from './SendCoinData';
-import { SignJWTData } from './SignJWTData';
 import { SendHashData } from './SendHashData';
 
 export type BaseResults = {
   valid: boolean
   result?: Record<string, unknown>
-  data: MarkerData | MarkerAddData | CustomActionData | SendCoinData | SignJWTData | SendHashData | string
+  data: MarkerData | MarkerAddData | CustomActionData | SendCoinData | SendHashData | string
   error?: string | Error | unknown
   request?: {
     id: number
