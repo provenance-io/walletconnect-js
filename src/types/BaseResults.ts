@@ -7,7 +7,7 @@ import { SendHashData } from './SendHashData';
 export type BaseResults = {
   valid: boolean
   result?: Record<string, unknown>
-  data: MarkerData | MarkerAddData | CustomActionData | SendCoinData | SendHashData | string
+  data: MarkerData | MarkerAddData | CustomActionData | SendCoinData | SendHashData | string | number,
   error?: string | Error | unknown
   request?: {
     id: number
