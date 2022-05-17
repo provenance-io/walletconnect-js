@@ -10,7 +10,7 @@ export const customAction = async (state: State, data: CustomActionData) => {
     method = 'provenance_sendTransaction',
     gasPrice,
   } = data;
-  const { connector, address } = state;
+  const { connector, address, connectionType, extensionId } = state;
   const metadata = JSON.stringify({
     description,
     address,
@@ -31,6 +31,11 @@ export const customAction = async (state: State, data: CustomActionData) => {
   const hexMsgArray = b64MessageArray.map((msg) => convertUtf8ToHex(msg))
   request.params.push(...hexMsgArray);
   try {
+    // If we are using a browser extension wallet, pop open the notification page before sending the request
+    if (connectionType === 'extension' && extensionId) {
+      const extData = { event: 'walletconnect_event' };
+      window?.chrome.runtime.sendMessage(extensionId, extData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
