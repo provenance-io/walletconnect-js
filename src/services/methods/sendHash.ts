@@ -8,7 +8,7 @@ import { State } from '../walletConnectService';
  */
 export const sendHash = async (state: State, data: SendHashData) => {
   let valid = false;
-  const {connector, address} = state;
+  const {connector, address, connectionType, extensionId} = state;
   const {to: toAddress, amount: sendAmountHash, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
@@ -46,6 +46,11 @@ export const sendHash = async (state: State, data: SendHashData) => {
   // Convert the amountList back into Hash (was converted to nHash before sending)
   const sentAmount = [{ denom: 'hash', amount: sendAmountHash}];
   try {
+    // If we are using a browser extension wallet, pop open the notification page before sending the request
+    if (connectionType === 'extension' && extensionId) {
+      const extData = { event: 'walletconnect_event' };
+      window?.chrome.runtime.sendMessage(extensionId, extData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID

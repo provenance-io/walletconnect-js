@@ -26,8 +26,8 @@ export const signMessage = async (state: State, message: string) => {
   try {
     // If we are using a browser extension wallet, pop open the notification page before sending the request
     if (connectionType === 'extension' && extensionId) {
-      const data = { event: 'walletconnect_event' };
-      window?.chrome.runtime.sendMessage(extensionId, data);
+      const extData = { event: 'walletconnect_event' };
+      window?.chrome.runtime.sendMessage(extensionId, extData);
     }
     // send message
     const result = await connector.sendCustomRequest(request);
