@@ -348,8 +348,8 @@ export class WalletConnectService {
     this.#resetConnectionTimeout();
   }
 
-  connect = () => {
-    connectMethod({
+  connect = async () => {
+    await connectMethod({
       state: this.state,
       setState: this.setState,
       resetState: this.resetState,
