@@ -250,17 +250,71 @@ This package works without react and with any other javascipt library/framework 
 There are a few differences in getting setup and running:
   1) Note [Webpack 5 Issues](#Webpack-5-Issues)
   2) When connecting, you will need to manually generate the QR code image element (Component is only available to React.js apps)
-  - Pull `QRCode` from `WalletConnectService` state
-  - Use `QRCode` as image element `src`
+  3) Don't forget to set up event and loading listeners
+  * Basic non-React.js example
     ```js
-    const walletConnectService = new WalletConnectService();
-    const QRCodeData = walletConnectService.state.QRCode;
-    const QRImage = document.createElement('img');
-    QRImage.src = QRCodeData;
+    import { WalletConnectService, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
 
-    return QRImage;
+    // Pull out the service (includes methods and state)
+    const walletConnectService = new WalletConnectService();
+    // Function to generate a QR code img element
+    const generateQRImgElement = () => {
+      // Pull `QRCode` from `WalletConnectService` state and use it as the element `src`
+      const QRCodeData = walletConnectService.state.QRCode;
+      const QRImage = document.createElement('img');
+      QRImage.src = QRCodeData;
+      return QRImage;
+    };
+    // Function to generate a custom button element
+    const Button = (content: string, id?: string, onClick?: () => void) => {
+      const button = document.createElement('button');
+      button.textContent = content;
+      button.id = id;
+      if (onClick) button.addEventListener('click', onClick);
+      return button;
+    };
+    // Initialize wcjs connection (builds qrCode into state)
+    const connect = async () => {
+      await walletConnectService.connect();
+      // Build QRCode img element
+      const QRImageElement = generateQRImgElement();
+      // Take this QR element and appendChild to wherever you wanted to render it
+      document.body.appendChild(QRImageElement);
+      // User can now scan the QR code to connect
+    }
+    // Manually disconnect from the wc-js session
+    const disconnect = async () => { await walletConnectService.disconnect(); };
+    // wc-js has returned a connection event, we should have data to use
+    const connectionEvent = (result) => {
+      const { address, publicKey } = walletConnectService.state;
+      document.body.innerHTML = `
+        <div>Status: Connected to wallet via ${result.connectionType}</div>
+        <div>Address: ${address}</div>
+        <div>PublicKey: ${publicKey}</div>
+      `;
+      document.body.appendChild(Button('Disconnect', 'disconnect', disconnect));
+    }
+    // Something has caused wc-js to return a disconnect event, we're no longer connected
+    const disconnectEvent = (result) => {
+      // Clear everything out, re-add the connect button
+      document.body.innerHTML = '';
+      document.body.appendChild(Button('Connect', 'connect', connect));
+    };
+    // Listen for specific walletconnect-js events
+    const setupEventListeners = () => {
+      // Connected
+      walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, connectionEvent)
+      // Disconnected
+      walletConnectService.addListener(WINDOW_MESSAGES.DISCONNECT, disconnectEvent)
+    }
+    // Initial function when page/app loads
+    const init = () => {
+      setupEventListeners();
+      document.body.appendChild(Button('Connect', 'connect', connect));
+    };
+    // Run on app load
+    init();
     ```
-  3) Don't forget to set up event and loading listeners.
   
 ## Webpack 5 Issues
 If you are on Webpack version 5+ (Note: Create React App 5+ uses Webpack 5+) then you will likely encounter a message like this:
@@ -348,3 +402,5 @@ Copy `window.localStorage` values from one site to another (mainly, to `localHos
 
 This application is under heavy development. The upcoming public blockchain is the evolution of the private Provenance network blockchain started in 2018.
 Current development is being supported by [Figure Technologies](https://figure.com).
+
+[Back to top](#Provenance.io-WalletConnect-JS)
