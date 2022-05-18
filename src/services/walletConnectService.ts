@@ -385,8 +385,8 @@ export class WalletConnectService {
     this.#resetConnectionTimeout();
   }
 
-  disconnect = () => {
-    if (this?.state?.connector) this.state.connector.killSession();
+  disconnect = async () => {
+    if (this?.state?.connector) await this.state.connector.killSession();
   }
 
   sendCoin = async (data: SendCoinData) => {
