@@ -250,10 +250,11 @@ This package works without react and with any other javascipt library/framework 
 There are a few differences in getting setup and running:
   1) Note [Webpack 5 Issues](#Webpack-5-Issues)
   2) When connecting, you will need to manually generate the QR code image element (Component is only available to React.js apps)
-  3) Don't forget to set up event and loading listeners
+  3) Don't use the default imports (`@provenanceio/walletconnect-js`), instead pull the service from `@provenanceio/walletconnect-js/lib/service`
+  4) Don't forget to set up event and loading listeners
   * Basic non-React.js example
     ```js
-    import { WalletConnectService, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
+    import { WalletConnectService, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js/lib/service';
 
     // Pull out the service (includes methods and state)
     const walletConnectService = new WalletConnectService();
