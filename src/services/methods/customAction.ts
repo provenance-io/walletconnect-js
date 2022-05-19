@@ -1,5 +1,5 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import { CustomActionData } from 'types';
+import { CustomActionData } from '../../types';
 import { State } from '../walletConnectService';
 
 export const customAction = async (state: State, data: CustomActionData) => {

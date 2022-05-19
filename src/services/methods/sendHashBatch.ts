@@ -1,6 +1,6 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MessageService } from '@provenanceio/wallet-lib';
-import { SendHashBatchData } from 'types';
+import { SendHashBatchData } from '../../types';
 import { State } from '../walletConnectService';
 
 export const sendHashBatch = async (state: State, data: SendHashBatchData) => {

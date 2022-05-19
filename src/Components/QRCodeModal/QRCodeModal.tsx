@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import styled from 'styled-components';
-import { WalletConnectService } from 'services';
+import { WalletConnectService } from '../../services';
 import {
   PLUGIN_PROVENANCE_WALLET,
   FIREBASE_FETCH_WALLET_URL,

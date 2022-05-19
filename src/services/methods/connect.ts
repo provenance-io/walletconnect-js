@@ -1,6 +1,6 @@
 import WalletConnectClient from "@walletconnect/client";
 import QRCode from 'qrcode';
-import { Broadcast, ConnectData, AccountInfo } from 'types';
+import { Broadcast, ConnectData, AccountInfo } from '../../types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
 import { SetState, State } from '../walletConnectService';
