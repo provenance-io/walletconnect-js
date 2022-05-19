@@ -1,7 +1,7 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { MsgActivateRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
-import { MarkerData } from 'types';
+import { MarkerData } from '../../types';
 import { State } from '../walletConnectService';
 
 export const markerActivate = async (state: State, data: MarkerData) => {

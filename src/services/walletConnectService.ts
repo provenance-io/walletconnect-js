@@ -13,7 +13,7 @@ import {
   AccountInfo,
   AccountObject,
   WalletInfo
-} from 'types';
+} from '../types';
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL, CONNECTION_TIMEOUT } from '../consts';
 import {
   markerActivate as markerActivateMethod,

@@ -4,7 +4,7 @@ import { MarkerStatus, MarkerType } from "@provenanceio/wallet-lib/lib/proto/pro
 import { MsgAddMarkerRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
 import { Coin } from "@provenanceio/wallet-lib/lib/proto/cosmos/base/v1beta1/coin_pb";
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
-import { MarkerAddData } from 'types';
+import { MarkerAddData } from '../../types';
 import { State } from '../walletConnectService';
 
 // Wallet-lib delegate message proto:
