@@ -155,7 +155,7 @@ interface Props {
   title: string
 }
 
-const QRCodeModal:React.FC<Props> = ({
+export const QRCodeModal:React.FC<Props> = ({
   className,
   walletConnectService: wcs,
   title = 'Scan the QRCode with your mobile Provenance Blockchain Wallet.',
@@ -302,5 +302,3 @@ const QRCodeModal:React.FC<Props> = ({
     </QRCodeModalContainer>
   ) : null;
 };
-
-export default QRCodeModal;
