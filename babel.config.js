@@ -28,6 +28,7 @@ module.exports = {
       },
     ],
     '@babel/plugin-transform-object-assign',
+    '@babel/transform-runtime'
   ],
   env: {
     cjs: {
