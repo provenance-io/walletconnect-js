@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "rootDir": "./src",
     "outDir": "./public",
     "target": "ES2015",
     "lib": [
