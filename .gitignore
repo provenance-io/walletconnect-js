@@ -19,6 +19,8 @@
 /esm
 /lib
 /docs
+/cdn
+/umd
 
 # misc
 .DS_Store

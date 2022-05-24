@@ -1,5 +1,5 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import { MessageService } from '@provenanceio/wallet-lib';
+import { MessageService } from '@provenanceio/wallet-lib/lib/services/message-service';
 import { SendCoinData } from '../../types';
 import { State } from '../walletConnectService';
 
