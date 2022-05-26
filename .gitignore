@@ -39,3 +39,4 @@ ignored/
 .eslintcache
 
 *.d.ts
+*.tgz

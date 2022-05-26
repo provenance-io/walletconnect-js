@@ -1,25 +1,33 @@
-import { convertUtf8ToHex } from "@walletconnect/utils";
-import { MessageService } from '@provenanceio/wallet-lib/lib/services/message-service';
+import { convertUtf8ToHex } from '@walletconnect/utils';
+import { Message } from 'google-protobuf';
+import {
+  buildMessage,
+  createAnyMessageBase64,
+} from '@provenanceio/wallet-utils';
 import { SendCoinData } from '../../types';
 import { State } from '../walletConnectService';
 
 export const sendCoin = async (state: State, data: SendCoinData) => {
   let valid = false;
-  const {connector, address} = state;
-  const {to: toAddress, amount: initialAmount, denom: initialDenom = 'hash', gasPrice } = data;
+  const { connector, address } = state;
+  const {
+    to: toAddress,
+    amount: initialAmount,
+    denom: initialDenom = 'hash',
+    gasPrice,
+  } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
   let amount = initialAmount;
   let denom = initialDenom.toLowerCase();
   if (denom === 'hash') {
     // Convert hash amount to nhash (cannot send hash, can only send nhash)
-    amount = initialAmount * (10 ** 9);
+    amount = initialAmount * 10 ** 9;
     denom = 'nhash';
   }
   // Set amount to string value
   const amountString = `${amount}`;
   const description = `Send Coin (${denom})`;
-  const messageService = new MessageService();
   const sendMessage = {
     fromAddress: address,
     toAddress,
@@ -34,15 +42,15 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   // Custom Request
   const request = {
     id: 1,
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     method,
     params: [metadata],
   };
 
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
-  const messageMsgSend = messageService.buildMessage(type, sendMessage);
-  const message = messageService.createAnyMessageBase64(type, messageMsgSend);
+  const messageMsgSend = buildMessage(type, sendMessage);
+  const message = createAnyMessageBase64(type, messageMsgSend as Message);
 
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
@@ -51,8 +59,10 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
-    valid = !!result
+    valid = !!result;
     // result is a hex encoded signature
     return { valid, result, data, request };
-  } catch (error) { return { valid, error, data, request }; }
+  } catch (error) {
+    return { valid, error, data, request };
+  }
 };
