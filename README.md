@@ -246,76 +246,83 @@ To see how to initiate and run the webDemo, look through the [webDemo README.md]
 
 ## Non React Setup
 This package works without react and with any other javascipt library/framework (tested with vanilla js)
-
-There are a few differences in getting setup and running:
-  1) Note [Webpack 5 Issues](#Webpack-5-Issues)
-  2) When connecting, you will need to manually generate the QR code image element (Component is only available to React.js apps)
-  3) Don't use the default imports (`@provenanceio/walletconnect-js`), instead pull the service from `@provenanceio/walletconnect-js/lib/service`
-  4) Don't forget to set up event and loading listeners
-  * Basic non-React.js example
+### Using a CDN Import
+  You can find this package on `https://unpkg.com/`:
+    - Note: Change the version in the url as needed: `https://unpkg.com/@provenanceio/walletconnect-js@1.0.19/umd/walletconnect-js.min.js`
+    - Example use:
     ```js
-    import { WalletConnectService, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js/lib/service';
-
-    // Pull out the service (includes methods and state)
-    const walletConnectService = new WalletConnectService();
-    // Function to generate a QR code img element
-    const generateQRImgElement = () => {
-      // Pull `QRCode` from `WalletConnectService` state and use it as the element `src`
-      const QRCodeData = walletConnectService.state.QRCode;
-      const QRImage = document.createElement('img');
-      QRImage.src = QRCodeData;
-      return QRImage;
-    };
-    // Function to generate a custom button element
-    const Button = (content: string, id?: string, onClick?: () => void) => {
-      const button = document.createElement('button');
-      button.textContent = content;
-      button.id = id;
-      if (onClick) button.addEventListener('click', onClick);
-      return button;
-    };
-    // Initialize wcjs connection (builds qrCode into state)
-    const connect = async () => {
-      await walletConnectService.connect();
-      // Build QRCode img element
-      const QRImageElement = generateQRImgElement();
-      // Take this QR element and appendChild to wherever you wanted to render it
-      document.body.appendChild(QRImageElement);
-      // User can now scan the QR code to connect
-    }
-    // Manually disconnect from the wc-js session
-    const disconnect = async () => { await walletConnectService.disconnect(); };
-    // wc-js has returned a connection event, we should have data to use
-    const connectionEvent = (result) => {
-      const { address, publicKey } = walletConnectService.state;
-      document.body.innerHTML = `
-        <div>Status: Connected to wallet via ${result.connectionType}</div>
-        <div>Address: ${address}</div>
-        <div>PublicKey: ${publicKey}</div>
-      `;
-      document.body.appendChild(Button('Disconnect', 'disconnect', disconnect));
-    }
-    // Something has caused wc-js to return a disconnect event, we're no longer connected
-    const disconnectEvent = (result) => {
-      // Clear everything out, re-add the connect button
-      document.body.innerHTML = '';
-      document.body.appendChild(Button('Connect', 'connect', connect));
-    };
-    // Listen for specific walletconnect-js events
-    const setupEventListeners = () => {
-      // Connected
-      walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, connectionEvent)
-      // Disconnected
-      walletConnectService.addListener(WINDOW_MESSAGES.DISCONNECT, disconnectEvent)
-    }
-    // Initial function when page/app loads
-    const init = () => {
-      setupEventListeners();
-      document.body.appendChild(Button('Connect', 'connect', connect));
-    };
-    // Run on app load
-    init();
+      <script src="https://unpkg.com/@provenanceio/walletconnect-js@1.0.19/umd/walletconnect-js.min.js"></script>
     ```
+### Using Imports
+  There are a few differences in getting setup and running:
+    1) Note [Webpack 5 Issues](#Webpack-5-Issues)
+    2) When connecting, you will need to manually generate the QR code image element (Component is only available to React.js apps)
+    3) Don't use the default imports (`@provenanceio/walletconnect-js`), instead pull the service from `@provenanceio/walletconnect-js/lib/service`
+    4) Don't forget to set up event and loading listeners
+    * Basic non-React.js example with
+      ```js
+      import { WalletConnectService, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js/lib/service';
+
+      // Pull out the service (includes methods and state)
+      const walletConnectService = new WalletConnectService();
+      // Function to generate a QR code img element
+      const generateQRImgElement = () => {
+        // Pull `QRCode` from `WalletConnectService` state and use it as the element `src`
+        const QRCodeData = walletConnectService.state.QRCode;
+        const QRImage = document.createElement('img');
+        QRImage.src = QRCodeData;
+        return QRImage;
+      };
+      // Function to generate a custom button element
+      const Button = (content: string, id?: string, onClick?: () => void) => {
+        const button = document.createElement('button');
+        button.textContent = content;
+        button.id = id;
+        if (onClick) button.addEventListener('click', onClick);
+        return button;
+      };
+      // Initialize wcjs connection (builds qrCode into state)
+      const connect = async () => {
+        await walletConnectService.connect();
+        // Build QRCode img element
+        const QRImageElement = generateQRImgElement();
+        // Take this QR element and appendChild to wherever you wanted to render it
+        document.body.appendChild(QRImageElement);
+        // User can now scan the QR code to connect
+      }
+      // Manually disconnect from the wc-js session
+      const disconnect = async () => { await walletConnectService.disconnect(); };
+      // wc-js has returned a connection event, we should have data to use
+      const connectionEvent = (result) => {
+        const { address, publicKey } = walletConnectService.state;
+        document.body.innerHTML = `
+          <div>Status: Connected to wallet via ${result.connectionType}</div>
+          <div>Address: ${address}</div>
+          <div>PublicKey: ${publicKey}</div>
+        `;
+        document.body.appendChild(Button('Disconnect', 'disconnect', disconnect));
+      }
+      // Something has caused wc-js to return a disconnect event, we're no longer connected
+      const disconnectEvent = (result) => {
+        // Clear everything out, re-add the connect button
+        document.body.innerHTML = '';
+        document.body.appendChild(Button('Connect', 'connect', connect));
+      };
+      // Listen for specific walletconnect-js events
+      const setupEventListeners = () => {
+        // Connected
+        walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, connectionEvent)
+        // Disconnected
+        walletConnectService.addListener(WINDOW_MESSAGES.DISCONNECT, disconnectEvent)
+      }
+      // Initial function when page/app loads
+      const init = () => {
+        setupEventListeners();
+        document.body.appendChild(Button('Connect', 'connect', connect));
+      };
+      // Run on app load
+      init();
+      ```
   
 ## Webpack 5 Issues
 If you are on Webpack version 5+ (Note: Create React App 5+ uses Webpack 5+) then you will likely encounter a message like this:
