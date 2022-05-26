@@ -1,8 +1,14 @@
-import { convertUtf8ToHex } from "@walletconnect/utils";
-import { Access, AccessGrant } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/accessgrant_pb";
-import { MarkerStatus, MarkerType } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/marker_pb";
-import { MsgAddMarkerRequest } from "@provenanceio/wallet-lib/lib/proto/provenance/marker/v1/tx_pb";
-import { Coin } from "@provenanceio/wallet-lib/lib/proto/cosmos/base/v1beta1/coin_pb";
+import { convertUtf8ToHex } from '@walletconnect/utils';
+import {
+  Access,
+  AccessGrant,
+} from '@provenanceio/wallet-utils/esm/proto/provenance/marker/v1/accessgrant_pb';
+import {
+  MarkerStatus,
+  MarkerType,
+} from '@provenanceio/wallet-utils/esm/proto/provenance/marker/v1/marker_pb';
+import { MsgAddMarkerRequest } from '@provenanceio/wallet-utils/esm/proto/provenance/marker/v1/tx_pb';
+import { Coin } from '@provenanceio/wallet-utils/esm/proto/cosmos/base/v1beta1/coin_pb';
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 import { MarkerAddData } from '../../types';
 import { State } from '../walletConnectService';
@@ -24,7 +30,7 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
   // Custom Request
   const request = {
     id: 1,
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     method,
     params: [metadata],
   };
@@ -40,7 +46,7 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
     Access.ACCESS_MINT,
     Access.ACCESS_DEPOSIT,
     Access.ACCESS_WITHDRAW,
-    Access.ACCESS_DELETE
+    Access.ACCESS_DELETE,
   ]);
 
   const msgAddMarkerRequest = new MsgAddMarkerRequest();
@@ -69,8 +75,10 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
-    valid = !!result
+    valid = !!result;
     // result is a hex encoded signature
     return { valid, result, data, request };
-  } catch (error) { return { valid, error, data, request }; }
+  } catch (error) {
+    return { valid, error, data, request };
+  }
 };

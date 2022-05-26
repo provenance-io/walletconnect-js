@@ -1,5 +1,9 @@
-import { convertUtf8ToHex } from "@walletconnect/utils";
-import { MessageService } from '@provenanceio/wallet-lib/lib/services/message-service';
+import { convertUtf8ToHex } from '@walletconnect/utils';
+import { Message } from 'google-protobuf';
+import {
+  buildMessage,
+  createAnyMessageBase64,
+} from '@provenanceio/wallet-utils';
 import { SendHashData } from '../../types';
 import { State } from '../walletConnectService';
 
@@ -10,12 +14,8 @@ export const delegateHash = async (state: State, data: SendHashData) => {
   const method = 'provenance_sendTransaction';
   const type = 'MsgDelegate';
   const description = 'Delegate Hash';
-  const {connector, address} = state;
-  const {
-    validatorAddress,
-    amount: sendAmountHash,
-    gasPrice,
-  } = data;
+  const { connector, address } = state;
+  const { validatorAddress, amount: sendAmountHash, gasPrice } = data;
   const metadata = JSON.stringify({
     description,
     address,
@@ -24,7 +24,7 @@ export const delegateHash = async (state: State, data: SendHashData) => {
   // Custom Request
   const request = {
     id: 1,
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     method,
     params: [metadata],
   };
@@ -32,28 +32,29 @@ export const delegateHash = async (state: State, data: SendHashData) => {
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // Convert hash amount to nhash (cannot send hash, can only send nhash)
-  const sendAmountNHash = sendAmountHash * (10 ** 9);
+  const sendAmountNHash = sendAmountHash * 10 ** 9;
 
-  const messageService = new MessageService();
   const sendMessage = {
     delegatorAddress: address,
     validatorAddress,
-    amount: { denom: "nhash", amount: sendAmountNHash },
+    amount: { denom: 'nhash', amount: sendAmountNHash },
   };
-  const messageMsgSend = messageService.buildMessage(type, sendMessage);
-  const message = messageService.createAnyMessageBase64(type, messageMsgSend);
+  const messageMsgSend = buildMessage(type, sendMessage);
+  const message = createAnyMessageBase64(type, messageMsgSend as Message);
 
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   // Convert the amountList back into Hash (was converted to nHash before sending)
-  const sentAmount = { denom: 'hash', amount: sendAmountHash};
+  const sentAmount = { denom: 'hash', amount: sendAmountHash };
   try {
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
-    valid = !!result
+    valid = !!result;
     // result is a hex encoded signature
     return { valid, result, data: { ...data, sentAmount }, request };
-  } catch (error) { return { valid, error, data: { ...data, sentAmount }, request }; }
+  } catch (error) {
+    return { valid, error, data: { ...data, sentAmount }, request };
+  }
 };
