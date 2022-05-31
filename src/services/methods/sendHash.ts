@@ -28,6 +28,7 @@ export const sendHash = async (state: State, data: SendHashData) => {
     jsonrpc: '2.0',
     method,
     params: [metadata],
+    date: Date.now(),
   };
 
   if (!connector) return { valid, data, request, error: 'No wallet connected' };

@@ -17,6 +17,7 @@ export const signMessage = async (state: State, message: string) => {
     jsonrpc: "2.0",
     method,
     params: [metadata],
+    date: Date.now(),
   };
 
   if (!connector) return { valid, data: message, request, error: 'No wallet connected' };
