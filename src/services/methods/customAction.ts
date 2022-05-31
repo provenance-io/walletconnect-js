@@ -22,7 +22,6 @@ export const customAction = async (state: State, data: CustomActionData) => {
     jsonrpc: "2.0",
     method,
     params: [metadata],
-    date: Date.now(),
   };
 
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
