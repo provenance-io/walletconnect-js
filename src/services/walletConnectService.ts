@@ -1,3 +1,4 @@
+import React from 'react';
 import events from 'events';
 import WalletConnectClient from "@walletconnect/client";
 import {
@@ -69,6 +70,11 @@ export interface State {
   showQRCodeModal: boolean,
   signedJWT: string,
   walletInfo: WalletInfo,
+  customDesktopWallet: {
+    onClick: (event: React.MouseEvent, encodedQRCodeUrl: string) => void,
+    walletTitle: React.ReactNode,
+    children: React.ReactNode,
+  } | null
 }
 
 export type SetState = (state: Partial<State>) => void;
@@ -96,6 +102,7 @@ const defaultState: State = {
   showQRCodeModal: false,
   signedJWT: '',
   walletInfo: {},
+  customDesktopWallet: null
 };
 
 // Pull values out of local storage if they exist
@@ -143,6 +150,7 @@ const initialState: State = {
   showQRCodeModal: defaultState.showQRCodeModal,
   signedJWT: getAccountItem('jwt') as string || defaultState.signedJWT,
   walletInfo: getAccountItem('walletInfo') as WalletInfo || defaultState.walletInfo,
+  customDesktopWallet: defaultState.customDesktopWallet
 };
 
 export class WalletConnectService {
@@ -221,6 +229,7 @@ export class WalletConnectService {
   setBridge(bridge: string) {
     this.#bridge = bridge;
   }
+
 
   updateState(): void {
     if (this.#setWalletConnectState) {

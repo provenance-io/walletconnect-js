@@ -14,9 +14,14 @@ interface Props {
   network?: 'testnet' | 'mainnet',
   bridge?: string,
   timeout?: number,
+  customDesktopWallet: {
+    onClick: (event: React.MouseEvent) => void,
+    walletTitle: string | React.ReactNode,
+    children: React.ReactNode,
+  } | null
 }
 
-const WalletConnectContextProvider:React.FC<Props> = ({ children, network, bridge, timeout }) => {
+const WalletConnectContextProvider:React.FC<Props> = ({ children, network, bridge, timeout, customDesktopWallet }) => {
   const [walletConnectState, setWalletConnectState] = useState<State>({ ...walletConnectService.state });
   const { address } = walletConnectState;
 
@@ -26,6 +31,7 @@ const WalletConnectContextProvider:React.FC<Props> = ({ children, network, bridg
     if (network) { walletConnectService.setNetwork(network) }
     if (bridge) { walletConnectService.setBridge(bridge) }
     if (timeout) { walletConnectService.setState({ connectionTimeout: timeout }) }
+    if (customDesktopWallet) { walletConnectService.setState({ customDesktopWallet }) }
     // Check if we have an address and public key, if so, auto-reconnect to session
     if (address) walletConnectService.connect();
     return () => walletConnectService.removeAllListeners();
