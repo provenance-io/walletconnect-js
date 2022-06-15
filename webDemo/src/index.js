@@ -1,11 +1,11 @@
-import ReactDOM from "react-dom";
-import styled from "styled-components";
-import { WalletConnectContextProvider } from "@provenanceio/walletconnect-js";
-import { StrictMode } from "react";
-import { App } from "./App";
-import figureSvg from "./img/figureLogo.svg";
+import ReactDOM from 'react-dom';
+import styled from 'styled-components';
+import { WalletConnectContextProvider } from '@provenanceio/walletconnect-js';
+import { StrictMode } from 'react';
+import { App } from './App';
+import figureSvg from './img/figureLogo.svg';
 // Bring in Google Fonts and base styles
-import "./base.css";
+import './base.css';
 
 const WalletIcon = styled.img`
   background: #ffffff;
@@ -24,13 +24,11 @@ const customDesktopWallet = {
 
 ReactDOM.render(
   <StrictMode>
-    <WalletConnectContextProvider
-      network="testnet"
-      customDesktopWallet={customDesktopWallet}
-    >
+    <WalletConnectContextProvider network="testnet" customDesktopWallet={customDesktopWallet}>
       <div id="portal" />
       <App />
     </WalletConnectContextProvider>
   </StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
+
