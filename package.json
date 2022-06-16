@@ -105,7 +105,7 @@
     "prebuild": "npm run test",
     "prepare": "npm run build",
     "start:webdemo": "cd webDemo && npm i && npm run start",
-    "start:watch": "nodemon -e js --watch src --exec 'npm run build'",
+    "start:watch": "nodemon -e js,ts,tsx --watch src --exec 'npm run build'",
     "start": "concurrently \"npm run start:watch\" \"npm run start:webdemo\"",
     "test": "",
     "commentSniff": "node -e 'require(\"./scripts/commentSniffer.ts\").commentSniffer()'",

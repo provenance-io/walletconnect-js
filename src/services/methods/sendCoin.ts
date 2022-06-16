@@ -6,10 +6,11 @@ import {
 } from '@provenanceio/wallet-utils';
 import { SendCoinData } from '../../types';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 export const sendCoin = async (state: State, data: SendCoinData) => {
   let valid = false;
-  const { connector, address } = state;
+  const { connector, address, walletApp, customExtId } = state;
   const {
     to: toAddress,
     amount: initialAmount,
@@ -47,6 +48,10 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
     params: [metadata],
   };
 
+  // Wallet App must exist
+  if (!walletApp) return { valid, error: 'Wallet app is missing', data, request };
+  const activeWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
+  if (!activeWalletApp) return { valid, error: 'Invalid active wallet app', data, request };
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   const messageMsgSend = buildMessage(type, sendMessage);
@@ -56,6 +61,11 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   try {
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (activeWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      activeWalletApp.eventAction(eventData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID

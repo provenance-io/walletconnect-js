@@ -6,10 +6,11 @@ import {
 } from '@provenanceio/wallet-utils';
 import { SendHashBatchData } from '../../types';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
   let valid = false;
-  const { connector, address } = state;
+  const { connector, address, walletApp, customExtId } = state;
   const { to: toAddress, amount: sendAmountHash, count, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
@@ -27,6 +28,10 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
     params: [metadata],
   };
 
+  // Wallet App must exist
+  if (!walletApp) return { valid, error: 'Wallet app is missing', data, request };
+  const activeWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
+  if (!activeWalletApp) return { valid, error: 'Invalid active wallet app', data, request };
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // Convert hash amount to nhash (cannot send hash, can only send nhash)
@@ -51,6 +56,11 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
   // Convert the amountList back into Hash (was converted to nHash before sending)
   const sentAmount = [{ denom: 'hash', amount: sendAmountHash }];
   try {
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (activeWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      activeWalletApp.eventAction(eventData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID

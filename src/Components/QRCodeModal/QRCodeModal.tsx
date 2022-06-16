@@ -3,14 +3,14 @@ import styled from 'styled-components';
 import { WalletConnectService } from '../../services';
 import {
   PLUGIN_PROVENANCE_WALLET,
-  FIREBASE_FETCH_WALLET_URL,
-  DYNAMIC_LINK_INFO_PROD,
   APP_STORE_GOOGLE_PLAY,
   APP_STORE_APPLE,
+  WALLET_LIST,
 } from '../../consts';
-import provenanceSvg from '../../images/provenance.svg';
 import appleAppStoreImg from '../../images/appStoreBadge.svg';
 import googlePlayImg from '../../images/googlePlayBadge.png';
+import { WALLET_ICONS } from '../../images';
+import { Wallet, EventData } from '../../types';
 
 const QRCodeModalContainer = styled.div`
   top: 0;
@@ -84,13 +84,16 @@ const Text = styled.p<{link?: boolean}>`
     cursor: pointer;
   `}
 `;
+const CopyButton = styled.button`
+  font-size: 10px;
+  margin: 0 28px 18px auto;
+`;
 const ImgContainer = styled.div`
   flex-basis: 100%;
-  margin: 10px 0;
+  margin-top: 10px;
 `;
 const WalletRow = styled.a`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-top: 10px;
   flex-basis: 100%;
@@ -98,13 +101,13 @@ const WalletRow = styled.a`
   border-radius: 4px;
   padding: 10px 18px;
   transition: 500ms all;
+  text-align: left;
   &:hover {
     background: #FFFFFF;
   }
 `;
 const WalletRowNonLink = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-top: 10px;
   flex-basis: 100%;
@@ -112,7 +115,7 @@ const WalletRowNonLink = styled.div`
   border-radius: 4px;
   padding: 10px 18px;
   transition: 500ms all;
-  flex-wrap: wrap;
+  text-align: left;
   cursor: pointer;
   input {
     width: 100%;
@@ -137,13 +140,15 @@ const WalletIcon = styled.img`
   border-radius: 4px;
   height: 30px;
   width: 30px;
+  margin-right: 20px;
+  padding: 4px;
 `;
 const AppStoreIcons = styled.div`
   display: flex;
   width: 100%;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 4px;
 `;
 const AppIcon = styled.a`
   margin: 0 6px;
@@ -162,52 +167,49 @@ export const QRCodeModal:React.FC<Props> = ({
 }) => {
   const { state } = wcs;
   const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
+  const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
   const options = ['qr', isMobile ? 'mobile' : 'desktop'];
+  // Which tab of the popup is currently open (qr/desktop/mobile)
   const [view, setView] = useState('qr');
-  const [provExtId, setProvExtId] = useState(PLUGIN_PROVENANCE_WALLET);
-  const [showProvExtId, setShowProvExtId] = useState(false);
+  // User defined custom extension ID (Used for local testing of extensions)
+  const [customExtId, setCustomExtId] = useState('');
+  const [showCustomExtId, setShowCustomExtId] = useState(false);
+  // Has the customExt ID changed from what we expected it to be?
+  const customProvExtId = customExtId && customExtId !== PLUGIN_PROVENANCE_WALLET;
+  // Copy the QR code value as a string
   const [copied, setCopied] = useState(false);
   const [timeoutInstance, setTimeoutInstance] = useState<number>(-1);
-  const [urlsLoading, setUrlsLoading] = useState(false);
-  const [appUrlProd, setAppUrlProd] = useState('');
-  const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
-  const customProvExtId = provExtId !== PLUGIN_PROVENANCE_WALLET;
-
-  // Kill any times when unmounted (prevent memory leaks w/running timers)
+  // List of mobile wallets after their dynamic links have been fetched (async)
+  const [mobileWallets, setMobileWallets] = useState<Wallet[]>([]);
+  const [initialLoad, setInitialLoad] = useState(true);
+  // On unload, remove any running 'copied' timeoutInstances (prevent memory leaks)
   useEffect(() => () => { if (timeoutInstance) clearTimeout(timeoutInstance); }, [timeoutInstance]);
-
-  // Attempt to grab the mobile app url from firebase if we're on a mobile device
+  // --------------------------------------------
+  // Build all the mobile wallet dynamic links
+  // --------------------------------------------
+  // When a user visits the site on mobile, they will get a "mobile" tab instead of "desktop"
+  // The links to those "mobile wallets" are dynamic (iOS vs Android).  To get the links we must fetch
   useEffect(() => {
-    const urlExists = appUrlProd;
-    if (
-      !urlExists
-      && !urlsLoading
-      && isMobile
-      && QRCodeUrl
-    ) {
-      const fetchFirebase = () => {
-        // Set is loading
-        setUrlsLoading(true);
-        const url = FIREBASE_FETCH_WALLET_URL;
-        const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
-        const linkProd = `${DYNAMIC_LINK_INFO_PROD.link}?data=${linkData}`;
-        // First fetch prod, then dev
-        fetch(url, {
-          method: 'POST',
-          body: JSON.stringify({ dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD, link: linkProd } })
-        })
-        .then((response) => response.json())
-        .then(({ shortLink }) => { setAppUrlProd(shortLink) })
-        .catch(() => {
-          // Remove env from loading list
-          setUrlsLoading(false);
-        })
-      };
-      // Fetch both dev and prod firebase dynamic url data
-      fetchFirebase();
+    const asyncBuildMobileWallets = () => WALLET_LIST
+    .filter(({ type }) => type === 'mobile')
+    .map(async (wallet) => {
+      // All mobile wallets should have a generateUrl function, but double check
+      if (wallet.generateUrl) {
+        const dynamicUrl = await wallet.generateUrl(QRCodeUrl);
+        // Add this wallet to the state wallet list with this generated url
+        const allMobileWallets = [...mobileWallets, { ...wallet, dynamicUrl }];
+        setMobileWallets(allMobileWallets);
+      } 
+    });
+    // Only run this when the modal is open and once for each wallet
+    if (showQRCodeModal && initialLoad) {
+      setInitialLoad(false);
+      asyncBuildMobileWallets();
     }
-  }, [isMobile, QRCodeUrl, appUrlProd, urlsLoading]);
-
+  }, [QRCodeUrl, mobileWallets, initialLoad, showQRCodeModal]);
+  // -----------------------------------------------------------------------------------------------  
+  // Ability to copy the QR code to the clipboard as a string (success message has a timeout)
+  // -----------------------------------------------------------------------------------------------
   const copyToClipboard = () => {
     navigator.clipboard.writeText(encodedQRCodeUrl).then(() => {
       clearTimeout(timeoutInstance);
@@ -218,14 +220,17 @@ export const QRCodeModal:React.FC<Props> = ({
       setTimeoutInstance(newTimeoutInstance);
     });
   };
-
+  // -----------------------------------------------
+  // Build the QR Code and mobile download view
+  // -----------------------------------------------
   const renderQRView = () => (
     <>
       <Text>{title}</Text>
       <ImgContainer>
         <img src={QRCode} alt="WalletConnect QR Code" />
       </ImgContainer>
-      { copied ? <Text>Copied to clipboard!</Text> : <Text link onClick={copyToClipboard}>Copy to clipboard</Text> }
+      { copied ? <CopyButton disabled>QR Code Copied</CopyButton> : <CopyButton onClick={copyToClipboard}>Copy QR Code</CopyButton> }
+      <Text>Download Provenance Mobile Wallet</Text>
       <AppStoreIcons>
         <AppIcon href={APP_STORE_APPLE} target="_blank" rel="no-referrer" title="Get the Provenance Blockchain Wallet in the Apple App store.">
           <img src={appleAppStoreImg} height="42px" alt="Apple App Store badge" />
@@ -236,50 +241,78 @@ export const QRCodeModal:React.FC<Props> = ({
       </AppStoreIcons>
     </>
   );
-
-  const handleExtensionAppOpen = (event:React.MouseEvent) => {
-    const shiftKeyPressed = event.shiftKey;
-    if (shiftKeyPressed) {
-      if (showProvExtId) { setProvExtId(PLUGIN_PROVENANCE_WALLET) } // reset value when closing
-      setShowProvExtId(!showProvExtId);
-    } else if (provExtId) {
-      // Set the extension id into the walletconnect-js state
-      wcs.setState({ extensionId: provExtId });
-      const data = { uri: encodedQRCodeUrl, event: 'walletconnect_init' };
-      window?.chrome.runtime.sendMessage(provExtId, data);
+  // ----------------------------------------
+  // Use clicks one of the desktop wallets
+  // ----------------------------------------
+  const handleDesktopWalletClick = (event:React.MouseEvent, wallet: Wallet) => {
+    // Does the user want to pass a custom extension id (pressing 'shift' when clicking button)?
+    if (wallet.type === 'extension' && event.shiftKey) {
+      // Already showing the custom extension id, reset it
+      if (showCustomExtId) setCustomExtId(''); // reset value when closing
+      // Toggle showing the extension id (if shown, hide, vice-versa)
+      setShowCustomExtId(!showCustomExtId);
+    }
+    // If the wallet has an eventAction (they should all have an event action...)
+    else if (wallet.eventAction) {
+      // Set the name of the wallet into the walletconnect-js state (to use as a reference)
+      // If a custom extension ID has been set, note it (need to handle this better)
+      wcs.setState({ walletApp: wallet.id, customExtId });
+      // Build eventdata to send to the extension
+      const eventData: EventData = { uri: encodedQRCodeUrl, event: 'walletconnect_init', customExtId };
+      // Trigger the event action based on the wallet
+      wallet.eventAction(eventData);
     }
   };
-
-  const renderDesktopView = () => (
-    <>
-      <Text>Select wallet</Text>
-      <WalletRowNonLink onClick={handleExtensionAppOpen}>
-        <WalletTitle custom={customProvExtId}>Provenance {customProvExtId && '(Custom ID)'}</WalletTitle>
-        <WalletIcon src={provenanceSvg} />
-        {showProvExtId && (
+  // -------------------------------
+  // Build all the desktop wallets
+  // -------------------------------
+  const buildDesktopWallets = () => WALLET_LIST
+    .filter(({ type }) => type === 'web' || type === 'extension')
+    .map((wallet) => {
+    const { type, id, icon, title: walletTitle } = wallet;
+    const isExtension = type === 'extension';
+    return (
+      <WalletRowNonLink onClick={(e) => handleDesktopWalletClick(e, wallet)} key={id}>
+        {!!icon && <WalletIcon src={WALLET_ICONS[icon]} />}
+        <WalletTitle custom={isExtension && !!customProvExtId}>
+          {walletTitle} {customProvExtId && isExtension && '(Custom ID)'}
+          {showCustomExtId && isExtension && (
           <input
-            value={provExtId}
-            placeholder="Extension ID"
+            value={customExtId}
+            placeholder="Custom Extension ID"
             onChange={({ target }) => {
-              setProvExtId(target.value)
+              setCustomExtId(target.value)
             }}
             onClick={(e) => e.stopPropagation()}
           />
         )}
+        </WalletTitle>
       </WalletRowNonLink>
-    </>
-  );
-  const renderMobileView = () => (
-    <>
-      <Text>Select wallet</Text>
-      {appUrlProd && (
-        <WalletRow href={appUrlProd} rel="noopener noreferrer" target="_blank">
-          <WalletTitle>Provenance Mobile Wallet</WalletTitle>
-          <WalletIcon src={provenanceSvg} />
+    )
+  });
+  // ------------------------------------------------------------------
+  // For every built mobile dynamic link, build out the wallet row
+  // ------------------------------------------------------------------
+  const buildMobileWallets = () => mobileWallets.map(wallet => {
+    const { dynamicUrl, title: walletTitle, icon, id } = wallet;
+    if (dynamicUrl) {
+      return (
+        <WalletRow
+          href={dynamicUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+          key={id}
+          onClick={() => {
+            // Update the walletApp value to be this mobile wallet id
+            wcs.setState({ walletApp: wallet.id });
+          }}
+        >
+          {!!icon && <WalletIcon src={WALLET_ICONS[icon]} />}
+          <WalletTitle>{walletTitle}</WalletTitle>
         </WalletRow>
-      )}
-    </>
-  );
+      )
+    } return <text>Unable to fetch {walletTitle} link. Please try again later.</text>;
+  });
 
   return showQRCodeModal ? (
     <QRCodeModalContainer className={className} onClick={() => wcs.showQRCode(false)}>
@@ -295,9 +328,9 @@ export const QRCodeModal:React.FC<Props> = ({
           {options.includes('desktop') && <ToggleNotch active={view === 'desktop'} onClick={() => setView('desktop')}>Desktop</ToggleNotch>}
           {options.includes('mobile') && <ToggleNotch active={view === 'mobile'} onClick={() => setView('mobile')}>Mobile</ToggleNotch>}
         </Toggle>
-        { view === 'qr' && renderQRView() }
-        { view === 'desktop' && renderDesktopView() }
-        { view === 'mobile' && renderMobileView() }
+        { view === 'qr' ? renderQRView() : <Text>Select wallet</Text>}
+        { view === 'desktop' && buildDesktopWallets() }
+        { view === 'mobile' && buildMobileWallets() }
       </QRModalContent>
     </QRCodeModalContainer>
   ) : null;

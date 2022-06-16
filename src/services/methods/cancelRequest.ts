@@ -2,10 +2,11 @@ import { convertUtf8ToHex } from '@walletconnect/utils';
 import { MsgCancelRequest } from '@provenanceio/wallet-utils/esm/proto/provenance/marker/v1/tx_pb';
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 export const cancelRequest = async (state: State, denom: string) => {
   let valid = false;
-  const { connector, address } = state;
+  const { connector, address, walletApp, customExtId } = state;
   const method = 'provenance_sendTransaction';
   const description = 'Cancel Request';
   const protoMessage = 'provenance.marker.v1.MsgCancelRequest';
@@ -21,8 +22,11 @@ export const cancelRequest = async (state: State, denom: string) => {
     params: [metadata],
   };
 
-  if (!connector)
-    return { valid, data: denom, request, error: 'No wallet connected' };
+  // Wallet App must exist
+  if (!walletApp) return { valid, error: 'Wallet app is missing', data: denom, request };
+  const activeWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
+  if (!activeWalletApp) return { valid, error: 'Invalid active wallet app', data: denom, request };
+  if (!connector) return { valid, data: denom, request, error: 'No wallet connected' };
 
   const msgCancelRequest = new MsgCancelRequest();
   msgCancelRequest.setDenom(denom);
@@ -38,6 +42,11 @@ export const cancelRequest = async (state: State, denom: string) => {
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   try {
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (activeWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      activeWalletApp.eventAction(eventData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
