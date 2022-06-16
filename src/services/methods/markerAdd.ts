@@ -27,6 +27,7 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
     description,
     address,
     gasPrice,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -36,10 +37,8 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
     params: [metadata],
   };
 
-  // Wallet App must exist
-  if (!walletApp) return { valid, error: 'Wallet app is missing', data, request };
-  const activeWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
-  if (!activeWalletApp) return { valid, error: 'Invalid active wallet app', data, request };
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   /* Build the Provnance blockchain add marker msg */
@@ -78,9 +77,9 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
   request.params.push(hexMsg);
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
-    if (activeWalletApp.eventAction) {
+    if (knownWalletApp && knownWalletApp.eventAction) {
       const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
-      activeWalletApp.eventAction(eventData);
+      knownWalletApp.eventAction(eventData);
     }
     // send message
     const result = await connector.sendCustomRequest(request);

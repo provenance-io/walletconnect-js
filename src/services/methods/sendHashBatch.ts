@@ -19,6 +19,7 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
     description,
     address,
     gasPrice,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -28,10 +29,8 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
     params: [metadata],
   };
 
-  // Wallet App must exist
-  if (!walletApp) return { valid, error: 'Wallet app is missing', data, request };
-  const activeWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
-  if (!activeWalletApp) return { valid, error: 'Invalid active wallet app', data, request };
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // Convert hash amount to nhash (cannot send hash, can only send nhash)
@@ -57,9 +56,9 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
   const sentAmount = [{ denom: 'hash', amount: sendAmountHash }];
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
-    if (activeWalletApp.eventAction) {
+    if (knownWalletApp && knownWalletApp.eventAction) {
       const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
-      activeWalletApp.eventAction(eventData);
+      knownWalletApp.eventAction(eventData);
     }
     // send message
     const result = await connector.sendCustomRequest(request);

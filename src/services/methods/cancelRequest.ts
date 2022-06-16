@@ -13,6 +13,7 @@ export const cancelRequest = async (state: State, denom: string) => {
   const metadata = JSON.stringify({
     description,
     address,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -22,10 +23,8 @@ export const cancelRequest = async (state: State, denom: string) => {
     params: [metadata],
   };
 
-  // Wallet App must exist
-  if (!walletApp) return { valid, error: 'Wallet app is missing', data: denom, request };
-  const activeWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
-  if (!activeWalletApp) return { valid, error: 'Invalid active wallet app', data: denom, request };
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data: denom, request, error: 'No wallet connected' };
 
   const msgCancelRequest = new MsgCancelRequest();
@@ -43,9 +42,9 @@ export const cancelRequest = async (state: State, denom: string) => {
   request.params.push(hexMsg);
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
-    if (activeWalletApp.eventAction) {
+    if (knownWalletApp && knownWalletApp.eventAction) {
       const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
-      activeWalletApp.eventAction(eventData);
+      knownWalletApp.eventAction(eventData);
     }
     // send message
     const result = await connector.sendCustomRequest(request);
