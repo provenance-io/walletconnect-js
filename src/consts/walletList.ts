@@ -36,6 +36,7 @@ export const WALLET_LIST: WalletList = [
     },
   },
   {
+    dev: true,
     id: 'figure_web',
     type: 'web',
     title: 'Figure Wallet',

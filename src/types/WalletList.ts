@@ -11,6 +11,7 @@ export interface EventData {
 }
 
 export interface Wallet {
+  dev?: boolean, // Is this wallet still in development?  If true, QRCode modal won't render by default
   id: WalletId, // Id to reference this specific wallet
   title: string, // Title to display when selecting wallets
   type: WalletType, // Is this wallet mobile, web, or an extension

@@ -158,12 +158,14 @@ interface Props {
   className: string,
   walletConnectService: WalletConnectService,
   title: string
+  devWallets?: string[]; // An array of wallet-ids which are in dev mode to force render (hidden by default)
 }
 
 export const QRCodeModal:React.FC<Props> = ({
   className,
   walletConnectService: wcs,
   title = 'Scan the QRCode with your mobile Provenance Blockchain Wallet.',
+  devWallets,
 }) => {
   const { state } = wcs;
   const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
@@ -267,7 +269,9 @@ export const QRCodeModal:React.FC<Props> = ({
   // Build all the desktop wallets
   // -------------------------------
   const buildDesktopWallets = () => WALLET_LIST
-    .filter(({ type }) => type === 'web' || type === 'extension')
+    // Pull out all web/extension wallets.
+    // If they are in dev mode we don't render them unless they're included in the devWallets override array
+    .filter(({ type, dev, id }) => ((type === 'web' || type === 'extension') && (!dev || devWallets?.includes(id))))
     .map((wallet) => {
     const { type, id, icon, title: walletTitle } = wallet;
     const isExtension = type === 'extension';
