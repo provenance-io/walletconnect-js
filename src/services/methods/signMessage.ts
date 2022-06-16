@@ -1,15 +1,17 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
 import { verifySignature } from '../../helpers';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 export const signMessage = async (state: State, message: string) => {
   let valid = false;
-  const { connector, address, publicKey: pubKeyB64, connectionType, extensionId } = state;
+  const { connector, address, publicKey: pubKeyB64, walletApp, customExtId } = state;
   const method = 'provenance_sign';
   const description = 'Sign Message';
   const metadata = JSON.stringify({
     description,
     address,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -17,18 +19,18 @@ export const signMessage = async (state: State, message: string) => {
     jsonrpc: "2.0",
     method,
     params: [metadata],
-    date: Date.now(),
   };
-
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data: message, request, error: 'No wallet connected' };
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   try {
-    // If we are using a browser extension wallet, pop open the notification page before sending the request
-    if (connectionType === 'extension' && extensionId) {
-      const extData = { event: 'walletconnect_event' };
-      window?.chrome.runtime.sendMessage(extensionId, extData);
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (knownWalletApp && knownWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      knownWalletApp.eventAction(eventData);
     }
     // send message
     const result = await connector.sendCustomRequest(request);

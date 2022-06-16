@@ -6,13 +6,14 @@ import {
 } from '@provenanceio/wallet-utils';
 import { SendHashData } from '../../types';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 /**
  * @deprecated Use sendCoin instead of sendHash
  */
 export const sendHash = async (state: State, data: SendHashData) => {
   let valid = false;
-  const { connector, address, connectionType, extensionId } = state;
+  const { connector, address, walletApp, customExtId } = state;
   const { to: toAddress, amount: sendAmountHash, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
@@ -21,6 +22,7 @@ export const sendHash = async (state: State, data: SendHashData) => {
     description,
     address,
     gasPrice,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -28,9 +30,10 @@ export const sendHash = async (state: State, data: SendHashData) => {
     jsonrpc: '2.0',
     method,
     params: [metadata],
-    date: Date.now(),
   };
 
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // Convert hash amount to nhash (cannot send hash, can only send nhash)
@@ -50,10 +53,10 @@ export const sendHash = async (state: State, data: SendHashData) => {
   // Convert the amountList back into Hash (was converted to nHash before sending)
   const sentAmount = [{ denom: 'hash', amount: sendAmountHash }];
   try {
-    // If we are using a browser extension wallet, pop open the notification page before sending the request
-    if (connectionType === 'extension' && extensionId) {
-      const extData = { event: 'walletconnect_event' };
-      window?.chrome.runtime.sendMessage(extensionId, extData);
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (knownWalletApp && knownWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      knownWalletApp.eventAction(eventData);
     }
     // send message
     const result = await connector.sendCustomRequest(request);

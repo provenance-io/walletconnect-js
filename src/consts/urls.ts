@@ -7,3 +7,5 @@ export const FIREBASE_FETCH_WALLET_URL = `${FIREBASE_PROJECT_URL}?key=${FIREBASE
 
 export const APP_STORE_GOOGLE_PLAY = 'https://play.google.com/store/apps/details?id=io.provenance.wallet';
 export const APP_STORE_APPLE = 'https://apps.apple.com/us/app/provenance-blockchain-wallet/id1606428494';
+
+export const FIGURE_WEB_WALLET_URL = 'https://test.figure.com/dashboard/wallet';

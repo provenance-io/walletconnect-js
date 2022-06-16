@@ -6,10 +6,11 @@ import {
 } from '@provenanceio/wallet-utils';
 import { SendCoinData } from '../../types';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 export const sendCoin = async (state: State, data: SendCoinData) => {
   let valid = false;
-  const { connector, address } = state;
+  const { connector, address, walletApp, customExtId } = state;
   const {
     to: toAddress,
     amount: initialAmount,
@@ -38,6 +39,7 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
     description,
     address,
     gasPrice,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -47,6 +49,8 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
     params: [metadata],
   };
 
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   const messageMsgSend = buildMessage(type, sendMessage);
@@ -56,6 +60,11 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   try {
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (knownWalletApp && knownWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      knownWalletApp.eventAction(eventData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID

@@ -12,12 +12,13 @@ import { Coin } from '@provenanceio/wallet-utils/esm/proto/cosmos/base/v1beta1/c
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 import { MarkerAddData } from '../../types';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 // Wallet-lib delegate message proto:
 // https://github.com/provenance-io/wallet-lib/blob/bac70a7fe6a9ad784ff4cc7fe440b68cfe598c47/src/services/message-service.ts#L396
 export const markerAdd = async (state: State, data: MarkerAddData) => {
   let valid = false;
-  const { connector, address } = state;
+  const { connector, address, walletApp, customExtId } = state;
   const { denom, amount, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const description = 'Add Marker';
@@ -26,6 +27,7 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
     description,
     address,
     gasPrice,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -35,6 +37,8 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
     params: [metadata],
   };
 
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   /* Build the Provnance blockchain add marker msg */
@@ -72,6 +76,11 @@ export const markerAdd = async (state: State, data: MarkerAddData) => {
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   try {
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (knownWalletApp && knownWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      knownWalletApp.eventAction(eventData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID

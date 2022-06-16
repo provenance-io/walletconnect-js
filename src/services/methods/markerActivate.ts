@@ -3,10 +3,11 @@ import { MsgActivateRequest } from '@provenanceio/wallet-utils/esm/proto/provena
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 import { MarkerData } from '../../types';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 export const markerActivate = async (state: State, data: MarkerData) => {
   let valid = false;
-  const { connector, address } = state;
+  const { connector, address, walletApp, customExtId } = state;
   const { denom, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const description = 'Activate Marker';
@@ -15,6 +16,7 @@ export const markerActivate = async (state: State, data: MarkerData) => {
     description,
     address,
     gasPrice,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -24,6 +26,8 @@ export const markerActivate = async (state: State, data: MarkerData) => {
     params: [metadata],
   };
 
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   const msgActivateRequest = new MsgActivateRequest();
@@ -40,6 +44,11 @@ export const markerActivate = async (state: State, data: MarkerData) => {
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   try {
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (knownWalletApp && knownWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      knownWalletApp.eventAction(eventData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
