@@ -12,7 +12,8 @@ import {
   SendHashData,
   AccountInfo,
   AccountObject,
-  WalletInfo
+  WalletInfo,
+  WalletId,
 } from '../types';
 import { WINDOW_MESSAGES, WALLETCONNECT_BRIDGE_URL, CONNECTION_TIMEOUT } from '../consts';
 import {
@@ -36,11 +37,11 @@ interface WCJSState {
   connectionEat: number,
   connectionIat: number,
   connectionTimeout: number,
-  connectionType: string,
-  extensionId: string,
+  customExtId?: string,
   figureConnected: boolean,
   newAccount: false,
   signedJWT: string,
+  walletApp?: WalletId | '',
 }
 
 // Check for existing values from localStorage
@@ -55,9 +56,8 @@ export interface State {
   connectionEat: number | null,
   connectionIat: number | null,
   connectionTimeout: number,
-  connectionType: string,
   connector: WalletConnectClient | null,
-  extensionId: string,
+  customExtId?: string,
   figureConnected: boolean,
   isMobile: boolean,
   loading: string,
@@ -68,6 +68,7 @@ export interface State {
   QRCodeUrl: string,
   showQRCodeModal: boolean,
   signedJWT: string,
+  walletApp?: WalletId | '',
   walletInfo: WalletInfo,
 }
 
@@ -82,9 +83,8 @@ const defaultState: State = {
   connectionEat: null,
   connectionIat: null,
   connectionTimeout: CONNECTION_TIMEOUT,
-  connectionType: '',
   connector: null,
-  extensionId: '',
+  customExtId: '',
   figureConnected: false,
   isMobile: isMobile(),
   loading: '',
@@ -95,6 +95,7 @@ const defaultState: State = {
   QRCodeUrl: '',
   showQRCodeModal: false,
   signedJWT: '',
+  walletApp: '',
   walletInfo: {},
 };
 
@@ -129,9 +130,8 @@ const initialState: State = {
   connectionEat: existingWCJSState.connectionEat || defaultState.connectionEat,
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
   connectionTimeout: existingWCJSState.connectionTimeout || defaultState.connectionTimeout,
-  connectionType: existingWCJSState.connectionType || defaultState.connectionType,
   connector: existingWCState || defaultState.connector,
-  extensionId: existingWCJSState.extensionId || defaultState.extensionId,
+  customExtId: existingWCJSState.customExtId || defaultState.customExtId,
   figureConnected: !!existingWCJSState.account && defaultState.connected,
   isMobile: defaultState.isMobile,
   loading: defaultState.loading,
@@ -142,6 +142,7 @@ const initialState: State = {
   QRCodeUrl: defaultState.QRCodeUrl,
   showQRCodeModal: defaultState.showQRCodeModal,
   signedJWT: getAccountItem('jwt') as string || defaultState.signedJWT,
+  walletApp: existingWCJSState.walletApp || defaultState.walletApp,
   walletInfo: getAccountItem('walletInfo') as WalletInfo || defaultState.walletInfo,
 };
 
@@ -246,11 +247,11 @@ export class WalletConnectService {
       connectionEat,
       connectionIat,
       connectionTimeout,
-      connectionType,
-      extensionId,
+      customExtId,
       figureConnected,
       newAccount,
       signedJWT,
+      walletApp,
     } = updatedState;
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
@@ -258,11 +259,11 @@ export class WalletConnectService {
       ...(connectionEat !== undefined && {connectionEat}),
       ...(connectionIat !== undefined && {connectionIat}),
       ...(connectionTimeout !== undefined && {connectionTimeout}),
-      ...(connectionType !== undefined && {connectionType}),
-      ...(extensionId !== undefined && {extensionId}),
+      ...(customExtId !== undefined && {customExtId}),
       ...(figureConnected !== undefined && {figureConnected}),
       ...(newAccount !== undefined && {newAccount}),
       ...(signedJWT !== undefined && {signedJWT}),
+      ...(walletApp !== undefined && {walletApp}),
     };
     // If we have updated 1 or more special values, update localStorage
     if (Object.keys(storageUpdates).length) {

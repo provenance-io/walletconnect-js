@@ -6,6 +6,7 @@ import {
 } from '@provenanceio/wallet-utils';
 import { SendHashData } from '../../types';
 import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 // Wallet-lib delegate message proto:
 // https://github.com/provenance-io/wallet-lib/blob/bac70a7fe6a9ad784ff4cc7fe440b68cfe598c47/src/services/message-service.ts#L396
@@ -14,12 +15,13 @@ export const delegateHash = async (state: State, data: SendHashData) => {
   const method = 'provenance_sendTransaction';
   const type = 'MsgDelegate';
   const description = 'Delegate Hash';
-  const { connector, address } = state;
+  const { connector, address, walletApp, customExtId } = state;
   const { validatorAddress, amount: sendAmountHash, gasPrice } = data;
   const metadata = JSON.stringify({
     description,
     address,
     gasPrice,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -29,6 +31,8 @@ export const delegateHash = async (state: State, data: SendHashData) => {
     params: [metadata],
   };
 
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // Convert hash amount to nhash (cannot send hash, can only send nhash)
@@ -48,6 +52,11 @@ export const delegateHash = async (state: State, data: SendHashData) => {
   // Convert the amountList back into Hash (was converted to nHash before sending)
   const sentAmount = { denom: 'hash', amount: sendAmountHash };
   try {
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (knownWalletApp && knownWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      knownWalletApp.eventAction(eventData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID

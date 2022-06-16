@@ -2,15 +2,17 @@ import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
 import { State, SetState } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 export const signJWT = async (state: State, setState: SetState, expires: number) => {
   let valid = false;
-  const { connector, address, publicKey: pubKeyB64 } = state;
+  const { connector, address, publicKey: pubKeyB64, walletApp, customExtId } = state;
   const method = 'provenance_sign';
   const description = 'Sign JWT Token';
   const metadata = JSON.stringify({
     description,
     address,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -20,6 +22,8 @@ export const signJWT = async (state: State, setState: SetState, expires: number)
     params: [metadata],
   };
 
+  // Check for a known wallet app with special callback functions
+  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
   if (!connector) return { valid, data: expires, request, error: 'No wallet connected' };
   // Build JWT
   const now = Math.floor(Date.now() / 1000); // Current time
@@ -41,6 +45,11 @@ export const signJWT = async (state: State, setState: SetState, expires: number)
   request.params.push(hexJWT);
   
   try {
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (knownWalletApp && knownWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      knownWalletApp.eventAction(eventData);
+    }
     // send message
     const result = await connector.sendCustomRequest(request);
     // result is a hex encoded signature
