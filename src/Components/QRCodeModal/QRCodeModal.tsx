@@ -11,6 +11,7 @@ import {
 import provenanceSvg from '../../images/provenance.svg';
 import appleAppStoreImg from '../../images/appStoreBadge.svg';
 import googlePlayImg from '../../images/googlePlayBadge.png';
+import { WalletconnectEvent } from '../../types';
 
 const QRCodeModalContainer = styled.div`
   top: 0;
@@ -245,7 +246,7 @@ export const QRCodeModal:React.FC<Props> = ({
     } else if (provExtId) {
       // Set the extension id into the walletconnect-js state
       wcs.setState({ extensionId: provExtId });
-      const data = { uri: encodedQRCodeUrl, event: 'walletconnect_init' };
+      const data: WalletconnectEvent = { uri: encodedQRCodeUrl, event: 'walletconnect_init' };
       window?.chrome.runtime.sendMessage(provExtId, data);
     }
   };

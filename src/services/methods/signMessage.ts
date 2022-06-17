@@ -1,4 +1,5 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
+import { WalletconnectEvent } from "types";
 import { verifySignature } from '../../helpers';
 import { State } from '../walletConnectService';
 
@@ -25,7 +26,7 @@ export const signMessage = async (state: State, message: string) => {
   try {
     // If we are using a browser extension wallet, pop open the notification page before sending the request
     if (connectionType === 'extension' && extensionId) {
-      const extData = { event: 'walletconnect_event' };
+      const extData: WalletconnectEvent = { event: 'walletconnect_event' };
       window?.chrome.runtime.sendMessage(extensionId, extData);
     }
     // send message

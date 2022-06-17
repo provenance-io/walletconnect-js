@@ -1,5 +1,5 @@
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import { CustomActionData } from '../../types';
+import { CustomActionData, WalletconnectEvent } from '../../types';
 import { State } from '../walletConnectService';
 
 export const customAction = async (state: State, data: CustomActionData) => {
@@ -33,7 +33,7 @@ export const customAction = async (state: State, data: CustomActionData) => {
   try {
     // If we are using a browser extension wallet, pop open the notification page before sending the request
     if (connectionType === 'extension' && extensionId) {
-      const extData = { event: 'walletconnect_event' };
+      const extData: WalletconnectEvent = { event: 'walletconnect_init' };
       window?.chrome.runtime.sendMessage(extensionId, extData);
     }
     // send message

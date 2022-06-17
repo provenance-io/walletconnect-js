@@ -4,7 +4,7 @@ import {
   buildMessage,
   createAnyMessageBase64,
 } from '@provenanceio/wallet-utils';
-import { SendHashData } from '../../types';
+import { SendHashData, WalletconnectEvent } from '../../types';
 import { State } from '../walletConnectService';
 
 /**
@@ -51,7 +51,7 @@ export const sendHash = async (state: State, data: SendHashData) => {
   try {
     // If we are using a browser extension wallet, pop open the notification page before sending the request
     if (connectionType === 'extension' && extensionId) {
-      const extData = { event: 'walletconnect_event' };
+      const extData: WalletconnectEvent = { event: 'walletconnect_event' };
       window?.chrome.runtime.sendMessage(extensionId, extData);
     }
     // send message
