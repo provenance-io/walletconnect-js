@@ -318,6 +318,8 @@ export const QRCodeModal:React.FC<Props> = ({
     } return <text>Unable to fetch {walletTitle} link. Please try again later.</text>;
   });
 
+  const DesktopWalletsList = buildDesktopWallets();
+
   return showQRCodeModal ? (
     <QRCodeModalContainer className={className} onClick={() => wcs.showQRCode(false)}>
       <QRModalContent onClick={(e) => e.stopPropagation()}>
@@ -333,7 +335,7 @@ export const QRCodeModal:React.FC<Props> = ({
           {options.includes('mobile') && <ToggleNotch active={view === 'mobile'} onClick={() => setView('mobile')}>Mobile</ToggleNotch>}
         </Toggle>
         { view === 'qr' ? renderQRView() : <Text>Select wallet</Text>}
-        { view === 'desktop' && buildDesktopWallets() }
+        { view === 'desktop' && (DesktopWalletsList.length ? DesktopWalletsList : <Text>No desktop wallets currently available.</Text>) }
         { view === 'mobile' && buildMobileWallets() }
       </QRModalContent>
     </QRCodeModalContainer>
