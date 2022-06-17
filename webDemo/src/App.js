@@ -185,7 +185,7 @@ return (
       <QRCodeModal
         walletConnectService={wcs}
         walletConnectState={walletConnectState}
-        devWallets={['figure_web']}
+        devWallets={['figure_web', 'provenance_extension']}
       />
     </HomeContainer>
   );
