@@ -7,6 +7,7 @@ import {
 import { SendCoinData } from '../../types';
 import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { rngNum } from '../../utils';
 
 export const sendCoin = async (state: State, data: SendCoinData) => {
   let valid = false;
@@ -43,7 +44,7 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   });
   // Custom Request
   const request = {
-    id: 1,
+    id: rngNum(),
     jsonrpc: '2.0',
     method,
     params: [metadata],

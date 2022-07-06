@@ -4,6 +4,7 @@ import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 import { MarkerData } from '../../types';
 import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { rngNum } from '../../utils';
 
 export const markerFinalize = async (state: State, data: MarkerData) => {
   let valid = false;
@@ -20,7 +21,7 @@ export const markerFinalize = async (state: State, data: MarkerData) => {
   });
   // Custom Request
   const request = {
-    id: 1,
+    id: rngNum(),
     jsonrpc: '2.0',
     method,
     params: [metadata],

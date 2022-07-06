@@ -111,7 +111,7 @@ export const ALL_ACTIONS = [
       {
         name: 'validatorAddress',
         label: 'Delegate To',
-        value: 'tpvaloper1tgq6cpu6hmsrvkvdu82j99tsxxw7qqajn843fe',
+        value: 'tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh',
         placeholder: 'Enter Address',
         width: '80%',
       },

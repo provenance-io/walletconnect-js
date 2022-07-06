@@ -7,6 +7,7 @@ import {
 import { SendHashData } from '../../types';
 import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { rngNum } from '../../utils';
 
 /**
  * @deprecated Use sendCoin instead of sendHash
@@ -26,7 +27,7 @@ export const sendHash = async (state: State, data: SendHashData) => {
   });
   // Custom Request
   const request = {
-    id: 1,
+    id: rngNum(),
     jsonrpc: '2.0',
     method,
     params: [metadata],

@@ -7,6 +7,7 @@ import {
 import { SendHashBatchData } from '../../types';
 import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { rngNum } from '../../utils';
 
 export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
   let valid = false;
@@ -23,7 +24,7 @@ export const sendHashBatch = async (state: State, data: SendHashBatchData) => {
   });
   // Custom Request
   const request = {
-    id: 1,
+    id: rngNum(),
     jsonrpc: '2.0',
     method,
     params: [metadata],
