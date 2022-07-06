@@ -2,6 +2,7 @@ import { convertUtf8ToHex } from "@walletconnect/utils";
 import { CustomActionData } from '../../types';
 import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { rngNum } from '../../utils';
 
 export const customAction = async (state: State, data: CustomActionData) => {
   let valid = false;
@@ -20,7 +21,7 @@ export const customAction = async (state: State, data: CustomActionData) => {
   });
   // Custom Request
   const request = {
-    id: 1,
+    id: rngNum(),
     jsonrpc: "2.0",
     method,
     params: [metadata],

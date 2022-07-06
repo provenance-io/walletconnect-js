@@ -3,6 +3,7 @@ import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
 import { State, SetState } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { rngNum } from '../../utils';
 
 export const signJWT = async (state: State, setState: SetState, expires: number) => {
   let valid = false;
@@ -16,7 +17,7 @@ export const signJWT = async (state: State, setState: SetState, expires: number)
   });
   // Custom Request
   const request = {
-    id: 1,
+    id: rngNum(),
     jsonrpc: "2.0",
     method,
     params: [metadata],

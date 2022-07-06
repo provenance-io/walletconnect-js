@@ -3,6 +3,7 @@ import { MsgCancelRequest } from '@provenanceio/wallet-utils/esm/proto/provenanc
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
 import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { rngNum } from '../../utils';
 
 export const cancelRequest = async (state: State, denom: string) => {
   let valid = false;
@@ -17,7 +18,7 @@ export const cancelRequest = async (state: State, denom: string) => {
   });
   // Custom Request
   const request = {
-    id: 1,
+    id: rngNum(),
     jsonrpc: '2.0',
     method,
     params: [metadata],
