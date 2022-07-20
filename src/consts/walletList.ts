@@ -30,10 +30,8 @@ export const WALLET_LIST: WalletList = [
     icon: 'provenance',
     extensionId: PLUGIN_PROVENANCE_WALLET,
     eventAction: (eventData) => {
-      // Allow users to pass their own custom extension ID (for testing)
-      const { customExtId } = eventData;
-      const extensionId = customExtId ? customExtId : PLUGIN_PROVENANCE_WALLET
-      window?.chrome?.runtime?.sendMessage(extensionId, eventData);
+      const sendMessageEvent = new CustomEvent('provWalletSendMessage', { detail: eventData });
+      window.document.dispatchEvent(sendMessageEvent);
     },
   },
   {
