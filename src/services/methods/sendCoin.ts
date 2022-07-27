@@ -1,31 +1,31 @@
-import { convertUtf8ToHex } from '@walletconnect/utils';
-import { Message } from 'google-protobuf';
+import { convertUtf8ToHex } from "@walletconnect/utils";
+import { Message } from "google-protobuf";
 import {
   buildMessage,
   createAnyMessageBase64,
-} from '@provenanceio/wallet-utils';
-import { SendCoinData } from '../../types';
-import { State } from '../walletConnectService';
-import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
-import { rngNum } from '../../utils';
+} from "@provenanceio/wallet-utils";
+import { SendCoinData } from "../../types";
+import { State } from "../walletConnectService";
+import { WALLET_LIST, WALLET_APP_EVENTS } from "../../consts";
+import { rngNum } from "../../utils";
 
 export const sendCoin = async (state: State, data: SendCoinData) => {
   let valid = false;
-  const { connector, address, walletApp, customExtId } = state;
+  const { connector, address, walletApp } = state;
   const {
     to: toAddress,
     amount: initialAmount,
-    denom: initialDenom = 'hash',
+    denom: initialDenom = "hash",
     gasPrice,
   } = data;
-  const method = 'provenance_sendTransaction';
-  const type = 'MsgSend';
+  const method = "provenance_sendTransaction";
+  const type = "MsgSend";
   let amount = initialAmount;
   let denom = initialDenom.toLowerCase();
-  if (denom === 'hash') {
+  if (denom === "hash") {
     // Convert hash amount to nhash (cannot send hash, can only send nhash)
     amount = initialAmount * 10 ** 9;
-    denom = 'nhash';
+    denom = "nhash";
   }
   // Set amount to string value
   const amountString = `${amount}`;
@@ -45,14 +45,14 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   // Custom Request
   const request = {
     id: rngNum(),
-    jsonrpc: '2.0',
+    jsonrpc: "2.0",
     method,
     params: [metadata],
   };
 
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
-  if (!connector) return { valid, data, request, error: 'No wallet connected' };
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
+  if (!connector) return { valid, data, request, error: "No wallet connected" };
 
   const messageMsgSend = buildMessage(type, sendMessage);
   const message = createAnyMessageBase64(type, messageMsgSend as Message);
@@ -63,7 +63,7 @@ export const sendCoin = async (state: State, data: SendCoinData) => {
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT };
       knownWalletApp.eventAction(eventData);
     }
     // send message
