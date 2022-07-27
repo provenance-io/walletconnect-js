@@ -1,9 +1,6 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { Message } from 'google-protobuf';
-import {
-  buildMessage,
-  createAnyMessageBase64,
-} from '@provenanceio/wallet-utils';
+import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
 import { SendHashData } from '../../types';
 import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
@@ -14,7 +11,7 @@ import { rngNum } from '../../utils';
  */
 export const sendHash = async (state: State, data: SendHashData) => {
   let valid = false;
-  const { connector, address, walletApp, customExtId } = state;
+  const { connector, address, walletApp } = state;
   const { to: toAddress, amount: sendAmountHash, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const type = 'MsgSend';
@@ -34,7 +31,7 @@ export const sendHash = async (state: State, data: SendHashData) => {
   };
 
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // Convert hash amount to nhash (cannot send hash, can only send nhash)
@@ -56,7 +53,7 @@ export const sendHash = async (state: State, data: SendHashData) => {
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT };
       knownWalletApp.eventAction(eventData);
     }
     // send message

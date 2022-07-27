@@ -7,7 +7,7 @@ import { rngNum } from '../../utils';
 
 export const cancelRequest = async (state: State, denom: string) => {
   let valid = false;
-  const { connector, address, walletApp, customExtId } = state;
+  const { connector, address, walletApp } = state;
   const method = 'provenance_sendTransaction';
   const description = 'Cancel Request';
   const protoMessage = 'provenance.marker.v1.MsgCancelRequest';
@@ -25,8 +25,9 @@ export const cancelRequest = async (state: State, denom: string) => {
   };
 
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
-  if (!connector) return { valid, data: denom, request, error: 'No wallet connected' };
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
+  if (!connector)
+    return { valid, data: denom, request, error: 'No wallet connected' };
 
   const msgCancelRequest = new MsgCancelRequest();
   msgCancelRequest.setDenom(denom);
@@ -44,7 +45,7 @@ export const cancelRequest = async (state: State, denom: string) => {
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT };
       knownWalletApp.eventAction(eventData);
     }
     // send message

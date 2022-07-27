@@ -8,7 +8,7 @@ import { rngNum } from '../../utils';
 
 export const markerFinalize = async (state: State, data: MarkerData) => {
   let valid = false;
-  const { connector, address, walletApp, customExtId } = state;
+  const { connector, address, walletApp } = state;
   const { denom, gasPrice } = data;
   const method = 'provenance_sendTransaction';
   const description = 'Finalize Marker';
@@ -28,7 +28,7 @@ export const markerFinalize = async (state: State, data: MarkerData) => {
   };
 
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   const msgFinalizeRequest = new MsgFinalizeRequest();
@@ -47,7 +47,7 @@ export const markerFinalize = async (state: State, data: MarkerData) => {
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT };
       knownWalletApp.eventAction(eventData);
     }
     // send message

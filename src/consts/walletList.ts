@@ -1,5 +1,5 @@
 import { WalletList } from '../types';
-import { PLUGIN_PROVENANCE_WALLET, FIREBASE_FETCH_WALLET_URL, FIGURE_WEB_WALLET_URL } from './urls';
+import { FIREBASE_FETCH_WALLET_URL, FIGURE_WEB_WALLET_URL } from './urls';
 import { DYNAMIC_LINK_INFO_PROD } from './dynamicLinkInfo';
 
 export const WALLET_LIST: WalletList = [
@@ -15,11 +15,13 @@ export const WALLET_LIST: WalletList = [
       // First fetch prod, then dev
       return fetch(url, {
         method: 'POST',
-        body: JSON.stringify({ dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD, link: linkProd } })
+        body: JSON.stringify({
+          dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD, link: linkProd },
+        }),
       })
-      .then((response) => response.json())
-      .then(({ shortLink }) => shortLink)
-      .catch(() => 'unavailable');
+        .then((response) => response.json())
+        .then(({ shortLink }) => shortLink)
+        .catch(() => 'unavailable');
     },
   },
   {
@@ -28,9 +30,10 @@ export const WALLET_LIST: WalletList = [
     type: 'extension',
     title: 'Provenance Wallet',
     icon: 'provenance',
-    extensionId: PLUGIN_PROVENANCE_WALLET,
     eventAction: (eventData) => {
-      const sendMessageEvent = new CustomEvent('provWalletSendMessage', { detail: eventData });
+      const sendMessageEvent = new CustomEvent('provWalletSendMessage', {
+        detail: eventData,
+      });
       window.document.dispatchEvent(sendMessageEvent);
     },
   },
@@ -47,7 +50,9 @@ export const WALLET_LIST: WalletList = [
       if (address) searchParams.append('address', address);
       if (event) searchParams.append('event', event);
       const searchParamsString = searchParams.toString();
-      const url = `${FIGURE_WEB_WALLET_URL}${searchParamsString ? `?${searchParamsString}` : ''}`;
+      const url = `${FIGURE_WEB_WALLET_URL}${
+        searchParamsString ? `?${searchParamsString}` : ''
+      }`;
       const width = 600;
       const height = window.outerHeight < 750 ? window.outerHeight : 550;
       const top = window.outerHeight / 2 + window.screenY - height / 2;

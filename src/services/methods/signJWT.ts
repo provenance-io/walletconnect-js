@@ -7,7 +7,7 @@ import { rngNum } from '../../utils';
 
 export const signJWT = async (state: State, setState: SetState, expires: number) => {
   let valid = false;
-  const { connector, address, publicKey: pubKeyB64, walletApp, customExtId } = state;
+  const { connector, address, publicKey: pubKeyB64, walletApp } = state;
   const method = 'provenance_sign';
   const description = 'Sign JWT Token';
   const metadata = JSON.stringify({
@@ -18,19 +18,20 @@ export const signJWT = async (state: State, setState: SetState, expires: number)
   // Custom Request
   const request = {
     id: rngNum(),
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     method,
     params: [metadata],
   };
 
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
-  if (!connector) return { valid, data: expires, request, error: 'No wallet connected' };
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
+  if (!connector)
+    return { valid, data: expires, request, error: 'No wallet connected' };
   // Build JWT
   const now = Math.floor(Date.now() / 1000); // Current time
   const defaultExpires = now + 86400; // (24hours)
   const finalExpires = expires || defaultExpires;
-  const header = JSON.stringify({alg: 'ES256K', typ: 'JWT'});
+  const header = JSON.stringify({ alg: 'ES256K', typ: 'JWT' });
   const headerEncoded = base64url(header);
   const payload = JSON.stringify({
     sub: pubKeyB64,
@@ -41,14 +42,14 @@ export const signJWT = async (state: State, setState: SetState, expires: number)
   });
   const payloadEncoded = base64url(payload);
   const JWT = `${headerEncoded}.${payloadEncoded}`;
-  
+
   const hexJWT = convertUtf8ToHex(JWT);
   request.params.push(hexJWT);
-  
+
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT };
       knownWalletApp.eventAction(eventData);
     }
     // send message
@@ -61,8 +62,8 @@ export const signJWT = async (state: State, setState: SetState, expires: number)
     const signedPayloadEncoded = base64url(signature);
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     // Update JWT within the wcjs state
-    setState({ signedJWT })
-    return { valid, result, data: expires, signedJWT, request  };
+    setState({ signedJWT });
+    return { valid, result, data: expires, signedJWT, request };
   } catch (error) {
     return { valid, error, data: expires, request };
   }

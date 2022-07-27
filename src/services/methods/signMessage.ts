@@ -1,4 +1,4 @@
-import { convertUtf8ToHex } from "@walletconnect/utils";
+import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
 import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
@@ -6,7 +6,7 @@ import { rngNum } from '../../utils';
 
 export const signMessage = async (state: State, message: string) => {
   let valid = false;
-  const { connector, address, publicKey: pubKeyB64, walletApp, customExtId } = state;
+  const { connector, address, publicKey: pubKeyB64, walletApp } = state;
   const method = 'provenance_sign';
   const description = 'Sign Message';
   const metadata = JSON.stringify({
@@ -17,20 +17,21 @@ export const signMessage = async (state: State, message: string) => {
   // Custom Request
   const request = {
     id: rngNum(),
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     method,
     params: [metadata],
   };
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find(wallet => wallet.id === walletApp);
-  if (!connector) return { valid, data: message, request, error: 'No wallet connected' };
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
+  if (!connector)
+    return { valid, data: message, request, error: 'No wallet connected' };
   // encode message (hex)
   const hexMsg = convertUtf8ToHex(message);
   request.params.push(hexMsg);
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT , customExtId };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT };
       knownWalletApp.eventAction(eventData);
     }
     // send message
