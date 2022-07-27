@@ -1,37 +1,37 @@
-import { WalletList } from "../types";
-import { FIREBASE_FETCH_WALLET_URL, FIGURE_WEB_WALLET_URL } from "./urls";
-import { DYNAMIC_LINK_INFO_PROD } from "./dynamicLinkInfo";
+import { WalletList } from '../types';
+import { FIREBASE_FETCH_WALLET_URL, FIGURE_WEB_WALLET_URL } from './urls';
+import { DYNAMIC_LINK_INFO_PROD } from './dynamicLinkInfo';
 
 export const WALLET_LIST: WalletList = [
   {
-    id: "provenance_mobile",
-    type: "mobile",
-    title: "Provenance Wallet",
-    icon: "provenance",
+    id: 'provenance_mobile',
+    type: 'mobile',
+    title: 'Provenance Wallet',
+    icon: 'provenance',
     generateUrl: async (QRCodeUrl) => {
       const url = FIREBASE_FETCH_WALLET_URL;
       const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
       const linkProd = `${DYNAMIC_LINK_INFO_PROD.link}?data=${linkData}`;
       // First fetch prod, then dev
       return fetch(url, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({
           dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD, link: linkProd },
         }),
       })
         .then((response) => response.json())
         .then(({ shortLink }) => shortLink)
-        .catch(() => "unavailable");
+        .catch(() => 'unavailable');
     },
   },
   {
     dev: true,
-    id: "provenance_extension",
-    type: "extension",
-    title: "Provenance Wallet",
-    icon: "provenance",
+    id: 'provenance_extension',
+    type: 'extension',
+    title: 'Provenance Wallet',
+    icon: 'provenance',
     eventAction: (eventData) => {
-      const sendMessageEvent = new CustomEvent("provWalletSendMessage", {
+      const sendMessageEvent = new CustomEvent('provWalletSendMessage', {
         detail: eventData,
       });
       window.document.dispatchEvent(sendMessageEvent);
@@ -39,19 +39,19 @@ export const WALLET_LIST: WalletList = [
   },
   {
     dev: true,
-    id: "figure_web",
-    type: "web",
-    title: "Figure Wallet",
-    icon: "figure",
+    id: 'figure_web',
+    type: 'web',
+    title: 'Figure Wallet',
+    icon: 'figure',
     eventAction: ({ uri, address, event }) => {
       // Build a full set of urlSearchParams to append to the url
       const searchParams = new URLSearchParams();
-      if (uri) searchParams.append("wc", uri);
-      if (address) searchParams.append("address", address);
-      if (event) searchParams.append("event", event);
+      if (uri) searchParams.append('wc', uri);
+      if (address) searchParams.append('address', address);
+      if (event) searchParams.append('event', event);
       const searchParamsString = searchParams.toString();
       const url = `${FIGURE_WEB_WALLET_URL}${
-        searchParamsString ? `?${searchParamsString}` : ""
+        searchParamsString ? `?${searchParamsString}` : ''
       }`;
       const width = 600;
       const height = window.outerHeight < 750 ? window.outerHeight : 550;

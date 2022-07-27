@@ -1,15 +1,11 @@
-import React, { useState, useEffect } from "react"; // eslint-disable-line no-unused-vars
-import styled from "styled-components";
-import { WalletConnectService } from "../../services";
-import {
-  APP_STORE_GOOGLE_PLAY,
-  APP_STORE_APPLE,
-  WALLET_LIST,
-} from "../../consts";
-import appleAppStoreImg from "../../images/appStoreBadge.svg";
-import googlePlayImg from "../../images/googlePlayBadge.png";
-import { WALLET_ICONS } from "../../images";
-import { Wallet, EventData, WalletId } from "../../types";
+import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
+import styled from 'styled-components';
+import { WalletConnectService } from '../../services';
+import { APP_STORE_GOOGLE_PLAY, APP_STORE_APPLE, WALLET_LIST } from '../../consts';
+import appleAppStoreImg from '../../images/appStoreBadge.svg';
+import googlePlayImg from '../../images/googlePlayBadge.png';
+import { WALLET_ICONS } from '../../images';
+import { Wallet, EventData, WalletId } from '../../types';
 
 const QRCodeModalContainer = styled.div`
   top: 0;
@@ -68,7 +64,7 @@ const ToggleNotch = styled.div<{ active?: boolean }>`
   transition: 500ms all;
   padding: 4px 10px;
   font-weight: 700;
-  ${({ active }) => active && "background: #FFFFFF;"}
+  ${({ active }) => active && 'background: #FFFFFF;'}
   flex-basis: 50%;
   border-radius: 4px;
   cursor: pointer;
@@ -133,7 +129,7 @@ const WalletRowNonLink = styled.div`
 const WalletTitle = styled.div<{ custom?: boolean }>`
   font-weight: 900;
   font-size: 2rem;
-  color: ${({ custom }) => (custom ? "#4889fa" : "#333333")};
+  color: ${({ custom }) => (custom ? '#4889fa' : '#333333')};
   user-select: none;
 `;
 const WalletIcon = styled.img`
@@ -165,15 +161,15 @@ interface Props {
 export const QRCodeModal: React.FC<Props> = ({
   className,
   walletConnectService: wcs,
-  title = "Scan the QRCode with your mobile Provenance Blockchain Wallet.",
+  title = 'Scan the QRCode with your mobile Provenance Blockchain Wallet.',
   devWallets,
 }) => {
   const { state } = wcs;
   const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
   const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
-  const options = ["qr", isMobile ? "mobile" : "desktop"];
+  const options = ['qr', isMobile ? 'mobile' : 'desktop'];
   // Which tab of the popup is currently open (qr/desktop/mobile)
-  const [view, setView] = useState("qr");
+  const [view, setView] = useState('qr');
   // Copy the QR code value as a string
   const [copied, setCopied] = useState(false);
   const [timeoutInstance, setTimeoutInstance] = useState<number>(-1);
@@ -194,20 +190,15 @@ export const QRCodeModal: React.FC<Props> = ({
   // The links to those "mobile wallets" are dynamic (iOS vs Android).  To get the links we must fetch
   useEffect(() => {
     const asyncBuildMobileWallets = () =>
-      WALLET_LIST.filter(({ type }) => type === "mobile").map(
-        async (wallet) => {
-          // All mobile wallets should have a generateUrl function, but double check
-          if (wallet.generateUrl) {
-            const dynamicUrl = await wallet.generateUrl(QRCodeUrl);
-            // Add this wallet to the state wallet list with this generated url
-            const allMobileWallets = [
-              ...mobileWallets,
-              { ...wallet, dynamicUrl },
-            ];
-            setMobileWallets(allMobileWallets);
-          }
+      WALLET_LIST.filter(({ type }) => type === 'mobile').map(async (wallet) => {
+        // All mobile wallets should have a generateUrl function, but double check
+        if (wallet.generateUrl) {
+          const dynamicUrl = await wallet.generateUrl(QRCodeUrl);
+          // Add this wallet to the state wallet list with this generated url
+          const allMobileWallets = [...mobileWallets, { ...wallet, dynamicUrl }];
+          setMobileWallets(allMobileWallets);
         }
-      );
+      });
     // Only run this when the modal is open and once for each wallet
     if (showQRCodeModal && initialLoad) {
       setInitialLoad(false);
@@ -249,11 +240,7 @@ export const QRCodeModal: React.FC<Props> = ({
           rel="no-referrer"
           title="Get the Provenance Blockchain Wallet in the Apple App store."
         >
-          <img
-            src={appleAppStoreImg}
-            height="42px"
-            alt="Apple App Store badge"
-          />
+          <img src={appleAppStoreImg} height="42px" alt="Apple App Store badge" />
         </AppIcon>
         <AppIcon
           href={APP_STORE_GOOGLE_PLAY}
@@ -261,11 +248,7 @@ export const QRCodeModal: React.FC<Props> = ({
           rel="no-referrer"
           title="Get the Provenance Blockchain Wallet in the Google Play store."
         >
-          <img
-            src={googlePlayImg}
-            height="42px"
-            alt="Google Play Store badge"
-          />
+          <img src={googlePlayImg} height="42px" alt="Google Play Store badge" />
         </AppIcon>
       </AppStoreIcons>
     </>
@@ -273,10 +256,7 @@ export const QRCodeModal: React.FC<Props> = ({
   // ----------------------------------------
   // Use clicks one of the desktop wallets
   // ----------------------------------------
-  const handleDesktopWalletClick = (
-    event: React.MouseEvent,
-    wallet: Wallet
-  ) => {
+  const handleDesktopWalletClick = (event: React.MouseEvent, wallet: Wallet) => {
     // If the wallet has an eventAction (they should all have an event action...)
     if (wallet.eventAction) {
       // Set the name of the wallet into the walletconnect-js state (to use as a reference)
@@ -285,7 +265,7 @@ export const QRCodeModal: React.FC<Props> = ({
       // Build eventdata to send to the extension
       const eventData: EventData = {
         uri: encodedQRCodeUrl,
-        event: "walletconnect_init",
+        event: 'walletconnect_init',
       };
       // Trigger the event action based on the wallet
       wallet.eventAction(eventData);
@@ -300,7 +280,7 @@ export const QRCodeModal: React.FC<Props> = ({
       // If they are in dev mode we don't render them unless they're included in the devWallets override array
       .filter(
         ({ type, dev, id }) =>
-          (type === "web" || type === "extension") &&
+          (type === 'web' || type === 'extension') &&
           (!dev || devWallets?.includes(id))
       )
       .map((wallet) => {
@@ -364,36 +344,36 @@ export const QRCodeModal: React.FC<Props> = ({
           </svg>
         </CloseQRModal>
         <Toggle>
-          {options.includes("qr") && (
-            <ToggleNotch active={view === "qr"} onClick={() => setView("qr")}>
+          {options.includes('qr') && (
+            <ToggleNotch active={view === 'qr'} onClick={() => setView('qr')}>
               QR Code
             </ToggleNotch>
           )}
-          {options.includes("desktop") && (
+          {options.includes('desktop') && (
             <ToggleNotch
-              active={view === "desktop"}
-              onClick={() => setView("desktop")}
+              active={view === 'desktop'}
+              onClick={() => setView('desktop')}
             >
               Desktop
             </ToggleNotch>
           )}
-          {options.includes("mobile") && (
+          {options.includes('mobile') && (
             <ToggleNotch
-              active={view === "mobile"}
-              onClick={() => setView("mobile")}
+              active={view === 'mobile'}
+              onClick={() => setView('mobile')}
             >
               Mobile
             </ToggleNotch>
           )}
         </Toggle>
-        {view === "qr" ? renderQRView() : <Text>Select wallet</Text>}
-        {view === "desktop" &&
+        {view === 'qr' ? renderQRView() : <Text>Select wallet</Text>}
+        {view === 'desktop' &&
           (DesktopWalletsList.length ? (
             DesktopWalletsList
           ) : (
             <Text>No desktop wallets currently available.</Text>
           ))}
-        {view === "mobile" && buildMobileWallets()}
+        {view === 'mobile' && buildMobileWallets()}
       </QRModalContent>
     </QRCodeModalContainer>
   ) : null;

@@ -1,15 +1,15 @@
-import { convertUtf8ToHex } from "@walletconnect/utils";
-import { CustomActionData } from "../../types";
-import { State } from "../walletConnectService";
-import { WALLET_LIST, WALLET_APP_EVENTS } from "../../consts";
-import { rngNum } from "../../utils";
+import { convertUtf8ToHex } from '@walletconnect/utils';
+import { CustomActionData } from '../../types';
+import { State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { rngNum } from '../../utils';
 
 export const customAction = async (state: State, data: CustomActionData) => {
   let valid = false;
   const {
     message: rawB64Message,
-    description = "Custom Action",
-    method = "provenance_sendTransaction",
+    description = 'Custom Action',
+    method = 'provenance_sendTransaction',
     gasPrice,
   } = data;
   const { connector, address, walletApp } = state;
@@ -22,13 +22,13 @@ export const customAction = async (state: State, data: CustomActionData) => {
   // Custom Request
   const request = {
     id: rngNum(),
-    jsonrpc: "2.0",
+    jsonrpc: '2.0',
     method,
     params: [metadata],
   };
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
-  if (!connector) return { valid, data, request, error: "No wallet connected" };
+  if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // If message isn't an array, turn it into one
   const b64MessageArray = Array.isArray(rawB64Message)
