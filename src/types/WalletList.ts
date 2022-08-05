@@ -1,4 +1,7 @@
-export type EventValue = 'walletconnect_event' | 'walletconnect_init';
+export type EventValue =
+  | 'walletconnect_event'
+  | 'walletconnect_init'
+  | 'walletconnect_disconnect';
 export type WalletType = 'mobile' | 'extension' | 'web';
 export type WalletId = 'provenance_extension' | 'provenance_mobile' | 'figure_web';
 export type WalletIcons = 'provenance' | 'figure' | 'unicorn';
