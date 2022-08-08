@@ -16,8 +16,9 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
 1. [Installation](#Installation)
 2. [Window messages](#Window-Messages)
 3. [WalletConnectContextProvider](#WalletConnectContextProvider)
-4. [useWalletConnect](#useWalletConnect)
-5. [walletConnectService](#walletConnectService)
+4. [QRCodeModal](#QRCodeModal)
+5. [useWalletConnect](#useWalletConnect)
+6. [walletConnectService](#walletConnectService)
     - [activateRequest](#activateRequest)
     - [addMarker](#addMarker)
     - [cancelRequest](#cancelRequest)
@@ -29,12 +30,12 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - [sendHash](#sendHash)
     - [signJWT](#signJWT)
     - [signMessage](#signMessage)
-6. [walletConnectState](#walletConnectState)
-7. [Web App](#Web-App)
-8. [Non React Setup](#Non-React-Setup)
-9. [Webpack 5 Issues](#Webpack-5-Issues)
-10. [Clone LocalStorage](#Automatic-localSession-copy)
-11. [WalletConnect-js Status](#Status)
+7. [walletConnectState](#walletConnectState)
+8. [Web App](#Web-App)
+9. [Non React Setup](#Non-React-Setup)
+10. [Webpack 5 Issues](#Webpack-5-Issues)
+11. [Clone LocalStorage](#Automatic-localSession-copy)
+12. [WalletConnect-js Status](#Status)
 
 ## Installation
 
@@ -90,8 +91,33 @@ React context provider to supply state to every child within
     );
     ```
 
-## useWalletConnect
+## QRCodeModal
+To start the connection from dApp to wallet you will need to initiate the connection using the QRCodeModal component.
+  - Takes in the following params:
+    - `walletConnectService`: Service pulled out of `useWalletConnect()` hook (Required)
+    - `walletConnectState`: State pulled out of `useWalletConnect()` hook (Required)
+    - `devWallets`: Array of allowed dev wallets to connect into. (Optional)
+      - For list of available wallets see `src/consts/walletList.ts`
+  - Usage:
+    ```js
+    // App.js
+    import { useWalletConnect, QRCodeModal } from '@provenanceio/walletconnect-js';
+    ...
+    export const App = () => {
+      const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
+      ...
+      return (
+        <QRCodeModal
+          walletConnectService={wcs}
+          walletConnectState={walletConnectState}
+          devWallets={['figure_web', 'provenance_extension']}
+        />
+      )
+    };
+    ```
+  - Note:  This modal is built with React.js and will only work within a react project.  If you are not using React.js look through the `webDemoVanilla` folder to see how to initiate the connection without QRCodeModal manually.
 
+## useWalletConnect
 React hook which contains `walletConnectService` and `walletConnectState`
 
 ## walletConnectService
