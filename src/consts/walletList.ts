@@ -28,7 +28,7 @@ export const WALLET_LIST: WalletList = [
     dev: true,
     id: 'provenance_extension',
     type: 'extension',
-    title: 'Provenance Wallet',
+    title: 'Provenance Blockchain Wallet',
     icon: 'provenance',
     eventAction: (eventData) => {
       const sendMessageEvent = new CustomEvent('provWalletSendMessage', {

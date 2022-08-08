@@ -1,0 +1,42 @@
+{
+  "root": true,
+  "plugins": [
+    "import"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "allowImportExportEverywhere": true
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "moduleDirectory": ["node_modules/", "src/"],
+        "extensions": [".js"]
+      }
+    }
+  },
+  "rules": {
+    "arrow-body-style": ["warn", "as-needed"],
+    "consistent-return": "warn",
+    "import/no-extraneous-dependencies": "off",
+    "import/newline-after-import": "error",
+    "import/order": ["error", { "groups": [["builtin", "external", "internal"]] }],
+    "import/prefer-default-export": 0,
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-var": "warn",
+    "object-shorthand": "warn",
+    "prefer-arrow-callback": "warn",
+    "prefer-const": "warn",
+    "prefer-spread": "warn"
+  },
+  "env": {
+    "browser": true,
+    "jest": true,
+    "node": true,
+    "es6": true
+  }
+}

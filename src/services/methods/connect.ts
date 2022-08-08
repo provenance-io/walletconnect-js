@@ -1,17 +1,19 @@
-import WalletConnectClient from "@walletconnect/client";
+import WalletConnectClient from '@walletconnect/client';
 import QRCode from 'qrcode';
 import { Broadcast, ConnectData, AccountInfo } from '../../types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
 import { SetState, State } from '../walletConnectService';
+import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 interface ConnectProps {
-  state: State,
-  setState: SetState,
-  resetState: () => void,
-  broadcast: Broadcast,
-  bridge: string,
-  startConnectionTimer: () => void,
+  state: State;
+  setState: SetState;
+  resetState: () => void;
+  broadcast: Broadcast;
+  bridge: string;
+  startConnectionTimer: () => void;
+  getState: () => State;
 }
 
 export const connect = async ({
@@ -21,6 +23,7 @@ export const connect = async ({
   broadcast,
   bridge,
   startConnectionTimer,
+  getState,
 }: ConnectProps) => {
   // -------------------
   // PULL ACCOUNT INFO
@@ -52,14 +55,27 @@ export const connect = async ({
     if (!connectionEat || connectionIat >= connectionEat) newConnector.killSession();
     else {
       const { accounts, peerMeta: peer } = newConnector;
-      const { address, publicKey, jwt: lastConnectJWT, walletInfo } = getAccountInfo(accounts);
+      const {
+        address,
+        publicKey,
+        jwt: lastConnectJWT,
+        walletInfo,
+      } = getAccountInfo(accounts);
       const signedJWT = state.signedJWT || lastConnectJWT;
-      setState({ address, publicKey, connected: true, signedJWT, peer, connectionIat, walletInfo });
+      setState({
+        address,
+        publicKey,
+        connected: true,
+        signedJWT,
+        peer,
+        connectionIat,
+        walletInfo,
+      });
       const broadcastData = {
         data: newConnector,
         connectionIat,
         connectionEat: state.connectionEat,
-        connectionType: 'existing session'
+        connectionType: 'existing session',
       };
       broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
       // Start the auto-logoff timer
@@ -72,7 +88,12 @@ export const connect = async ({
   const onConnect = (payload: ConnectData) => {
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
-    const { address, publicKey, jwt: signedJWT, walletInfo } = getAccountInfo(accounts);
+    const {
+      address,
+      publicKey,
+      jwt: signedJWT,
+      walletInfo,
+    } = getAccountInfo(accounts);
     // Get connection issued/expires times (auto-logout)
     const connectionIat = Math.floor(Date.now() / 1000);
     const connectionEat = state.connectionTimeout + connectionIat;
@@ -99,6 +120,17 @@ export const connect = async ({
   // WALLET DISCONNECT
   // --------------------
   const onDisconnect = () => {
+    // Get the latest state values
+    const latestState = getState();
+    // Check for a known wallet app with special callback functions
+    const knownWalletApp = WALLET_LIST.find(
+      (wallet) => wallet.id === latestState.walletApp
+    );
+    // If the wallet app has an eventAction (web/extension) trigger it
+    if (knownWalletApp && knownWalletApp.eventAction) {
+      const eventData = { event: WALLET_APP_EVENTS.DISCONNECT };
+      knownWalletApp.eventAction(eventData);
+    }
     resetState();
     broadcast(WINDOW_MESSAGES.DISCONNECT);
     // Manually clear out all of walletconnect-js from localStorage
@@ -122,31 +154,44 @@ export const connect = async ({
       "transport_error",
     */
     // Session Update
-    newConnector.on("session_update", (error) => {
+    newConnector.on('session_update', (error) => {
       if (error) throw error;
       onSessionUpdate(newConnector);
     });
     // Connect
-    newConnector.on("connect", (error, payload) => {
+    newConnector.on('connect', (error, payload) => {
       if (error) throw error;
       onConnect(payload);
     });
     // Disconnect
-    newConnector.on("disconnect", (error) => {
+    newConnector.on('disconnect', (error) => {
       if (error) throw error;
       onDisconnect();
     });
     // Latest values
     const { accounts, peerMeta: peer } = newConnector;
-    const { address, publicKey, jwt: lastConnectJWT, walletInfo } = getAccountInfo(accounts);
+    const {
+      address,
+      publicKey,
+      jwt: lastConnectJWT,
+      walletInfo,
+    } = getAccountInfo(accounts);
     const signedJWT = state.signedJWT || lastConnectJWT;
     // Are we already connected
     if (newConnector.connected) {
       onSessionUpdate(newConnector);
     }
     // Update Connector
-    setState({ connector: newConnector, connected: !!address, address, publicKey, signedJWT, peer, walletInfo });
-  }
+    setState({
+      connector: newConnector,
+      connected: !!address,
+      address,
+      publicKey,
+      signedJWT,
+      peer,
+      walletInfo,
+    });
+  };
   // ----------------------------
   // CREATE NEW WC CONNECTION
   // ----------------------------
@@ -155,11 +200,11 @@ export const connect = async ({
     open = async (data: string) => {
       const qrcode = await QRCode.toDataURL(data);
       setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: true });
-    }
-    
+    };
+
     close = () => {
       setState({ showQRCodeModal: false });
-    }
+    };
   }
   const qrcodeModal = new QRCodeModal();
   // create new connector

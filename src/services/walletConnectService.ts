@@ -191,6 +191,9 @@ export class WalletConnectService {
     });
   }
 
+  // Pull latest state values on demand (prevent stale state in callback events)
+  #getState = () => this.state;
+
   // Control auto-disconnect / timeout
   #startConnectionTimer = () => {
     // Can't start a timer if one is already running (make sure we have Eat and Iat too)
@@ -376,6 +379,7 @@ export class WalletConnectService {
       broadcast: this.#broadcastEvent,
       bridge: this.#bridge,
       startConnectionTimer: this.#startConnectionTimer,
+      getState: this.#getState,
     });
   };
 
