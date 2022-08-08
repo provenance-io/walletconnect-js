@@ -4,7 +4,7 @@ const ListElement = window.demo.ListElement;
 // Pull walletconnect-js functionality from window object
 const walletConnectService = new window.wcjs.WalletConnectService();
 const WINDOW_MESSAGES = window.wcjs.WINDOW_MESSAGES;
-// TEMP: Next version of wcjs will export WALLET_LIST
+// NOTE: Next version of wcjs (1.2.7) will export WALLET_LIST
 const WALLET_LIST = [
   {
     dev: true,

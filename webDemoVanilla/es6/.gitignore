@@ -21,6 +21,7 @@
 /docs
 /cdn
 /umd
+/public
 
 # misc
 .DS_Store
