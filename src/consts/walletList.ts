@@ -36,6 +36,9 @@ export const WALLET_LIST: WalletList = [
       });
       window.document.dispatchEvent(sendMessageEvent);
     },
+    walletUrl:
+      'https://chrome.google.com/webstore/detail/provenance-blockchain-wal/pfcpdmimlaffecihgamfbnfffmdlhkmh',
+    walletCheck: () => window?.provenance && window?.provenance?.isProvenance,
   },
   {
     dev: true,

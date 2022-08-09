@@ -14,13 +14,15 @@ export interface EventData {
 
 export interface Wallet {
   dev?: boolean; // Is this wallet still in development?  If true, QRCode modal won't render by default
+  dynamicUrl?: string; // The result of generateUrl, the dyanmic url for mobile users.
+  eventAction?: (eventData: EventData) => void; // Callback function for every walletconnect-js method/action
+  generateUrl?: (QRCodeUrl: string) => Promise<string>; // Function to generate a dynamic URL for mobile users
+  icon?: WalletIcons; // Icon to display next to the wallet selection
   id: WalletId; // Id to reference this specific wallet
   title: string; // Title to display when selecting wallets
   type: WalletType; // Is this wallet mobile, web, or an extension
-  icon?: WalletIcons; // Icon to display next to the wallet selection
-  eventAction?: (eventData: EventData) => void; // Callback function for every walletconnect-js method/action
-  generateUrl?: (QRCodeUrl: string) => Promise<string>; // Function to generate a dynamic URL for mobile users
-  dynamicUrl?: string; // The result of generateUrl, the dyanmic url for mobile users.
+  walletCheck?: () => boolean; // Check if the wallet exists, runs background actions as needed, returns a boolean indicating existance
+  walletUrl?: string; // Location of wallet download
 }
 
 export type WalletList = Wallet[];

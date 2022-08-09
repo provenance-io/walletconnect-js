@@ -72,7 +72,7 @@ const ToggleNotch = styled.div<{ active?: boolean }>`
   user-select: none;
 `;
 const Text = styled.p<{ link?: boolean }>`
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   margin: 0;
   ${({ link }) =>
     link &&
@@ -257,20 +257,37 @@ export const QRCodeModal: React.FC<Props> = ({
   // Use clicks one of the desktop wallets
   // ----------------------------------------
   const handleDesktopWalletClick = (event: React.MouseEvent, wallet: Wallet) => {
-    // If the wallet has an eventAction (they should all have an event action...)
-    if (wallet.eventAction) {
-      // Set the name of the wallet into the walletconnect-js state (to use as a reference)
-      // If a custom extension ID has been set, note it (need to handle this better)
-      wcs.setState({ walletApp: wallet.id });
-      // Build eventdata to send to the extension
-      const eventData: EventData = {
-        uri: encodedQRCodeUrl,
-        event: 'walletconnect_init',
-      };
-      // Trigger the event action based on the wallet
-      wallet.eventAction(eventData);
+    const runEventAction = () => {
+      // If the wallet has an eventAction (they should all have an event action...)
+      if (wallet.eventAction) {
+        // Set the name of the wallet into the walletconnect-js state (to use as a reference)
+        // If a custom extension ID has been set, note it (need to handle this better)
+        wcs.setState({ walletApp: wallet.id });
+        // Build eventdata to send to the extension
+        const eventData: EventData = {
+          uri: encodedQRCodeUrl,
+          event: 'walletconnect_init',
+        };
+        // Trigger the event action based on the wallet
+        wallet.eventAction(eventData);
+      }
+    };
+    // Wallet includes a self-existence check function
+    if (wallet.walletCheck) {
+      // Use function to see if wallet exists
+      const walletExists = wallet.walletCheck();
+      // Wallet exists, run the proper event action
+      if (walletExists) runEventAction();
+      // Wallet doesn't exist, send the user to the wallets download url (if provided)
+      else if (wallet.walletUrl) {
+        window.open(wallet.walletUrl);
+      }
+    } else {
+      // No self-existence check required, just run the event action for this wallet
+      runEventAction();
     }
   };
+
   // -------------------------------
   // Build all the desktop wallets
   // -------------------------------
