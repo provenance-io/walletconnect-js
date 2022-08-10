@@ -11,4 +11,4 @@ export const APP_STORE_GOOGLE_PLAY =
 export const APP_STORE_APPLE =
   'https://apps.apple.com/us/app/provenance-blockchain-wallet/id1606428494';
 
-export const FIGURE_WEB_WALLET_URL = 'https://test.figure.com/dashboard/wallet';
+export const FIGURE_WEB_WALLET_URL = 'http://test.figure.com/figure-wallet';
