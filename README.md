@@ -243,7 +243,6 @@ React hook which contains `walletConnectService` and `walletConnectState`
     initialState: {
       account: '', // Figure account uuid [string]
       address: '', // Wallet address [string]
-      assets: [], // Wallet assets [array]
       connected: false, // WalletConnect connected [bool]
       connectionIat: null, // WalletConnect initialized at time [number]
       connectionEat: null, // WalletConnect expires at time [number]

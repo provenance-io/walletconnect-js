@@ -152,9 +152,9 @@ const AppIcon = styled.a`
 `;
 
 interface Props {
-  className: string;
+  className?: string;
   walletConnectService: WalletConnectService;
-  title: string;
+  title?: string;
   devWallets?: WalletId[]; // An array of wallet-ids which are in dev mode to force render (hidden by default)
 }
 
