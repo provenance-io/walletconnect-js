@@ -54,7 +54,6 @@ const existingWCJSState: WCJSState = getFromLocalStorage('walletconnect-js');
 export interface State {
   account: string;
   address: string;
-  assets: string[];
   connected: boolean;
   connectionEat: number | null;
   connectionIat: number | null;
@@ -80,7 +79,6 @@ export type SetFullState = (state: State) => void;
 const defaultState: State = {
   account: '',
   address: '',
-  assets: [],
   connected: false,
   connectionEat: null,
   connectionIat: null,
@@ -131,7 +129,6 @@ const getAccountItem = (itemName: keyof AccountObject) => {
 const initialState: State = {
   account: existingWCJSState.account || defaultState.account,
   address: (getAccountItem('address') as string) || defaultState.address,
-  assets: defaultState.assets,
   connected: existingWCState.connected || defaultState.connected,
   connectionEat: existingWCJSState.connectionEat || defaultState.connectionEat,
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
