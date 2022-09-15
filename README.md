@@ -206,7 +206,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
     | gasPrice | object 	| no       	| `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` 	| `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` 	| Optional gasPrice object, defaults to Figure values |
 
   - #### sendHash
-    Send a custom amount of Hash token to a custom address
+    NOTE: Depricated, use sendCoin instead.  Send a custom amount of Hash token to a custom address
     ```js
       walletConnectService.sendHash({ to, amount });
       // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
