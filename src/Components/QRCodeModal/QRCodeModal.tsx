@@ -150,6 +150,31 @@ const AppStoreIcons = styled.div`
 const AppIcon = styled.a`
   margin: 0 6px;
 `;
+const ReloadNotice = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: #eeeeee;
+  padding: 60px 40px 40px 40px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  ${Text} {
+    margin-bottom: 34px;
+  }
+  button {
+    margin-top: 6px;
+    padding: 10px;
+    box-sizing: border-box;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid #aaaaaa;
+    background: white;
+  }
+`;
 
 interface Props {
   className?: string;
@@ -176,6 +201,8 @@ export const QRCodeModal: React.FC<Props> = ({
   // List of mobile wallets after their dynamic links have been fetched (async)
   const [mobileWallets, setMobileWallets] = useState<Wallet[]>([]);
   const [initialLoad, setInitialLoad] = useState(true);
+  // Display a message to the user that a reload is required
+  const [showReloadNotice, setShowReloadNotice] = useState(false);
   // On unload, remove any running 'copied' timeoutInstances (prevent memory leaks)
   useEffect(
     () => () => {
@@ -281,6 +308,7 @@ export const QRCodeModal: React.FC<Props> = ({
       // Wallet doesn't exist, send the user to the wallets download url (if provided)
       else if (wallet.walletUrl) {
         window.open(wallet.walletUrl);
+        setShowReloadNotice(true);
       }
     } else {
       // No self-existence check required, just run the event action for this wallet
@@ -384,12 +412,37 @@ export const QRCodeModal: React.FC<Props> = ({
           )}
         </Toggle>
         {view === 'qr' ? renderQRView() : <Text>Select wallet</Text>}
-        {view === 'desktop' &&
-          (DesktopWalletsList.length ? (
-            DesktopWalletsList
-          ) : (
-            <Text>No desktop wallets currently available.</Text>
-          ))}
+        {view === 'desktop' && (
+          <>
+            {!!showReloadNotice && (
+              <ReloadNotice>
+                <CloseQRModal onClick={() => setShowReloadNotice(false)}>
+                  <svg
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    height="1.4rem"
+                  >
+                    <path d="M8.99984 1L5.09375 5L8.99984 9" />
+                    <path d="M1.00016 1L4.90625 5L1.00016 9" />
+                  </svg>
+                </CloseQRModal>
+                <Text>
+                  Note: You must reload this page after installing the Provenance
+                  Blockchain Wallet extension.
+                </Text>
+                <button onClick={() => setShowReloadNotice(false)}>Back</button>
+                <button onClick={() => window.location.reload()}>Reload</button>
+              </ReloadNotice>
+            )}
+            {DesktopWalletsList.length ? (
+              DesktopWalletsList
+            ) : (
+              <Text>No desktop wallets currently available.</Text>
+            )}
+          </>
+        )}
         {view === 'mobile' && buildMobileWallets()}
       </QRModalContent>
     </QRCodeModalContainer>
