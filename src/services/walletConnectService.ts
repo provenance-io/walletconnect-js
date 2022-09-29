@@ -153,8 +153,6 @@ export class WalletConnectService {
 
   #setWalletConnectState: SetFullState | undefined = undefined;
 
-  #network = 'mainnet';
-
   #connectionTimer = 0;
 
   #bridge: string = WALLETCONNECT_BRIDGE_URL;
@@ -222,11 +220,7 @@ export class WalletConnectService {
     this.#startConnectionTimer();
   };
 
-  // Update the network and bridge by passing it through as a prop on the provider
-
-  setNetwork(network: string) {
-    this.#network = network;
-  }
+  // Update bridge by passing it through as a prop on the provider
 
   setBridge(bridge: string) {
     this.#bridge = bridge;

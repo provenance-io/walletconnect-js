@@ -101,7 +101,6 @@ React context provider to supply state to every child within
 
 - Include as parent to all Components using `walletconnect-js`
 - Takes in optional params:
-  - `network`: Chain network of `"mainnet"` or `"testnet"` [`string`] (default: `"mainnet"`)
   - `bridge`: WalletConnect bridge [`string`] (default: `"'wss://test.figure.tech/service-wallet-connect-bridge/ws/external'"`)
   - `timeout`: Session timeout, seconds [`number`] (default: `1800`)
 - Usage Example (w/React.js):
@@ -111,7 +110,7 @@ React context provider to supply state to every child within
   ...
 
   ReactDOM.render(
-    <WalletConnectContextProvider network="testnet">
+    <WalletConnectContextProvider>
       <App />
     </WalletConnectContextProvider>,
     document.getElementById('root')

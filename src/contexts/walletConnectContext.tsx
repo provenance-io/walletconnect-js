@@ -11,14 +11,12 @@ const walletConnectService = new WalletConnectService();
 
 interface Props {
   children: React.ReactElement;
-  network?: 'testnet' | 'mainnet';
   bridge?: string;
   timeout?: number;
 }
 
 const WalletConnectContextProvider: React.FC<Props> = ({
   children,
-  network,
   bridge,
   timeout,
 }) => {
@@ -30,9 +28,6 @@ const WalletConnectContextProvider: React.FC<Props> = ({
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
     // If custom props are passed in, update the defaults
-    if (network) {
-      walletConnectService.setNetwork(network);
-    }
     if (bridge) {
       walletConnectService.setBridge(bridge);
     }
