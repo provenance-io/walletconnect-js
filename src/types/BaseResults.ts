@@ -5,14 +5,22 @@ import { SendCoinData } from './SendCoinData';
 import { SendHashData } from './SendHashData';
 
 export type BaseResults = {
-  valid: boolean
-  result?: Record<string, unknown>
-  data: MarkerData | MarkerAddData | CustomActionData | SendCoinData | SendHashData | string | number,
-  error?: string | Error | unknown
+  valid: boolean;
+  result?: Record<string, unknown>;
+  data:
+    | MarkerData
+    | MarkerAddData
+    | CustomActionData
+    | SendCoinData
+    | SendHashData
+    | string
+    | number;
+  error?: string | Error | unknown;
   request?: {
-    id: number
-    jsonrpc: string
-    method: string
-    params: string[],
-  },
+    id: number;
+    jsonrpc: string;
+    method: string;
+    params: string[];
+  };
+  signedJWT?: string;
 };

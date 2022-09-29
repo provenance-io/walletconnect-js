@@ -28,10 +28,8 @@ import {
   customAction as customActionMethod,
   delegateHash as delegateHashMethod,
   sendCoin as sendCoinMethod,
-  sendHash as sendHashMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
-  sendHashBatch as sendHashBatchMethod,
   markerFinalize as markerFinalizeMethod,
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
@@ -429,43 +427,10 @@ export class WalletConnectService {
     this.#resetConnectionTimeout();
   };
 
-  /**
-   * @deprecated The method should no longer used, use sendCoin instead
-   */
-  sendHash = async (data: SendHashData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'sendHash' });
-    const result = await sendHashMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.TRANSACTION_FAILED
-      : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  sendHashBatch = async (data: SendHashBatchData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'sendHashBatch' });
-    const result = await sendHashBatchMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.TRANSACTION_FAILED
-      : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  signJWT = async (expires: string) => {
+  signJWT = async (expires: number) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'signJWT' });
-    const result = await signJWTMethod(this.state, this.setState, +expires);
+    const result = await signJWTMethod(this.state, this.setState, expires);
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method

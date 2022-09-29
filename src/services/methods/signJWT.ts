@@ -4,9 +4,17 @@ import { verifySignature } from '../../helpers';
 import { State, SetState } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
+import { BaseResults } from '../../types';
 
-export const signJWT = async (state: State, setState: SetState, expires: number) => {
+export const signJWT = async (
+  state: State,
+  setState: SetState,
+  expires?: number
+): Promise<BaseResults> => {
   let valid = false;
+  const now = Math.floor(Date.now() / 1000); // Current time
+  const defaultExpires = now + 86400; // (24hours)
+  const finalExpires = expires || defaultExpires;
   const { connector, address, publicKey: pubKeyB64, walletApp } = state;
   const method = 'provenance_sign';
   const description = 'Sign JWT Token';
@@ -26,11 +34,8 @@ export const signJWT = async (state: State, setState: SetState, expires: number)
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
   if (!connector)
-    return { valid, data: expires, request, error: 'No wallet connected' };
+    return { valid, data: finalExpires, request, error: 'No wallet connected' };
   // Build JWT
-  const now = Math.floor(Date.now() / 1000); // Current time
-  const defaultExpires = now + 86400; // (24hours)
-  const finalExpires = expires || defaultExpires;
   const header = JSON.stringify({ alg: 'ES256K', typ: 'JWT' });
   const headerEncoded = base64url(header);
   const payload = JSON.stringify({
@@ -63,8 +68,8 @@ export const signJWT = async (state: State, setState: SetState, expires: number)
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     // Update JWT within the wcjs state
     setState({ signedJWT });
-    return { valid, result, data: expires, signedJWT, request };
+    return { valid, result, data: finalExpires, signedJWT, request };
   } catch (error) {
-    return { valid, error, data: expires, request };
+    return { valid, error: `${error}`, data: finalExpires, request };
   }
 };
