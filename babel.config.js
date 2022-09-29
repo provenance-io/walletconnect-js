@@ -14,7 +14,10 @@ if (process.env.BABEL_ENV === 'es') {
 
 const productionPlugins = ['@babel/plugin-transform-react-constant-elements'];
 module.exports = {
-  presets: defaultPresets.concat(['@babel/preset-typescript', '@babel/preset-react']),
+  presets: defaultPresets.concat([
+    '@babel/preset-typescript',
+    '@babel/preset-react',
+  ]),
   plugins: [
     '@babel/plugin-proposal-optional-chaining',
     '@babel/plugin-proposal-nullish-coalescing-operator',
@@ -28,7 +31,7 @@ module.exports = {
       },
     ],
     '@babel/plugin-transform-object-assign',
-    '@babel/transform-runtime'
+    '@babel/transform-runtime',
   ],
   env: {
     cjs: {
@@ -36,11 +39,17 @@ module.exports = {
       ignore: ['**/*.test.js', '**/*.test.ts'],
     },
     es: {
-      plugins: [...productionPlugins, ['@babel/plugin-transform-runtime', { useESModules: true }]],
+      plugins: [
+        ...productionPlugins,
+        ['@babel/plugin-transform-runtime', { useESModules: true }],
+      ],
       ignore: ['**/*.test.js', '**/*.test.ts'],
     },
     esm: {
-      plugins: [...productionPlugins, ['@babel/plugin-transform-runtime', { useESModules: true }]],
+      plugins: [
+        ...productionPlugins,
+        ['@babel/plugin-transform-runtime', { useESModules: true }],
+      ],
       ignore: ['**/*.test.js', '**/*.test.ts'],
     },
   },

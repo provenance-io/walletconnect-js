@@ -1,3 +1,4 @@
+export * from './BaseResults';
 export * from './Broadcast';
 export * from './BroadcastResults';
 export * from './ConnectData';

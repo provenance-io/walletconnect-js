@@ -6,7 +6,5 @@ export * from './markerActivate';
 export * from './markerAdd';
 export * from './markerFinalize';
 export * from './sendCoin';
-export * from './sendHash';
-export * from './sendHashBatch';
 export * from './signJWT';
 export * from './signMessage';

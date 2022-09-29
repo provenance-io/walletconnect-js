@@ -13,7 +13,7 @@ module.exports = {
   },
   mode: 'production',
   optimization: {
-    minimize: true
+    minimize: true,
   },
   plugins: [
     // Work around for Buffer is undefined:
@@ -22,7 +22,7 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.ProvidePlugin({
-        process: 'process/browser',
+      process: 'process/browser',
     }),
   ],
   module: {
@@ -37,7 +37,7 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(js|jsx)$/i,
@@ -46,27 +46,27 @@ module.exports = {
           options: {
             presets: [['@babel/preset-env']],
             plugins: [
-              "@babel/plugin-proposal-class-properties",
-              "@babel/plugin-proposal-nullish-coalescing-operator",
-              "@babel/plugin-proposal-object-rest-spread",
-              "@babel/plugin-proposal-optional-chaining",
-              "@babel/plugin-transform-object-assign",
-              "@babel/plugin-transform-react-constant-elements",
-              "@babel/plugin-transform-runtime",
-              "@babel/plugin-transform-modules-commonjs"
+              '@babel/plugin-proposal-class-properties',
+              '@babel/plugin-proposal-nullish-coalescing-operator',
+              '@babel/plugin-proposal-object-rest-spread',
+              '@babel/plugin-proposal-optional-chaining',
+              '@babel/plugin-transform-object-assign',
+              '@babel/plugin-transform-react-constant-elements',
+              '@babel/plugin-transform-runtime',
+              '@babel/plugin-transform-modules-commonjs',
             ],
-          }
-        }
-      }
+          },
+        },
+      },
     ],
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     fallback: {
       crypto: require.resolve('crypto-browserify'),
-      buffer: require.resolve("buffer/"),
-      util: require.resolve("util/"),
-      stream: require.resolve("stream-browserify")
+      buffer: require.resolve('buffer/'),
+      util: require.resolve('util/'),
+      stream: require.resolve('stream-browserify'),
     },
   },
 };

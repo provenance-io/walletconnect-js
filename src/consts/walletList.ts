@@ -25,7 +25,6 @@ export const WALLET_LIST: WalletList = [
     },
   },
   {
-    dev: true,
     id: 'provenance_extension',
     type: 'extension',
     title: 'Provenance Blockchain Wallet',

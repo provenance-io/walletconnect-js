@@ -16,6 +16,11 @@
 
 # production
 /build
+/esm
+/lib
+/docs
+/cdn
+/umd
 
 # misc
 .DS_Store
@@ -32,5 +37,5 @@ yarn-error.log*
 *.ignored.*
 ignored/
 .eslintcache
-src/version.js
-.idea/
+
+*.tgz

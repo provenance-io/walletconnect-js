@@ -1,13 +1,13 @@
 module.exports = {
-  parser: "babel",
+  parser: 'babel',
   printWidth: 85,
   singleQuote: true,
-  trailingComma: "es5",
+  trailingComma: 'es5',
   overrides: [
     {
-      files: ["*.ts", "*.tsx"],
+      files: ['*.ts', '*.tsx'],
       options: {
-        parser: "typescript",
+        parser: 'typescript',
       },
     },
   ],
