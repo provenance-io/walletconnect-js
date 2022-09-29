@@ -6,7 +6,6 @@ import USER_ICON from 'img/userIcon.svg';
 const AccountInfoContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  flex-wrap: wrap;
   @media (max-width: 1150px) {
     margin-top: 6px;
   }
