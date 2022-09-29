@@ -11,10 +11,8 @@ const root = createRoot(container!);
 root.render(
   <StrictMode>
     <WalletConnectContextProvider>
-      <>
-        <div id="portal" />
-        <App />
-      </>
+      <div id="portal" />
+      <App />
     </WalletConnectContextProvider>
   </StrictMode>
 );

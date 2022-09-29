@@ -10,7 +10,7 @@ const StateContext = createContext<ProviderState | undefined>(undefined);
 const walletConnectService = new WalletConnectService();
 
 interface Props {
-  children: React.ReactElement;
+  children: React.ReactNode;
   bridge?: string;
   timeout?: number;
 }
