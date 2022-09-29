@@ -1,16 +1,16 @@
-import styled from "styled-components";
-import { Loading } from "Components";
+import styled from 'styled-components';
+import { Loading } from 'Components';
 
 const StyledButton = styled.button<{ width: string }>`
   max-width: ${({ width }) => width};
-  ${({ width }) => width === "auto" && "min-width: 150px"};
+  ${({ width }) => width === 'auto' && 'min-width: 150px'};
   align-items: center;
   background: ${({ color }) => color};
   white-space: nowrap;
   border-radius: 6px;
   border: 1px solid ${({ color }) => color};
   color: white;
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   display: flex;
   justify-content: center;
   letter-spacing: 0.07rem;
@@ -44,13 +44,13 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button: React.FC<Props> = ({
   className,
-  color = "#376FE8",
+  color = '#376FE8',
   onClick = () => {},
   children,
   disabled = false,
-  width = "auto",
+  width = 'auto',
   title,
-  type = "button",
+  type = 'button',
   loading = false,
 }) => {
   const handleClick = () => {
@@ -66,7 +66,7 @@ export const Button: React.FC<Props> = ({
       onClick={handleClick}
       color={color.toUpperCase()}
       onKeyPress={(e) => {
-        if (e.key === "Enter") {
+        if (e.key === 'Enter') {
           handleClick();
         }
       }}

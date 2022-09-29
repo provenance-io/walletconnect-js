@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const Svg = styled.svg`
   margin: auto;
@@ -14,9 +14,9 @@ interface Props {
 
 export const Loading: React.FC<Props> = ({
   className,
-  color = "#eeeeee",
-  height = "20px",
-  width = "20px",
+  color = '#eeeeee',
+  height = '20px',
+  width = '20px',
 }) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"

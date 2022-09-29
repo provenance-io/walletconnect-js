@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const InputContainer = styled.div<{ width: string; bottomGap?: boolean }>`
   position: relative;
@@ -46,8 +46,8 @@ export const Input: React.FC<Props> = ({
   label,
   value,
   onChange,
-  placeholder = "Enter Value",
-  width = "100%",
+  placeholder = 'Enter Value',
+  width = '100%',
   bottomGap = false,
   disabled = false,
 }) => (

@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { Button } from "Components";
-import JsonFormatter from "react-json-formatter";
+import styled from 'styled-components';
+import { Button } from 'Components';
+import JsonFormatter from 'react-json-formatter';
 
 const ResultsContainer = styled.div`
   border: 1px solid rgba(60, 60, 100, 0.9);
@@ -53,7 +53,7 @@ export const Results: React.FC<Props> = ({ results, setResults }) => {
   const renderResults = () => {
     const keys = Object.keys(results!);
     return keys.map((key) =>
-      key === "data" ? (
+      key === 'data' ? (
         <span key={key}>
           <ResultRow>
             <ResultTitle>Raw Data:</ResultTitle>

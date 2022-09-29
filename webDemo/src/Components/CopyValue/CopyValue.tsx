@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import styled from "styled-components";
-import REPORTS_ICON from "img/reportsIcon.svg";
+import { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import REPORTS_ICON from 'img/reportsIcon.svg';
 
 const CopyButton = styled.div`
   cursor: pointer;
@@ -26,7 +26,7 @@ interface Props {
   title?: string;
 }
 
-export const CopyValue: React.FC<Props> = ({ value, title = "Copy Text" }) => {
+export const CopyValue: React.FC<Props> = ({ value, title = 'Copy Text' }) => {
   const [justCopied, setJustCopied] = useState(false);
   const [timeoutInstance, setTimeoutInstance] = useState(0);
 

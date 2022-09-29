@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const SelectContainer = styled.div`
   margin-bottom: 42px;
@@ -52,7 +52,7 @@ export const Dropdown: React.FC<Props> = ({
   options,
   onChange,
   value,
-  placeholder = "Select Method/Action",
+  placeholder = 'Select Method/Action',
 }) => {
   const renderOptions = () =>
     options.map((title) => (

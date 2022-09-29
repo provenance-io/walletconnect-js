@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { WINDOW_MESSAGES } from "@provenanceio/walletconnect-js";
-import { Button } from "Components";
+import { useEffect } from 'react';
+import { WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
+import { Button } from 'Components';
 
 interface Props {
   walletConnectService: {
@@ -11,26 +11,20 @@ interface Props {
   setResults: (results: any) => void;
 }
 
-export const Connect: React.FC<Props> = ({
-  walletConnectService,
-  setResults,
-}) => {
+export const Connect: React.FC<Props> = ({ walletConnectService, setResults }) => {
   useEffect(() => {
     const connectEvent = (result: any) => {
       setResults({
-        action: "connect",
-        status: "success",
-        message: "WalletConnectJS | Connected",
+        action: 'connect',
+        status: 'success',
+        message: 'WalletConnectJS | Connected',
         data: result,
       });
     };
     walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, connectEvent);
 
     return () => {
-      walletConnectService.removeListener(
-        WINDOW_MESSAGES.CONNECTED,
-        connectEvent
-      );
+      walletConnectService.removeListener(WINDOW_MESSAGES.CONNECTED, connectEvent);
     };
   }, [walletConnectService, setResults]);
 

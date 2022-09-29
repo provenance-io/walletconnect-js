@@ -6,28 +6,28 @@ export interface Field {
   width?: string;
 }
 export type WindowMessages =
-  | "MARKER_ACTIVATE"
-  | "MARKER_FINALIZE"
-  | "MARKER_ADD"
-  | "CANCEL_REQUEST"
-  | "CUSTOM_ACTION"
-  | "DELEGATE_HASH"
-  | "TRANSACTION"
-  | "TRANSACTION"
-  | "SIGN_JWT"
-  | "SIGNATURE"
-  | "TRANSACTION";
+  | 'MARKER_ACTIVATE'
+  | 'MARKER_FINALIZE'
+  | 'MARKER_ADD'
+  | 'CANCEL_REQUEST'
+  | 'CUSTOM_ACTION'
+  | 'DELEGATE_HASH'
+  | 'TRANSACTION'
+  | 'TRANSACTION'
+  | 'SIGN_JWT'
+  | 'SIGNATURE'
+  | 'TRANSACTION';
 
 export type WCJSMethod =
-  | "markerActivate"
-  | "markerFinalize"
-  | "markerAdd"
-  | "cancelRequest"
-  | "customAction"
-  | "delegateHash"
-  | "sendCoin"
-  | "signJWT"
-  | "signMessage";
+  | 'markerActivate'
+  | 'markerFinalize'
+  | 'markerAdd'
+  | 'cancelRequest'
+  | 'customAction'
+  | 'delegateHash'
+  | 'sendCoin'
+  | 'signJWT'
+  | 'signMessage';
 
 export interface Action {
   windowMessage: WindowMessages;

@@ -1,6 +1,6 @@
-import ReactDom from "react-dom";
-import React, { useRef, useEffect } from "react";
-import styled from "styled-components";
+import ReactDom from 'react-dom';
+import React, { useRef, useEffect } from 'react';
+import styled from 'styled-components';
 
 const ModalElement = styled.div`
   position: fixed;
@@ -25,20 +25,20 @@ interface Props {
 }
 
 export const Modal: React.FC<Props> = ({ children, isOpen = false, close }) => {
-  const targetElement = document.getElementById("portal");
+  const targetElement = document.getElementById('portal');
   const modalElement = useRef<HTMLInputElement>(null);
   // When this modal is open, prevent body from scrolling
   useEffect(() => {
     const documentElement = document.body;
     if (isOpen && documentElement && modalElement.current) {
       modalElement.current.focus();
-      documentElement.style.overflow = "hidden";
+      documentElement.style.overflow = 'hidden';
     } else {
-      documentElement.style.overflow = "auto";
+      documentElement.style.overflow = 'auto';
     }
 
     return () => {
-      documentElement.style.overflow = "auto";
+      documentElement.style.overflow = 'auto';
     };
   }, [isOpen]);
 
@@ -46,8 +46,8 @@ export const Modal: React.FC<Props> = ({ children, isOpen = false, close }) => {
     // Clicking outside of modal
     // use mousedown since if you start a clickdrag and end on the background it would trigger onclick and close
     if (
-      e.type === "mousedown" ||
-      (e.type === "keyup" && (e as React.KeyboardEvent).code === "Escape")
+      e.type === 'mousedown' ||
+      (e.type === 'keyup' && (e as React.KeyboardEvent).code === 'Escape')
     )
       close();
   };

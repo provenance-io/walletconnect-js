@@ -1,10 +1,11 @@
-import styled from "styled-components";
-import { useWalletConnect } from "@provenanceio/walletconnect-js";
-import { CopyValue, Button } from "Components";
-import USER_ICON from "img/userIcon.svg";
+import styled from 'styled-components';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import { CopyValue, Button } from 'Components';
+import USER_ICON from 'img/userIcon.svg';
 
 const AccountInfoContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
   flex-wrap: wrap;
   @media (max-width: 1150px) {
     margin-top: 6px;
@@ -25,7 +26,7 @@ const AccountRow = styled.div<{ end?: boolean }>`
   flex-wrap: wrap;
   align-content: center;
   line-height: 14px;
-  ${({ end }) => end && "justify-content: flex-end;"}
+  ${({ end }) => end && 'justify-content: flex-end;'}
   @media (max-width: 1150px) {
     margin-bottom: 6px;
   }
@@ -62,13 +63,13 @@ export const AccountInfo: React.FC<Props> = ({ bridgeUrl }) => {
         <AccountRow>
           <img src={USER_ICON} alt="wallet name" />
           <Title>Wallet Name:</Title>
-          <Value title={walletName || "N/A"}>{walletName || "N/A"}</Value>
+          <Value title={walletName || 'N/A'}>{walletName || 'N/A'}</Value>
           {walletName && <CopyValue value={walletName} />}
         </AccountRow>
         <AccountRow>
           <img src={USER_ICON} alt="address" />
           <Title>Address:</Title>
-          <Value>{address || "N/A"}</Value>
+          <Value>{address || 'N/A'}</Value>
           {address && <CopyValue value={address} />}
         </AccountRow>
       </Column>
@@ -76,13 +77,13 @@ export const AccountInfo: React.FC<Props> = ({ bridgeUrl }) => {
         <AccountRow>
           <img src={USER_ICON} alt="public key" />
           <Title>Public Key:</Title>
-          <Value>{publicKey || "N/A"}</Value>
+          <Value>{publicKey || 'N/A'}</Value>
           {publicKey && <CopyValue value={publicKey} />}
         </AccountRow>
         <AccountRow>
           <img src={USER_ICON} alt="bridge url" />
           <Title>Bridge Url:</Title>
-          <Value>{bridgeUrl || "N/A"}</Value>
+          <Value>{bridgeUrl || 'N/A'}</Value>
           {bridgeUrl && <CopyValue value={bridgeUrl} />}
         </AccountRow>
       </Column>

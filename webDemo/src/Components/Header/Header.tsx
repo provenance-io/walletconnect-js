@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import { AccountInfo, Subheader } from "Components";
-import PROVENANCE_LOGO from "img/provenanceLogo.svg";
-import { REACT_APP_WCJS_VERSION } from "../../version";
+import styled from 'styled-components';
+import { AccountInfo, Subheader } from 'Components';
+import PROVENANCE_LOGO from 'img/provenanceLogo.svg';
+import { REACT_APP_WCJS_VERSION } from '../../version';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -79,7 +79,7 @@ export const Header: React.FC<Props> = (
           target="_blank"
           rel="noreferrer"
         >
-          v{REACT_APP_WCJS_VERSION || "v??.??.??"}
+          v{REACT_APP_WCJS_VERSION || 'v??.??.??'}
         </a>
       </Title>
     </Group>

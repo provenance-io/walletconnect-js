@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import styled from "styled-components";
-import { formatSeconds } from "utils";
-import { useInterval } from "hooks";
+import { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { formatSeconds } from 'utils';
+import { useInterval } from 'hooks';
 
 const Time = styled.div`
-  font-family: "Courier New", Courier, monospace;
+  font-family: 'Courier New', Courier, monospace;
   font-weight: bold;
   line-height: 1.3rem;
   margin-top: 2px;
@@ -19,29 +19,25 @@ interface Props {
   };
 }
 
-export const CountdownTimer: React.FC<Props> = ({
-  expires,
-  onEnd,
-  timeEvents,
-}) => {
+export const CountdownTimer: React.FC<Props> = ({ expires, onEnd, timeEvents }) => {
   // Get current time in seconds and compare it to expiration
   const timeNow = Math.ceil(new Date().getTime() / 1000);
   const initialStartTime = expires - timeNow >= 0 ? expires - timeNow : 0; // Don't allow negative numbers, stop at 0
   const [currentTime, setCurrentTime] = useState(initialStartTime);
-  const [countdownState, setCountdownState] = useState("init"); // init => start => running => end
+  const [countdownState, setCountdownState] = useState('init'); // init => start => running => end
   const [remainingTimeEvents, setRemainingTimeEvents] = useState(timeEvents);
   const [refreshRate, setRefreshRate] = useState(1000);
 
   // Detect change to start time (refreshed/new JWT)
   useEffect(() => {
     // We handle the first init in the next use effect, this is for a new change/refresh
-    setCountdownState("start");
+    setCountdownState('start');
   }, [expires]);
 
   // Initial start to timer
   useEffect(() => {
-    if (countdownState === "start") {
-      setCountdownState("running");
+    if (countdownState === 'start') {
+      setCountdownState('running');
       // reset/update currentTime
       setCurrentTime(initialStartTime);
       // Clean up the already expired timed events
@@ -86,13 +82,13 @@ export const CountdownTimer: React.FC<Props> = ({
         // Clear the current interval
         setRefreshRate(0);
         // Update countdown state to ended
-        setCountdownState("end");
+        setCountdownState('end');
         // Run onEnd callback function
         if (onEnd) onEnd();
       }
     },
     refreshRate,
-    countdownState === "end"
+    countdownState === 'end'
   );
 
   return <Time>{formatSeconds(currentTime)}</Time>;

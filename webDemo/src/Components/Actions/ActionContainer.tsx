@@ -1,11 +1,11 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const Container = styled.div<{
   inputCount: number;
   isLoading?: boolean;
   noMargin?: boolean;
 }>`
-  padding: ${({ inputCount }) => (inputCount ? "34px 20px 20px 20px" : "20px")};
+  padding: ${({ inputCount }) => (inputCount ? '34px 20px 20px 20px' : '20px')};
   border: 1px solid rgba(60, 60, 100, 0.9);
   background: rgba(10, 10, 30, 0.9);
   border-radius: 5px;
@@ -13,8 +13,8 @@ const Container = styled.div<{
   max-width: 100%;
   align-items: center;
   justify-content: center;
-  ${({ noMargin }) => !noMargin && "margin-bottom: 30px;"}
-  flex-wrap: ${({ inputCount }) => (inputCount > 2 ? "wrap" : "nowrap")};
+  ${({ noMargin }) => !noMargin && 'margin-bottom: 30px;'}
+  flex-wrap: ${({ inputCount }) => (inputCount > 2 ? 'wrap' : 'nowrap')};
   @media (max-width: 1150px) {
     flex-wrap: wrap;
     justify-content: flex-start;
