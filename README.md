@@ -124,7 +124,6 @@ To start the connection from dApp to wallet you will need to initiate the connec
 
 - Takes in the following params:
   - `walletConnectService`: Service pulled out of `useWalletConnect()` hook (Required)
-  - `walletConnectState`: State pulled out of `useWalletConnect()` hook (Required)
   - `devWallets`: Array of allowed dev wallets to connect into. (Optional)
     - For list of available wallets see `src/consts/walletList.ts`
 - Usage:
@@ -133,13 +132,12 @@ To start the connection from dApp to wallet you will need to initiate the connec
   import { useWalletConnect, QRCodeModal } from '@provenanceio/walletconnect-js';
   ...
   export const App = () => {
-    const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
+    const { walletConnectService: wcs } = useWalletConnect();
     ...
     return (
       <QRCodeModal
         walletConnectService={wcs}
-        walletConnectState={walletConnectState}
-        devWallets={['figure_web', 'provenance_extension']}
+        devWallets={['figure_web']}
       />
     )
   };
@@ -258,21 +256,6 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | denom    | string | no       | `'Hash'`                                                          | `'Hash'`                                     | Coin's Denom                                        |
   | gasPrice | object | no       | `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` | `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` | Optional gasPrice object, defaults to Figure values |
 
-- #### sendHash
-
-  NOTE: Depricated, use sendCoin instead. Send a custom amount of Hash token to a custom address
-
-  ```js
-  walletConnectService.sendHash({ to, amount });
-  // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
-  ```
-
-  | Param    | Type   | Required | Default                                                           | Example                                      | Info                                                |
-  | -------- | ------ | -------- | ----------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
-  | to       | string | yes      | -                                                                 | `'tpa1b23...'`                               | Target wallet address                               |
-  | amount   | number | yes      | -                                                                 | `10`                                         | Amount to use                                       |
-  | gasPrice | object | no       | `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` | `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` | Optional gasPrice object, defaults to Figure values |
-
 - #### signJWT
 
   Prompt user to sign a generated JWT
@@ -284,7 +267,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
 
   | Param  | Type   | Required | Default                | Example      | Info                                    |
   | ------ | ------ | -------- | ---------------------- | ------------ | --------------------------------------- |
-  | expire | number | no       | 24 hours (now + 86400) | `1647020269` | Custom expiration date (seconds) of JWT |
+  | expire | number | no       | 24 hours (Date.now() + 86400) | `1647020269` | Custom expiration date (ms) of JWT |
 
 - #### signMessage
   Prompt user to sign a custom message
@@ -304,8 +287,9 @@ React hook which contains `walletConnectService` and `walletConnectState`
     account: '', // Figure account uuid [string]
     address: '', // Wallet address [string]
     connected: false, // WalletConnect connected [bool]
-    connectionIat: null, // WalletConnect initialized at time [number]
     connectionEat: null, // WalletConnect expires at time [number]
+    connectionIat: null, // WalletConnect initialized at time [number]
+    connectionTimeout: 1800, // Default timeout duration (seconds)
     connector: null, // WalletConnect connector
     figureConnected: false, // Account and address both exist [bool]
     isMobile: false, // Is the connected browser a mobile device [bool]
@@ -317,6 +301,8 @@ React hook which contains `walletConnectService` and `walletConnectState`
     QRCodeUrl: '', // QRCode url contained within image [string]
     showQRCodeModal: false, // Should the QR modal be open [bool]
     signedJWT: '', // Signed JWT token [string]
+    walletApp: '', // What type of wallet is this "provenance_extension" | "provenance_mobile" | "figure_web"
+    walletInfo: {}, // Contains wallet coin, id, and name
   }
   ```
 
@@ -328,7 +314,7 @@ To see how to initiate and run the webDemo, look through the [webDemo README.md]
 - Quick Start:
   1. Pull down the latest `walletconnect-js`.
   2. Run `npm i` to install all the required node packages
-  3. Run `npm run start` to launch a localhost demo, live updates take place on each page reload.
+  3. Run `npm run start` to launch a localhost demo.
 
 ## Non React Setup
 
@@ -342,6 +328,7 @@ You can find this package on `https://unpkg.com/`: - Note: Change the version in
 ### Using Imports
 
 There are a few differences in getting setup and running: 1) Note [Webpack 5 Issues](#Webpack-5-Issues) 2) When connecting, you will need to manually generate the QR code image element (Component is only available to React.js apps) 3) Don't use the default imports (`@provenanceio/walletconnect-js`), instead pull the service from `@provenanceio/walletconnect-js/lib/service` 4) Don't forget to set up event and loading listeners \* Basic non-React.js example with
+
 ```js
 import { WalletConnectService, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js/lib/service';
 
@@ -404,7 +391,7 @@ import { WalletConnectService, WINDOW_MESSAGES } from '@provenanceio/walletconne
       };
       // Run on app load
       init();
-      ```
+```
 
 ## Webpack 5 Issues
 
@@ -415,7 +402,7 @@ BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules 
 This is no longer the case. Verify if you need this module and configure a polyfill for it.
 ```
 
-To fix this issue, add the following plugins and module rules to your `webpack.config.js` (Note, having `file-loader` allows for svg logos to load):
+To fix this issue, add the following plugins and module rules to your `webpack.config.js`:
 
 ```js
 const webpack = require('webpack');
@@ -433,18 +420,6 @@ module.exports = {
         process: 'process/browser',
     }),
   ],
-  module: {
-    rules: [
-      {
-        test: /\.(png|jpe?g|gif|svg)$/i,
-        use: [
-          {
-            loader: 'file-loader',
-          },
-        ],
-      },
-    ],
-  },
   resolve: {
     extensions: ['.js'],
     fallback: {
@@ -456,19 +431,49 @@ module.exports = {
   },
 };
 ```
+If using React Create App, you will need to install a new package called `react-app-rewired`.  After installing, swap your `react-scripts` start command with `react-app-rewired` start. Create a new file named `config-overrides.js` in the root of your project as follows:
+```js
+const webpack = require("webpack");
+
+module.exports = function override(config) {
+  // Pull any existing fallbacks from config, or make a new fallback object
+  const fallback = config.resolve.fallback || {};
+  // Merge/add new webpack fallbacks
+  Object.assign(fallback, {
+    crypto: require.resolve("crypto-browserify"),
+    buffer: require.resolve("buffer/"),
+    stream: require.resolve("stream-browserify"),
+    util: require.resolve("util/"),
+  });
+  // Set new fallback into config
+  config.resolve.fallback = fallback;
+  // Combine new plugins with any existing plugins
+  config.plugins = (config.plugins || []).concat([
+    new webpack.ProvidePlugin({
+      process: "process/browser",
+      Buffer: ["buffer", "Buffer"],
+    }),
+  ]);
+  // Return updated/modified webpack config
+  return config;
+};
+
+```
 
 Next, make sure to have the following packages added into your `package.json` dependencies or devDependencies list:
 
 ```json
   "buffer",
   "crypto-browserify",
-  "file-loader",
   "process",
   "stream-browserify",
   "util"
 ```
-
-`npm i --save-dev buffer crypto-browserify file-loader process stream-browserify util`
+Quickly add these to your dependencies with this command: 
+```js
+npm i --save-dev buffer crypto-browserify process stream-browserify util
+```
+For more information/examples, look through the `webDemo` files and structure which uses these methods.
 
 ## Automatic localSession copy
 
