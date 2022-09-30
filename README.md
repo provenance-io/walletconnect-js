@@ -27,7 +27,6 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
    - [delegateHash](#delegateHash)
    - [disconnect](#disconnect)
    - [sendCoin](#sendCoin)
-   - [sendHash](#sendHash)
    - [signJWT](#signJWT)
    - [signMessage](#signMessage)
 7. [walletConnectState](#walletConnectState)
