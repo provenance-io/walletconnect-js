@@ -104,14 +104,9 @@ export const App = () => {
       return null;
     });
 
-  const changeBridgeUrl = (value: string) => {
-    setBridgeUrl(value);
-    wcs.setBridge(value);
-  };
-
   return (
     <HomeContainer>
-      <Header bridgeUrl={bridgeUrl} />
+      <Header />
       <ContentBack>
         <ContentCover />
         {connected ? (
@@ -147,11 +142,11 @@ export const App = () => {
             <Dropdown
               placeholder="Select Bridge"
               options={BRIDGE_URLS}
-              onChange={changeBridgeUrl}
+              onChange={setBridgeUrl}
               value={BRIDGE_URLS[0]}
             />
             <Title>Connect Wallet</Title>
-            <Connect walletConnectService={wcs} setResults={setResults} />
+            <Connect setResults={setResults} bridge={bridgeUrl} />
           </>
         )}
       </ContentBack>

@@ -1,14 +1,13 @@
 import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
-import { State, SetState } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
-import { BaseResults } from '../../types';
+import type { BaseResults, WCSState, WCSSetState } from '../../types';
 
 export const signJWT = async (
-  state: State,
-  setState: SetState,
+  state: WCSState,
+  setState: WCSSetState,
   expires?: number
 ): Promise<BaseResults> => {
   let valid = false;

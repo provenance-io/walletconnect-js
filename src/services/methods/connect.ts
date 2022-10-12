@@ -1,19 +1,24 @@
 import WalletConnectClient from '@walletconnect/client';
 import QRCode from 'qrcode';
-import { Broadcast, ConnectData, AccountInfo } from '../../types';
+import type {
+  Broadcast,
+  ConnectData,
+  AccountInfo,
+  WCSState,
+  WCSSetState,
+} from '../../types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
-import { SetState, State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 interface ConnectProps {
-  state: State;
-  setState: SetState;
+  state: WCSState;
+  setState: WCSSetState;
   resetState: () => void;
   broadcast: Broadcast;
-  bridge: string;
+  customBridge?: string;
   startConnectionTimer: () => void;
-  getState: () => State;
+  getState: () => WCSState;
 }
 
 export const connect = async ({
@@ -21,10 +26,12 @@ export const connect = async ({
   setState,
   resetState,
   broadcast,
-  bridge,
+  customBridge,
   startConnectionTimer,
   getState,
 }: ConnectProps) => {
+  // Either use the custom bridge passed in, or default back to stage bridge
+  const bridge = customBridge || state.bridge;
   // -------------------
   // PULL ACCOUNT INFO
   // -------------------
@@ -64,6 +71,7 @@ export const connect = async ({
       const signedJWT = state.signedJWT || lastConnectJWT;
       setState({
         address,
+        bridge,
         publicKey,
         connected: true,
         signedJWT,
@@ -99,6 +107,7 @@ export const connect = async ({
     const connectionEat = state.connectionTimeout + connectionIat;
     setState({
       address,
+      bridge,
       publicKey,
       peer,
       connected: true,
@@ -183,12 +192,13 @@ export const connect = async ({
     }
     // Update Connector
     setState({
-      connector: newConnector,
-      connected: !!address,
       address,
+      bridge,
+      connected: !!address,
+      connector: newConnector,
+      peer,
       publicKey,
       signedJWT,
-      peer,
       walletInfo,
     });
   };

@@ -1,12 +1,11 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { Message } from 'google-protobuf';
 import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
-import { SendCoinData } from '../../types';
-import { State } from '../walletConnectService';
+import type { SendCoinData, WCSState } from '../../types';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
 
-export const sendCoin = async (state: State, data: SendCoinData) => {
+export const sendCoin = async (state: WCSState, data: SendCoinData) => {
   let valid = false;
   const { connector, address, walletApp } = state;
   const {

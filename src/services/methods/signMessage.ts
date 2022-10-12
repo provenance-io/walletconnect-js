@@ -1,10 +1,10 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
-import { State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
+import type { WCSState } from '../../types';
 
-export const signMessage = async (state: State, message: string) => {
+export const signMessage = async (state: WCSState, message: string) => {
   let valid = false;
   const { connector, address, publicKey: pubKeyB64, walletApp } = state;
   const method = 'provenance_sign';

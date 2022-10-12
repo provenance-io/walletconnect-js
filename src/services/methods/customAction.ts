@@ -1,10 +1,10 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { CustomActionData } from '../../types';
-import { State } from '../walletConnectService';
+import type { WCSState } from '../../types';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
 
-export const customAction = async (state: State, data: CustomActionData) => {
+export const customAction = async (state: WCSState, data: CustomActionData) => {
   let valid = false;
   const {
     message: rawB64Message,

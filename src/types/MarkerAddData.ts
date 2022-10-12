@@ -1,5 +1,5 @@
-import { MarkerData } from './MarkerData';
+import type { MarkerData } from './MarkerData';
 
 export type MarkerAddData = MarkerData & {
-  amount: number,
+  amount: number;
 };

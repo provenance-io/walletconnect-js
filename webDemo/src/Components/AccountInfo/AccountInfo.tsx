@@ -42,14 +42,16 @@ const Value = styled.div`
   margin-right: 4px;
 `;
 
-interface Props {
-  bridgeUrl?: string;
-}
-
-export const AccountInfo: React.FC<Props> = ({ bridgeUrl }) => {
+export const AccountInfo: React.FC = () => {
   // eslint-disable-line react/prop-types
   const { walletConnectService, walletConnectState } = useWalletConnect();
-  const { address, publicKey, walletInfo = {}, connected } = walletConnectState;
+  const {
+    address,
+    publicKey,
+    walletInfo = {},
+    connected,
+    bridge,
+  } = walletConnectState;
   const { name: walletName } = walletInfo;
 
   const handleDisconnect = () => {
@@ -82,8 +84,8 @@ export const AccountInfo: React.FC<Props> = ({ bridgeUrl }) => {
         <AccountRow>
           <img src={USER_ICON} alt="bridge url" />
           <Title>Bridge Url:</Title>
-          <Value>{bridgeUrl || 'N/A'}</Value>
-          {bridgeUrl && <CopyValue value={bridgeUrl} />}
+          <Value>{bridge || 'N/A'}</Value>
+          {bridge && <CopyValue value={bridge} />}
         </AccountRow>
       </Column>
       {connected && (

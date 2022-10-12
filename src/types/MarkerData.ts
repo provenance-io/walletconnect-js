@@ -1,7 +1,7 @@
-import { GasPrice } from './GasPriceType'
+import type { GasPrice } from './GasPriceType';
 
 export type MarkerData = {
-  amount?: number,
-  denom: string,
-  gasPrice?: GasPrice
+  amount?: number;
+  denom: string;
+  gasPrice?: GasPrice;
 };

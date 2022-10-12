@@ -143,7 +143,7 @@ export const ALL_ACTIONS: Action[] = [
       {
         name: 'to',
         label: 'Coin To',
-        value: 'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6',
+        value: 'tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh',
         placeholder: 'Enter Address',
         width: '70%',
       },

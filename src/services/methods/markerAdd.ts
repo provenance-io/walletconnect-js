@@ -10,14 +10,13 @@ import {
 import { MsgAddMarkerRequest } from '@provenanceio/wallet-utils/esm/proto/provenance/marker/v1/tx_pb';
 import { Coin } from '@provenanceio/wallet-utils/esm/proto/cosmos/base/v1beta1/coin_pb';
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
-import { MarkerAddData } from '../../types';
-import { State } from '../walletConnectService';
+import type { MarkerAddData, WCSState } from '../../types';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
 
 // Wallet-lib delegate message proto:
 // https://github.com/provenance-io/wallet-lib/blob/bac70a7fe6a9ad784ff4cc7fe440b68cfe598c47/src/services/message-service.ts#L396
-export const markerAdd = async (state: State, data: MarkerAddData) => {
+export const markerAdd = async (state: WCSState, data: MarkerAddData) => {
   let valid = false;
   const { connector, address, walletApp } = state;
   const { denom, amount, gasPrice } = data;

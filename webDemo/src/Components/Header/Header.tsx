@@ -60,13 +60,7 @@ const LogoImg = styled.img`
   margin-right: 20px;
 `;
 
-interface Props {
-  bridgeUrl: string;
-}
-
-export const Header: React.FC<Props> = (
-  { bridgeUrl } // eslint-disable-line react/prop-types
-) => (
+export const Header: React.FC = () => (
   <Wrapper>
     <Group>
       <Logo>
@@ -84,7 +78,7 @@ export const Header: React.FC<Props> = (
       </Title>
     </Group>
     <Group>
-      <AccountInfo bridgeUrl={bridgeUrl} />
+      <AccountInfo />
     </Group>
     <Subheader />
   </Wrapper>

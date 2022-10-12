@@ -1,17 +1,14 @@
 import { useEffect } from 'react';
-import { WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
+import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Button } from 'Components';
 
 interface Props {
-  walletConnectService: {
-    addListener: (a: string, b: (results: any) => void) => void;
-    removeListener: (a: string, b: (results: any) => void) => void;
-    connect: () => void;
-  };
   setResults: (results: any) => void;
+  bridge: string;
 }
 
-export const Connect: React.FC<Props> = ({ walletConnectService, setResults }) => {
+export const Connect: React.FC<Props> = ({ setResults, bridge }) => {
+  const { walletConnectService: wcs } = useWalletConnect();
   useEffect(() => {
     const connectEvent = (result: any) => {
       setResults({
@@ -21,15 +18,15 @@ export const Connect: React.FC<Props> = ({ walletConnectService, setResults }) =
         data: result,
       });
     };
-    walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, connectEvent);
+    wcs.addListener(WINDOW_MESSAGES.CONNECTED, connectEvent);
 
     return () => {
-      walletConnectService.removeListener(WINDOW_MESSAGES.CONNECTED, connectEvent);
+      wcs.removeListener(WINDOW_MESSAGES.CONNECTED, connectEvent);
     };
-  }, [walletConnectService, setResults]);
+  }, [wcs, setResults]);
 
   return (
-    <Button width="200px" onClick={walletConnectService.connect}>
+    <Button width="200px" onClick={() => wcs.connect(bridge)}>
       Connect
     </Button>
   );

@@ -1,24 +1,25 @@
 import events from 'events';
-import WalletConnectClient from '@walletconnect/client';
-import {
+import type {
+  AccountInfo,
+  AccountObject,
   Broadcast,
   BroadcastResults,
   CustomActionData,
-  IClientMeta,
+  DelegateHashData,
   MarkerAddData,
   MarkerData,
   SendCoinData,
-  SendHashBatchData,
-  SendHashData,
-  AccountInfo,
-  AccountObject,
+  WalletConnectClientType,
   WalletInfo,
-  WalletId,
+  WCJSLocalState,
+  WCSSetFullState,
+  WCSSetState,
+  WCSState,
 } from '../types';
 import {
   WINDOW_MESSAGES,
-  WALLETCONNECT_BRIDGE_URL,
   CONNECTION_TIMEOUT,
+  WALLETCONNECT_BRIDGE_URL,
 } from '../consts';
 import {
   markerActivate as markerActivateMethod,
@@ -34,49 +35,15 @@ import {
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
 
-interface WCJSState {
-  account: string;
-  connectionEat: number;
-  connectionIat: number;
-  connectionTimeout: number;
-  figureConnected: boolean;
-  newAccount: false;
-  signedJWT: string;
-  walletApp?: WalletId | '';
-}
-
 // Check for existing values from localStorage
-const existingWCState: WalletConnectClient = getFromLocalStorage('walletconnect');
-const existingWCJSState: WCJSState = getFromLocalStorage('walletconnect-js');
+const existingWCState: WalletConnectClientType =
+  getFromLocalStorage('walletconnect');
+const existingWCJSState: WCJSLocalState = getFromLocalStorage('walletconnect-js');
 
-export interface State {
-  account: string;
-  address: string;
-  connected: boolean;
-  connectionEat: number | null;
-  connectionIat: number | null;
-  connectionTimeout: number;
-  connector: WalletConnectClient | null;
-  figureConnected: boolean;
-  isMobile: boolean;
-  loading: string;
-  newAccount: boolean;
-  peer: IClientMeta | null;
-  publicKey: string;
-  QRCode: string;
-  QRCodeUrl: string;
-  showQRCodeModal: boolean;
-  signedJWT: string;
-  walletApp?: WalletId | '';
-  walletInfo: WalletInfo;
-}
-
-export type SetState = (state: Partial<State>) => void;
-export type SetFullState = (state: State) => void;
-
-const defaultState: State = {
+const defaultState: WCSState = {
   account: '',
   address: '',
+  bridge: WALLETCONNECT_BRIDGE_URL,
   connected: false,
   connectionEat: null,
   connectionIat: null,
@@ -124,9 +91,10 @@ const getAccountItem = (itemName: keyof AccountObject) => {
   return accountsObj[itemName];
 };
 
-const initialState: State = {
+const initialState: WCSState = {
   account: existingWCJSState.account || defaultState.account,
   address: (getAccountItem('address') as string) || defaultState.address,
+  bridge: existingWCState.bridge || defaultState.bridge,
   connected: existingWCState.connected || defaultState.connected,
   connectionEat: existingWCJSState.connectionEat || defaultState.connectionEat,
   connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
@@ -151,13 +119,11 @@ const initialState: State = {
 export class WalletConnectService {
   #eventEmitter = new events.EventEmitter();
 
-  #setWalletConnectState: SetFullState | undefined = undefined;
+  #setWalletConnectState: WCSSetFullState | undefined = undefined;
 
   #connectionTimer = 0;
 
-  #bridge: string = WALLETCONNECT_BRIDGE_URL;
-
-  state: State = { ...initialState };
+  state: WCSState = { ...initialState };
 
   // *** Event Listener *** (https://nodejs.org/api/events.html)
   // Instead of having to use walletConnectService.eventEmitter.addListener()
@@ -220,12 +186,6 @@ export class WalletConnectService {
     this.#startConnectionTimer();
   };
 
-  // Update bridge by passing it through as a prop on the provider
-
-  setBridge(bridge: string) {
-    this.#bridge = bridge;
-  }
-
   updateState(): void {
     if (this.#setWalletConnectState) {
       this.#setWalletConnectState({
@@ -234,7 +194,7 @@ export class WalletConnectService {
     }
   }
 
-  setStateUpdater(setWalletConnectState: SetFullState): void {
+  setStateUpdater(setWalletConnectState: WCSSetFullState): void {
     this.#setWalletConnectState = setWalletConnectState;
   }
 
@@ -243,7 +203,7 @@ export class WalletConnectService {
     this.updateState();
   };
 
-  #updateLocalStorage = (updatedState: Partial<State>) => {
+  #updateLocalStorage = (updatedState: Partial<WCSState>) => {
     // Special values to look for
     const {
       account,
@@ -272,7 +232,7 @@ export class WalletConnectService {
     }
   };
 
-  setState: SetState = (updatedState) => {
+  setState: WCSSetState = (updatedState) => {
     // Check if connected and account exists to update 'figureConnected' state
     const figureConnected =
       (!!this.state.account || !!updatedState.account) &&
@@ -360,13 +320,13 @@ export class WalletConnectService {
     this.#resetConnectionTimeout();
   };
 
-  connect = async () => {
+  connect = async (customBridge?: string) => {
     await connectMethod({
       state: this.state,
       setState: this.setState,
       resetState: this.resetState,
       broadcast: this.#broadcastEvent,
-      bridge: this.#bridge,
+      customBridge,
       startConnectionTimer: this.#startConnectionTimer,
       getState: this.#getState,
     });
@@ -387,7 +347,7 @@ export class WalletConnectService {
     this.#resetConnectionTimeout();
   };
 
-  delegateHash = async (data: SendHashData) => {
+  delegateHash = async (data: DelegateHashData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'delegateHash' });
     const result = await delegateHashMethod(this.state, data);

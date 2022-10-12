@@ -1,8 +1,8 @@
-import { MarkerData } from './MarkerData';
-import { MarkerAddData } from './MarkerAddData';
-import { CustomActionData } from './CustomActionData';
-import { SendCoinData } from './SendCoinData';
-import { SendHashData } from './SendHashData';
+import type { MarkerData } from './MarkerData';
+import type { MarkerAddData } from './MarkerAddData';
+import type { CustomActionData } from './CustomActionData';
+import type { SendCoinData } from './SendCoinData';
+import type { DelegateHashData } from './DelegateHash';
 
 export type BaseResults = {
   valid: boolean;
@@ -12,7 +12,7 @@ export type BaseResults = {
     | MarkerAddData
     | CustomActionData
     | SendCoinData
-    | SendHashData
+    | DelegateHashData
     | string
     | number;
   error?: string | Error | unknown;

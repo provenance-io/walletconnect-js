@@ -1,12 +1,11 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { MsgActivateRequest } from '@provenanceio/wallet-utils/esm/proto/provenance/marker/v1/tx_pb';
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
-import { MarkerData } from '../../types';
-import { State } from '../walletConnectService';
+import type { MarkerData, WCSState } from '../../types';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
 
-export const markerActivate = async (state: State, data: MarkerData) => {
+export const markerActivate = async (state: WCSState, data: MarkerData) => {
   let valid = false;
   const { connector, address, walletApp } = state;
   const { denom, gasPrice } = data;

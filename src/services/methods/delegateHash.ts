@@ -1,14 +1,13 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { Message } from 'google-protobuf';
 import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
-import { SendHashData } from '../../types';
-import { State } from '../walletConnectService';
+import type { DelegateHashData, WCSState } from '../../types';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
 
 // Wallet-lib delegate message proto:
 // https://github.com/provenance-io/wallet-lib/blob/bac70a7fe6a9ad784ff4cc7fe440b68cfe598c47/src/services/message-service.ts#L396
-export const delegateHash = async (state: State, data: SendHashData) => {
+export const delegateHash = async (state: WCSState, data: DelegateHashData) => {
   let valid = false;
   const method = 'provenance_sendTransaction';
   const type = 'MsgDelegate';

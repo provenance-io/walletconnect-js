@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { WalletConnectService, State } from '../services';
+import { WalletConnectService } from '../services';
+import type { WCSState } from '../types';
 
 interface ProviderState {
   walletConnectService: WalletConnectService;
-  walletConnectState: State;
+  walletConnectState: WCSState;
 }
 
 const StateContext = createContext<ProviderState | undefined>(undefined);
@@ -11,16 +12,11 @@ const walletConnectService = new WalletConnectService();
 
 interface Props {
   children: React.ReactNode;
-  bridge?: string;
   timeout?: number;
 }
 
-const WalletConnectContextProvider: React.FC<Props> = ({
-  children,
-  bridge,
-  timeout,
-}) => {
-  const [walletConnectState, setWalletConnectState] = useState<State>({
+const WalletConnectContextProvider: React.FC<Props> = ({ children, timeout }) => {
+  const [walletConnectState, setWalletConnectState] = useState<WCSState>({
     ...walletConnectService.state,
   });
   const { address } = walletConnectState;
@@ -28,9 +24,6 @@ const WalletConnectContextProvider: React.FC<Props> = ({
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
     // If custom props are passed in, update the defaults
-    if (bridge) {
-      walletConnectService.setBridge(bridge);
-    }
     if (timeout) {
       walletConnectService.setState({ connectionTimeout: timeout });
     }

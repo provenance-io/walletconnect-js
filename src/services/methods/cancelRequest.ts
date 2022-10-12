@@ -1,11 +1,11 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { MsgCancelRequest } from '@provenanceio/wallet-utils/esm/proto/provenance/marker/v1/tx_pb';
 import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
-import { State } from '../walletConnectService';
+import type { WCSState } from '../../types';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
 
-export const cancelRequest = async (state: State, denom: string) => {
+export const cancelRequest = async (state: WCSState, denom: string) => {
   let valid = false;
   const { connector, address, walletApp } = state;
   const method = 'provenance_sendTransaction';
