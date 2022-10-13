@@ -411,7 +411,7 @@ export const QRCodeModal: React.FC<Props> = ({
             <ToggleNotch
               active={view === 'qr'}
               onClick={() => setView('qr')}
-              className="wcjs-qr-notch"
+              className={`wcjs-qr-notch ${view === 'qr' ? 'active' : ''}`}
             >
               QR Code
             </ToggleNotch>
@@ -420,7 +420,7 @@ export const QRCodeModal: React.FC<Props> = ({
             <ToggleNotch
               active={view === 'desktop'}
               onClick={() => setView('desktop')}
-              className="wcjs-qr-notch"
+              className={`wcjs-qr-notch ${view === 'desktop' ? 'active' : ''}`}
             >
               Desktop
             </ToggleNotch>
@@ -429,7 +429,7 @@ export const QRCodeModal: React.FC<Props> = ({
             <ToggleNotch
               active={view === 'mobile'}
               onClick={() => setView('mobile')}
-              className="wcjs-qr-notch"
+              className={`wcjs-qr-notch ${view === 'mobile' ? 'active' : ''}`}
             >
               Mobile
             </ToggleNotch>
