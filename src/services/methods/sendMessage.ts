@@ -1,17 +1,18 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import { MsgActivateRequest } from '@provenanceio/wallet-utils/esm/proto/provenance/marker/v1/tx_pb';
-import * as GoogleProtobufAnyPb from 'google-protobuf/google/protobuf/any_pb';
-import type { MarkerData, WCSState } from '../../types';
+import { SendMessageData } from '../../types';
+import type { WCSState } from '../../types';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
 
-export const markerActivate = async (state: WCSState, data: MarkerData) => {
+export const sendMessage = async (state: WCSState, data: SendMessageData) => {
   let valid = false;
+  const {
+    message: rawB64Message,
+    description = 'Send Message',
+    method = 'provenance_sendTransaction',
+    gasPrice,
+  } = data;
   const { connector, address, walletApp } = state;
-  const { denom, gasPrice } = data;
-  const method = 'provenance_sendTransaction';
-  const description = 'Activate Marker';
-  const protoMessage = 'provenance.marker.v1.MsgActivateRequest';
   const metadata = JSON.stringify({
     description,
     address,
@@ -25,24 +26,17 @@ export const markerActivate = async (state: WCSState, data: MarkerData) => {
     method,
     params: [metadata],
   };
-
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
-  const msgActivateRequest = new MsgActivateRequest();
-  msgActivateRequest.setDenom(denom);
-  msgActivateRequest.setAdministrator(address);
-
-  /* Convert the add marker message to any bytes for signing */
-  const msgAny = new GoogleProtobufAnyPb.Any();
-  msgAny.pack(msgActivateRequest.serializeBinary(), protoMessage, '/');
-  const binary = String.fromCharCode(...msgAny.serializeBinary());
-  const message = window.btoa(binary);
-
-  // encode message (hex)
-  const hexMsg = convertUtf8ToHex(message);
-  request.params.push(hexMsg);
+  // If message isn't an array, turn it into one
+  const b64MessageArray = Array.isArray(rawB64Message)
+    ? rawB64Message
+    : [rawB64Message];
+  // Convert to hex
+  const hexMsgArray = b64MessageArray.map((msg) => convertUtf8ToHex(msg));
+  request.params.push(...hexMsgArray);
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
@@ -53,6 +47,7 @@ export const markerActivate = async (state: WCSState, data: MarkerData) => {
     const result = await connector.sendCustomRequest(request);
     // TODO verify transaction ID
     valid = !!result;
+
     // result is a hex encoded signature
     return { valid, result, data, request };
   } catch (error) {

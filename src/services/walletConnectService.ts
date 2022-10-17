@@ -4,11 +4,7 @@ import type {
   AccountObject,
   Broadcast,
   BroadcastResults,
-  CustomActionData,
-  DelegateHashData,
-  MarkerAddData,
-  MarkerData,
-  SendCoinData,
+  SendMessageData,
   WalletConnectClientType,
   WalletInfo,
   WCJSLocalState,
@@ -22,16 +18,10 @@ import {
   WALLETCONNECT_BRIDGE_URL,
 } from '../consts';
 import {
-  markerActivate as markerActivateMethod,
-  markerAdd as markerAddMethod,
-  cancelRequest as cancelRequestMethod,
   connect as connectMethod,
-  customAction as customActionMethod,
-  delegateHash as delegateHashMethod,
-  sendCoin as sendCoinMethod,
+  sendMessage as sendMessageMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
-  markerFinalize as markerFinalizeMethod,
 } from './methods';
 import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
 
@@ -249,76 +239,11 @@ export class WalletConnectService {
   };
 
   // All Wallet Methods here
-  // - Marker Activate
-  // - Marker Add
-  // - Cancel Request
   // - Connect
-  // - CustomAction
-  // - Delegate Hash
+  // - SendMessage
   // - Disconnect
-  // - Send Hash
   // - Sign JWT
   // - Sign Message
-
-  markerActivate = async (data: MarkerData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'markerActivate' });
-    const result = await markerActivateMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.MARKER_ACTIVATE_FAILED
-      : WINDOW_MESSAGES.MARKER_ACTIVATE_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  markerFinalize = async (data: MarkerData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'markerFinalize' });
-    const result = await markerFinalizeMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.MARKER_FINALIZE_FAILED
-      : WINDOW_MESSAGES.MARKER_FINALIZE_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  markerAdd = async (data: MarkerAddData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'markerAdd' });
-    const result = await markerAddMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.MARKER_ADD_FAILED
-      : WINDOW_MESSAGES.MARKER_ADD_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  cancelRequest = async (denom: string) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'cancelRequest' });
-    const result = await cancelRequestMethod(this.state, denom);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.CANCEL_REQUEST_FAILED
-      : WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
 
   connect = async (customBridge?: string) => {
     await connectMethod({
@@ -332,31 +257,16 @@ export class WalletConnectService {
     });
   };
 
-  customAction = async (data: CustomActionData) => {
+  sendMessage = async (data: SendMessageData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'customAction' });
-    const result = await customActionMethod(this.state, data);
+    const result = await sendMessageMethod(this.state, data);
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error
-      ? WINDOW_MESSAGES.CUSTOM_ACTION_FAILED
-      : WINDOW_MESSAGES.CUSTOM_ACTION_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  delegateHash = async (data: DelegateHashData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'delegateHash' });
-    const result = await delegateHashMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.DELEGATE_HASH_FAILED
-      : WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE;
+      ? WINDOW_MESSAGES.SEND_MESSAGE_FAILED
+      : WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.#resetConnectionTimeout();
@@ -364,21 +274,6 @@ export class WalletConnectService {
 
   disconnect = async () => {
     if (this?.state?.connector) await this.state.connector.killSession();
-  };
-
-  sendCoin = async (data: SendCoinData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'sendCoin' });
-    const result = await sendCoinMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.TRANSACTION_FAILED
-      : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
   };
 
   signJWT = async (expires: number) => {

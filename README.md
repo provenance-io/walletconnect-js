@@ -1,8 +1,3 @@
-<div align="center">
-  <img src="./src/logo.svg" alt="Provenance.io WalletConnect-JS"/>
-</div>
-<br/><br/>
-
 # Provenance.io WalletConnect-JS
 
 Library to interface with Provenance Wallet using WalletConnect.
@@ -19,15 +14,10 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
 4. [QRCodeModal](#QRCodeModal)
 5. [useWalletConnect](#useWalletConnect)
 6. [walletConnectService](#walletConnectService)
-   - [activateRequest](#activateRequest)
-   - [addMarker](#addMarker)
-   - [cancelRequest](#cancelRequest)
    - [connect](#connect)
-   - [customAction](#customAction)
-   - [delegateHash](#delegateHash)
    - [disconnect](#disconnect)
-   - [sendCoin](#sendCoin)
    - [signJWT](#signJWT)
+   - [sendMessage](#sendMessage)
    - [signMessage](#signMessage)
 7. [walletConnectState](#walletConnectState)
 8. [Web App](#Web-App)
@@ -66,30 +56,30 @@ _Note B: All of these are based off Node.js Event Emitters, read more on them he
 
 // Listen for complete/success
 const successAction = (result) => {
-  console.log(`WalletConnectJS | Complete | Result: `, result);
+  console.log(`WalletConnectJS | Send Message Complete | Result: `, result);
 };
 walletConnectService.addListener(
-  WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE,
+  WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE,
   successAction
 );
 // Listen for error/failure
 const failAction = (result) => {
   const { error } = result;
-  console.log(`WalletConnectJS | Failed | result, error: `, result, error);
+  console.log(`WalletConnectJS | Send Message Failed | result, error: `, result, error);
 };
 walletConnectService.addListener(
-  WINDOW_MESSAGES.CANCEL_REQUEST_FAILED,
+  WINDOW_MESSAGES.SEND_MESSAGE_FAILED,
   failAction
 );
 
 // Unmount listeners once they are no longer needed (typically in useEffect return)
 // Remove event listeners once no longer needed (Node: Each requires specific function to remove, see Note B above)
 walletConnectService.removeListener(
-  WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE,
+  WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE,
   successAction
 );
 walletConnectService.removeListener(
-  WINDOW_MESSAGES.CANCEL_REQUEST_FAILED,
+  WINDOW_MESSAGES.SEND_MESSAGE_FAILED,
   failAction
 );
 ```
@@ -99,8 +89,7 @@ walletConnectService.removeListener(
 React context provider to supply state to every child within
 
 - Include as parent to all Components using `walletconnect-js`
-- Takes in optional params:
-  - `bridge`: WalletConnect bridge [`string`] (default: `"'wss://test.figure.tech/service-wallet-connect-bridge/ws/external'"`)
+- Takes in optional param of `timeout` to control connection timeout duration
   - `timeout`: Session timeout, seconds [`number`] (default: `1800`)
 - Usage Example (w/React.js):
 
@@ -150,84 +139,18 @@ React hook which contains `walletConnectService` and `walletConnectState`
 
 - Holds all main methods and functions to use WalletConnect service
 
-- #### activateRequest
-
-  Activate a request
-
-  ```js
-  walletConnectService.activateRequest(denom);
-  // WINDOW_MESSAGES: ACTIVATE_REQUEST_COMPLETE, ACTIVATE_REQUEST_FAILED
-  ```
-
-  | Param | Type   | Required | Default | Example               | Info                  |
-  | ----- | ------ | -------- | ------- | --------------------- | --------------------- |
-  | denom | string | yes      | -       | `'My_Special_Marker'` | Title of denomination |
-
-- #### addMarker
-
-  Add a marker
-
-  ```js
-  walletConnectService.addMarker({ denom, amount });
-  // WINDOW_MESSAGES: ADD_MARKER_COMPLETE, ADD_MARKER_FAILED
-  ```
-
-  | Param  | Type   | Required | Default | Example               | Info                   |
-  | ------ | ------ | -------- | ------- | --------------------- | ---------------------- |
-  | denom  | string | yes      | -       | `'My_Special_Marker'` | Title of denomination  |
-  | amount | number | yes      | -       | `10`                  | Amount of denomination |
-
-- #### cancelRequest
-
-  Cancels a request
-
-  ```js
-  walletConnectService.cancelRequest(denom);
-  // WINDOW_MESSAGES: CANCEL_REQUEST_COMPLETE, CANCEL_REQUEST_FAILED
-  ```
-
-  | Param | Type   | Required | Default | Example               | Info                  |
-  | ----- | ------ | -------- | ------- | --------------------- | --------------------- |
-  | denom | string | yes      | -       | `'My_Special_Marker'` | Title of denomination |
-
 - #### connect
 
   Connect a WalletConnect wallet
 
   ```js
-  walletConnectService.connect();
+  walletConnectService.connect(bridge);
   // WINDOW_MESSAGE: CONNECTED
   ```
 
-- #### customAction
-
-  Pass through a custom base64 encoded message
-
-  ```js
-  walletConnectService.customAction({ message, description, method });
-  // WINDOW_MESSAGES: CUSTOM_ACTION_COMPLETE, CUSTOM_ACTION_FAILED
-  ```
-
-  | Param       | Type           | Required | Default                                                           | Example                                      | Info                                                |
-  | ----------- | -------------- | -------- | ----------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
-  | message     | string / array | yes      | -                                                                 | `'CiwvcHJvdmVuYW5jZS5tZX...'`                | B64 encoded Message(s) to pass to wallet            |
-  | description | string         | no       | `'Custom Action'`                                                 | `'My Custom Action'`                         | Prompt title on mobile wallet                       |
-  | method      | string         | no       | `'provenance_sendTransaction'`                                    | `'provenance_sendTransaction'`               | Message method                                      |
-  | gasPrice    | object         | no       | `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` | `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` | Optional gasPrice object, defaults to Figure values |
-
-- #### delegateHash
-
-  Delegate a custom amount of Hash token to a custom address
-
-  ```js
-  walletConnectService.delegateHash({ to, amount });
-  // WINDOW_MESSAGES: DELEGATE_HASH_COMPLETE, DELEGATE_HASH_FAILED
-  ```
-
-  | Param  | Type   | Required | Default | Example        | Info                  |
-  | ------ | ------ | -------- | ------- | -------------- | --------------------- |
-  | to     | string | yes      | -       | `'tpa1b23...'` | Target wallet address |
-  | amount | number | yes      | -       | `10`           | Amount to use         |
+  | Param  | Type   | Required | Default                | Example      | Info                                    |
+  | ------ | ------ | -------- | ---------------------- | ------------ | --------------------------------------- |
+  | bridge | string | no       | `"wss://figure.tech/service-wallet-connect-bridge/ws/external"` | `"wss://custom.bridge"` | Custom bridge to connect into |
 
 - #### disconnect
 
@@ -237,22 +160,6 @@ React hook which contains `walletConnectService` and `walletConnectState`
   walletConnectService.disconnect();
   // WINDOW_MESSAGE: DISCONNECT
   ```
-
-- #### sendCoin
-
-  Send amount of custom coin to an address
-
-  ```js
-  walletConnectService.sendCoin({ to, amount, denom });
-  // WINDOW_MESSAGES: TRANSACTION_COMPLETE, TRANSACTION_FAILED
-  ```
-
-  | Param    | Type   | Required | Default                                                           | Example                                      | Info                                                |
-  | -------- | ------ | -------- | ----------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
-  | to       | string | yes      | -                                                                 | `'tpa1b23...'`                               | Target wallet address                               |
-  | amount   | number | yes      | -                                                                 | `10`                                         | Amount to use                                       |
-  | denom    | string | no       | `'Hash'`                                                          | `'Hash'`                                     | Coin's Denom                                        |
-  | gasPrice | object | no       | `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` | `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` | Optional gasPrice object, defaults to Figure values |
 
 - #### signJWT
 
@@ -266,6 +173,22 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | Param  | Type   | Required | Default                | Example      | Info                                    |
   | ------ | ------ | -------- | ---------------------- | ------------ | --------------------------------------- |
   | expire | number | no       | 24 hours (Date.now() + 86400) | `1647020269` | Custom expiration date (ms) of JWT |
+
+- #### sendMessage
+
+  Pass through a custom base64 encoded message
+
+  ```js
+  walletConnectService.sendMessage({ message, description, method });
+  // WINDOW_MESSAGES: SEND_MESSAGE_COMPLETE, SEND_MESSAGE_FAILED
+  ```
+
+  | Param       | Type           | Required | Default                                                           | Example                                      | Info                                                |
+  | ----------- | -------------- | -------- | ----------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
+  | message     | string / array | yes      | -                                                                 | `'CiwvcHJvdmVuYW5jZS5tZX...'`                | B64 encoded Message(s) to pass to wallet            |
+  | description | string         | no       | `'Send Message'`                                                 | `'My Special Message'`                         | Prompt title on mobile wallet                       |
+  | method      | string         | no       | `'provenance_sendTransaction'`                                    | `'provenance_sendTransaction'`               | Message method                                      |
+  | gasPrice    | object         | no       | `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` | `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` | Optional gasPrice object, defaults to Figure values |
 
 - #### signMessage
   Prompt user to sign a custom message
@@ -284,6 +207,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   initialState: {
     account: '', // Figure account uuid [string]
     address: '', // Wallet address [string]
+    bridge: 'wss://figure.tech/service-wallet-connect-bridge/ws/external', // WalletConnect bridge used for connection [string]
     connected: false, // WalletConnect connected [bool]
     connectionEat: null, // WalletConnect expires at time [number]
     connectionIat: null, // WalletConnect initialized at time [number]
@@ -320,8 +244,8 @@ This package works without react and with any other javascipt library/framework 
 
 ### Using a CDN Import
 
-You can find this package on `https://unpkg.com/`: - Note: Change the version in the url as needed: `https://unpkg.com/@provenanceio/walletconnect-js@1.0.19/umd/walletconnect-js.min.js` - Example use:
-`js <script src="https://unpkg.com/@provenanceio/walletconnect-js@1.0.19/umd/walletconnect-js.min.js"></script> `
+You can find this package on `https://unpkg.com/`: - Note: Change the version in the url as needed: `https://unpkg.com/@provenanceio/walletconnect-js@2.0.0/umd/walletconnect-js.min.js` - Example use:
+`js <script src="https://unpkg.com/@provenanceio/walletconnect-js@2.0.0/umd/walletconnect-js.min.js"></script> `
 
 ### Using Imports
 
