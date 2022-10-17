@@ -21,7 +21,6 @@ const QRCodeModalContainer = styled.div`
   z-index: 1000;
 `;
 const QRModalContent = styled.div`
-  /* min-height: 400px; */
   width: 400px;
   transition: 1s all;
   position: relative;
