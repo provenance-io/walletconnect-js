@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Button, Sprite } from 'Components';
-import JsonFormatter from 'react-json-formatter';
+import ReactJson from '@microlink/react-json-view';
 import { COLORS, FONTS } from 'theme';
 import { useState } from 'react';
 import { ICON_NAMES } from 'consts';
@@ -34,6 +34,9 @@ const ResultsContainer = styled.div`
   font-family: ${FONTS.MONOSPACE_FONT};
   font-size: 1.3rem;
   max-height: 300px;
+  .react-json-view {
+    word-break: break-all;
+  }
 `;
 const ResultKey = styled.div`
   min-width: 75px;
@@ -65,12 +68,6 @@ interface Props {
 export const Results: React.FC<Props> = ({ results, setResults }) => {
   const [resultsVisible, setResultsVisible] = useState(false);
 
-  const jsonStyle = {
-    propertyStyle: { color: COLORS.PRIMARY_600 },
-    stringStyle: { color: COLORS.NEUTRAL_350 },
-    numberStyle: { color: COLORS.SECONDARY_400 },
-  };
-
   const renderResults = () => {
     const keys = Object.keys(results!);
     return keys.map((key) =>
@@ -79,11 +76,7 @@ export const Results: React.FC<Props> = ({ results, setResults }) => {
           <ResultRow>
             <ResultKey>Raw Data:</ResultKey>
           </ResultRow>
-          <JsonFormatter
-            json={JSON.stringify(results!.data)}
-            tabWith={4}
-            jsonStyle={jsonStyle}
-          />
+          <ReactJson src={results!.data} />
         </span>
       ) : (
         <ResultRow key={key}>
