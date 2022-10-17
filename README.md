@@ -6,6 +6,9 @@ Library to interface with Provenance Wallet using WalletConnect.
 
 For more information about [Provenance Inc](https://provenance.io) visit https://provenance.io
 
+## Version 2.x.x Update
+WalletConnect-JS version 2.0.0 significantly reduced its package size by removing to ability to build a protobuf message internally.  This means all sendMessages must come through as a google protobuf any and cannot be created within the app anymore.  Previously these were built using [Wallet-Utils](https://www.npmjs.com/package/@provenanceio/wallet-utils).  If your dApp needs to build messages on the front-end, import wallet-utils and follow along with their repo's [README.md](https://github.com/provenance-io/wallet-utils#readme).
+
 ## Table of Contents
 
 1. [Installation](#Installation)
