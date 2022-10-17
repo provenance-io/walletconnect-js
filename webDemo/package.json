@@ -25,7 +25,8 @@
     "util": "^0.12.4"
   },
   "scripts": {
-    "start": "node -p \"'export const REACT_APP_WCJS_VERSION = ' + JSON.stringify(require('../package.json').version)\" > src/version.ts && react-app-rewired start"
+    "start": "node -p \"'export const REACT_APP_WCJS_VERSION = ' + JSON.stringify(require('../package.json').version)\" > src/version.ts && react-app-rewired start",
+    "start:4000": "node -p \"'export const REACT_APP_WCJS_VERSION = ' + JSON.stringify(require('../package.json').version)\" > src/version.ts && PORT=4000 react-app-rewired start"
   },
   "eslintConfig": {
     "extends": [

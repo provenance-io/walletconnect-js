@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Button, Input } from 'Components';
 import { ActionContainer } from './ActionContainer';
-import { Action as ActionType } from 'types';
+import type { Action as ActionType } from 'types';
 
 interface Props extends ActionType {
   setResults: (results: any) => void;

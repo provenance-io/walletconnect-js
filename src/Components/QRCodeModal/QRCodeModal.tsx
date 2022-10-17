@@ -385,6 +385,7 @@ export const QRCodeModal: React.FC<Props> = ({
   return showQRCodeModal ? (
     <QRCodeModalContainer
       className={className}
+      id="wcjs-qr-modal"
       onClick={() => wcs.showQRCode(false)}
     >
       <QRModalContent

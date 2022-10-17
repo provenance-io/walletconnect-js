@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useWalletConnect, QRCodeModal } from '@provenanceio/walletconnect-js';
 import styled from 'styled-components';
-import { Action, Connect, Dropdown, Header, Results } from 'Components';
+import {
+  Action,
+  Connect,
+  Dropdown,
+  ExternalLink,
+  Header,
+  Results,
+} from 'Components';
 import { ALL_ACTIONS, BRIDGE_URLS } from 'consts';
+import './qrModalCustomStyle.css';
 
 const HomeContainer = styled.div`
   position: relative;
@@ -69,57 +77,8 @@ const Error = styled.p`
 
 const QRCodeModalStyled = styled(QRCodeModal)`
   // Custom styling test for QRCodeModal
-  /* background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
-  .wcjs-qr-content {
-    background: radial-gradient(
-        80.87% 32.41% at 49.85% 0%,
-        rgba(90, 90, 200, 0.5) 6.25%,
-        rgba(55, 78, 125, 0) 96.35%
-      ),
-      radial-gradient(
-        117.93% 56.41% at 113.12% 107.17%,
-        #616e9d 6.25%,
-        rgba(65, 67, 122, 0.71) 35.94%,
-        rgba(56, 94, 121, 0) 100%
-      );
-    color: #ffffff;
-    border-radius: 3px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  .wcjs-qr-toggle {
-    background: none;
-  }
-  .wcjs-qr-notch {
-    background: none;
-    &.active {
-      border: 1px solid currentColor;
-    }
-  }
-  .wcjs-qr-row-nonlink {
-    &:hover {
-      background: rgb(26, 44, 81);
-    }
-  }
-  .wcjs-qr-title {
-    color: white;
-  }
-  .wcjs-qr-copy {
-    background: rgba(100, 100, 255, 0.9);
-    padding: 6px 12px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    color: white;
-  }
-  .wcjs-qr-img {
-    img {
-      border-radius: 8px;
-    }
-  }
-  .wcjs-qr-close {
-    background: none;
-  } */
 `;
 
 export const App = () => {
@@ -205,6 +164,7 @@ export const App = () => {
           </>
         )}
       </ContentBack>
+      {connected && <ExternalLink />}
       <QRCodeModalStyled walletConnectService={wcs} devWallets={['figure_web']} />
     </HomeContainer>
   );

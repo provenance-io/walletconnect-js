@@ -36,3 +36,8 @@ export interface Action {
   fields: Field[];
   multiAction?: boolean;
 }
+
+export interface ExtraMethod {
+  method: WCJSMethod;
+  fields: Field[];
+}
