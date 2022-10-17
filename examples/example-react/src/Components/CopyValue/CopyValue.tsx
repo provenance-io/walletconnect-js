@@ -1,24 +1,28 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import REPORTS_ICON from 'img/reportsIcon.svg';
+import { COLORS } from 'theme';
+import { Sprite } from '../Sprite/Sprite';
+import { ICON_NAMES } from 'consts';
 
 const CopyButton = styled.div`
   cursor: pointer;
   display: flex;
   align-items: center;
   position: relative;
+  margin-left: 4px;
 `;
 const CopiedNotice = styled.div`
-  background: rgb(57, 35, 169);
-  color: white;
+  background: ${COLORS.PRIMARY_500};
+  color: ${COLORS.WHITE};
   position: absolute;
-  padding: 8px;
-  border-radius: 5px;
+  padding: 8px 12px;
+  border-radius: 4px;
   font-size: 1.2rem;
   font-weight: bold;
   bottom: -50px;
-  left: -8px;
+  right: -8px;
   min-width: 55px;
+  z-index: 100;
 `;
 
 interface Props {
@@ -55,7 +59,7 @@ export const CopyValue: React.FC<Props> = ({ value, title = 'Copy Text' }) => {
 
   return (
     <CopyButton title={title} onClick={handleCopyClick}>
-      <img src={REPORTS_ICON} alt={title} />
+      <Sprite icon={ICON_NAMES.COPY} size="0.9rem" />
       {justCopied && <CopiedNotice>Copied!</CopiedNotice>}
     </CopyButton>
   );

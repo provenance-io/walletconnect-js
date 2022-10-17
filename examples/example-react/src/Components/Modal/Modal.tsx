@@ -1,6 +1,7 @@
 import ReactDom from 'react-dom';
 import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import { COLORS } from 'theme';
 
 const ModalElement = styled.div`
   position: fixed;
@@ -10,7 +11,7 @@ const ModalElement = styled.div`
   width: 100%;
   max-width: 100%;
   max-height: 100%;
-  background: rgba(255, 255, 255, 0.75);
+  background: ${COLORS.BLACK_70};
   display: flex;
   align-items: center;
   justify-content: center;

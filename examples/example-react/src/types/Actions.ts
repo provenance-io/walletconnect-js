@@ -5,39 +5,16 @@ export interface Field {
   placeholder: string;
   width?: string;
 }
-export type WindowMessages =
-  | 'MARKER_ACTIVATE'
-  | 'MARKER_FINALIZE'
-  | 'MARKER_ADD'
-  | 'CANCEL_REQUEST'
-  | 'CUSTOM_ACTION'
-  | 'DELEGATE_HASH'
-  | 'TRANSACTION'
-  | 'TRANSACTION'
-  | 'SIGN_JWT'
-  | 'SIGNATURE'
-  | 'TRANSACTION';
+export type WindowMessages = 'SEND_MESSAGE' | 'SIGN_JWT' | 'SIGNATURE';
 
-export type WCJSMethod =
-  | 'markerActivate'
-  | 'markerFinalize'
-  | 'markerAdd'
-  | 'cancelRequest'
-  | 'customAction'
-  | 'delegateHash'
-  | 'sendCoin'
-  | 'signJWT'
-  | 'signMessage';
+export type WCJSMethod = 'sendMessage' | 'signJWT' | 'signMessage';
 
 export interface Action {
+  icon?: string;
+  name: string;
   windowMessage: WindowMessages;
   method: WCJSMethod;
   gas?: boolean;
   fields: Field[];
-  multiAction?: boolean;
-}
-
-export interface ExtraMethod {
-  method: WCJSMethod;
-  fields: Field[];
+  description: string;
 }

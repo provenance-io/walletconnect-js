@@ -1,33 +1,40 @@
 import styled from 'styled-components';
+import { COLORS, FONTS } from 'theme';
 
 const InputContainer = styled.div<{ width: string; bottomGap?: boolean }>`
-  position: relative;
   flex-basis: ${({ width }) => width};
   display: flex;
+  flex-direction: column;
   ${({ bottomGap }) =>
     bottomGap &&
     `
-    margin-bottom: 36px;
+    margin-bottom: 20px;
   `}
 `;
 const StyledInput = styled.input`
-  padding: 0 16px;
-  height: 40px;
   width: 100%;
-  box-sizing: content-box;
-  border-radius: 0;
-  margin-right: 4px;
-  border: 1px solid rgba(90, 90, 200, 0.9);
-  background: rgba(60, 60, 140, 0.4);
-  color: white;
+  font-family: ${FONTS.PRIMARY_FONT};
+  font-weight: 400;
+  height: 48px;
+  font-size: 1.6rem;
+  color: ${COLORS.NEUTRAL_500};
+  border: 1px solid ${COLORS.NEUTRAL_300};
+  background: ${COLORS.WHITE};
   border-radius: 4px;
+  padding: 10px 16px;
+  outline: none;
+  appearance: none;
+  box-sizing: border-box;
+  transition: 300ms all;
+  &:active,
+  &:focus {
+    outline: 1px solid ${COLORS.PRIMARY_300};
+  }
 `;
 const Label = styled.label`
   font-size: 1.2rem;
   font-weight: 700;
-  position: absolute;
-  top: -24px;
-  left: 0;
+  margin-bottom: 3px;
 `;
 
 interface Props {

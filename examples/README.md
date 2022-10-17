@@ -1,9 +1,7 @@
-# Provenance.io | WalletConnect-JS | WebDemoVanilla
+# Provenance.io | WalletConnect-JS | Examples
 
-## Run a non-react, plain vanilla js version of walletconnect-js (or use as a reference to setup your own non-react project with wcjs)
+## Included in this package are 3 examples of how to create and run a dApp using walletconnect-js
 
-### Two vanilla versions to choose from
-* ES5
-  - Inline scripts, no package.json.  Old school.
-* ES6
-  - Imports, package.json, npm, and more.
+### React.js | example-react
+### ES6 |example-js-es6 (Imports, package.json, npm, and more.)
+### ES5 |example-js-es5 (Inline scripts, no package.json.  Old school cool.)

@@ -1,1 +1,0 @@
-export var CONNECTION_TIMEOUT = 1800; // 30min

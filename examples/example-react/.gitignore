@@ -21,7 +21,6 @@
 /docs
 /cdn
 /umd
-/src/version.ts
 
 # misc
 .DS_Store
@@ -38,4 +37,5 @@ yarn-error.log*
 *.ignored.*
 ignored/
 .eslintcache
+src/version.ts
 *.tgz

@@ -1,26 +1,29 @@
 import styled from 'styled-components';
 import { Loading } from 'Components';
+import { COLORS, FONTS } from 'theme';
 
 const StyledButton = styled.button<{ width: string }>`
-  max-width: ${({ width }) => width};
-  ${({ width }) => width === 'auto' && 'min-width: 150px'};
   align-items: center;
-  background: ${({ color }) => color};
-  white-space: nowrap;
-  border-radius: 6px;
-  border: 1px solid ${({ color }) => color};
-  color: white;
+  background: ${COLORS.PRIMARY_600};
+  border-radius: 4px;
+  border: none;
+  color: ${COLORS.WHITE};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   display: flex;
+  font-size: 1.6rem;
+  font-family: ${FONTS.PRIMARY_FONT};
+  font-weight: 500;
+  height: 48px;
   justify-content: center;
-  letter-spacing: 0.07rem;
+  letter-spacing: 0;
+  max-width: ${({ width }) => width};
+  min-width: 167px;
+  padding: 11px 16px;
   transition: 250ms all;
   user-select: none;
-  font-size: 1.2rem;
-  height: 40px;
-  padding: 0 30px;
+  white-space: nowrap;
   &:hover:not(:disabled) {
-    filter: saturate(175%);
+    background: ${COLORS.PRIMARY_500};
   }
   &:active:not(:disabled) {
     filter: contrast(90%);
@@ -33,7 +36,6 @@ const ButtonContent = styled.div``;
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
-  color?: string;
   onClick?: () => void;
   disabled?: boolean;
   width?: string;
@@ -44,7 +46,6 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button: React.FC<Props> = ({
   className,
-  color = '#376FE8',
   onClick = () => {},
   children,
   disabled = false,
@@ -64,7 +65,6 @@ export const Button: React.FC<Props> = ({
       title={title}
       className={className}
       onClick={handleClick}
-      color={color.toUpperCase()}
       onKeyPress={(e) => {
         if (e.key === 'Enter') {
           handleClick();

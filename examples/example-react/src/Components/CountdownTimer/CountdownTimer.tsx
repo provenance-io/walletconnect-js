@@ -6,8 +6,6 @@ import { useInterval } from 'hooks';
 const Time = styled.div`
   font-family: 'Courier New', Courier, monospace;
   font-weight: bold;
-  line-height: 1.3rem;
-  margin-top: 2px;
   color: #aaaaaa;
 `;
 

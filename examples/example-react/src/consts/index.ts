@@ -1,3 +1,4 @@
 export * from './allActions';
 export * from './bridgeUrls';
-export * from './extraMethods';
+export * from './iconNames';
+export * from './urls';

@@ -1,0 +1,9 @@
+package.json
+package-lock.json
+public
+node_modules
+.eslintrc
+jsconfig.json
+.vscode
+lib
+docs

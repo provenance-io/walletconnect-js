@@ -1,22 +1,45 @@
 import styled from 'styled-components';
-import { Button } from 'Components';
+import { Button, Sprite } from 'Components';
 import JsonFormatter from 'react-json-formatter';
+import { COLORS, FONTS } from 'theme';
+import { useState } from 'react';
+import { ICON_NAMES } from 'consts';
+
+const ResultsWrapper = styled.div`
+  margin-top: 40px;
+`;
+const ResultsTitle = styled.div`
+  margin-bottom: 4px;
+  font-weight: bold;
+  font-size: 1.3rem;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  p {
+    margin-right: 4px;
+    margin-top: 3px;
+  }
+`;
 
 const ResultsContainer = styled.div`
-  border: 1px solid rgba(60, 60, 100, 0.9);
-  background: rgba(10, 10, 30, 0.9);
-  color: #dddddd;
+  background: ${COLORS.NEUTRAL_150};
+  color: ${COLORS.NEUTRAL_550};
   border-radius: 4px;
-  padding: 20px;
+  padding: 30px;
   position: relative;
   word-wrap: break-word;
   overflow: auto;
+  overflow-y: scroll;
+  font-family: ${FONTS.MONOSPACE_FONT};
+  font-size: 1.3rem;
+  max-height: 300px;
 `;
-const ResultTitle = styled.span`
-  font-weight: bold;
+const ResultKey = styled.div`
   min-width: 75px;
   margin-right: 20px;
   text-transform: capitalize;
+  border-bottom: 1px solid ${COLORS.NEUTRAL_300};
 `;
 const ResultRow = styled.div`
   display: flex;
@@ -28,16 +51,6 @@ const FloatingButton = styled.p`
   position: absolute;
   top: 20px;
   right: 20px;
-  @media (max-width: 1150px) {
-    top: -20px;
-    right: 0;
-    button {
-      min-width: 10px;
-      padding: 2px 10px;
-      font-size: 0.9rem;
-      height: auto;
-    }
-  }
 `;
 
 interface Result {
@@ -50,19 +63,31 @@ interface Props {
 }
 
 export const Results: React.FC<Props> = ({ results, setResults }) => {
+  const [resultsVisible, setResultsVisible] = useState(false);
+
+  const jsonStyle = {
+    propertyStyle: { color: COLORS.PRIMARY_600 },
+    stringStyle: { color: COLORS.NEUTRAL_350 },
+    numberStyle: { color: COLORS.SECONDARY_400 },
+  };
+
   const renderResults = () => {
     const keys = Object.keys(results!);
     return keys.map((key) =>
       key === 'data' ? (
         <span key={key}>
           <ResultRow>
-            <ResultTitle>Raw Data:</ResultTitle>
+            <ResultKey>Raw Data:</ResultKey>
           </ResultRow>
-          <JsonFormatter json={JSON.stringify(results!.data)} tabWith={4} />
+          <JsonFormatter
+            json={JSON.stringify(results!.data)}
+            tabWith={4}
+            jsonStyle={jsonStyle}
+          />
         </span>
       ) : (
         <ResultRow key={key}>
-          <ResultTitle>{key}:</ResultTitle>
+          <ResultKey>{key}:</ResultKey>
           <ResultValue>{results![key]}</ResultValue>
         </ResultRow>
       )
@@ -70,13 +95,30 @@ export const Results: React.FC<Props> = ({ results, setResults }) => {
   };
 
   return results ? (
-    <ResultsContainer>
-      {renderResults()}
-      <FloatingButton>
-        <Button onClick={() => setResults(null)} type="button">
-          Clear Results
-        </Button>
-      </FloatingButton>
-    </ResultsContainer>
+    <ResultsWrapper>
+      <ResultsTitle
+        onClick={() => {
+          setResultsVisible(!resultsVisible);
+        }}
+      >
+        <p>Results</p>
+        <Sprite
+          icon={ICON_NAMES.CARET}
+          size="1.2rem"
+          color={COLORS.NEUTRAL_400}
+          spin={resultsVisible ? '180' : '0'}
+        />
+      </ResultsTitle>
+      {resultsVisible && (
+        <ResultsContainer>
+          {renderResults()}
+          <FloatingButton>
+            <Button onClick={() => setResults(null)} type="button">
+              Clear Results
+            </Button>
+          </FloatingButton>
+        </ResultsContainer>
+      )}
+    </ResultsWrapper>
   ) : null;
 };

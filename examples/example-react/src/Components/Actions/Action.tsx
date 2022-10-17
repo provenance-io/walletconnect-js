@@ -1,8 +1,24 @@
 import { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Button, Input } from 'Components';
-import { ActionContainer } from './ActionContainer';
-import type { Action as ActionType } from 'types';
+import { Action as ActionType } from 'types';
+
+const ActionContainer = styled.div<{ inputCount: number }>`
+  display: flex;
+  max-width: 100%;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 30px;
+  flex-wrap: ${({ inputCount }) => (inputCount > 2 ? 'wrap' : 'nowrap')};
+  @media (max-width: 1150px) {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    input {
+      margin-bottom: 10px;
+    }
+  }
+`;
 
 interface Props extends ActionType {
   setResults: (results: any) => void;
@@ -13,13 +29,13 @@ export const Action: React.FC<Props> = ({
   setResults,
   fields,
   windowMessage,
-  multiAction,
   gas,
 }) => {
   const [figureGasPrice, setFigureGasPrice] = useState({
     gasPrice: '',
     gasPriceDenom: '',
   });
+
   // Build state object from fields data (fields are an array of obj, see propTypes)
   const initialInputValues = {} as { [key: string]: string };
   fields.forEach(({ name, value }) => {
@@ -141,7 +157,7 @@ export const Action: React.FC<Props> = ({
     <>
       <Input
         key="gasPrice"
-        width="50%"
+        width="48%"
         value={inputValues.gasPrice || ''}
         label={`Gas Price (${
           Number(inputValues.gasPrice) === Number(figureGasPrice.gasPrice) ||
@@ -155,7 +171,7 @@ export const Action: React.FC<Props> = ({
       />
       <Input
         key="gasPriceDenom"
-        width="50%"
+        width="48%"
         value={inputValues.gasPriceDenom || ''}
         label={`Gas Denom (${
           inputValues.gasPriceDenom === figureGasPrice.gasPriceDenom ||
@@ -172,15 +188,16 @@ export const Action: React.FC<Props> = ({
 
   const handleSubmit = async () => {
     const sendData = getSendData();
+    console.log('Action.tsx | handleSubmit() | sendData: ', sendData);
     walletConnectService[method](sendData as never);
   };
 
   return (
-    <ActionContainer loading={loading} inputCount={gas ? 3 : fields.length}>
+    <ActionContainer inputCount={gas ? 3 : fields.length}>
       {renderInputs()}
       {gas && renderGasInputs()}
       <Button loading={loading} onClick={handleSubmit}>
-        {multiAction ? 'Add' : 'Submit'}
+        Submit
       </Button>
     </ActionContainer>
   );
