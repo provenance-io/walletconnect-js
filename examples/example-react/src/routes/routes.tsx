@@ -2,13 +2,19 @@ import { HOMEPAGE_URL } from 'consts';
 import { CONNECT } from './connect';
 import { Connect } from 'Page';
 import { Root } from 'Page';
-import { ACTIONS } from './actions';
+import { SIGN_JWT, SEND_MESSAGE, SIGN_MESSAGE } from './actions';
 
 export const routes = [
   {
     path: HOMEPAGE_URL,
     element: <Root />,
-    children: [{ index: true, element: <Connect /> }, CONNECT, ACTIONS],
+    children: [
+      { index: true, element: <Connect /> },
+      CONNECT,
+      SIGN_JWT,
+      SEND_MESSAGE,
+      SIGN_MESSAGE,
+    ],
   },
   // { path: FOUR_OH_FOUR_URL, element: <NotFound /> },
   // { path: '*', element: <Navigate to={FOUR_OH_FOUR_URL} /> },

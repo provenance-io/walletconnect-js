@@ -6,9 +6,9 @@ export const decodeJWT = (
   // To keep this function lean and simple, we won't validate the signature, we'll use an optional
   // validation object that will check for a specific value in the payload.
 
-  const [encodedHeader, encodedPayload] = encodedJWT.split("."); // [header, payload, signature]
-  const decodedHeader = atob(encodedHeader);
-  const decodedPayload = atob(encodedPayload);
+  const [encodedHeader, encodedPayload] = encodedJWT.split('.'); // [header, payload, signature]
+  const decodedHeader = window.atob(encodedHeader);
+  const decodedPayload = window.atob(encodedPayload);
   const header = JSON.parse(decodedHeader);
   const payload = JSON.parse(decodedPayload);
   let valid = true;

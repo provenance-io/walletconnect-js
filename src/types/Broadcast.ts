@@ -6,8 +6,8 @@ export type Broadcast = (eventName: string, data?: BroadcastResults) => void;
 
 type ConnectResults = {
   data: WalletConnectClientType | ConnectData;
-  connectionIat: number;
-  connectionEat: number | null;
+  connectionEST: number;
+  connectionEXP: number | null;
 };
 
 export type BroadcastResults = ConnectResults | BaseResults;

@@ -56,10 +56,10 @@ export const connect = async ({
   // ----------------
   const onSessionUpdate = (newConnector: WalletConnectClient) => {
     // Get connection issued time
-    const connectionIat = Math.floor(Date.now() / 1000);
-    const connectionEat = state.connectionEat;
+    const connectionEST = Date.now();
+    const connectionEXP = state.connectionEXP;
     // If the session is already expired (re-opened closed/idle tab), kill the session
-    if (!connectionEat || connectionIat >= connectionEat) newConnector.killSession();
+    if (!connectionEXP || connectionEST >= connectionEXP) newConnector.killSession();
     else {
       const { accounts, peerMeta: peer } = newConnector;
       const {
@@ -76,13 +76,13 @@ export const connect = async ({
         connected: true,
         signedJWT,
         peer,
-        connectionIat,
+        connectionEST,
         walletInfo,
       });
       const broadcastData = {
         data: newConnector,
-        connectionIat,
-        connectionEat: state.connectionEat,
+        connectionEST,
+        connectionEXP: state.connectionEXP,
         connectionType: 'existing session',
       };
       broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
@@ -103,23 +103,23 @@ export const connect = async ({
       walletInfo,
     } = getAccountInfo(accounts);
     // Get connection issued/expires times (auto-logout)
-    const connectionIat = Math.floor(Date.now() / 1000);
-    const connectionEat = state.connectionTimeout + connectionIat;
+    const connectionEST = Date.now();
+    const connectionEXP = state.connectionTimeout + connectionEST;
     setState({
       address,
       bridge,
       publicKey,
       peer,
       connected: true,
-      connectionIat,
+      connectionEST,
       signedJWT,
-      connectionEat,
+      connectionEXP,
       walletInfo,
     });
     const broadcastData = {
       data: payload,
-      connectionIat,
-      connectionEat,
+      connectionEST,
+      connectionEXP,
     };
     broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
     // Start the auto-logoff timer

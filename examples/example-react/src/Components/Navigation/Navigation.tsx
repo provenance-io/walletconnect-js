@@ -2,7 +2,13 @@ import styled from 'styled-components';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Sprite } from 'Components';
 import { useState } from 'react';
-import { CONNECT_URL, ICON_NAMES, ALL_ACTIONS, ACTIONS_URL } from 'consts';
+import {
+  CONNECT_URL,
+  ICON_NAMES,
+  SEND_MESSAGE_URL,
+  SIGN_JWT_URL,
+  SIGN_MESSAGE_URL,
+} from 'consts';
 import { COLORS } from 'theme';
 import { useNavigate } from 'react-router-dom';
 
@@ -47,6 +53,25 @@ interface Props {
 
 export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
   const [activePage, setActivePage] = useState('connect');
+  // List of links
+  const navItems = [
+    {
+      name: 'Send Message',
+      icon: ICON_NAMES.GEAR,
+      url: SEND_MESSAGE_URL,
+    },
+    {
+      name: 'Sign JWT',
+      icon: ICON_NAMES.PENCIL,
+      url: SIGN_JWT_URL,
+    },
+    {
+      name: 'Sign Message',
+      icon: ICON_NAMES.PENCIL,
+      url: SIGN_MESSAGE_URL,
+    },
+  ];
+
   const navigate = useNavigate();
   // eslint-disable-line react/prop-types
   const { walletConnectService, walletConnectState } = useWalletConnect();
@@ -56,17 +81,17 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
     walletConnectService.disconnect();
   };
 
-  const handleActionClick = (method: string) => {
-    setActivePage(method);
-    navigate(`${ACTIONS_URL}?name=${method}`);
+  const handleActionClick = (name: string, url: string) => {
+    setActivePage(name);
+    navigate(url);
   };
 
   const renderActionNavItems = () =>
-    ALL_ACTIONS.map(({ name, icon = ICON_NAMES.LOGOUT, method }) => (
+    navItems.map(({ name, icon, url }) => (
       <RowItem
-        active={activePage === method}
+        active={activePage === name}
         key={name}
-        onClick={() => handleActionClick(method)}
+        onClick={() => handleActionClick(name, url)}
       >
         <Sprite icon={icon} size="1.1rem" />
         <RowTitle>{name}</RowTitle>

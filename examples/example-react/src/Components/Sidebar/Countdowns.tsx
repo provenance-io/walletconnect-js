@@ -65,13 +65,15 @@ export const Countdowns: React.FC = () => {
   const [showPopupModal, setShowPopupModal] = useState(false); // Popup modal will warn the user befor the JWT or Connection expire
   const [popupModalMsg, setPopupModalMsg] = useState(''); // What message should the popup modal display?
   const { walletConnectState } = useWalletConnect();
-  const { address, connected, connectionEat, signedJWT } = walletConnectState;
+  const { address, connected, connectionEXP, signedJWT } = walletConnectState;
   // Need to decode signedJWT and note the expiration time
   const { payload: JWTPayload, valid: JWTValid } = decodeJWT(signedJWT, {
     addr: address,
   });
   // Pull out expiration date for jwt (in seconds)
-  const { exp: JWTExp } = JWTPayload;
+  const { exp: JWTExpSec } = JWTPayload;
+  // Convert JWT Expiration to ms for countdown
+  const JWTExpMs = JWTExpSec * 1000;
 
   const handleCountdownExpires = (type: 'jwt' | 'connection') => {
     setPopupModalMsg(`${type} Expired`);
@@ -85,15 +87,15 @@ export const Countdowns: React.FC = () => {
     setShowPopupModal(false);
   };
 
-  const showCountdowns = (connected && connectionEat) || JWTValid;
+  const showCountdowns = (connected && connectionEXP) || JWTValid;
   return showCountdowns ? (
     <>
-      {connected && connectionEat && (
+      {connected && connectionEXP && (
         <RowInfo title="WalletConnect-JS connection expiration countdown">
           <RowInfoTitle>Connection Expires</RowInfoTitle>
           <RowInfoValue>
             <CountdownTimer
-              expires={connectionEat}
+              expires={connectionEXP}
               onEnd={() => handleCountdownExpires('connection')}
               timeEvents={{
                 300: () => handleCountdownWarning('connection'),
@@ -108,7 +110,8 @@ export const Countdowns: React.FC = () => {
           <RowInfoTitle>JWT Expires</RowInfoTitle>
           <RowInfoValue>
             <CountdownTimer
-              expires={JWTExp}
+              debug
+              expires={JWTExpMs}
               onEnd={() => handleCountdownExpires('jwt')}
               timeEvents={{
                 300: () => handleCountdownWarning('jwt'),

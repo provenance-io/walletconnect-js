@@ -4,6 +4,7 @@ export interface Field {
   value: string;
   placeholder: string;
   width?: string;
+  type?: 'number' | 'string';
 }
 export type WindowMessages = 'SEND_MESSAGE' | 'SIGN_JWT' | 'SIGNATURE';
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { formatSeconds } from 'utils';
 import { useInterval } from 'hooks';
@@ -13,81 +13,74 @@ interface Props {
   expires: number;
   onEnd?: () => void;
   timeEvents?: {
-    [key: number]: () => void;
+    [key: number | string]: () => void;
   };
+  debug?: boolean;
 }
 
-export const CountdownTimer: React.FC<Props> = ({ expires, onEnd, timeEvents }) => {
-  // Get current time in seconds and compare it to expiration
-  const timeNow = Math.ceil(new Date().getTime() / 1000);
-  const initialStartTime = expires - timeNow >= 0 ? expires - timeNow : 0; // Don't allow negative numbers, stop at 0
-  const [currentTime, setCurrentTime] = useState(initialStartTime);
-  const [countdownState, setCountdownState] = useState('init'); // init => start => running => end
-  const [remainingTimeEvents, setRemainingTimeEvents] = useState(timeEvents);
-  const [refreshRate, setRefreshRate] = useState(1000);
-
-  // Detect change to start time (refreshed/new JWT)
-  useEffect(() => {
-    // We handle the first init in the next use effect, this is for a new change/refresh
-    setCountdownState('start');
-  }, [expires]);
-
-  // Initial start to timer
-  useEffect(() => {
-    if (countdownState === 'start') {
-      setCountdownState('running');
-      // reset/update currentTime
-      setCurrentTime(initialStartTime);
-      // Clean up the already expired timed events
-      const cleanedTimeEvents = { ...timeEvents };
-      Object.keys(cleanedTimeEvents).forEach((eventTime) => {
-        const eventTimeNumber = Number(eventTime);
-        if (initialStartTime <= eventTimeNumber)
-          delete cleanedTimeEvents[eventTimeNumber];
-      });
-      setRemainingTimeEvents(cleanedTimeEvents);
-    }
-  }, [initialStartTime, currentTime, countdownState, timeEvents]);
-
+/**
+ *
+ * @param expires Date of expiration in ms
+ * @param onEnd Optional fx to call when expired
+ * @param timeEvents Optional time object of events to trigger at various intervals (seconds)
+ * @returns React countdown Component
+ */
+export const CountdownTimer: React.FC<Props> = ({
+  expires,
+  onEnd,
+  timeEvents = {},
+  debug,
+}) => {
+  const initTime = Date.now(); // Current time (ms) (when component was loaded/created)
+  const timeStepAmount = 1000; // How often are we updating the timer (ms) (and how much does it change by)
+  const [remainingTime, setRemainingTime] = useState(expires - initTime); // Time left on countdown in ms
+  const [remainingTimeEvents, setRemainingTimeEvents] = useState({ ...timeEvents }); // Will be removing time events when triggered
+  if (debug) {
+    console.log(
+      'CountdownTimer | remainingTime: ',
+      'ms: ',
+      remainingTime,
+      's: ',
+      remainingTime / 1000,
+      'h: ',
+      remainingTime / 60000
+    );
+  }
+  // Start timer
   useInterval(
     () => {
       // ----------------------------------
       // Loop through special time events
       // ----------------------------------
-      if (remainingTimeEvents) {
-        // Keys are the special times (in seconds)
-        const eventTimeValues = Object.keys(remainingTimeEvents);
-        // Look through each special event time to see if we need to trigger it
-        eventTimeValues.forEach((eventTime) => {
-          const eventTimeNumber = Number(eventTime);
-          // Trigger any special time events if they have occured
-          if (currentTime - 1 <= eventTimeNumber) {
-            // Run special event
-            remainingTimeEvents[eventTimeNumber]();
-            // Remove special event
-            const cleanedTimeEvents = { ...remainingTimeEvents };
-            delete cleanedTimeEvents[eventTimeNumber];
-            setRemainingTimeEvents(cleanedTimeEvents);
-          }
+      const newRemainingTimeEvents = { ...remainingTimeEvents };
+      const timeEventKeys = Object.keys(newRemainingTimeEvents);
+      // If we have remaining events
+      if (timeEventKeys.length) {
+        timeEventKeys.forEach((eventTime) => {
+          const eventTimeNumber = Number(eventTime); // Number converted to string via Object.keys
+          if (remainingTime <= eventTimeNumber * 1000)
+            // Convert event (s) to (ms)
+            newRemainingTimeEvents[eventTime](); // Run the callback function
+          delete newRemainingTimeEvents[eventTimeNumber]; // Remove this event from the time events
+          setRemainingTimeEvents(newRemainingTimeEvents); // Update state with new time events
         });
       }
       // --------------------------------------------------
       // Update the current time, trigger end if needed
       // --------------------------------------------------
-      if (currentTime > 0) setCurrentTime(currentTime - 1);
-      if (currentTime <= 1) {
-        // Time has reached zero/expired
-        // Clear the current interval
-        setRefreshRate(0);
-        // Update countdown state to ended
-        setCountdownState('end');
-        // Run onEnd callback function
-        if (onEnd) onEnd();
+      // Timer has expired
+      if (!remainingTime) {
+        setRemainingTime(0); // Time should never show below 0
+        if (onEnd) onEnd(); // Run onEnd function if provided
+      } else {
+        // Timer is not expired
+        const newRemainingTime = remainingTime - timeStepAmount;
+        setRemainingTime(newRemainingTime);
       }
     },
-    refreshRate,
-    countdownState === 'end'
+    timeStepAmount,
+    !remainingTime
   );
 
-  return <Time>{formatSeconds(currentTime)}</Time>;
+  return <Time>{formatSeconds(Math.round(remainingTime / 1000))}</Time>;
 };

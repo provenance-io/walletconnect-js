@@ -4,7 +4,7 @@ import type {
   AccountObject,
   Broadcast,
   BroadcastResults,
-  SendMessageData,
+  GasPrice,
   WalletConnectClientType,
   WalletInfo,
   WCJSLocalState,
@@ -35,8 +35,8 @@ const defaultState: WCSState = {
   address: '',
   bridge: WALLETCONNECT_BRIDGE_URL,
   connected: false,
-  connectionEat: null,
-  connectionIat: null,
+  connectionEXP: null,
+  connectionEST: null,
   connectionTimeout: CONNECTION_TIMEOUT,
   connector: null,
   figureConnected: false,
@@ -86,8 +86,8 @@ const initialState: WCSState = {
   address: (getAccountItem('address') as string) || defaultState.address,
   bridge: existingWCState.bridge || defaultState.bridge,
   connected: existingWCState.connected || defaultState.connected,
-  connectionEat: existingWCJSState.connectionEat || defaultState.connectionEat,
-  connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
+  connectionEXP: existingWCJSState.connectionEXP || defaultState.connectionEXP,
+  connectionEST: existingWCJSState.connectionEST || defaultState.connectionEST,
   connectionTimeout:
     existingWCJSState.connectionTimeout || defaultState.connectionTimeout,
   connector: existingWCState || defaultState.connector,
@@ -148,16 +148,16 @@ export class WalletConnectService {
     // Can't start a timer if one is already running (make sure we have Eat and Iat too)
     if (
       !this.#connectionTimer &&
-      this.state.connectionEat &&
-      this.state.connectionIat
+      this.state.connectionEXP &&
+      this.state.connectionEST
     ) {
       // Get the time until expiration (typically this.state.connectionTimeout, but might not be if session restored from refresh)
-      const connectionTimeout = this.state.connectionEat - this.state.connectionIat;
+      const connectionTimeout = this.state.connectionEXP - this.state.connectionEST;
       // Create a new timer
       const newConnectionTimer = window.setTimeout(() => {
         // When this timer expires, kill the session
         this.disconnect();
-      }, connectionTimeout * 1000); // Convert to ms (timeout takes ms)
+      }, connectionTimeout);
       // Save this timer (so it can be deleted on a reset)
       this.#connectionTimer = newConnectionTimer;
     }
@@ -166,12 +166,12 @@ export class WalletConnectService {
   #resetConnectionTimeout = () => {
     // Kill the last timer (if it exists)
     if (this.#connectionTimer) window.clearTimeout(this.#connectionTimer);
-    // Build a new connectionIat (time now in seconds)
-    const connectionIat = Math.floor(Date.now() / 1000);
-    // Build a new connectionEat (Iat + connectionTimeout)
-    const connectionEat = this.state.connectionTimeout + connectionIat;
+    // Build a new connectionEST
+    const connectionEST = Date.now();
+    // Build a new connectionEXP (Iat + connectionTimeout)
+    const connectionEXP = this.state.connectionTimeout + connectionEST;
     // Save these new values (needed for session restore functionality/page refresh)
-    this.setState({ connectionIat, connectionEat });
+    this.setState({ connectionEST, connectionEXP });
     // Start a new timer
     this.#startConnectionTimer();
   };
@@ -197,8 +197,8 @@ export class WalletConnectService {
     // Special values to look for
     const {
       account,
-      connectionEat,
-      connectionIat,
+      connectionEXP,
+      connectionEST,
       connectionTimeout,
       figureConnected,
       newAccount,
@@ -208,8 +208,8 @@ export class WalletConnectService {
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
       ...(account !== undefined && { account }),
-      ...(connectionEat !== undefined && { connectionEat }),
-      ...(connectionIat !== undefined && { connectionIat }),
+      ...(connectionEXP !== undefined && { connectionEXP }),
+      ...(connectionEST !== undefined && { connectionEST }),
       ...(connectionTimeout !== undefined && { connectionTimeout }),
       ...(figureConnected !== undefined && { figureConnected }),
       ...(newAccount !== undefined && { newAccount }),
@@ -245,6 +245,10 @@ export class WalletConnectService {
   // - Sign JWT
   // - Sign Message
 
+  /**
+   *
+   * @param customBridge (optional) URL string of bridge to connect into
+   */
   connect = async (customBridge?: string) => {
     await connectMethod({
       state: this.state,
@@ -257,10 +261,27 @@ export class WalletConnectService {
     });
   };
 
-  sendMessage = async (data: SendMessageData) => {
+  /**
+   *
+   * @param message Raw Base64 encoded msgAny string
+   * @param description (optional) Additional information for wallet to display
+   * @param method (optional) What method is used to send this message
+   * @param gasPrice (optional) Gas price object to use
+   */
+  sendMessage = async (
+    message: string | string[],
+    description?: string,
+    gasPrice?: GasPrice,
+    method?: string
+  ) => {
     // Loading while we wait for mobile to respond
-    this.setState({ loading: 'customAction' });
-    const result = await sendMessageMethod(this.state, data);
+    this.setState({ loading: 'sendMessage' });
+    const result = await sendMessageMethod(this.state, {
+      message,
+      description,
+      gasPrice,
+      method,
+    });
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method
@@ -276,6 +297,10 @@ export class WalletConnectService {
     if (this?.state?.connector) await this.state.connector.killSession();
   };
 
+  /**
+   *
+   * @param expires Time from now in seconds to expire new JWT
+   */
   signJWT = async (expires: number) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'signJWT' });

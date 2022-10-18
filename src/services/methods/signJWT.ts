@@ -5,15 +5,25 @@ import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
 import type { BaseResults, WCSState, WCSSetState } from '../../types';
 
+/**
+ *
+ * @param state WalletConnectService State
+ * @param setState SetWalletConnectService State function
+ * @param expires Expiration time in seconds from now
+ * @returns Result object with data or with error
+ */
 export const signJWT = async (
   state: WCSState,
   setState: WCSSetState,
-  expires?: number
+  expires?: number // Custom expiration time in seconds from now
 ): Promise<BaseResults> => {
   let valid = false;
-  const now = Math.floor(Date.now() / 1000); // Current time
-  const defaultExpires = now + 86400; // (24hours)
-  const finalExpires = expires || defaultExpires;
+  const nowSec = Math.round(Date.now() / 1000); // Current time seconds
+  const customExpiresGiven = expires !== undefined;
+  const defaultExpireSec = 1440; // (24hours as seconds)
+  const customExpiresSec = customExpiresGiven && expires;
+  const finalExpiresSec =
+    nowSec + (customExpiresGiven ? (customExpiresSec as number) : defaultExpireSec);
   const { connector, address, publicKey: pubKeyB64, walletApp } = state;
   const method = 'provenance_sign';
   const description = 'Sign JWT Token';
@@ -29,19 +39,18 @@ export const signJWT = async (
     method,
     params: [metadata],
   };
-
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
   if (!connector)
-    return { valid, data: finalExpires, request, error: 'No wallet connected' };
+    return { valid, data: finalExpiresSec, request, error: 'No wallet connected' };
   // Build JWT
   const header = JSON.stringify({ alg: 'ES256K', typ: 'JWT' });
   const headerEncoded = base64url(header);
   const payload = JSON.stringify({
     sub: pubKeyB64,
     iss: 'provenance.io',
-    iat: now,
-    exp: finalExpires,
+    iat: nowSec,
+    exp: finalExpiresSec,
     addr: address,
   });
   const payloadEncoded = base64url(payload);
@@ -67,8 +76,8 @@ export const signJWT = async (
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     // Update JWT within the wcjs state
     setState({ signedJWT });
-    return { valid, result, data: finalExpires, signedJWT, request };
+    return { valid, result, data: finalExpiresSec, signedJWT, request };
   } catch (error) {
-    return { valid, error: `${error}`, data: finalExpires, request };
+    return { valid, error: `${error}`, data: finalExpiresSec, request };
   }
 };

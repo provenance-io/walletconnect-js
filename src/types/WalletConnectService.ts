@@ -5,18 +5,20 @@ import type { WalletInfo } from './ConnectData';
 
 export type WalletConnectClientType = WalletConnectClient;
 
+type WCSLoadingValue = '' | 'sendMessage' | 'signJWT' | 'signMessage';
+
 export interface WCSState {
   account: string;
   address: string;
   bridge: string;
   connected: boolean;
-  connectionEat: number | null;
-  connectionIat: number | null;
+  connectionEXP: number | null;
+  connectionEST: number | null;
   connectionTimeout: number;
   connector: WalletConnectClientType | null;
   figureConnected: boolean;
   isMobile: boolean;
-  loading: string;
+  loading: WCSLoadingValue;
   newAccount: boolean;
   peer: IClientMeta | null;
   publicKey: string;
@@ -33,8 +35,8 @@ export type WCSSetFullState = (state: WCSState) => void;
 
 export interface WCJSLocalState {
   account: string;
-  connectionEat: number;
-  connectionIat: number;
+  connectionEXP: number;
+  connectionEST: number;
   connectionTimeout: number;
   figureConnected: boolean;
   newAccount: false;

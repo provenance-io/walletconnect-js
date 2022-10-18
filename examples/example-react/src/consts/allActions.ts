@@ -46,8 +46,9 @@ export const ALL_ACTIONS: Action[] = [
       {
         value: '',
         label: 'Custom JWT Expiration',
-        placeholder: 'Enter custom expiration (seconds)',
+        placeholder: 'Enter custom expiration (seconds from now)',
         name: 'expires',
+        type: 'number',
       },
     ],
   },

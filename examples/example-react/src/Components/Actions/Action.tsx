@@ -37,7 +37,7 @@ export const Action: React.FC<Props> = ({
   });
 
   // Build state object from fields data (fields are an array of obj, see propTypes)
-  const initialInputValues = {} as { [key: string]: string };
+  const initialInputValues = {} as { [key: string]: string | number };
   fields.forEach(({ name, value }) => {
     initialInputValues[name] = value;
   });
@@ -48,7 +48,7 @@ export const Action: React.FC<Props> = ({
     return response.json();
   };
 
-  const changeInputValue = (name: string, value: string) => {
+  const changeInputValue = (name: string, value: string | number) => {
     const newInputValues = { ...inputValues };
     newInputValues[name] = value || '';
     setInputValues(newInputValues);
@@ -119,14 +119,16 @@ export const Action: React.FC<Props> = ({
   }, [walletConnectService, setResults, windowMsgComplete, windowMsgFailed, method]);
 
   const renderInputs = () =>
-    fields.map(({ name, width, label, placeholder }) => (
+    fields.map(({ name, width, label, placeholder, type }) => (
       <Input
         key={name}
         width={width}
-        value={inputValues[name]}
+        value={`${inputValues[name]}`}
         label={label}
         placeholder={placeholder}
-        onChange={(value: string) => changeInputValue(name, value)}
+        onChange={(value: string) =>
+          changeInputValue(name, type === 'number' ? Number(value) : value)
+        }
         bottomGap={gas || fields.length > 2 ? true : undefined}
       />
     ));
@@ -158,7 +160,7 @@ export const Action: React.FC<Props> = ({
       <Input
         key="gasPrice"
         width="48%"
-        value={inputValues.gasPrice || ''}
+        value={`${inputValues.gasPrice || ''}`}
         label={`Gas Price (${
           Number(inputValues.gasPrice) === Number(figureGasPrice.gasPrice) ||
           inputValues.gasPrice === ''
@@ -172,7 +174,7 @@ export const Action: React.FC<Props> = ({
       <Input
         key="gasPriceDenom"
         width="48%"
-        value={inputValues.gasPriceDenom || ''}
+        value={`${inputValues.gasPriceDenom || ''}`}
         label={`Gas Denom (${
           inputValues.gasPriceDenom === figureGasPrice.gasPriceDenom ||
           inputValues.gasPriceDenom === ''
@@ -188,7 +190,6 @@ export const Action: React.FC<Props> = ({
 
   const handleSubmit = async () => {
     const sendData = getSendData();
-    console.log('Action.tsx | handleSubmit() | sendData: ', sendData);
     walletConnectService[method](sendData as never);
   };
 
