@@ -35,17 +35,17 @@ export const CountdownTimer: React.FC<Props> = ({
   const timeStepAmount = 1000; // How often are we updating the timer (ms) (and how much does it change by)
   const [remainingTime, setRemainingTime] = useState(expires - initTime); // Time left on countdown in ms
   const [remainingTimeEvents, setRemainingTimeEvents] = useState({ ...timeEvents }); // Will be removing time events when triggered
-  if (debug) {
-    console.log(
-      'CountdownTimer | remainingTime: ',
-      'ms: ',
-      remainingTime,
-      's: ',
-      remainingTime / 1000,
-      'h: ',
-      remainingTime / 60000
-    );
-  }
+  // if (debug) {
+  //   console.log(
+  //     'CountdownTimer | remainingTime: ',
+  //     'ms: ',
+  //     remainingTime,
+  //     's: ',
+  //     remainingTime / 1000,
+  //     'h: ',
+  //     remainingTime / 60000
+  //   );
+  // }
   // Start timer
   useInterval(
     () => {

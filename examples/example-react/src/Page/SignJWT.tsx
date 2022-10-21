@@ -1,9 +1,8 @@
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { useWalletConnect, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
-import { Button, Input, Card, Results } from 'Components';
+import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
-import { COLORS } from 'theme';
 
 const ActionContainer = styled.div`
   display: flex;
@@ -11,9 +10,8 @@ const ActionContainer = styled.div`
   align-items: flex-end;
   justify-content: space-between;
   margin-top: 30px;
-  flex-wrap: 'nowrap';
+  flex-wrap: wrap;
   @media (max-width: 1150px) {
-    flex-wrap: wrap;
     justify-content: flex-start;
     input {
       margin-bottom: 10px;
@@ -62,24 +60,7 @@ export const SignJWT: React.FC = () => {
   };
 
   return (
-    <Card
-      title={`Sign JWT ${results?.status ? `(${results.status})` : ''}`}
-      logoIcon={ICON_NAMES.PENCIL}
-      logoBg={`${
-        results?.status
-          ? results.status === 'success'
-            ? COLORS.NOTICE_400
-            : COLORS.NEGATIVE_400
-          : COLORS.SVG_DEFAULT
-      }`}
-      bannerName={`${
-        results?.status
-          ? results.status === 'success'
-            ? 'figureBuildings'
-            : 'figureGrey'
-          : 'figureChain'
-      }`}
-    >
+    <ActionCard icon={ICON_NAMES.PENCIL} title="Sign JWT" status={results?.status}>
       Sign a new JWT, updated any existing value
       <ActionContainer>
         <Input
@@ -87,12 +68,13 @@ export const SignJWT: React.FC = () => {
           label="Custom JWT Expiration"
           placeholder="Enter custom expiration (seconds from now)"
           onChange={setValue}
+          bottomGap
         />
         <Button loading={signJWTLoading} onClick={handleSubmit} disabled={!value}>
           Submit
         </Button>
       </ActionContainer>
       <Results results={results} setResults={setResults} />
-    </Card>
+    </ActionCard>
   );
 };

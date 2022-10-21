@@ -30,6 +30,9 @@ const StyledInput = styled.input`
   &:focus {
     outline: 1px solid ${COLORS.PRIMARY_300};
   }
+  &::placeholder {
+    color: ${COLORS.NEUTRAL_200};
+  }
 `;
 const Label = styled.label`
   font-size: 1.2rem;

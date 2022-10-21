@@ -1,9 +1,8 @@
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { useWalletConnect, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
-import { Button, Input, Card, Results } from 'Components';
+import { Button, Input, ActionCard, Results, ActionGas } from 'Components';
 import { ICON_NAMES } from 'consts';
-import { COLORS } from 'theme';
 
 const ActionContainer = styled.div`
   display: flex;
@@ -11,9 +10,8 @@ const ActionContainer = styled.div`
   align-items: flex-end;
   justify-content: space-between;
   margin-top: 30px;
-  flex-wrap: 'nowrap';
+  flex-wrap: wrap;
   @media (max-width: 1150px) {
-    flex-wrap: wrap;
     justify-content: flex-start;
     input {
       margin-bottom: 10px;
@@ -24,8 +22,9 @@ const ActionContainer = styled.div`
 export const SendMessage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [description, setDescription] = useState('');
+  const [initialLoad, setInitialLoad] = useState(true);
   const [method, setMethod] = useState('provenance_sendTransaction');
-  const [gasFee, setGasFee] = useState(0);
+  const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
@@ -51,80 +50,61 @@ export const SendMessage: React.FC = () => {
         data: result,
       });
     };
-    wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE, completeEvent);
-    wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_FAILED, failEvent);
-
+    if (initialLoad) {
+      setInitialLoad(false);
+      wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE, completeEvent);
+      wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_FAILED, failEvent);
+    }
     return () => {
       wcs.removeListener(WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE, completeEvent);
       wcs.removeListener(WINDOW_MESSAGES.SEND_MESSAGE_FAILED, failEvent);
     };
-  }, [wcs, setResults]);
+  }, [wcs, setResults, initialLoad]);
 
   const handleSubmit = () => {
-    wcs.sendMessage(message, description, gasFee, method);
+    // Convert input string value to number for price
+    const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
+    wcs.sendMessage(message, description, finalGasData, method);
   };
 
   return (
-    <Card
-      title={`Send Message ${results?.status ? `(${results.status})` : ''}`}
-      logoIcon={ICON_NAMES.GEAR}
-      logoBg={`${
-        results?.status
-          ? results.status === 'success'
-            ? COLORS.NOTICE_400
-            : COLORS.NEGATIVE_400
-          : COLORS.SVG_DEFAULT
-      }`}
-      bannerName={`${
-        results?.status
-          ? results.status === 'success'
-            ? 'figureBuildings'
-            : 'figureGrey'
-          : 'figureChain'
-      }`}
-    >
+    <ActionCard icon={ICON_NAMES.GEAR} title="Send Message" status={results?.status}>
       Pass along an encoded base64 message to the wallet
       <ActionContainer>
-        {
-          // {
-          //   gas: true,
-          //   fields: [
-          //     {
-          //       name: 'message',
-          //       label: 'Base64 Encoded Message',
-          //       value: '',
-          //       placeholder: 'Enter Base64 Encoded Message',
-          //     },
-          //     {
-          //       name: 'method',
-          //       label: 'Message method',
-          //       value: 'provenance_sendTransaction',
-          //       placeholder: 'Enter the message method',
-          //     },
-          //     {
-          //       name: 'description',
-          //       label: 'Wallet message description (Optional)',
-          //       value: '',
-          //       placeholder: 'Enter message description',
-          //     },
-          //   ],
-          // },
-        }
-        <Input
-          value={value}
-          label="Custom JWT Expiration"
-          placeholder="Enter custom expiration (seconds from now)"
-          onChange={setValue}
-        />
-        <Button
-          loading={sendMessageLoading}
-          onClick={handleSubmit}
-          disabled={!value}
-        >
-          Submit
-        </Button>
+        <>
+          <Input
+            width="100%"
+            value={message}
+            label="Base64 Encoded Message"
+            placeholder="Enter Base64 Encoded Message"
+            onChange={setMessage}
+            bottomGap
+          />
+          <Input
+            value={method}
+            label="Message method"
+            placeholder="Enter the message method"
+            onChange={setMethod}
+            bottomGap
+          />
+          <Input
+            value={description}
+            label="Wallet message description (Optional)"
+            placeholder="Enter message description"
+            onChange={setDescription}
+            bottomGap
+          />
+          <ActionGas setGasData={setGasData} gasData={gasData} />
+          <Button
+            loading={sendMessageLoading}
+            onClick={handleSubmit}
+            disabled={!message || !method}
+          >
+            Submit
+          </Button>
+        </>
       </ActionContainer>
       <Results results={results} setResults={setResults} />
-    </Card>
+    </ActionCard>
   );
 };
