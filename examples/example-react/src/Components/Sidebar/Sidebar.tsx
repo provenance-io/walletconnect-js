@@ -59,9 +59,10 @@ const SubtitleSection = styled.div`
   margin-bottom: 80px;
 `;
 const Subtitle = styled.p`
-  color: ${COLORS.SECONDARY_450};
+  color: ${COLORS.NEUTRAL_650};
   font-size: 1.4rem;
   max-width: 100%;
+  text-shadow: 0px 0px 4px ${COLORS.BLACK_20};
 `;
 const Version = styled.a`
   font-size: 1rem;
