@@ -49,6 +49,7 @@ interface Props {
   width?: string;
   bottomGap?: boolean;
   disabled?: boolean;
+  submit?: () => void;
 }
 
 export const Input: React.FC<Props> = ({
@@ -60,6 +61,7 @@ export const Input: React.FC<Props> = ({
   width = '100%',
   bottomGap = false,
   disabled = false,
+  submit,
 }) => (
   <InputContainer width={width} className={className} bottomGap={bottomGap}>
     {label && <Label>{label}</Label>}
@@ -67,6 +69,9 @@ export const Input: React.FC<Props> = ({
       value={value}
       placeholder={placeholder}
       onChange={({ target }) => onChange(target.value)}
+      onKeyUp={({ key }) => {
+        key === 'Enter' && submit && submit();
+      }}
       disabled={disabled}
     />
   </InputContainer>

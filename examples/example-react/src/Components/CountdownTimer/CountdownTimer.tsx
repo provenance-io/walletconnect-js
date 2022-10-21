@@ -1,86 +1,83 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { formatSeconds } from 'utils';
-import { useInterval } from 'hooks';
+import { COLORS } from 'theme';
 
-const Time = styled.div`
+const Time = styled.div<{ remainingTime: number }>`
   font-family: 'Courier New', Courier, monospace;
   font-weight: bold;
-  color: #aaaaaa;
+  color: ${({ remainingTime }) => {
+    if (remainingTime < 1) return COLORS.LIGHT_RED;
+    if (remainingTime < 300) return COLORS.ORANGE;
+    if (remainingTime < 600) return COLORS.YELLOW;
+    return COLORS.GREEN;
+  }};
 `;
 
 interface Props {
   expires: number;
+  interval?: number;
   onEnd?: () => void;
-  timeEvents?: {
-    [key: number | string]: () => void;
-  };
-  debug?: boolean;
 }
 
 /**
  *
  * @param expires Date of expiration in ms
  * @param onEnd Optional fx to call when expired
- * @param timeEvents Optional time object of events to trigger at various intervals (seconds)
+ * @param interval Optional time for each countdown display (ms) (default 1000ms)
  * @returns React countdown Component
  */
 export const CountdownTimer: React.FC<Props> = ({
   expires,
   onEnd,
-  timeEvents = {},
-  debug,
+  interval = 1000,
 }) => {
-  const initTime = Date.now(); // Current time (ms) (when component was loaded/created)
-  const timeStepAmount = 1000; // How often are we updating the timer (ms) (and how much does it change by)
-  const [remainingTime, setRemainingTime] = useState(expires - initTime); // Time left on countdown in ms
-  const [remainingTimeEvents, setRemainingTimeEvents] = useState({ ...timeEvents }); // Will be removing time events when triggered
-  // if (debug) {
-  //   console.log(
-  //     'CountdownTimer | remainingTime: ',
-  //     'ms: ',
-  //     remainingTime,
-  //     's: ',
-  //     remainingTime / 1000,
-  //     'h: ',
-  //     remainingTime / 60000
-  //   );
-  // }
-  // Start timer
-  useInterval(
-    () => {
-      // ----------------------------------
-      // Loop through special time events
-      // ----------------------------------
-      const newRemainingTimeEvents = { ...remainingTimeEvents };
-      const timeEventKeys = Object.keys(newRemainingTimeEvents);
-      // If we have remaining events
-      if (timeEventKeys.length) {
-        timeEventKeys.forEach((eventTime) => {
-          const eventTimeNumber = Number(eventTime); // Number converted to string via Object.keys
-          if (remainingTime <= eventTimeNumber * 1000)
-            // Convert event (s) to (ms)
-            newRemainingTimeEvents[eventTime](); // Run the callback function
-          delete newRemainingTimeEvents[eventTimeNumber]; // Remove this event from the time events
-          setRemainingTimeEvents(newRemainingTimeEvents); // Update state with new time events
-        });
-      }
-      // --------------------------------------------------
-      // Update the current time, trigger end if needed
-      // --------------------------------------------------
-      // Timer has expired
-      if (!remainingTime) {
-        setRemainingTime(0); // Time should never show below 0
-        if (onEnd) onEnd(); // Run onEnd function if provided
-      } else {
-        // Timer is not expired
-        const newRemainingTime = remainingTime - timeStepAmount;
-        setRemainingTime(newRemainingTime);
-      }
-    },
-    timeStepAmount,
-    !remainingTime
-  );
+  // Control the remaining time
+  const [remainingTime, setRemainingTime] = useState(expires - Date.now());
+  const [timerEnded, setTimerEnded] = useState(false);
 
-  return <Time>{formatSeconds(Math.round(remainingTime / 1000))}</Time>;
+  // Save the countdown interval
+  const intervalId = useRef(0);
+  // Create/update timer
+  useEffect(() => {
+    if (!intervalId.current && !timerEnded) {
+      // Create new interval, save to be able to clear it
+      const newIntervalId = window.setInterval(() => {
+        // Every [interval] update the remaining time
+        setRemainingTime(
+          (previousRemainingTime) => previousRemainingTime - interval
+        );
+      }, interval);
+      // Save newIntervalId to state
+      intervalId.current = newIntervalId;
+    }
+    // Remove timer on unmount
+    return () => {
+      if (intervalId.current) {
+        window.clearInterval(intervalId.current);
+        intervalId.current = 0;
+      }
+    };
+  }, [interval, onEnd, intervalId, timerEnded]);
+
+  // If we change the expiration date, update the timer
+  useEffect(() => {
+    const newRemainingTime = expires - Date.now();
+    setTimerEnded(false);
+    setRemainingTime(newRemainingTime);
+  }, [expires]);
+
+  // Track the value of remaining time, if it expires, kill timer and run onEnd
+  useEffect(() => {
+    if (remainingTime <= 0 && intervalId.current && !timerEnded) {
+      setTimerEnded(true);
+      // Timer has expired, kill it and run onEnd function
+      window.clearInterval(intervalId.current);
+      if (onEnd) onEnd();
+    }
+  }, [onEnd, remainingTime, timerEnded]);
+
+  const finalTime = remainingTime > 0 ? Math.ceil(remainingTime / 1000) : 0; // Seconds
+
+  return <Time remainingTime={finalTime}>{formatSeconds(finalTime)}</Time>;
 };

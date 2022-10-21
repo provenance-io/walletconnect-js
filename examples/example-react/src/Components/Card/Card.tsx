@@ -40,6 +40,7 @@ const Title = styled.p`
   font-family: ${FONTS.SECONDARY_FONT};
   font-weight: 700;
   text-transform: capitalize;
+  margin-bottom: 4px;
 `;
 const LogoContainer = styled.div<{ logoBg: string }>`
   position: absolute;

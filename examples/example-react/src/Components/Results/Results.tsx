@@ -87,7 +87,7 @@ export const Results: React.FC<Props> = ({ results, setResults }) => {
     );
   };
 
-  return results ? (
+  return results && Object.keys(results).length ? (
     <ResultsWrapper>
       <ResultsTitle
         onClick={() => {

@@ -52,7 +52,6 @@ export const ActionCard: React.FC<Props> = ({
   // Create all event listeners for this Action Card method
   useEffect(() => {
     const completeEvent = (result: any) => {
-      console.log('completeEvent triggered: ', result);
       setResults({
         action: title,
         status: 'success',
@@ -75,12 +74,6 @@ export const ActionCard: React.FC<Props> = ({
       wcs.addListener(windowMessages.success, completeEvent);
       wcs.addListener(windowMessages.failure, failEvent);
     }
-    return () => {
-      if (windowMessages) {
-        wcs.removeListener(windowMessages.success, completeEvent);
-        wcs.removeListener(windowMessages.failure, failEvent);
-      }
-    };
   }, [initialLoad, wcs, windowMessages, title]);
 
   return (

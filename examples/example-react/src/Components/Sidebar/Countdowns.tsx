@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { COLORS } from 'theme';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { decodeJWT } from 'utils';
-import { CountdownTimer, Modal, Button } from 'Components';
+import { CountdownTimer, Modal, Button, Sprite } from 'Components';
+import { ICON_NAMES } from 'consts';
 
 const RowInfo = styled.div`
   padding: 0 20px 0 40px;
@@ -15,12 +16,16 @@ const RowInfo = styled.div`
   flex-wrap: wrap;
   margin-bottom: 10px;
 `;
-const RowInfoTitle = styled.p`
+const RowInfoTitle = styled.div`
   font-weight: 700;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-basis: 100%;
   margin-bottom: 4px;
   font-size: 1.2rem;
+  cursor: pointer;
 `;
 const RowInfoValue = styled.div`
   display: flex;
@@ -64,7 +69,7 @@ const ModalText = styled.div`
 export const Countdowns: React.FC = () => {
   const [showPopupModal, setShowPopupModal] = useState(false); // Popup modal will warn the user befor the JWT or Connection expire
   const [popupModalMsg, setPopupModalMsg] = useState(''); // What message should the popup modal display?
-  const { walletConnectState } = useWalletConnect();
+  const { walletConnectState, walletConnectService: wcs } = useWalletConnect();
   const { address, connected, connectionEXP, signedJWT } = walletConnectState;
   // Need to decode signedJWT and note the expiration time
   const { payload: JWTPayload, valid: JWTValid } = decodeJWT(signedJWT, {
@@ -79,10 +84,6 @@ export const Countdowns: React.FC = () => {
     setPopupModalMsg(`${type} Expired`);
     setShowPopupModal(true);
   };
-  const handleCountdownWarning = (type: 'jwt' | 'connection') => {
-    setPopupModalMsg(`${type} Expires Soon`);
-    setShowPopupModal(true);
-  };
   const closePopupModal = () => {
     setShowPopupModal(false);
   };
@@ -91,16 +92,22 @@ export const Countdowns: React.FC = () => {
   return showCountdowns ? (
     <>
       {connected && connectionEXP && (
-        <RowInfo title="WalletConnect-JS connection expiration countdown">
-          <RowInfoTitle>Connection Expires</RowInfoTitle>
+        <RowInfo
+          title="Click to reset connection timeout"
+          onClick={wcs.resetConnectionTimeout}
+        >
+          <RowInfoTitle>
+            <div>Connection Expires</div>
+            <Sprite
+              icon={ICON_NAMES.RELOAD}
+              size="1.3rem"
+              color={COLORS.PRIMARY_600}
+            />
+          </RowInfoTitle>
           <RowInfoValue>
             <CountdownTimer
               expires={connectionEXP}
               onEnd={() => handleCountdownExpires('connection')}
-              timeEvents={{
-                300: () => handleCountdownWarning('connection'),
-                60: () => handleCountdownWarning('connection'),
-              }}
             />
           </RowInfoValue>
         </RowInfo>
@@ -110,13 +117,8 @@ export const Countdowns: React.FC = () => {
           <RowInfoTitle>JWT Expires</RowInfoTitle>
           <RowInfoValue>
             <CountdownTimer
-              debug
               expires={JWTExpMs}
               onEnd={() => handleCountdownExpires('jwt')}
-              timeEvents={{
-                300: () => handleCountdownWarning('jwt'),
-                60: () => handleCountdownWarning('jwt'),
-              }}
             />
           </RowInfoValue>
         </RowInfo>

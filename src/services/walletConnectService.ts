@@ -100,7 +100,10 @@ const initialState: WCSState = {
   QRCode: defaultState.QRCode,
   QRCodeUrl: defaultState.QRCodeUrl,
   showQRCodeModal: defaultState.showQRCodeModal,
-  signedJWT: (getAccountItem('jwt') as string) || defaultState.signedJWT,
+  signedJWT:
+    existingWCJSState.signedJWT ||
+    (getAccountItem('jwt') as string) ||
+    defaultState.signedJWT,
   walletApp: existingWCJSState.walletApp || defaultState.walletApp,
   walletInfo:
     (getAccountItem('walletInfo') as WalletInfo) || defaultState.walletInfo,
@@ -163,7 +166,7 @@ export class WalletConnectService {
     }
   };
 
-  #resetConnectionTimeout = () => {
+  resetConnectionTimeout = () => {
     // Kill the last timer (if it exists)
     if (this.#connectionTimer) window.clearTimeout(this.#connectionTimer);
     // Build a new connectionEST
@@ -261,6 +264,10 @@ export class WalletConnectService {
     });
   };
 
+  disconnect = async () => {
+    if (this?.state?.connector) await this.state.connector.killSession();
+  };
+
   /**
    *
    * @param message Raw Base64 encoded msgAny string
@@ -290,11 +297,7 @@ export class WalletConnectService {
       : WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  disconnect = async () => {
-    if (this?.state?.connector) await this.state.connector.killSession();
+    this.resetConnectionTimeout();
   };
 
   /**
@@ -313,7 +316,7 @@ export class WalletConnectService {
       : WINDOW_MESSAGES.SIGN_JWT_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
+    this.resetConnectionTimeout();
   };
 
   signMessage = async (customMessage: string) => {
@@ -329,6 +332,6 @@ export class WalletConnectService {
       : WINDOW_MESSAGES.SIGNATURE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
+    this.resetConnectionTimeout();
   };
 }

@@ -57,6 +57,7 @@ export const SendMessage: React.FC = () => {
         placeholder="Enter Base64 Encoded Message"
         onChange={setMessage}
         bottomGap
+        disabled={sendMessageLoading}
       />
       <Input
         value={method}
@@ -64,6 +65,7 @@ export const SendMessage: React.FC = () => {
         placeholder="Enter the message method"
         onChange={setMethod}
         bottomGap
+        disabled={sendMessageLoading}
       />
       <Input
         value={description}
@@ -71,6 +73,7 @@ export const SendMessage: React.FC = () => {
         placeholder="Enter message description"
         onChange={setDescription}
         bottomGap
+        disabled={sendMessageLoading}
       />
       <ActionGas setGasData={setGasData} gasData={gasData} />
       <Button
