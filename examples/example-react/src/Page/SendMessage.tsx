@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import { useWalletConnect, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
+import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, ActionGas } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
@@ -25,7 +25,7 @@ export const SendMessage: React.FC = () => {
   const handleSubmit = () => {
     // Convert input string value to number for price
     const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
-    wcs.sendMessage(message, description, finalGasData, method);
+    wcs.sendMessage({ message, description, gasPrice: finalGasData, method });
   };
 
   const clickUseSampleButton = () => {

@@ -57,7 +57,11 @@ export const Connect: React.FC = () => {
         onChange={setSelectedBridge}
         value={selectedBridge}
       />
-      <Button onClick={() => wcs.connect(selectedBridge)}>Connect</Button>
+      <Button
+        onClick={() => wcs.connect({ bridge: selectedBridge, duration: 3600 })}
+      >
+        Connect
+      </Button>
       <QRCodeModalStyled walletConnectService={wcs} devWallets={['figure_web']} />
     </Card>
   );

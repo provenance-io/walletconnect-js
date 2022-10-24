@@ -12,10 +12,13 @@ const walletConnectService = new WalletConnectService();
 
 interface Props {
   children: React.ReactNode;
-  timeout?: number;
 }
-
-const WalletConnectContextProvider: React.FC<Props> = ({ children, timeout }) => {
+/**
+ *
+ * @param children Other elements/rest of app children to render
+ * @param timeout How long should the initial connection to the dApp last? (seconds)
+ */
+const WalletConnectContextProvider: React.FC<Props> = ({ children }) => {
   const [walletConnectState, setWalletConnectState] = useState<WCSState>({
     ...walletConnectService.state,
   });
@@ -23,10 +26,6 @@ const WalletConnectContextProvider: React.FC<Props> = ({ children, timeout }) =>
 
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
-    // If custom props are passed in, update the defaults
-    if (timeout) {
-      walletConnectService.setState({ connectionTimeout: timeout });
-    }
     // Check if we have an address and public key, if so, auto-reconnect to session
     if (address) walletConnectService.connect();
     return () => walletConnectService.removeAllListeners();

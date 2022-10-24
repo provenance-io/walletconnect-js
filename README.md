@@ -92,8 +92,6 @@ walletConnectService.removeListener(
 React context provider to supply state to every child within
 
 - Include as parent to all Components using `walletconnect-js`
-- Takes in optional param of `timeout` to control connection timeout duration
-  - `timeout`: Session timeout, seconds [`number`] (default: `1800`)
 - Usage Example (w/React.js):
 
   ```js
@@ -132,7 +130,7 @@ To start the connection from dApp to wallet you will need to initiate the connec
     )
   };
   ```
-- Note: This modal is built with React.js and will only work within a react project. If you are not using React.js look through the `webDemoVanilla` folder to see how to initiate the connection without QRCodeModal manually.
+- Note: This modal is built with React.js and will only work within a react project. If you are not using React.js look through the `examples` folder to see how to initiate the connection without QRCodeModal manually.
 
 ## useWalletConnect
 
@@ -154,6 +152,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | Param  | Type   | Required | Default                | Example      | Info                                    |
   | ------ | ------ | -------- | ---------------------- | ------------ | --------------------------------------- |
   | bridge | string | no       | `"wss://figure.tech/service-wallet-connect-bridge/ws/external"` | `"wss://custom.bridge"` | Custom bridge to connect into |
+  | duration | string | no       | `1800` | `3600` | Custom connection timeout in seconds |
 
 - #### disconnect
 

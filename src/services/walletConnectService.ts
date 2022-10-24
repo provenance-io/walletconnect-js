@@ -249,18 +249,28 @@ export class WalletConnectService {
   // - Sign Message
 
   /**
-   *
-   * @param customBridge (optional) URL string of bridge to connect into
+   * @param bridge - (optional) URL string of bridge to connect into
+   * @param duration - (optional) Time before connection is timed out (seconds)
    */
-  connect = async (customBridge?: string) => {
+  connect = async ({
+    bridge,
+    duration,
+  }: {
+    bridge?: string;
+    duration?: number;
+  } = {}) => {
+    // Update the duration of this connection
+    this.setState({
+      connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
+    });
     await connectMethod({
-      state: this.state,
-      setState: this.setState,
-      resetState: this.resetState,
+      bridge: bridge || this.state.bridge,
       broadcast: this.#broadcastEvent,
-      customBridge,
-      startConnectionTimer: this.#startConnectionTimer,
       getState: this.#getState,
+      resetState: this.resetState,
+      setState: this.setState,
+      startConnectionTimer: this.#startConnectionTimer,
+      state: this.state,
     });
   };
 
@@ -275,12 +285,17 @@ export class WalletConnectService {
    * @param method (optional) What method is used to send this message
    * @param gasPrice (optional) Gas price object to use
    */
-  sendMessage = async (
-    message: string | string[],
-    description?: string,
-    gasPrice?: GasPrice,
-    method?: string
-  ) => {
+  sendMessage = async ({
+    message,
+    description,
+    gasPrice,
+    method,
+  }: {
+    message: string | string[];
+    description?: string;
+    gasPrice?: GasPrice;
+    method?: string;
+  }) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendMessage' });
     const result = await sendMessageMethod(this.state, {
@@ -319,6 +334,10 @@ export class WalletConnectService {
     this.resetConnectionTimeout();
   };
 
+  /**
+   *
+   * @param customMessage Message you want the wallet to sign
+   */
   signMessage = async (customMessage: string) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'signMessage' });

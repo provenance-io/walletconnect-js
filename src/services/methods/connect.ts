@@ -12,26 +12,24 @@ import { clearLocalStorage } from '../../utils';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 interface ConnectProps {
-  state: WCSState;
-  setState: WCSSetState;
-  resetState: () => void;
+  bridge: string;
   broadcast: Broadcast;
-  customBridge?: string;
-  startConnectionTimer: () => void;
   getState: () => WCSState;
+  resetState: () => void;
+  setState: WCSSetState;
+  startConnectionTimer: () => void;
+  state: WCSState;
 }
 
 export const connect = async ({
-  state,
-  setState,
-  resetState,
+  bridge,
   broadcast,
-  customBridge,
-  startConnectionTimer,
   getState,
+  resetState,
+  setState,
+  startConnectionTimer,
+  state,
 }: ConnectProps) => {
-  // Either use the custom bridge passed in, or default back to stage bridge
-  const bridge = customBridge || state.bridge;
   // -------------------
   // PULL ACCOUNT INFO
   // -------------------
