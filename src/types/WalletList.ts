@@ -10,6 +10,7 @@ export interface EventData {
   event?: EventValue;
   uri?: string;
   address?: string;
+  duration?: number;
 }
 
 export interface Wallet {

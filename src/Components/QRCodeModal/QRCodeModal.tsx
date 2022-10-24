@@ -189,7 +189,7 @@ export const QRCodeModal: React.FC<Props> = ({
   devWallets,
 }) => {
   const { state } = wcs;
-  const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
+  const { showQRCodeModal, QRCode, QRCodeUrl, isMobile, connectionTimeout } = state;
   const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
   const options = ['qr', isMobile ? 'mobile' : 'desktop'];
   // Which tab of the popup is currently open (qr/desktop/mobile)
@@ -297,6 +297,7 @@ export const QRCodeModal: React.FC<Props> = ({
         const eventData: EventData = {
           uri: encodedQRCodeUrl,
           event: 'walletconnect_init',
+          duration: connectionTimeout,
         };
         // Trigger the event action based on the wallet
         wallet.eventAction(eventData);
