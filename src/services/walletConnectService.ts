@@ -290,13 +290,16 @@ export class WalletConnectService {
   /**
    * @param bridge - (optional) URL string of bridge to connect into
    * @param duration - (optional) Time before connection is timed out (seconds)
+   * @param noPopup - (optional) Prevent the QRCodeModal from automatically popping up
    */
   connect = async ({
     bridge,
     duration,
+    noPopup,
   }: {
     bridge?: string;
     duration?: number;
+    noPopup?: boolean;
   } = {}) => {
     // Update the duration of this connection
     this.setState({
@@ -306,6 +309,7 @@ export class WalletConnectService {
       bridge: bridge || this.state.bridge,
       broadcast: this.#broadcastEvent,
       getState: this.#getState,
+      noPopup,
       resetState: this.resetState,
       setState: this.setState,
       startConnectionTimer: this.#startConnectionTimer,

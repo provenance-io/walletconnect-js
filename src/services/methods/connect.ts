@@ -15,6 +15,7 @@ interface ConnectProps {
   bridge: string;
   broadcast: Broadcast;
   getState: () => WCSState;
+  noPopup?: boolean;
   resetState: () => void;
   setState: WCSSetState;
   startConnectionTimer: () => void;
@@ -25,11 +26,13 @@ export const connect = async ({
   bridge,
   broadcast,
   getState,
+  noPopup,
   resetState,
   setState,
   startConnectionTimer,
   state,
 }: ConnectProps) => {
+  console.log('connect.ts | start of connect function');
   // -------------------
   // PULL ACCOUNT INFO
   // -------------------
@@ -207,7 +210,7 @@ export const connect = async ({
   class QRCodeModal {
     open = async (data: string) => {
       const qrcode = await QRCode.toDataURL(data);
-      setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: true });
+      setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: !noPopup });
     };
 
     close = () => {
@@ -217,10 +220,12 @@ export const connect = async ({
   const qrcodeModal = new QRCodeModal();
   // create new connector
   const newConnector = new WalletConnectClient({ bridge, qrcodeModal });
+  console.log('connect.ts | newConnector: ', newConnector);
   // check if already connected
   if (!newConnector.connected) {
     // create new session
     await newConnector.createSession();
+    console.log('connect.ts | newConnector not connected:', newConnector);
   }
   // ----------------------------------------------
   // RUN SUBSCRIPTION WITH NEW WC CONNECTION

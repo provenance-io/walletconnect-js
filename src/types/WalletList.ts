@@ -21,6 +21,7 @@ export interface EventData {
   address?: string;
   duration?: number;
   data?: CustomEventData;
+  referral?: string;
 }
 
 export interface Wallet {
