@@ -14,6 +14,7 @@ import type {
 } from '../types';
 import {
   WINDOW_MESSAGES,
+  WALLET_APP_EVENTS,
   CONNECTION_TIMEOUT,
   WALLETCONNECT_BRIDGE_URL,
 } from '../consts';
@@ -23,7 +24,12 @@ import {
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
 } from './methods';
-import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
+import {
+  getFromLocalStorage,
+  addToLocalStorage,
+  isMobile,
+  sendWalletEvent,
+} from '../utils';
 
 // Check for existing values from localStorage
 const existingWCState: WalletConnectClientType =
@@ -110,11 +116,11 @@ const initialState: WCSState = {
 };
 
 export class WalletConnectService {
+  #connectionTimer = 0;
+
   #eventEmitter = new events.EventEmitter();
 
   #setWalletConnectState: WCSSetFullState | undefined = undefined;
-
-  #connectionTimer = 0;
 
   state: WCSState = { ...initialState };
 
@@ -125,23 +131,15 @@ export class WalletConnectService {
     this.#eventEmitter.emit(eventName, data);
   };
 
-  addListener(eventName: string, callback: (results: BroadcastResults) => void) {
-    this.#eventEmitter.addListener(eventName, callback);
-  }
-
-  on(eventName: string, callback: () => void) {
-    this.#eventEmitter.addListener(eventName, callback);
-  }
-
-  removeListener(eventName: string, callback: (results: BroadcastResults) => void) {
-    this.#eventEmitter.removeListener(eventName, callback);
-  }
-
-  removeAllListeners() {
-    this.#eventEmitter.eventNames().forEach((eventName) => {
-      this.#eventEmitter.removeAllListeners(eventName);
-    });
-  }
+  // Stop the current running connection timer
+  #clearConnectionTimer = () => {
+    if (this.#connectionTimer) {
+      // Stop timer
+      window.clearTimeout(this.#connectionTimer);
+      // Reset timer value to 0
+      this.#connectionTimer = 0;
+    }
+  };
 
   // Pull latest state values on demand (prevent stale state in callback events)
   #getState = () => this.state;
@@ -155,7 +153,7 @@ export class WalletConnectService {
       this.state.connectionEST
     ) {
       // Get the time until expiration (typically this.state.connectionTimeout, but might not be if session restored from refresh)
-      const connectionTimeout = this.state.connectionEXP - this.state.connectionEST;
+      const connectionTimeout = this.state.connectionEXP - Date.now();
       // Create a new timer
       const newConnectionTimer = window.setTimeout(() => {
         // When this timer expires, kill the session
@@ -164,36 +162,6 @@ export class WalletConnectService {
       // Save this timer (so it can be deleted on a reset)
       this.#connectionTimer = newConnectionTimer;
     }
-  };
-
-  resetConnectionTimeout = () => {
-    // Kill the last timer (if it exists)
-    if (this.#connectionTimer) window.clearTimeout(this.#connectionTimer);
-    // Build a new connectionEST
-    const connectionEST = Date.now();
-    // Build a new connectionEXP (Iat + connectionTimeout)
-    const connectionEXP = this.state.connectionTimeout + connectionEST;
-    // Save these new values (needed for session restore functionality/page refresh)
-    this.setState({ connectionEST, connectionEXP });
-    // Start a new timer
-    this.#startConnectionTimer();
-  };
-
-  updateState(): void {
-    if (this.#setWalletConnectState) {
-      this.#setWalletConnectState({
-        ...this.state,
-      });
-    }
-  }
-
-  setStateUpdater(setWalletConnectState: WCSSetFullState): void {
-    this.#setWalletConnectState = setWalletConnectState;
-  }
-
-  resetState = () => {
-    this.state = { ...defaultState };
-    this.updateState();
   };
 
   #updateLocalStorage = (updatedState: Partial<WCSState>) => {
@@ -225,6 +193,62 @@ export class WalletConnectService {
     }
   };
 
+  // Create listeners used with eventEmitter/broadcast results
+  addListener(eventName: string, callback: (results: BroadcastResults) => void) {
+    this.#eventEmitter.addListener(eventName, callback);
+  }
+
+  // Clone of addListener function
+  on(eventName: string, callback: () => void) {
+    this.#eventEmitter.addListener(eventName, callback);
+  }
+
+  // Remove all listeners used with eventEmitter/broadcast results
+  removeAllListeners() {
+    this.#eventEmitter.eventNames().forEach((eventName) => {
+      this.#eventEmitter.removeAllListeners(eventName);
+    });
+  }
+
+  // Remove listener w/specific eventName used with eventEmitter/broadcast results
+  removeListener(eventName: string, callback: (results: BroadcastResults) => void) {
+    this.#eventEmitter.removeListener(eventName, callback);
+  }
+
+  /**
+   *
+   * @param connectionTimeout (optional) Seconds to bump the connection timeout by
+   */
+  resetConnectionTimeout = (connectionTimeout?: number) => {
+    // Use the new (convert to ms) or existing connection timeout
+    const newConnectionTimeout = connectionTimeout
+      ? connectionTimeout * 1000
+      : this.state.connectionTimeout;
+    // Kill the last timer (if it exists)
+    this.#clearConnectionTimer();
+    // Build a new connectionEXP (Iat + connectionTimeout)
+    const connectionEXP = newConnectionTimeout + Date.now();
+    // Save these new values (needed for session restore functionality/page refresh)
+    this.setState({ connectionTimeout: newConnectionTimeout, connectionEXP });
+    // Start a new timer
+    this.#startConnectionTimer();
+    // Send connected wallet custom event with the new connection details
+    if (this.state.walletApp) {
+      sendWalletEvent(
+        this.state.walletApp,
+        WALLET_APP_EVENTS.RESET_TIMEOUT,
+        newConnectionTimeout
+      );
+    }
+  };
+
+  // Reset walletConnectService state back to the original default state
+  resetState = () => {
+    this.state = { ...defaultState };
+    this.updateState();
+  };
+
+  // Change the class state
   setState: WCSSetState = (updatedState) => {
     // Check if connected and account exists to update 'figureConnected' state
     const figureConnected =
@@ -237,9 +261,24 @@ export class WalletConnectService {
     this.#updateLocalStorage({ ...updatedState, figureConnected });
   };
 
+  // Create a stateUpdater, used for context to be able to auto change this class state
+  setStateUpdater(setWalletConnectState: WCSSetFullState): void {
+    this.#setWalletConnectState = setWalletConnectState;
+  }
+
+  // Show/Hide the QrCodeModal (just a state value passed into the Component)
   showQRCode = (value: boolean) => {
     this.setState({ showQRCodeModal: value });
   };
+
+  // Update the class object to reflect the latest state changes
+  updateState(): void {
+    if (this.#setWalletConnectState) {
+      this.#setWalletConnectState({
+        ...this.state,
+      });
+    }
+  }
 
   // All Wallet Methods here
   // - Connect

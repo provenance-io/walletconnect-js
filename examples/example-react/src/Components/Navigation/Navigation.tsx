@@ -5,6 +5,7 @@ import { useState } from 'react';
 import {
   CONNECT_URL,
   ICON_NAMES,
+  RESET_CONNECTION_URL,
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
   SIGN_MESSAGE_URL,
@@ -55,6 +56,11 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
   const [activePage, setActivePage] = useState('connect');
   // List of links
   const navItems = [
+    {
+      name: 'Reset Connection',
+      icon: ICON_NAMES.RELOAD,
+      url: RESET_CONNECTION_URL,
+    },
     {
       name: 'Send Message',
       icon: ICON_NAMES.GEAR,

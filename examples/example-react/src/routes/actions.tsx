@@ -1,5 +1,15 @@
-import { SEND_MESSAGE_URL, SIGN_JWT_URL, SIGN_MESSAGE_URL } from 'consts';
-import { SendMessage, SignJWT, SignMessage } from 'Page';
+import {
+  RESET_CONNECTION_URL,
+  SEND_MESSAGE_URL,
+  SIGN_JWT_URL,
+  SIGN_MESSAGE_URL,
+} from 'consts';
+import { ResetConnectionTimeout, SendMessage, SignJWT, SignMessage } from 'Page';
+
+export const RESET_CONNECTION = {
+  path: RESET_CONNECTION_URL,
+  element: <ResetConnectionTimeout />,
+};
 
 export const SEND_MESSAGE = {
   path: SEND_MESSAGE_URL,

@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import { COLORS } from 'theme';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { decodeJWT } from 'utils';
-import { CountdownTimer, Modal, Button, Sprite } from 'Components';
-import { ICON_NAMES } from 'consts';
+import { CountdownTimer, Modal, Button } from 'Components';
 
 const RowInfo = styled.div`
   padding: 0 20px 0 40px;
@@ -69,7 +68,7 @@ const ModalText = styled.div`
 export const Countdowns: React.FC = () => {
   const [showPopupModal, setShowPopupModal] = useState(false); // Popup modal will warn the user befor the JWT or Connection expire
   const [popupModalMsg, setPopupModalMsg] = useState(''); // What message should the popup modal display?
-  const { walletConnectState, walletConnectService: wcs } = useWalletConnect();
+  const { walletConnectState } = useWalletConnect();
   const { address, connected, connectionEXP, signedJWT } = walletConnectState;
   // Need to decode signedJWT and note the expiration time
   const { payload: JWTPayload, valid: JWTValid } = decodeJWT(signedJWT, {
@@ -92,17 +91,18 @@ export const Countdowns: React.FC = () => {
   return showCountdowns ? (
     <>
       {connected && connectionEXP && (
-        <RowInfo
-          title="Click to reset connection timeout"
-          onClick={wcs.resetConnectionTimeout}
-        >
-          <RowInfoTitle>
-            <div>Connection Expires</div>
-            <Sprite
-              icon={ICON_NAMES.RELOAD}
-              size="1.3rem"
-              color={COLORS.PRIMARY_600}
-            />
+        <RowInfo title="Click to reset connection timeout">
+          <RowInfoTitle
+            title={`Connection Expires: ${new Date(connectionEXP).toLocaleDateString(
+              'en-US',
+              {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              }
+            )}`}
+          >
+            Connection Expires
           </RowInfoTitle>
           <RowInfoValue>
             <CountdownTimer
@@ -113,7 +113,13 @@ export const Countdowns: React.FC = () => {
         </RowInfo>
       )}
       {JWTValid && (
-        <RowInfo title="Signed JWT expiration countdown">
+        <RowInfo
+          title={`JWT Expires: ${new Date(JWTExpMs).toLocaleDateString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          })}`}
+        >
           <RowInfoTitle>JWT Expires</RowInfoTitle>
           <RowInfoValue>
             <CountdownTimer
