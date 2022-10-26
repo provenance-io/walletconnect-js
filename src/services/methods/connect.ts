@@ -32,7 +32,6 @@ export const connect = async ({
   startConnectionTimer,
   state,
 }: ConnectProps) => {
-  console.log('connect.ts | start of connect function');
   // -------------------
   // PULL ACCOUNT INFO
   // -------------------
@@ -220,15 +219,15 @@ export const connect = async ({
   const qrcodeModal = new QRCodeModal();
   // create new connector
   const newConnector = new WalletConnectClient({ bridge, qrcodeModal });
-  console.log('connect.ts | newConnector: ', newConnector);
   // check if already connected
   if (!newConnector.connected) {
     // create new session
     await newConnector.createSession();
-    console.log('connect.ts | newConnector not connected:', newConnector);
   }
   // ----------------------------------------------
   // RUN SUBSCRIPTION WITH NEW WC CONNECTION
   // ----------------------------------------------
   subscribeToEvents(newConnector);
+
+  return;
 };

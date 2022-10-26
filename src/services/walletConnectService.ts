@@ -146,7 +146,7 @@ export class WalletConnectService {
 
   // Control auto-disconnect / timeout
   #startConnectionTimer = () => {
-    // Can't start a timer if one is already running (make sure we have Eat and Iat too)
+    // Can't start a timer if one is already running (make sure we have EXP and EST too)
     if (
       !this.#connectionTimer &&
       this.state.connectionEXP &&

@@ -19,7 +19,7 @@ const WalletConnectContextProvider: React.FC<Props> = ({ children }) => {
   const [walletConnectState, setWalletConnectState] = useState<WCSState>({
     ...walletConnectService.state,
   });
-  const { address, QRCodeUrl } = walletConnectState;
+  const { address } = walletConnectState;
 
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
@@ -30,39 +30,43 @@ const WalletConnectContextProvider: React.FC<Props> = ({ children }) => {
       // Check to see if resuming connection on a new domain (url params)
       const url = new URL(window.location.href);
       // Check for referral whos value will be the wallet type to reconnect into
-      const referralWalletType = url.searchParams.get('wcjs_referral');
+      const referralWalletType = url.searchParams.get('wcjs_wallet');
+      // Check for custom bridge param
+      const customBridge = url.searchParams.get('wcjs_bridge');
+      // Check for custom duration param (duration is in the url as ms)
+      const customDuration = url.searchParams.get('wcjs_duration');
       const matchingWallet = WALLET_LIST.find(({ id }) => id === referralWalletType);
-      console.log('referralWalletType :', referralWalletType);
-      console.log('matchingWallet :', matchingWallet);
       if (matchingWallet) {
-        // Check for custom bridge param
-        const customBridge = url.searchParams.get('wcjs_bridge');
-        // Clear out search params to keep url pretty
-        url.searchParams.delete('wcjs_referral');
-        url.searchParams.delete('wcjs_bridge');
-        const finalUrl = url.toString();
-        window.history.replaceState(null, '', finalUrl);
         const asyncConnectionEvent = async () => {
+          // Clear out search params to keep url pretty
+          url.searchParams.delete('wcjs_wallet');
+          url.searchParams.delete('wcjs_bridge');
+          url.searchParams.delete('wcjs_duration');
+          const finalUrl = url.toString();
+          window.history.replaceState(null, '', finalUrl);
           // Need an eventAction to send the reconnect event
           if (matchingWallet.eventAction) {
             // Initialize a connection
             await walletConnectService.connect({
-              bridge: customBridge || '',
+              bridge: customBridge || undefined,
               noPopup: true,
+              // Duration is in the url in ms.  Connect requires duration as seconds
+              duration: customDuration ? Number(customDuration) / 1000 : undefined,
             });
             // Attempt to get previous page
             const referralUrl = document.referrer;
             // Set the wallet.id passed in
             walletConnectService.setState({ walletApp: matchingWallet.id });
             // Build eventData to send to the extension
-            const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
+            const encodedQRCodeUrl = encodeURIComponent(
+              walletConnectService.state?.QRCodeUrl
+            );
             const eventData: EventData = {
               uri: encodedQRCodeUrl,
               event: 'walletconnect_init',
               referral: referralUrl,
+              duration: customDuration ? Number(customDuration) : undefined,
             };
-            // FIX: Not getting URI in event data
-            console.log('eventData :', eventData);
             // Trigger the event action based on the wallet
             matchingWallet.eventAction(eventData);
           }
