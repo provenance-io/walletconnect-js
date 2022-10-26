@@ -31,7 +31,9 @@ export const Root: React.FC = () => {
   // If we are disconnected/not connected, redirect ot the connect page
   useEffect(() => {
     const connectPage = location.pathname.includes('/connect');
-    if (!connected && !connectPage) navigate(CONNECT_URL);
+    const urlParams = new URL(window.location.href).searchParams.toString();
+    if (!connected && !connectPage)
+      navigate(`${CONNECT_URL}${urlParams ? `?${urlParams}` : ''}`);
   }, [connected, navigate, location.pathname]);
 
   return (

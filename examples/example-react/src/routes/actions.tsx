@@ -1,11 +1,22 @@
 import {
+  AUTOCONNECT_URL,
   RESET_CONNECTION_URL,
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
   SIGN_MESSAGE_URL,
 } from 'consts';
-import { ResetConnectionTimeout, SendMessage, SignJWT, SignMessage } from 'Page';
+import {
+  AutoConnect,
+  ResetConnectionTimeout,
+  SendMessage,
+  SignJWT,
+  SignMessage,
+} from 'Page';
 
+export const AUTO_CONNECT = {
+  path: AUTOCONNECT_URL,
+  element: <AutoConnect />,
+};
 export const RESET_CONNECTION = {
   path: RESET_CONNECTION_URL,
   element: <ResetConnectionTimeout />,

@@ -19,6 +19,8 @@ WalletConnect-JS version 2.0.0 significantly reduced its package size by removin
 6. [walletConnectService](#walletConnectService)
    - [connect](#connect)
    - [disconnect](#disconnect)
+   - [generateAutoConnectUrl](#generateAutoConnectUrl)
+   - [resetConnectionTimeout](#resetConnectionTimeout)
    - [signJWT](#signJWT)
    - [sendMessage](#sendMessage)
    - [signMessage](#signMessage)
@@ -163,6 +165,28 @@ React hook which contains `walletConnectService` and `walletConnectState`
   // WINDOW_MESSAGE: DISCONNECT
   ```
 
+- #### generateAutoConnectUrl
+
+  Change the amount of connection time remaining for the currenct walletconnect session
+  ```js
+  walletConnectService.generateAutoConnectUrl({ url, duration, walletId });
+  ```
+  | Param   | Type   | Required | Default | Example               | Info                   |
+  | ------- | ------ | -------- | ------- | --------------------- | ---------------------- |
+  | url | string | yes      | -       | 'https://figure.com' | URL to send user (with wcjs functionality) |
+  | duration | number | no      | current connected wallet timeout       | 3600 | Seconds to set future connection to |
+  | walletId | string | no      | current connected wallet type id       | 'provenance_extension' | Which wallet to auto-connect with |
+
+- #### resetConnectionTimeout
+
+  Change the amount of connection time remaining for the currenct walletconnect session
+  ```js
+  walletConnectService.resetConnectionTimeout(connectionTimeout);
+  ```
+  | Param   | Type   | Required | Default | Example               | Info                   |
+  | ------- | ------ | -------- | ------- | --------------------- | ---------------------- |
+  | connectionTimeout | number | no      | 1800       | 3600 | Seconds to extend current session |
+
 - #### signJWT
 
   Prompt user to sign a generated JWT
@@ -196,7 +220,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   Prompt user to sign a custom message
   ```js
   walletConnectService.signMessage(message);
-  // WINDOW_MESSAGES: SIGNATURE_COMPLETE, SIGNATURE_FAILED
+  // WINDOW_MESSAGES: SIGN_MESSAGE_COMPLETE, SIGN_MESSAGE_FAILED
   ```
   | Param   | Type   | Required | Default | Example               | Info                   |
   | ------- | ------ | -------- | ------- | --------------------- | ---------------------- |

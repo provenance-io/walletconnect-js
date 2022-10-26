@@ -2,7 +2,13 @@ import { HOMEPAGE_URL } from 'consts';
 import { CONNECT } from './connect';
 import { Connect } from 'Page';
 import { Root } from 'Page';
-import { SIGN_JWT, SEND_MESSAGE, SIGN_MESSAGE, RESET_CONNECTION } from './actions';
+import {
+  AUTO_CONNECT,
+  RESET_CONNECTION,
+  SEND_MESSAGE,
+  SIGN_JWT,
+  SIGN_MESSAGE,
+} from './actions';
 
 export const routes = [
   {
@@ -10,11 +16,12 @@ export const routes = [
     element: <Root />,
     children: [
       { index: true, element: <Connect /> },
+      AUTO_CONNECT,
       CONNECT,
-      SIGN_JWT,
-      SEND_MESSAGE,
-      SIGN_MESSAGE,
       RESET_CONNECTION,
+      SEND_MESSAGE,
+      SIGN_JWT,
+      SIGN_MESSAGE,
     ],
   },
   // { path: FOUR_OH_FOUR_URL, element: <NotFound /> },

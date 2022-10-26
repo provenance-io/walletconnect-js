@@ -6,6 +6,7 @@ import type {
   BroadcastResults,
   GasPrice,
   WalletConnectClientType,
+  WalletId,
   WalletInfo,
   WCJSLocalState,
   WCSSetFullState,
@@ -280,12 +281,25 @@ export class WalletConnectService {
     }
   }
 
-  // All Wallet Methods here
-  // - Connect
-  // - SendMessage
-  // - Disconnect
-  // - Sign JWT
-  // - Sign Message
+  /**
+   *
+   * @param url - URL to send user (with wcjs functionality)
+   * @param walletId - (optional) wallet id to auto load upon landing on new url
+   * @param duration - (optional) new connection timeout in seconds
+   * @returns URL redirect string
+   */
+  generateAutoConnectUrl = ({
+    url,
+    walletId,
+    duration,
+  }: {
+    url: string;
+    walletId?: WalletId;
+    duration?: number;
+  }) =>
+    `${url}?wcjs_wallet=${walletId || this.state.walletApp}&wcjs_bridge=${
+      this.state.bridge
+    }&wcjs_duration=${duration ? duration * 1000 : this.state.connectionTimeout}`;
 
   /**
    * @param bridge - (optional) URL string of bridge to connect into
@@ -390,8 +404,8 @@ export class WalletConnectService {
     this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error
-      ? WINDOW_MESSAGES.SIGNATURE_FAILED
-      : WINDOW_MESSAGES.SIGNATURE_COMPLETE;
+      ? WINDOW_MESSAGES.SIGN_MESSAGE_FAILED
+      : WINDOW_MESSAGES.SIGN_MESSAGE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();

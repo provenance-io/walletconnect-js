@@ -30,12 +30,12 @@ const WalletConnectContextProvider: React.FC<Props> = ({ children }) => {
       // Check to see if resuming connection on a new domain (url params)
       const url = new URL(window.location.href);
       // Check for referral whos value will be the wallet type to reconnect into
-      const referralWalletType = url.searchParams.get('wcjs_wallet');
+      const walletId = url.searchParams.get('wcjs_wallet');
       // Check for custom bridge param
       const customBridge = url.searchParams.get('wcjs_bridge');
       // Check for custom duration param (duration is in the url as ms)
       const customDuration = url.searchParams.get('wcjs_duration');
-      const matchingWallet = WALLET_LIST.find(({ id }) => id === referralWalletType);
+      const matchingWallet = WALLET_LIST.find(({ id }) => id === walletId);
       if (matchingWallet) {
         const asyncConnectionEvent = async () => {
           // Clear out search params to keep url pretty

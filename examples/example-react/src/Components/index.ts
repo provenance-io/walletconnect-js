@@ -1,6 +1,5 @@
 export * from './ActionCard';
 export * from './ActionGas';
-export * from './Actions';
 export * from './Button';
 export * from './Card';
 export * from './CopyValue';

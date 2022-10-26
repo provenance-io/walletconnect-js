@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
-import { Button, Input, ActionCard, ActionGas } from 'Components';
+import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
 
@@ -16,6 +16,10 @@ const TestMessage = styled.span`
 export const SendMessage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [description, setDescription] = useState('');
+  const [results, setResults] = useState<{
+    [key: string]: any;
+  } | null>({});
+  const [initialLoad, setInitialLoad] = useState(true);
   const [method, setMethod] = useState('provenance_sendTransaction');
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
@@ -34,15 +38,39 @@ export const SendMessage: React.FC = () => {
     );
   };
 
+  // Create all event listeners for this Action Card method
+  useEffect(() => {
+    const completeEvent = (result: any) => {
+      setResults({
+        action: 'sendMessage',
+        status: 'success',
+        message: 'WalletConnectJS | Send Message Complete',
+        data: result,
+      });
+    };
+    const failEvent = (result: any) => {
+      const { error } = result;
+      setResults({
+        action: 'sendMessage',
+        status: 'failed',
+        message: error.message,
+        data: result,
+      });
+    };
+    // First load, if windowMessages passed in, create events
+    if (initialLoad) {
+      setInitialLoad(false);
+      wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE, completeEvent);
+      wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_FAILED, failEvent);
+    }
+  }, [initialLoad, wcs]);
+
   return (
     <ActionCard
       icon={ICON_NAMES.GEAR}
       title="Send Message"
       description="Pass along an encoded base64 message to the wallet"
-      windowMessages={{
-        success: WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE,
-        failure: WINDOW_MESSAGES.SEND_MESSAGE_FAILED,
-      }}
+      status={results?.status}
     >
       <TestMessage
         onClick={clickUseSampleButton}
@@ -83,6 +111,7 @@ export const SendMessage: React.FC = () => {
       >
         Submit
       </Button>
+      <Results results={results} setResults={setResults} />
     </ActionCard>
   );
 };

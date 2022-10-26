@@ -3,6 +3,15 @@ import styled from 'styled-components';
 import { COLORS, FONTS } from 'theme';
 import { Sprite } from '../Sprite/Sprite';
 
+const DropdownContainer = styled.div<{ bottomGap?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  ${({ bottomGap }) =>
+    bottomGap &&
+    `
+    margin-bottom: 20px;
+  `}
+`;
 const SelectContainer = styled.div`
   align-items: center;
   border-radius: 4px;
@@ -10,7 +19,6 @@ const SelectContainer = styled.div`
   border: 1px solid ${COLORS.NEUTRAL_300};
   display: inline-flex;
   justify-content: flex-start;
-  margin-bottom: 42px;
   height: 50px;
   position: relative;
   transition: 300ms all;
@@ -49,14 +57,27 @@ const DropdownIcon = styled.div`
   );
   width: 80px;
 `;
+const Label = styled.label`
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 3px;
+`;
 
 interface Props {
   options: string[];
   onChange: (value: any) => void;
   value: string;
+  label?: string;
+  bottomGap?: boolean;
 }
 
-export const Dropdown: React.FC<Props> = ({ options, onChange, value }) => {
+export const Dropdown: React.FC<Props> = ({
+  options,
+  onChange,
+  value,
+  label,
+  bottomGap,
+}) => {
   const renderOptions = () =>
     options.map((title) => (
       <option key={title} value={title}>
@@ -65,17 +86,20 @@ export const Dropdown: React.FC<Props> = ({ options, onChange, value }) => {
     ));
 
   return (
-    <SelectContainer>
-      <StyledSelect
-        onChange={({ target }) => onChange(target.value)}
-        defaultValue={value}
-      >
-        <option disabled />
-        {renderOptions()}
-      </StyledSelect>
-      <DropdownIcon>
-        <Sprite icon={ICON_NAMES.CARET} color={COLORS.NEUTRAL_400} size="16px" />
-      </DropdownIcon>
-    </SelectContainer>
+    <DropdownContainer bottomGap={bottomGap}>
+      {label && <Label>{label}</Label>}
+      <SelectContainer>
+        <StyledSelect
+          onChange={({ target }) => onChange(target.value)}
+          defaultValue={value}
+        >
+          <option disabled />
+          {renderOptions()}
+        </StyledSelect>
+        <DropdownIcon>
+          <Sprite icon={ICON_NAMES.CARET} color={COLORS.NEUTRAL_400} size="16px" />
+        </DropdownIcon>
+      </SelectContainer>
+    </DropdownContainer>
   );
 };

@@ -1,24 +1,42 @@
 import { useState } from 'react';
 import { WALLET_LIST, useWalletConnect } from '@provenanceio/walletconnect-js';
-import { Input, ActionCard, Dropdown } from 'Components';
+import { Input, ActionCard, Dropdown, Button } from 'Components';
 import { ICON_NAMES } from 'consts';
 
 export const AutoConnect: React.FC = () => {
+  const walletIdOptions = WALLET_LIST.map(({ id }) => id).sort();
   const [duration, setDuration] = useState('');
-  const [wallet, setWallet] = useState('');
-  const [url, setUrl] = useState('');
-  const { walletConnectState } = useWalletConnect();
-  const { bridge } = walletConnectState;
+  const [walletId, setWalletId] = useState(walletIdOptions[0]);
+  const [url, setUrl] = useState('http://localhost:3000/walletconnect');
+  const { walletConnectService: wcs } = useWalletConnect();
 
-  const walletIdOptions = WALLET_LIST.map(({ id }) => id);
+  const handleSubmit = async () => {
+    const newUrl = wcs.generateAutoConnectUrl({
+      url,
+      walletId,
+      duration: duration ? Number(duration) : undefined,
+    });
+    // If the url is this localhost demo, first kill the connection before redirection
+    if (url.includes('http://localhost:3000/walletconnect')) {
+      await wcs.disconnect();
+    }
+    // Navigate to new page
+    window.location.href = newUrl;
+  };
 
   return (
     <ActionCard
-      icon={ICON_NAMES.RELOAD}
+      icon={ICON_NAMES.CHECK}
       title="Auto Connect"
       description="Automatically initiate a wcjs connection on a new url"
     >
-      <Dropdown options={walletIdOptions} onChange={setWallet} value={wallet} />
+      <Dropdown
+        options={walletIdOptions}
+        onChange={setWalletId}
+        value={walletId}
+        label="Select a wallet ID"
+        bottomGap
+      />
       <Input
         value={url}
         label="URL to send user to"
@@ -28,20 +46,12 @@ export const AutoConnect: React.FC = () => {
       />
       <Input
         value={duration}
-        label="New connection timeout duration"
+        label="New connection timeout duration (seconds)"
         placeholder="(optional) Enter duration in seconds"
         onChange={setDuration}
         bottomGap
       />
-      <a
-        href={`${url}?wcjs_wallet=${wallet}&wcjs_bridge${bridge}${
-          duration ? `&wcjs_duration=${duration}` : ''
-        }`}
-        target="_blank"
-        rel="noreferrer"
-      >
-        Navigate to new url
-      </a>
+      <Button onClick={handleSubmit}>Visit New Page</Button>
     </ActionCard>
   );
 };

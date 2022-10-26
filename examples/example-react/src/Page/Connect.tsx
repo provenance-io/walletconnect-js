@@ -56,6 +56,8 @@ export const Connect: React.FC = () => {
         options={BRIDGE_URLS}
         onChange={setSelectedBridge}
         value={selectedBridge}
+        label="Select Bridge"
+        bottomGap
       />
       <Button
         onClick={() => wcs.connect({ bridge: selectedBridge, duration: 3600 })}

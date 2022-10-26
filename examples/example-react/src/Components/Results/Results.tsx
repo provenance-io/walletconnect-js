@@ -7,6 +7,7 @@ import { ICON_NAMES } from 'consts';
 
 const ResultsWrapper = styled.div`
   margin-top: 40px;
+  width: 100%;
 `;
 const ResultsTitle = styled.div`
   margin-bottom: 4px;
