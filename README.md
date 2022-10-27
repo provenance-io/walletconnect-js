@@ -147,7 +147,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   Connect a WalletConnect wallet
 
   ```js
-  walletConnectService.connect(bridge);
+  walletConnectService.connect({bridge, duration, noPopup});
   // WINDOW_MESSAGE: CONNECTED
   ```
 
@@ -155,6 +155,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | ------ | ------ | -------- | ---------------------- | ------------ | --------------------------------------- |
   | bridge | string | no       | `"wss://figure.tech/service-wallet-connect-bridge/ws/external"` | `"wss://custom.bridge"` | Custom bridge to connect into |
   | duration | string | no       | `1800` | `3600` | Custom connection timeout in seconds |
+  | noPopup | boolean | no       | false | true | Should the QRCodeModal popup automatically on connect call |
 
 - #### disconnect
 
