@@ -206,7 +206,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   Pass through a custom base64 encoded message
 
   ```js
-  walletConnectService.sendMessage({ message, description, method });
+  walletConnectService.sendMessage({ message, description, method, gasPrice });
   // WINDOW_MESSAGES: SEND_MESSAGE_COMPLETE, SEND_MESSAGE_FAILED
   ```
 
