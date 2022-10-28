@@ -56,6 +56,26 @@ Each method will return a window message indicating whether it failed or was com
 _Note A: See `walletConnectService` for all `WINDOW_MESSAGES` based on method._
 _Note B: All of these are based off Node.js Event Emitters, read more on them here: [Node.js Event Emitters](https://nodejs.org/api/events.html#event-newlistener)_
 
+List of WINDOW_MESSAGES:
+```js
+  export const WINDOW_MESSAGES = {
+  // WalletConnect Connected
+  CONNECTED: 'FWC_CONNECTED',
+  // WalletConnect Disconnect
+  DISCONNECT: 'FWC_DISCONNECT',
+  // Send Message
+  SEND_MESSAGE_COMPLETE: 'SEND_MESSAGE_COMPLETE',
+  SEND_MESSAGE_FAILED: 'SEND_MESSAGE_FAILED',
+  // JWT
+  SIGN_JWT_COMPLETE: 'SIGN_JWT_COMPLETE',
+  SIGN_JWT_FAILED: 'SIGN_JWT_FAILED',
+  // Sign
+  SIGN_MESSAGE_COMPLETE: 'SIGN_MESSAGE_COMPLETE',
+  SIGN_MESSAGE_FAILED: 'SIGN_MESSAGE_FAILED',
+};
+```
+
+Example Usesage: 
 ```js
 // (Example using cancelRequest)
 
