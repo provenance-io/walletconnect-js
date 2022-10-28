@@ -77,7 +77,7 @@ List of WINDOW_MESSAGES:
 
 Example Usesage: 
 ```js
-// (Example using cancelRequest)
+// (Example using sendMessage)
 
 // Listen for complete/success
 const successAction = (result) => {
