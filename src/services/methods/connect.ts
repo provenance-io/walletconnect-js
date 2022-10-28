@@ -1,29 +1,36 @@
 import WalletConnectClient from '@walletconnect/client';
 import QRCode from 'qrcode';
-import { Broadcast, ConnectData, AccountInfo } from '../../types';
+import type {
+  Broadcast,
+  ConnectData,
+  AccountInfo,
+  WCSState,
+  WCSSetState,
+} from '../../types';
 import { WINDOW_MESSAGES } from '../../consts';
 import { clearLocalStorage } from '../../utils';
-import { SetState, State } from '../walletConnectService';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 interface ConnectProps {
-  state: State;
-  setState: SetState;
-  resetState: () => void;
-  broadcast: Broadcast;
   bridge: string;
+  broadcast: Broadcast;
+  getState: () => WCSState;
+  noPopup?: boolean;
+  resetState: () => void;
+  setState: WCSSetState;
   startConnectionTimer: () => void;
-  getState: () => State;
+  state: WCSState;
 }
 
 export const connect = async ({
-  state,
-  setState,
-  resetState,
-  broadcast,
   bridge,
-  startConnectionTimer,
+  broadcast,
   getState,
+  noPopup,
+  resetState,
+  setState,
+  startConnectionTimer,
+  state,
 }: ConnectProps) => {
   // -------------------
   // PULL ACCOUNT INFO
@@ -49,10 +56,10 @@ export const connect = async ({
   // ----------------
   const onSessionUpdate = (newConnector: WalletConnectClient) => {
     // Get connection issued time
-    const connectionIat = Math.floor(Date.now() / 1000);
-    const connectionEat = state.connectionEat;
+    const connectionEST = Date.now();
+    const connectionEXP = state.connectionEXP;
     // If the session is already expired (re-opened closed/idle tab), kill the session
-    if (!connectionEat || connectionIat >= connectionEat) newConnector.killSession();
+    if (!connectionEXP || connectionEST >= connectionEXP) newConnector.killSession();
     else {
       const { accounts, peerMeta: peer } = newConnector;
       const {
@@ -64,17 +71,18 @@ export const connect = async ({
       const signedJWT = state.signedJWT || lastConnectJWT;
       setState({
         address,
+        bridge,
         publicKey,
         connected: true,
         signedJWT,
         peer,
-        connectionIat,
+        connectionEST,
         walletInfo,
       });
       const broadcastData = {
         data: newConnector,
-        connectionIat,
-        connectionEat: state.connectionEat,
+        connectionEST,
+        connectionEXP: state.connectionEXP,
         connectionType: 'existing session',
       };
       broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
@@ -95,22 +103,23 @@ export const connect = async ({
       walletInfo,
     } = getAccountInfo(accounts);
     // Get connection issued/expires times (auto-logout)
-    const connectionIat = Math.floor(Date.now() / 1000);
-    const connectionEat = state.connectionTimeout + connectionIat;
+    const connectionEST = Date.now();
+    const connectionEXP = state.connectionTimeout + connectionEST;
     setState({
       address,
+      bridge,
       publicKey,
       peer,
       connected: true,
-      connectionIat,
+      connectionEST,
       signedJWT,
-      connectionEat,
+      connectionEXP,
       walletInfo,
     });
     const broadcastData = {
       data: payload,
-      connectionIat,
-      connectionEat,
+      connectionEST,
+      connectionEXP,
     };
     broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
     // Start the auto-logoff timer
@@ -183,12 +192,13 @@ export const connect = async ({
     }
     // Update Connector
     setState({
-      connector: newConnector,
-      connected: !!address,
       address,
+      bridge,
+      connected: !!address,
+      connector: newConnector,
+      peer,
       publicKey,
       signedJWT,
-      peer,
       walletInfo,
     });
   };
@@ -199,7 +209,7 @@ export const connect = async ({
   class QRCodeModal {
     open = async (data: string) => {
       const qrcode = await QRCode.toDataURL(data);
-      setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: true });
+      setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: !noPopup });
     };
 
     close = () => {
@@ -218,4 +228,6 @@ export const connect = async ({
   // RUN SUBSCRIPTION WITH NEW WC CONNECTION
   // ----------------------------------------------
   subscribeToEvents(newConnector);
+
+  return;
 };

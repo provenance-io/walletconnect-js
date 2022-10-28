@@ -1,5 +1,5 @@
 export const WALLETCONNECT_BRIDGE_URL =
-  'wss://test.figure.tech/service-wallet-connect-bridge/ws/external';
+  'wss://figure.tech/service-wallet-connect-bridge/ws/external';
 
 const FIREBASE_PROJECT_API_KEY = 'AIzaSyBNzgtDMBU_7Df1MjTGjHyj4_3pLYtdOY8';
 const FIREBASE_PROJECT_URL =

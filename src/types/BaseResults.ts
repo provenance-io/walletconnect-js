@@ -1,20 +1,9 @@
-import { MarkerData } from './MarkerData';
-import { MarkerAddData } from './MarkerAddData';
-import { CustomActionData } from './CustomActionData';
-import { SendCoinData } from './SendCoinData';
-import { SendHashData } from './SendHashData';
+import type { SendMessageData } from './SendMessageData';
 
 export type BaseResults = {
   valid: boolean;
   result?: Record<string, unknown>;
-  data:
-    | MarkerData
-    | MarkerAddData
-    | CustomActionData
-    | SendCoinData
-    | SendHashData
-    | string
-    | number;
+  data: SendMessageData | string | number;
   error?: string | Error | unknown;
   request?: {
     id: number;

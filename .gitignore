@@ -37,5 +37,5 @@ yarn-error.log*
 *.ignored.*
 ignored/
 .eslintcache
-/webdemoPkg
+/examples/@provenanceio-wcjs-local
 *.tgz

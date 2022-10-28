@@ -1,15 +1,27 @@
+export type EventValueNames = 'RESET_TIMEOUT' | 'DISCONNECT' | 'EVENT' | 'INIT';
 export type EventValue =
   | 'walletconnect_event'
   | 'walletconnect_init'
-  | 'walletconnect_disconnect';
+  | 'walletconnect_disconnect'
+  | 'resetConnectionTimeout';
+export type EventOptions = { [Key in EventValueNames]: EventValue };
 export type WalletType = 'mobile' | 'extension' | 'web';
 export type WalletId = 'provenance_extension' | 'provenance_mobile' | 'figure_web';
-export type WalletIcons = 'provenance' | 'figure' | 'unicorn';
+export type WalletIcons = 'provenance' | 'figure';
+
+export type CustomEventData =
+  | { [key: string]: Record<string, unknown> }
+  | string
+  | number
+  | [];
 
 export interface EventData {
   event?: EventValue;
   uri?: string;
   address?: string;
+  duration?: number;
+  data?: CustomEventData;
+  referral?: string;
 }
 
 export interface Wallet {

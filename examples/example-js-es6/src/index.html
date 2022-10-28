@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>wcjs-example-es6</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script defer src="bundle.js"></script>
+</head>
+
+<body>
+  <div id="modalContainer">
+    <div class="title">
+      WalletConnect-JS Demo
+    </div>
+    <div id="options">
+      <div class="option">
+        <div class="optionTitle">QR Code</div>
+        <div class="optionContent hidden" id="qrcode"></div>
+      </div>
+      <div class="option">
+        <div class="optionTitle">Desktop</div>
+        <div class="optionContent" id="wallets"></div>
+      </div>
+    </div>
+    <div class="status">
+      <div class="statusTitle">Status:</div>
+      <div id="statusValue">Not Connected</div>
+    </div>
+    <div id="connectionInfo" class="hidden"></div>
+  </div>
+</body>
+
+</html>

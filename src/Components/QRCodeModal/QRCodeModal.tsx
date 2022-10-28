@@ -21,7 +21,6 @@ const QRCodeModalContainer = styled.div`
   z-index: 1000;
 `;
 const QRModalContent = styled.div`
-  /* min-height: 400px; */
   width: 400px;
   transition: 1s all;
   position: relative;
@@ -190,7 +189,7 @@ export const QRCodeModal: React.FC<Props> = ({
   devWallets,
 }) => {
   const { state } = wcs;
-  const { showQRCodeModal, QRCode, QRCodeUrl, isMobile } = state;
+  const { showQRCodeModal, QRCode, QRCodeUrl, isMobile, connectionTimeout } = state;
   const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
   const options = ['qr', isMobile ? 'mobile' : 'desktop'];
   // Which tab of the popup is currently open (qr/desktop/mobile)
@@ -250,17 +249,21 @@ export const QRCodeModal: React.FC<Props> = ({
   // -----------------------------------------------
   const renderQRView = () => (
     <>
-      <Text>{title}</Text>
-      <ImgContainer>
+      <Text className="wcjs-qr-text">{title}</Text>
+      <ImgContainer className="wcjs-qr-img">
         <img src={QRCode} alt="WalletConnect QR Code" />
       </ImgContainer>
       {copied ? (
-        <CopyButton disabled>QR Code Copied</CopyButton>
+        <CopyButton disabled className="wcjs-qr-copy">
+          QR Code Copied
+        </CopyButton>
       ) : (
-        <CopyButton onClick={copyToClipboard}>Copy QR Code</CopyButton>
+        <CopyButton onClick={copyToClipboard} className="wcjs-qr-copy">
+          Copy QR Code
+        </CopyButton>
       )}
-      <Text>Download Provenance Mobile Wallet</Text>
-      <AppStoreIcons>
+      <Text className="wcjs-qr-text">Download Provenance Mobile Wallet</Text>
+      <AppStoreIcons className="wcjs-qr-appicons">
         <AppIcon
           href={APP_STORE_APPLE}
           target="_blank"
@@ -294,6 +297,7 @@ export const QRCodeModal: React.FC<Props> = ({
         const eventData: EventData = {
           uri: encodedQRCodeUrl,
           event: 'walletconnect_init',
+          duration: connectionTimeout,
         };
         // Trigger the event action based on the wallet
         wallet.eventAction(eventData);
@@ -334,9 +338,12 @@ export const QRCodeModal: React.FC<Props> = ({
           <WalletRowNonLink
             onClick={(e) => handleDesktopWalletClick(e, wallet)}
             key={id}
+            className="wcjs-qr-row-nonlink"
           >
-            {!!icon && <WalletIcon src={WALLET_ICONS[icon]} />}
-            <WalletTitle>{walletTitle}</WalletTitle>
+            {!!icon && (
+              <WalletIcon src={WALLET_ICONS[icon]} className="wcjs-qr-icon" />
+            )}
+            <WalletTitle className="wcjs-qr-title">{walletTitle}</WalletTitle>
           </WalletRowNonLink>
         );
       });
@@ -349,6 +356,7 @@ export const QRCodeModal: React.FC<Props> = ({
       if (dynamicUrl) {
         return (
           <WalletRow
+            className="wcjs-qr-row"
             href={dynamicUrl}
             rel="noopener noreferrer"
             target="_blank"
@@ -358,13 +366,17 @@ export const QRCodeModal: React.FC<Props> = ({
               wcs.setState({ walletApp: wallet.id });
             }}
           >
-            {!!icon && <WalletIcon src={WALLET_ICONS[icon]} />}
-            <WalletTitle>{walletTitle}</WalletTitle>
+            {!!icon && (
+              <WalletIcon src={WALLET_ICONS[icon]} className="wcjs-qr-icon" />
+            )}
+            <WalletTitle className="wcjs-qr-title">{walletTitle}</WalletTitle>
           </WalletRow>
         );
       }
       return (
-        <text>Unable to fetch {walletTitle} link. Please try again later.</text>
+        <Text className="wcjs-qr-text">
+          Unable to fetch {walletTitle} link. Please try again later.
+        </Text>
       );
     });
 
@@ -373,10 +385,17 @@ export const QRCodeModal: React.FC<Props> = ({
   return showQRCodeModal ? (
     <QRCodeModalContainer
       className={className}
+      id="wcjs-qr-modal"
       onClick={() => wcs.showQRCode(false)}
     >
-      <QRModalContent onClick={(e) => e.stopPropagation()}>
-        <CloseQRModal onClick={() => wcs.showQRCode(false)}>
+      <QRModalContent
+        onClick={(e) => e.stopPropagation()}
+        className="wcjs-qr-content"
+      >
+        <CloseQRModal
+          onClick={() => wcs.showQRCode(false)}
+          className="wcjs-qr-close"
+        >
           <svg
             viewBox="0 0 10 10"
             fill="none"
@@ -388,9 +407,13 @@ export const QRCodeModal: React.FC<Props> = ({
             <path d="M1.00016 1L4.90625 5L1.00016 9" />
           </svg>
         </CloseQRModal>
-        <Toggle>
+        <Toggle className="wcjs-qr-toggle">
           {options.includes('qr') && (
-            <ToggleNotch active={view === 'qr'} onClick={() => setView('qr')}>
+            <ToggleNotch
+              active={view === 'qr'}
+              onClick={() => setView('qr')}
+              className={`wcjs-qr-notch ${view === 'qr' ? 'active' : ''}`}
+            >
               QR Code
             </ToggleNotch>
           )}
@@ -398,6 +421,7 @@ export const QRCodeModal: React.FC<Props> = ({
             <ToggleNotch
               active={view === 'desktop'}
               onClick={() => setView('desktop')}
+              className={`wcjs-qr-notch ${view === 'desktop' ? 'active' : ''}`}
             >
               Desktop
             </ToggleNotch>
@@ -406,17 +430,25 @@ export const QRCodeModal: React.FC<Props> = ({
             <ToggleNotch
               active={view === 'mobile'}
               onClick={() => setView('mobile')}
+              className={`wcjs-qr-notch ${view === 'mobile' ? 'active' : ''}`}
             >
               Mobile
             </ToggleNotch>
           )}
         </Toggle>
-        {view === 'qr' ? renderQRView() : <Text>Select wallet</Text>}
+        {view === 'qr' ? (
+          renderQRView()
+        ) : (
+          <Text className="wcjs-qr-text">Select wallet</Text>
+        )}
         {view === 'desktop' && (
           <>
             {!!showReloadNotice && (
-              <ReloadNotice>
-                <CloseQRModal onClick={() => setShowReloadNotice(false)}>
+              <ReloadNotice className="wcjs-qr-reload">
+                <CloseQRModal
+                  onClick={() => setShowReloadNotice(false)}
+                  className="wcjs-qr-close"
+                >
                   <svg
                     viewBox="0 0 10 10"
                     fill="none"
@@ -428,7 +460,7 @@ export const QRCodeModal: React.FC<Props> = ({
                     <path d="M1.00016 1L4.90625 5L1.00016 9" />
                   </svg>
                 </CloseQRModal>
-                <Text>
+                <Text className="wcjs-qr-text">
                   Note: You must reload this page after installing the Provenance
                   Blockchain Wallet extension.
                 </Text>
@@ -439,7 +471,9 @@ export const QRCodeModal: React.FC<Props> = ({
             {DesktopWalletsList.length ? (
               DesktopWalletsList
             ) : (
-              <Text>No desktop wallets currently available.</Text>
+              <Text className="wcjs-qr-text">
+                No desktop wallets currently available.
+              </Text>
             )}
           </>
         )}

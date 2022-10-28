@@ -1,1 +1,1 @@
-export const CONNECTION_TIMEOUT = 1800; // 30min
+export const CONNECTION_TIMEOUT = 1800000; // Default wcjs timeout in ms (default 30min)

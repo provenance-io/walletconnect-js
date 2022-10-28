@@ -1,85 +1,49 @@
 import events from 'events';
-import WalletConnectClient from '@walletconnect/client';
-import {
-  Broadcast,
-  BroadcastResults,
-  CustomActionData,
-  IClientMeta,
-  MarkerAddData,
-  MarkerData,
-  SendCoinData,
-  SendHashBatchData,
-  SendHashData,
+import type {
   AccountInfo,
   AccountObject,
-  WalletInfo,
+  Broadcast,
+  BroadcastResults,
+  GasPrice,
+  WalletConnectClientType,
   WalletId,
+  WalletInfo,
+  WCJSLocalState,
+  WCSSetFullState,
+  WCSSetState,
+  WCSState,
 } from '../types';
 import {
   WINDOW_MESSAGES,
-  WALLETCONNECT_BRIDGE_URL,
+  WALLET_APP_EVENTS,
   CONNECTION_TIMEOUT,
+  WALLETCONNECT_BRIDGE_URL,
 } from '../consts';
 import {
-  markerActivate as markerActivateMethod,
-  markerAdd as markerAddMethod,
-  cancelRequest as cancelRequestMethod,
   connect as connectMethod,
-  customAction as customActionMethod,
-  delegateHash as delegateHashMethod,
-  sendCoin as sendCoinMethod,
+  sendMessage as sendMessageMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
-  markerFinalize as markerFinalizeMethod,
 } from './methods';
-import { getFromLocalStorage, addToLocalStorage, isMobile } from '../utils';
-
-interface WCJSState {
-  account: string;
-  connectionEat: number;
-  connectionIat: number;
-  connectionTimeout: number;
-  figureConnected: boolean;
-  newAccount: false;
-  signedJWT: string;
-  walletApp?: WalletId | '';
-}
+import {
+  getFromLocalStorage,
+  addToLocalStorage,
+  isMobile,
+  sendWalletEvent,
+} from '../utils';
 
 // Check for existing values from localStorage
-const existingWCState: WalletConnectClient = getFromLocalStorage('walletconnect');
-const existingWCJSState: WCJSState = getFromLocalStorage('walletconnect-js');
+const existingWCState: WalletConnectClientType =
+  getFromLocalStorage('walletconnect');
+const existingWCJSState: WCJSLocalState = getFromLocalStorage('walletconnect-js');
 
-export interface State {
-  account: string;
-  address: string;
-  connected: boolean;
-  connectionEat: number | null;
-  connectionIat: number | null;
-  connectionTimeout: number;
-  connector: WalletConnectClient | null;
-  figureConnected: boolean;
-  isMobile: boolean;
-  loading: string;
-  newAccount: boolean;
-  peer: IClientMeta | null;
-  publicKey: string;
-  QRCode: string;
-  QRCodeUrl: string;
-  showQRCodeModal: boolean;
-  signedJWT: string;
-  walletApp?: WalletId | '';
-  walletInfo: WalletInfo;
-}
-
-export type SetState = (state: Partial<State>) => void;
-export type SetFullState = (state: State) => void;
-
-const defaultState: State = {
+const defaultState: WCSState = {
   account: '',
   address: '',
+  bridge: WALLETCONNECT_BRIDGE_URL,
   connected: false,
-  connectionEat: null,
-  connectionIat: null,
+  connectionEXP: null,
+  connectionEST: null,
   connectionTimeout: CONNECTION_TIMEOUT,
   connector: null,
   figureConnected: false,
@@ -124,12 +88,13 @@ const getAccountItem = (itemName: keyof AccountObject) => {
   return accountsObj[itemName];
 };
 
-const initialState: State = {
+const initialState: WCSState = {
   account: existingWCJSState.account || defaultState.account,
   address: (getAccountItem('address') as string) || defaultState.address,
+  bridge: existingWCState.bridge || defaultState.bridge,
   connected: existingWCState.connected || defaultState.connected,
-  connectionEat: existingWCJSState.connectionEat || defaultState.connectionEat,
-  connectionIat: existingWCJSState.connectionIat || defaultState.connectionIat,
+  connectionEXP: existingWCJSState.connectionEXP || defaultState.connectionEXP,
+  connectionEST: existingWCJSState.connectionEST || defaultState.connectionEST,
   connectionTimeout:
     existingWCJSState.connectionTimeout || defaultState.connectionTimeout,
   connector: existingWCState || defaultState.connector,
@@ -142,22 +107,23 @@ const initialState: State = {
   QRCode: defaultState.QRCode,
   QRCodeUrl: defaultState.QRCodeUrl,
   showQRCodeModal: defaultState.showQRCodeModal,
-  signedJWT: (getAccountItem('jwt') as string) || defaultState.signedJWT,
+  signedJWT:
+    existingWCJSState.signedJWT ||
+    (getAccountItem('jwt') as string) ||
+    defaultState.signedJWT,
   walletApp: existingWCJSState.walletApp || defaultState.walletApp,
   walletInfo:
     (getAccountItem('walletInfo') as WalletInfo) || defaultState.walletInfo,
 };
 
 export class WalletConnectService {
-  #eventEmitter = new events.EventEmitter();
-
-  #setWalletConnectState: SetFullState | undefined = undefined;
-
   #connectionTimer = 0;
 
-  #bridge: string = WALLETCONNECT_BRIDGE_URL;
+  #eventEmitter = new events.EventEmitter();
 
-  state: State = { ...initialState };
+  #setWalletConnectState: WCSSetFullState | undefined = undefined;
+
+  state: WCSState = { ...initialState };
 
   // *** Event Listener *** (https://nodejs.org/api/events.html)
   // Instead of having to use walletConnectService.eventEmitter.addListener()
@@ -166,89 +132,45 @@ export class WalletConnectService {
     this.#eventEmitter.emit(eventName, data);
   };
 
-  addListener(eventName: string, callback: (results: BroadcastResults) => void) {
-    this.#eventEmitter.addListener(eventName, callback);
-  }
-
-  on(eventName: string, callback: () => void) {
-    this.#eventEmitter.addListener(eventName, callback);
-  }
-
-  removeListener(eventName: string, callback: (results: BroadcastResults) => void) {
-    this.#eventEmitter.removeListener(eventName, callback);
-  }
-
-  removeAllListeners() {
-    this.#eventEmitter.eventNames().forEach((eventName) => {
-      this.#eventEmitter.removeAllListeners(eventName);
-    });
-  }
+  // Stop the current running connection timer
+  #clearConnectionTimer = () => {
+    if (this.#connectionTimer) {
+      // Stop timer
+      window.clearTimeout(this.#connectionTimer);
+      // Reset timer value to 0
+      this.#connectionTimer = 0;
+    }
+  };
 
   // Pull latest state values on demand (prevent stale state in callback events)
   #getState = () => this.state;
 
   // Control auto-disconnect / timeout
   #startConnectionTimer = () => {
-    // Can't start a timer if one is already running (make sure we have Eat and Iat too)
+    // Can't start a timer if one is already running (make sure we have EXP and EST too)
     if (
       !this.#connectionTimer &&
-      this.state.connectionEat &&
-      this.state.connectionIat
+      this.state.connectionEXP &&
+      this.state.connectionEST
     ) {
       // Get the time until expiration (typically this.state.connectionTimeout, but might not be if session restored from refresh)
-      const connectionTimeout = this.state.connectionEat - this.state.connectionIat;
+      const connectionTimeout = this.state.connectionEXP - Date.now();
       // Create a new timer
       const newConnectionTimer = window.setTimeout(() => {
         // When this timer expires, kill the session
         this.disconnect();
-      }, connectionTimeout * 1000); // Convert to ms (timeout takes ms)
+      }, connectionTimeout);
       // Save this timer (so it can be deleted on a reset)
       this.#connectionTimer = newConnectionTimer;
     }
   };
 
-  #resetConnectionTimeout = () => {
-    // Kill the last timer (if it exists)
-    if (this.#connectionTimer) window.clearTimeout(this.#connectionTimer);
-    // Build a new connectionIat (time now in seconds)
-    const connectionIat = Math.floor(Date.now() / 1000);
-    // Build a new connectionEat (Iat + connectionTimeout)
-    const connectionEat = this.state.connectionTimeout + connectionIat;
-    // Save these new values (needed for session restore functionality/page refresh)
-    this.setState({ connectionIat, connectionEat });
-    // Start a new timer
-    this.#startConnectionTimer();
-  };
-
-  // Update bridge by passing it through as a prop on the provider
-
-  setBridge(bridge: string) {
-    this.#bridge = bridge;
-  }
-
-  updateState(): void {
-    if (this.#setWalletConnectState) {
-      this.#setWalletConnectState({
-        ...this.state,
-      });
-    }
-  }
-
-  setStateUpdater(setWalletConnectState: SetFullState): void {
-    this.#setWalletConnectState = setWalletConnectState;
-  }
-
-  resetState = () => {
-    this.state = { ...defaultState };
-    this.updateState();
-  };
-
-  #updateLocalStorage = (updatedState: Partial<State>) => {
+  #updateLocalStorage = (updatedState: Partial<WCSState>) => {
     // Special values to look for
     const {
       account,
-      connectionEat,
-      connectionIat,
+      connectionEXP,
+      connectionEST,
       connectionTimeout,
       figureConnected,
       newAccount,
@@ -258,8 +180,8 @@ export class WalletConnectService {
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
       ...(account !== undefined && { account }),
-      ...(connectionEat !== undefined && { connectionEat }),
-      ...(connectionIat !== undefined && { connectionIat }),
+      ...(connectionEXP !== undefined && { connectionEXP }),
+      ...(connectionEST !== undefined && { connectionEST }),
       ...(connectionTimeout !== undefined && { connectionTimeout }),
       ...(figureConnected !== undefined && { figureConnected }),
       ...(newAccount !== undefined && { newAccount }),
@@ -272,7 +194,63 @@ export class WalletConnectService {
     }
   };
 
-  setState: SetState = (updatedState) => {
+  // Create listeners used with eventEmitter/broadcast results
+  addListener(eventName: string, callback: (results: BroadcastResults) => void) {
+    this.#eventEmitter.addListener(eventName, callback);
+  }
+
+  // Clone of addListener function
+  on(eventName: string, callback: () => void) {
+    this.#eventEmitter.addListener(eventName, callback);
+  }
+
+  // Remove all listeners used with eventEmitter/broadcast results
+  removeAllListeners() {
+    this.#eventEmitter.eventNames().forEach((eventName) => {
+      this.#eventEmitter.removeAllListeners(eventName);
+    });
+  }
+
+  // Remove listener w/specific eventName used with eventEmitter/broadcast results
+  removeListener(eventName: string, callback: (results: BroadcastResults) => void) {
+    this.#eventEmitter.removeListener(eventName, callback);
+  }
+
+  /**
+   *
+   * @param connectionTimeout (optional) Seconds to bump the connection timeout by
+   */
+  resetConnectionTimeout = (connectionTimeout?: number) => {
+    // Use the new (convert to ms) or existing connection timeout
+    const newConnectionTimeout = connectionTimeout
+      ? connectionTimeout * 1000
+      : this.state.connectionTimeout;
+    // Kill the last timer (if it exists)
+    this.#clearConnectionTimer();
+    // Build a new connectionEXP (Iat + connectionTimeout)
+    const connectionEXP = newConnectionTimeout + Date.now();
+    // Save these new values (needed for session restore functionality/page refresh)
+    this.setState({ connectionTimeout: newConnectionTimeout, connectionEXP });
+    // Start a new timer
+    this.#startConnectionTimer();
+    // Send connected wallet custom event with the new connection details
+    if (this.state.walletApp) {
+      sendWalletEvent(
+        this.state.walletApp,
+        WALLET_APP_EVENTS.RESET_TIMEOUT,
+        newConnectionTimeout
+      );
+    }
+  };
+
+  // Reset walletConnectService state back to the original default state
+  resetState = () => {
+    this.state = { ...defaultState };
+    this.updateState();
+  };
+
+  // Change the class state
+  setState: WCSSetState = (updatedState) => {
     // Check if connected and account exists to update 'figureConnected' state
     const figureConnected =
       (!!this.state.account || !!updatedState.account) &&
@@ -284,143 +262,120 @@ export class WalletConnectService {
     this.#updateLocalStorage({ ...updatedState, figureConnected });
   };
 
+  // Create a stateUpdater, used for context to be able to auto change this class state
+  setStateUpdater(setWalletConnectState: WCSSetFullState): void {
+    this.#setWalletConnectState = setWalletConnectState;
+  }
+
+  // Show/Hide the QrCodeModal (just a state value passed into the Component)
   showQRCode = (value: boolean) => {
     this.setState({ showQRCodeModal: value });
   };
 
-  // All Wallet Methods here
-  // - Marker Activate
-  // - Marker Add
-  // - Cancel Request
-  // - Connect
-  // - CustomAction
-  // - Delegate Hash
-  // - Disconnect
-  // - Send Hash
-  // - Sign JWT
-  // - Sign Message
+  // Update the class object to reflect the latest state changes
+  updateState(): void {
+    if (this.#setWalletConnectState) {
+      this.#setWalletConnectState({
+        ...this.state,
+      });
+    }
+  }
 
-  markerActivate = async (data: MarkerData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'markerActivate' });
-    const result = await markerActivateMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.MARKER_ACTIVATE_FAILED
-      : WINDOW_MESSAGES.MARKER_ACTIVATE_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
+  /**
+   *
+   * @param url - URL to send user (with wcjs functionality)
+   * @param walletId - (optional) wallet id to auto load upon landing on new url
+   * @param duration - (optional) new connection timeout in seconds
+   * @returns URL redirect string
+   */
+  generateAutoConnectUrl = ({
+    url,
+    walletId,
+    duration,
+  }: {
+    url: string;
+    walletId?: WalletId;
+    duration?: number;
+  }) =>
+    `${url}?wcjs_wallet=${walletId || this.state.walletApp}&wcjs_bridge=${
+      this.state.bridge
+    }&wcjs_duration=${duration ? duration * 1000 : this.state.connectionTimeout}`;
 
-  markerFinalize = async (data: MarkerData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'markerFinalize' });
-    const result = await markerFinalizeMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.MARKER_FINALIZE_FAILED
-      : WINDOW_MESSAGES.MARKER_FINALIZE_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  markerAdd = async (data: MarkerAddData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'markerAdd' });
-    const result = await markerAddMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.MARKER_ADD_FAILED
-      : WINDOW_MESSAGES.MARKER_ADD_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  cancelRequest = async (denom: string) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'cancelRequest' });
-    const result = await cancelRequestMethod(this.state, denom);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.CANCEL_REQUEST_FAILED
-      : WINDOW_MESSAGES.CANCEL_REQUEST_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  connect = async () => {
-    await connectMethod({
-      state: this.state,
-      setState: this.setState,
-      resetState: this.resetState,
-      broadcast: this.#broadcastEvent,
-      bridge: this.#bridge,
-      startConnectionTimer: this.#startConnectionTimer,
-      getState: this.#getState,
+  /**
+   * @param bridge - (optional) URL string of bridge to connect into
+   * @param duration - (optional) Time before connection is timed out (seconds)
+   * @param noPopup - (optional) Prevent the QRCodeModal from automatically popping up
+   */
+  connect = async ({
+    bridge,
+    duration,
+    noPopup,
+  }: {
+    bridge?: string;
+    duration?: number;
+    noPopup?: boolean;
+  } = {}) => {
+    // Update the duration of this connection
+    this.setState({
+      connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
     });
-  };
-
-  customAction = async (data: CustomActionData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'customAction' });
-    const result = await customActionMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.CUSTOM_ACTION_FAILED
-      : WINDOW_MESSAGES.CUSTOM_ACTION_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
-  };
-
-  delegateHash = async (data: SendHashData) => {
-    // Loading while we wait for mobile to respond
-    this.setState({ loading: 'delegateHash' });
-    const result = await delegateHashMethod(this.state, data);
-    // No longer loading
-    this.setState({ loading: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.DELEGATE_HASH_FAILED
-      : WINDOW_MESSAGES.DELEGATE_HASH_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
-    // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
+    await connectMethod({
+      bridge: bridge || this.state.bridge,
+      broadcast: this.#broadcastEvent,
+      getState: this.#getState,
+      noPopup,
+      resetState: this.resetState,
+      setState: this.setState,
+      startConnectionTimer: this.#startConnectionTimer,
+      state: this.state,
+    });
   };
 
   disconnect = async () => {
     if (this?.state?.connector) await this.state.connector.killSession();
   };
 
-  sendCoin = async (data: SendCoinData) => {
+  /**
+   *
+   * @param message Raw Base64 encoded msgAny string
+   * @param description (optional) Additional information for wallet to display
+   * @param method (optional) What method is used to send this message
+   * @param gasPrice (optional) Gas price object to use
+   */
+  sendMessage = async ({
+    message,
+    description,
+    gasPrice,
+    method,
+  }: {
+    message: string | string[];
+    description?: string;
+    gasPrice?: GasPrice;
+    method?: string;
+  }) => {
     // Loading while we wait for mobile to respond
-    this.setState({ loading: 'sendCoin' });
-    const result = await sendCoinMethod(this.state, data);
+    this.setState({ loading: 'sendMessage' });
+    const result = await sendMessageMethod(this.state, {
+      message,
+      description,
+      gasPrice,
+      method,
+    });
     // No longer loading
     this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error
-      ? WINDOW_MESSAGES.TRANSACTION_FAILED
-      : WINDOW_MESSAGES.TRANSACTION_COMPLETE;
+      ? WINDOW_MESSAGES.SEND_MESSAGE_FAILED
+      : WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
+    this.resetConnectionTimeout();
   };
 
+  /**
+   *
+   * @param expires Time from now in seconds to expire new JWT
+   */
   signJWT = async (expires: number) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'signJWT' });
@@ -433,9 +388,13 @@ export class WalletConnectService {
       : WINDOW_MESSAGES.SIGN_JWT_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
+    this.resetConnectionTimeout();
   };
 
+  /**
+   *
+   * @param customMessage Message you want the wallet to sign
+   */
   signMessage = async (customMessage: string) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'signMessage' });
@@ -445,10 +404,10 @@ export class WalletConnectService {
     this.setState({ loading: '' });
     // Broadcast result of method
     const windowMessage = result.error
-      ? WINDOW_MESSAGES.SIGNATURE_FAILED
-      : WINDOW_MESSAGES.SIGNATURE_COMPLETE;
+      ? WINDOW_MESSAGES.SIGN_MESSAGE_FAILED
+      : WINDOW_MESSAGES.SIGN_MESSAGE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
-    this.#resetConnectionTimeout();
+    this.resetConnectionTimeout();
   };
 }

@@ -1,7 +1,8 @@
-import { EventValue } from '../types';
+import { EventOptions } from '../types';
 
-export const WALLET_APP_EVENTS: { [key: string]: EventValue } = {
+export const WALLET_APP_EVENTS: EventOptions = {
+  RESET_TIMEOUT: 'resetConnectionTimeout',
+  DISCONNECT: 'walletconnect_disconnect',
   EVENT: 'walletconnect_event',
   INIT: 'walletconnect_init',
-  DISCONNECT: 'walletconnect_disconnect',
 };

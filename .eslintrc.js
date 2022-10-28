@@ -25,6 +25,8 @@ module.exports = {
       },
     ],
     'no-var': 'warn',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'warn',
     'object-shorthand': 'warn',
     'prefer-arrow-callback': 'warn',
     'prefer-const': 'warn',
@@ -74,5 +76,8 @@ module.exports = {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     },
+  },
+  parserOptions: {
+    project: ['./tsconfig.json'],
   },
 };
