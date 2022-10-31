@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -115,20 +115,9 @@
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
     "tsc:esm": "tsc --module es2015 --outDir esm"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all",
-      "ie 11"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version",
-      "ie 11"
-    ]
-  },
+  "browserslist": [
+    "defaults"
+  ],
   "eslintConfig": {
     "extends": [
       "react-app",

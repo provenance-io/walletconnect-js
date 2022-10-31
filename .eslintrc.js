@@ -65,6 +65,7 @@ module.exports = {
     browser: true,
     jest: true,
     node: true,
+    es2020: true,
   },
   settings: {
     react: {
