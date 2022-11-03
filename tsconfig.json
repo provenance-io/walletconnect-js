@@ -27,7 +27,6 @@
   },
   "include": [
     "src",
-    "custom.d.ts",
-    "declarations.d.ts"
+    "custom.d.ts"
   ],
 }
