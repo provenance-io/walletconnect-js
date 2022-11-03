@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -35,29 +34,12 @@ module.exports = {
     clean: true,
   },
   plugins: [
-    // Work around for Buffer is undefined:
-    // https://github.com/webpack/changelog-v5/issues/10
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-    }),
-    new webpack.ProvidePlugin({
-      process: 'process/browser',
-    }),
     new HtmlWebpackPlugin({
       title: 'WalletConnect-JS | Vanilla ES6 Demo',
       template: 'src/index.html',
       inject: false,
     }),
   ],
-  resolve: {
-    extensions: ['.js'],
-    fallback: {
-      crypto: require.resolve('crypto-browserify'),
-      buffer: require.resolve('buffer/'),
-      util: require.resolve('util/'),
-      stream: require.resolve('stream-browserify'),
-    },
-  },
   watchOptions: {
     aggregateTimeout: 200,
     poll: 1000,
