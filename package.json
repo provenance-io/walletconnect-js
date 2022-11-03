@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -31,9 +31,13 @@
     "@walletconnect/utils": "1.8.0",
     "base64url": "3.0.1",
     "bip32": "3.1.0",
+    "buffer": "npm:buffer@6.0.3",
+    "crypto": "npm:crypto-browserify@3.12.0",
     "qrcode": "1.5.1",
     "secp256k1": "4.0.3",
-    "styled-components": "^5.3.6"
+    "stream": "npm:stream-browserify@3.0.0",
+    "styled-components": "^5.3.6",
+    "util": "npm:util@0.12.5"
   },
   "devDependencies": {
     "@babel/cli": "7.19.3",
@@ -63,9 +67,7 @@
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.5",
     "babel-plugin-styled-components": "2.0.7",
-    "buffer": "6.0.3",
     "concurrently": "7.4.0",
-    "crypto-browserify": "3.12.0",
     "css-loader": "6.7.1",
     "env-cmd": "10.1.0",
     "eslint": "8.24.0",
@@ -85,11 +87,9 @@
     "pretty-error": "4.0.0",
     "process": "0.11.10",
     "react": "^18.2.0",
-    "stream-browserify": "3.0.0",
     "style-loader": "3.3.1",
     "ts-loader": "9.4.1",
     "typescript": "4.8.3",
-    "util": "0.12.4",
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0"
   },

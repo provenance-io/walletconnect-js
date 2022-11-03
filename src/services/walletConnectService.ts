@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import events from 'events';
 import type {
   AccountInfo,
@@ -31,6 +32,9 @@ import {
   isMobile,
   sendWalletEvent,
 } from '../utils';
+
+// If we don't have a value for Buffer (node core module) create it/polyfill it
+if (window.Buffer === undefined) window.Buffer = Buffer;
 
 // Check for existing values from localStorage
 const existingWCState: WalletConnectClientType =
