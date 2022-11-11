@@ -297,7 +297,6 @@ export const QRCodeModal: React.FC<Props> = ({
   // Use clicks one of the desktop wallets
   // ----------------------------------------
   const handleDesktopWalletClick = (event: React.MouseEvent, wallet: Wallet) => {
-    console.log('wallet: ', wallet);
     const runEventAction = () => {
       // If the wallet has an eventAction (they should all have an event action...)
       if (wallet.eventAction) {

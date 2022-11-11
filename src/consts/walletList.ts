@@ -84,7 +84,6 @@ export const WALLET_LIST: WalletList = [
       const top = window.outerHeight / 2 + window.screenY - height / 2;
       const left = window.outerWidth / 2 + window.screenX - width / 2;
       const windowOptions = `popup=1 height=${height} width=${width} top=${top} left=${left} resizable=1, scrollbars=1, fullscreen=0, toolbar=0, menubar=0, status=1`;
-      console.log('Figure Wallet | eventAction | url: ', url);
       window.open(url, undefined, windowOptions);
     },
   },
