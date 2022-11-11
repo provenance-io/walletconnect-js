@@ -6,7 +6,11 @@ export type EventValue =
   | 'resetConnectionTimeout';
 export type EventOptions = { [Key in EventValueNames]: EventValue };
 export type WalletType = 'mobile' | 'extension' | 'web';
-export type WalletId = 'provenance_extension' | 'provenance_mobile' | 'figure_web';
+export type WalletId =
+  | 'provenance_extension'
+  | 'provenance_mobile'
+  | 'figure_web'
+  | 'figure_mobile';
 export type WalletIcons = 'provenance' | 'figure';
 
 export type CustomEventData =
