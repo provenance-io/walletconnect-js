@@ -10,7 +10,9 @@ export type WalletId =
   | 'provenance_extension'
   | 'provenance_mobile'
   | 'figure_web'
-  | 'figure_mobile';
+  | 'figure_mobile'
+  | 'figure_web_test'
+  | 'figure_mobile_test';
 export type WalletIcons = 'provenance' | 'figure';
 
 export type CustomEventData =
