@@ -8,13 +8,14 @@ export const getFromLocalStorage = (name: string, key?: string) => {
 };
 
 // Ability to add single or array of items into current localStorage
-export const addToLocalStorage = (name: string, newData: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const addToLocalStorage = (name: string, newData: any) => {
   // Pull from localStorage
   const rawData = window.localStorage.getItem(name) || '{}';
   // Parse to edit
   const data = JSON.parse(rawData);
   // Update key/value
-  const finalData = {...data, ...newData};
+  const finalData = { ...data, ...newData };
   // Stringify to save
   const stringFinalData = JSON.stringify(finalData);
   // Save
