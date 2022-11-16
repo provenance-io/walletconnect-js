@@ -179,7 +179,8 @@ interface Props {
   className?: string;
   walletConnectService: WalletConnectService;
   title?: string;
-  devWallets?: WalletId[]; // An array of wallet-ids which are in dev mode to force render (hidden by default)
+  devWallets?: WalletId[]; // Dev mode Wallet-ids to render (hidden by default)
+  hideWallets?: WalletId[]; // Prod mode Wallet-ids to hide (visible by default)
 }
 
 export const QRCodeModal: React.FC<Props> = ({
@@ -187,6 +188,7 @@ export const QRCodeModal: React.FC<Props> = ({
   walletConnectService: wcs,
   title = 'Scan the QRCode with your mobile Provenance Blockchain Wallet.',
   devWallets,
+  hideWallets,
 }) => {
   const { state } = wcs;
   const { showQRCodeModal, QRCode, QRCodeUrl, isMobile, connectionTimeout } = state;
@@ -216,7 +218,15 @@ export const QRCodeModal: React.FC<Props> = ({
   // The links to those "mobile wallets" are dynamic (iOS vs Android).  To get the links we must fetch
   useEffect(() => {
     // Get all mobile wallets
-    const allMobileWallets = WALLET_LIST.filter(({ type }) => type === 'mobile');
+    const allMobileWallets = WALLET_LIST.filter(
+      ({ type, dev, id }) =>
+        // Has to be a mobile wallet
+        type === 'mobile' &&
+        // If a dev wallet, has to be included in devWallets list
+        (!dev || devWallets?.includes(id)) &&
+        // Cannot be included in hideWallets list
+        !hideWallets?.includes(id)
+    );
     // useEffect needs an async wrapper
     const asyncBuildMobileWallets = async () => {
       // Check each mobile wallet for a dynamic url (requires async API call to generate)
@@ -235,12 +245,20 @@ export const QRCodeModal: React.FC<Props> = ({
       // Update state value for all mobile wallets (api calls finished)
       setMobileWallets(newMobileWallets);
     };
-    // Only run this when the modal is open and once for each wallet
+    // Only run this when the modal is open
     if (showQRCodeModal && initialLoad) {
       setInitialLoad(false);
-      asyncBuildMobileWallets();
+      // Only run if wallets exist
+      if (allMobileWallets.length) asyncBuildMobileWallets();
     }
-  }, [QRCodeUrl, mobileWallets, initialLoad, showQRCodeModal]);
+  }, [
+    QRCodeUrl,
+    mobileWallets,
+    initialLoad,
+    showQRCodeModal,
+    devWallets,
+    hideWallets,
+  ]);
   // -----------------------------------------------------------------------------------------------
   // Ability to copy the QR code to the clipboard as a string (success message has a timeout)
   // -----------------------------------------------------------------------------------------------
@@ -339,8 +357,12 @@ export const QRCodeModal: React.FC<Props> = ({
       // If they are in dev mode we don't render them unless they're included in the devWallets override array
       .filter(
         ({ type, dev, id }) =>
+          // Has to either be a web or extension wallet
           (type === 'web' || type === 'extension') &&
-          (!dev || devWallets?.includes(id))
+          // Not dev, or if dev, included in devWallets list
+          (!dev || devWallets?.includes(id)) &&
+          // Cannot be included in hideWallets list
+          !hideWallets?.includes(id)
       )
       .map((wallet) => {
         const { id, icon, title: walletTitle } = wallet;
@@ -361,50 +383,54 @@ export const QRCodeModal: React.FC<Props> = ({
   // For every built mobile dynamic link, build out the wallet row
   // ------------------------------------------------------------------
   const buildMobileWallets = () =>
-    mobileWallets.map((wallet) => {
-      const { dynamicUrl, title: walletTitle, icon, id, generateUrl } = wallet;
-      // If we have a generateUrl w/the wallet, make sure we got a dynamicUrl
-      if (generateUrl) {
-        if (dynamicUrl) {
+    mobileWallets.length ? (
+      mobileWallets.map((wallet) => {
+        const { dynamicUrl, title: walletTitle, icon, id, generateUrl } = wallet;
+        // If we have a generateUrl w/the wallet, make sure we got a dynamicUrl
+        if (generateUrl) {
+          if (dynamicUrl) {
+            return (
+              <WalletRow
+                className="wcjs-qr-row"
+                href={dynamicUrl || ''}
+                rel="noopener noreferrer"
+                target="_blank"
+                key={id}
+                onClick={() => {
+                  // Update the walletApp value to be this mobile wallet id
+                  wcs.setState({ walletApp: wallet.id });
+                }}
+              >
+                {!!icon && (
+                  <WalletIcon src={WALLET_ICONS[icon]} className="wcjs-qr-icon" />
+                )}
+                <WalletTitle className="wcjs-qr-title">{walletTitle}</WalletTitle>
+              </WalletRow>
+            );
+          }
           return (
-            <WalletRow
-              className="wcjs-qr-row"
-              href={dynamicUrl || ''}
-              rel="noopener noreferrer"
-              target="_blank"
-              key={id}
-              onClick={() => {
-                // Update the walletApp value to be this mobile wallet id
-                wcs.setState({ walletApp: wallet.id });
-              }}
-            >
-              {!!icon && (
-                <WalletIcon src={WALLET_ICONS[icon]} className="wcjs-qr-icon" />
-              )}
-              <WalletTitle className="wcjs-qr-title">{walletTitle}</WalletTitle>
-            </WalletRow>
+            <Text className="wcjs-qr-text">
+              Unable to fetch {walletTitle} link. Please try again later.
+            </Text>
           );
         }
+        // No generateUrl/dynamicUrl, just render the wallet with standard click functionality
         return (
-          <Text className="wcjs-qr-text">
-            Unable to fetch {walletTitle} link. Please try again later.
-          </Text>
+          <WalletRowNonLink
+            onClick={(e) => handleDesktopWalletClick(e, wallet)}
+            key={id}
+            className="wcjs-qr-row-nonlink"
+          >
+            {!!icon && (
+              <WalletIcon src={WALLET_ICONS[icon]} className="wcjs-qr-icon" />
+            )}
+            <WalletTitle className="wcjs-qr-title">{walletTitle}</WalletTitle>
+          </WalletRowNonLink>
         );
-      }
-      // No generateUrl/dynamicUrl, just render the wallet with standard click functionality
-      return (
-        <WalletRowNonLink
-          onClick={(e) => handleDesktopWalletClick(e, wallet)}
-          key={id}
-          className="wcjs-qr-row-nonlink"
-        >
-          {!!icon && (
-            <WalletIcon src={WALLET_ICONS[icon]} className="wcjs-qr-icon" />
-          )}
-          <WalletTitle className="wcjs-qr-title">{walletTitle}</WalletTitle>
-        </WalletRowNonLink>
-      );
-    });
+      })
+    ) : (
+      <Text className="wcjs-qr-text">No mobile wallets currently available.</Text>
+    );
 
   const DesktopWalletsList = buildDesktopWallets();
 
