@@ -149,7 +149,8 @@ To start the connection from dApp to wallet you will need to initiate the connec
 - Takes in the following params:
   - `walletConnectService`: Service pulled out of `useWalletConnect()` hook (Required)
   - `devWallets`: Array of allowed dev wallets to connect into. (Optional)
-    - For list of available wallets see `src/consts/walletList.ts`
+  - `hideWallets`: Array of prod wallets to hide from user. (Optional)
+  - For list of available wallets and their IDs see `src/consts/walletList.ts`
 - Usage:
   ```js
   // App.js
@@ -161,7 +162,8 @@ To start the connection from dApp to wallet you will need to initiate the connec
     return (
       <QRCodeModal
         walletConnectService={wcs}
-        devWallets={['figure_web']}
+        devWallets={['figure_web_test', 'figure_mobile_test']}
+        hideWallets={['figure_web', 'figure_mobile']}
       />
     )
   };
