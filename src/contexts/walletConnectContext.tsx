@@ -26,7 +26,7 @@ const WalletConnectContextProvider: React.FC<Props> = ({ children }) => {
     // Check if we have an address and public key, if so, auto-reconnect to session
     if (address) {
       // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
-      const duration = connectionTimeout / 1000;
+      const duration = connectionTimeout ? connectionTimeout / 1000 : undefined;
       walletConnectService.connect({ duration, bridge });
     }
     // Only run this check if we arn't already connected
