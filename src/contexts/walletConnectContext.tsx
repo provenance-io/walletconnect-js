@@ -19,12 +19,16 @@ const WalletConnectContextProvider: React.FC<Props> = ({ children }) => {
   const [walletConnectState, setWalletConnectState] = useState<WCSState>({
     ...walletConnectService.state,
   });
-  const { address } = walletConnectState;
+  const { address, connectionTimeout, bridge } = walletConnectState;
 
   useEffect(() => {
     walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
     // Check if we have an address and public key, if so, auto-reconnect to session
-    if (address) walletConnectService.connect();
+    if (address) {
+      // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
+      const duration = connectionTimeout / 1000;
+      walletConnectService.connect({ duration, bridge });
+    }
     // Only run this check if we arn't already connected
     else {
       // Check to see if resuming connection on a new domain (url params)
