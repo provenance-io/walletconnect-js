@@ -5,7 +5,7 @@ import type {
   AccountObject,
   Broadcast,
   BroadcastResults,
-  GasPrice,
+  SendMessageData,
   WalletConnectClientType,
   WalletId,
   WalletInfo,
@@ -345,18 +345,15 @@ export class WalletConnectService {
    * @param description (optional) Additional information for wallet to display
    * @param method (optional) What method is used to send this message
    * @param gasPrice (optional) Gas price object to use
+   * @param feePayer (optional) Specify a fee payer address
    */
   sendMessage = async ({
     message,
     description,
     gasPrice,
     method,
-  }: {
-    message: string | string[];
-    description?: string;
-    gasPrice?: GasPrice;
-    method?: string;
-  }) => {
+    feePayer,
+  }: SendMessageData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendMessage' });
     const result = await sendMessageMethod(this.state, {
@@ -364,6 +361,7 @@ export class WalletConnectService {
       description,
       gasPrice,
       method,
+      feePayer,
     });
     // No longer loading
     this.setState({ loading: '' });

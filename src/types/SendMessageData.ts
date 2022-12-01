@@ -5,4 +5,5 @@ export type SendMessageData = {
   description?: string;
   method?: string;
   gasPrice?: GasPrice;
+  feePayer?: string;
 };
