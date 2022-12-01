@@ -11,12 +11,14 @@ export const sendMessage = async (state: WCSState, data: SendMessageData) => {
     description = 'Send Message',
     method = 'provenance_sendTransaction',
     gasPrice,
+    feePayer,
   } = data;
   const { connector, address, walletApp } = state;
   const metadata = JSON.stringify({
     description,
     address,
     gasPrice,
+    feePayer,
     date: Date.now(),
   });
   // Custom Request
