@@ -9,6 +9,7 @@ export type WalletType = 'mobile' | 'extension' | 'web';
 export type WalletId =
   | 'provenance_extension'
   | 'provenance_mobile'
+  | 'figure_extension'
   | 'figure_web'
   | 'figure_mobile'
   | 'figure_web_test'

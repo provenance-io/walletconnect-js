@@ -31,7 +31,7 @@ export const WALLET_LIST: WalletList = [
   {
     id: 'provenance_extension',
     type: 'extension',
-    title: 'Provenance Blockchain Wallet',
+    title: 'Provenance Extension',
     icon: 'provenance',
     eventAction: (eventData) => {
       const sendMessageEvent = new CustomEvent('provWalletSendMessage', {
@@ -41,7 +41,23 @@ export const WALLET_LIST: WalletList = [
     },
     walletUrl:
       'https://chrome.google.com/webstore/detail/provenance-blockchain-wal/pfcpdmimlaffecihgamfbnfffmdlhkmh',
-    walletCheck: () => window?.provenance && window?.provenance?.isProvenance,
+    walletCheck: () => !!(window?.provenance && window?.provenance?.isProvenance),
+  },
+  {
+    id: 'figure_extension',
+    type: 'extension',
+    title: 'Figure Extension',
+    icon: 'figure',
+    eventAction: (eventData) => {
+      const sendMessageEvent = new CustomEvent('figureWalletExtensionSendMessage', {
+        detail: eventData,
+      });
+      window.document.dispatchEvent(sendMessageEvent);
+    },
+    walletUrl:
+      'https://chrome.google.com/webstore/detail/figure-blockchain-wal/pfcpdmimlaffecihgamfbnfffmdlhkmh',
+    walletCheck: () =>
+      !!(window?.figureWalletExtension && window?.figureWalletExtension?.isFigure),
   },
   {
     id: 'figure_web',

@@ -17,7 +17,7 @@ export const GlobalStyles = createGlobalStyle`
 
   // React local causes iframe when error process is not defined shows up.
   // https://github.com/facebook/create-react-app/issues/11773
-  iframe {
+  iframe:not(#figure-wallet-extension) {
     pointer-events: none;
   }
 
