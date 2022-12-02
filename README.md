@@ -262,7 +262,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   ```
   | Param   | Type   | Required | Default | Example               | Info                   |
   | ------- | ------ | -------- | ------- | --------------------- | ---------------------- |
-  | message | string | yes      | -       | `'My Custom Message'` | String message to send |
+  | message | hex string | yes      | -       | `'My Custom Message'` | Hex string message to send |
 
 ## walletConnectState
 
