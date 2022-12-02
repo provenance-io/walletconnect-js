@@ -1,4 +1,3 @@
-import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 import { rngNum } from '../../utils';
@@ -26,8 +25,7 @@ export const signMessage = async (state: WCSState, message: string) => {
   if (!connector)
     return { valid, data: message, request, error: 'No wallet connected' };
   // encode message (hex)
-  const hexMsg = convertUtf8ToHex(message);
-  request.params.push(hexMsg);
+  request.params.push(message);
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
