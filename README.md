@@ -242,7 +242,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   Pass through a custom base64 encoded message
 
   ```js
-  walletConnectService.sendMessage({ message, description, method, gasPrice });
+  walletConnectService.sendMessage({ message, description, method, gasPrice, feeGranter });
   // WINDOW_MESSAGES: SEND_MESSAGE_COMPLETE, SEND_MESSAGE_FAILED
   ```
 
@@ -252,7 +252,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | description | string         | no       | `'Send Message'`                                                 | `'My Special Message'`                         | Prompt title on mobile wallet                       |
   | method      | string         | no       | `'provenance_sendTransaction'`                                    | `'provenance_sendTransaction'`               | Message method                                      |
   | gasPrice    | object         | no       | `{ gasPrice: [Figure Default], gasPriceDenom: [Figure Default] }` | `{ gasPrice: 1337, gasPriceDenom: 'nhash' }` | Optional gasPrice object, defaults to Figure values |
-  | feePayer    | string         | no       | - | `'tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh'` | Specify a fee payer address |
+  | feeGranter    | string         | no       | - | `'tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh'` | Specify a fee granter address |
 
 - #### signMessage
   Prompt user to sign a custom message

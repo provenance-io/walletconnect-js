@@ -345,14 +345,14 @@ export class WalletConnectService {
    * @param description (optional) Additional information for wallet to display
    * @param method (optional) What method is used to send this message
    * @param gasPrice (optional) Gas price object to use
-   * @param feePayer (optional) Specify a fee payer address
+   * @param feeGranter (optional) Specify a fee payer address
    */
   sendMessage = async ({
     message,
     description,
     gasPrice,
     method,
-    feePayer,
+    feeGranter,
   }: SendMessageData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendMessage' });
@@ -361,7 +361,7 @@ export class WalletConnectService {
       description,
       gasPrice,
       method,
-      feePayer,
+      feeGranter,
     });
     // No longer loading
     this.setState({ loading: '' });
