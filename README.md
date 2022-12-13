@@ -7,7 +7,7 @@ Library to interface with Provenance Wallet using WalletConnect.
 For more information about [Provenance Inc](https://provenance.io) visit https://provenance.io
 
 ## Version 2.x.x Update
-WalletConnect-JS version 2.0.0 significantly reduced its package size by removing to ability to build a protobuf message internally.  This means all sendMessages must come through as a google protobuf any and cannot be created within the app anymore.  Previously these were built using [Wallet-Utils](https://www.npmjs.com/package/@provenanceio/wallet-utils).  If your dApp needs to build messages on the front-end, import wallet-utils and follow along with their repo's [README.md](https://github.com/provenance-io/wallet-utils#readme).
+WalletConnect-JS version 2.0.0 significantly reduced its package size by removing the ability to build a protobuf message internally.  This means all sendMessages must come through as a google protobuf any and cannot be created within the app anymore.  Previously these were built using [Wallet-Utils](https://www.npmjs.com/package/@provenanceio/wallet-utils).  If your dApp needs to build messages on the front-end, import wallet-utils and follow along with their repo's [README.md](https://github.com/provenance-io/wallet-utils#readme).
 
 ### v2.x.x Breaking Changes
 - Removed methods: `cancelRequest`, `delegateHash`, `markerActivate`, `markerAdd`, `markerFinalize`, and `sendCoin`;
@@ -190,7 +190,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | Param  | Type   | Required | Default                | Example      | Info                                    |
   | ------ | ------ | -------- | ---------------------- | ------------ | --------------------------------------- |
   | bridge | string | no       | `"wss://figure.tech/service-wallet-connect-bridge/ws/external"` | `"wss://custom.bridge"` | Custom bridge to connect into |
-  | duration | string | no       | `1800` | `3600` | Custom connection timeout in seconds |
+  | duration | number | no       | `1800` | `3600` | Custom connection timeout in seconds |
   | noPopup | boolean | no       | false | true | Should the QRCodeModal popup automatically on connect call |
 
 - #### disconnect
