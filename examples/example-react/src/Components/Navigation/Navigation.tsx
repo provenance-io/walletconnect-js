@@ -120,15 +120,9 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       </RowItem>
     </NavContainer>
   ) : (
-    <>
-      <RowItem active={true} onClick={() => navigate(CONNECT_URL)}>
-        <Sprite icon={ICON_NAMES.KEY} size="1.1rem" />
-        <RowTitle>Connect</RowTitle>
-      </RowItem>
-      <RowItem active={true} onClick={() => navigate(FIGURE_DAPP_CONNECT_URL)}>
-        <Sprite icon={ICON_NAMES.KEY} size="1.1rem" />
-        <RowTitle>Figure Connect</RowTitle>
-      </RowItem>
-    </>
+    <RowItem active={true} onClick={() => navigate(CONNECT_URL)}>
+      <Sprite icon={ICON_NAMES.KEY} size="1.1rem" />
+      <RowTitle>Connect</RowTitle>
+    </RowItem>
   );
 };
