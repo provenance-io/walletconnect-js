@@ -5,6 +5,7 @@ import { useState } from 'react';
 import {
   AUTOCONNECT_URL,
   CONNECT_URL,
+  FIGURE_DAPP_CONNECT_URL,
   ICON_NAMES,
   RESET_CONNECTION_URL,
   SEND_MESSAGE_URL,
@@ -119,9 +120,15 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       </RowItem>
     </NavContainer>
   ) : (
-    <RowItem active={true} onClick={() => navigate(CONNECT_URL)}>
-      <Sprite icon={ICON_NAMES.KEY} size="1.1rem" />
-      <RowTitle>Connect</RowTitle>
-    </RowItem>
+    <>
+      <RowItem active={true} onClick={() => navigate(CONNECT_URL)}>
+        <Sprite icon={ICON_NAMES.KEY} size="1.1rem" />
+        <RowTitle>Connect</RowTitle>
+      </RowItem>
+      <RowItem active={true} onClick={() => navigate(FIGURE_DAPP_CONNECT_URL)}>
+        <Sprite icon={ICON_NAMES.KEY} size="1.1rem" />
+        <RowTitle>Figure Connect</RowTitle>
+      </RowItem>
+    </>
   );
 };

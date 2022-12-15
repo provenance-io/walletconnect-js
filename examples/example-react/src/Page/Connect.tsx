@@ -66,7 +66,7 @@ export const Connect: React.FC = () => {
       </Button>
       <QRCodeModalStyled
         walletConnectService={wcs}
-        devWallets={['figure_web_test', 'figure_mobile_test']}
+        devWallets={['figure_web_test', 'figure_mobile_test', 'figure_web_local']}
       />
     </Card>
   );

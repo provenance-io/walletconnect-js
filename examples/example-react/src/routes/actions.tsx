@@ -1,5 +1,6 @@
 import {
   AUTOCONNECT_URL,
+  FIGURE_DAPP_CONNECT_URL,
   RESET_CONNECTION_URL,
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
@@ -11,6 +12,7 @@ import {
   SendMessage,
   SignJWT,
   SignMessage,
+  FigureDAppConnect,
 } from 'Page';
 
 export const AUTO_CONNECT = {
@@ -35,4 +37,9 @@ export const SIGN_JWT = {
 export const SIGN_MESSAGE = {
   path: SIGN_MESSAGE_URL,
   element: <SignMessage />,
+};
+
+export const FIGURE_DAPP_CONNECT = {
+  path: FIGURE_DAPP_CONNECT_URL,
+  element: <FigureDAppConnect />,
 };

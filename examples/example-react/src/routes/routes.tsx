@@ -4,6 +4,7 @@ import { Connect } from 'Page';
 import { Root } from 'Page';
 import {
   AUTO_CONNECT,
+  FIGURE_DAPP_CONNECT,
   RESET_CONNECTION,
   SEND_MESSAGE,
   SIGN_JWT,
@@ -22,6 +23,7 @@ export const routes = [
       SEND_MESSAGE,
       SIGN_JWT,
       SIGN_MESSAGE,
+      FIGURE_DAPP_CONNECT,
     ],
   },
   // { path: FOUR_OH_FOUR_URL, element: <NotFound /> },

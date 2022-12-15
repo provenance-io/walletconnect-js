@@ -12,6 +12,7 @@ export type WalletId =
   | 'figure_web'
   | 'figure_mobile'
   | 'figure_web_test'
+  | 'figure_web_local'
   | 'figure_mobile_test';
 export type WalletIcons = 'provenance' | 'figure';
 
