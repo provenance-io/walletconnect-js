@@ -6,4 +6,9 @@ export type SendMessageData = {
   method?: string;
   gasPrice?: GasPrice;
   feeGranter?: string;
+  feePayer?: string;
+  memo?: string;
+  timeoutHeight?: number;
+  extensionOptions?: string[];
+  nonCriticalExtensionOptions?: string[];
 };
