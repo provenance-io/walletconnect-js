@@ -362,6 +362,7 @@ export class WalletConnectService {
     timeoutHeight,
     extensionOptions,
     nonCriticalExtensionOptions,
+    memo,
   }: SendMessageData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendMessage' });
@@ -375,6 +376,7 @@ export class WalletConnectService {
       timeoutHeight,
       extensionOptions,
       nonCriticalExtensionOptions,
+      memo,
     });
     // No longer loading
     this.setState({ loading: '' });
