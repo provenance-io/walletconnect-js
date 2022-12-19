@@ -12,14 +12,24 @@ export const sendMessage = async (state: WCSState, data: SendMessageData) => {
     method = 'provenance_sendTransaction',
     gasPrice,
     feeGranter,
+    feePayer,
+    memo,
+    timeoutHeight,
+    extensionOptions,
+    nonCriticalExtensionOptions,
   } = data;
   const { connector, address, walletApp } = state;
   const metadata = JSON.stringify({
     description,
     address,
     gasPrice,
-    feeGranter,
     date: Date.now(),
+    feeGranter,
+    feePayer,
+    memo,
+    timeoutHeight,
+    extensionOptions,
+    nonCriticalExtensionOptions,
   });
   // Custom Request
   const request = {
