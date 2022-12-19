@@ -345,7 +345,12 @@ export class WalletConnectService {
    * @param description (optional) Additional information for wallet to display
    * @param method (optional) What method is used to send this message
    * @param gasPrice (optional) Gas price object to use
-   * @param feeGranter (optional) Specify a fee payer address
+   * @param feeGranter (optional) Specify a fee granter address
+   * @param feePayer (optional) Specify a fee payer address
+   * @param memo (optional) Tx body memo
+   * @param timeoutHeight (optional) Tx body timeoutHeight
+   * @param extensionOptions (optional) Tx body extensionOptions
+   * @param nonCriticalExtensionOptions (optional) Tx body nonCriticalExtensionOptions
    */
   sendMessage = async ({
     message,
@@ -353,6 +358,10 @@ export class WalletConnectService {
     gasPrice,
     method,
     feeGranter,
+    feePayer,
+    timeoutHeight,
+    extensionOptions,
+    nonCriticalExtensionOptions,
   }: SendMessageData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendMessage' });
@@ -362,6 +371,10 @@ export class WalletConnectService {
       gasPrice,
       method,
       feeGranter,
+      feePayer,
+      timeoutHeight,
+      extensionOptions,
+      nonCriticalExtensionOptions,
     });
     // No longer loading
     this.setState({ loading: '' });
