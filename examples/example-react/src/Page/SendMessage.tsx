@@ -29,7 +29,13 @@ export const SendMessage: React.FC = () => {
   const handleSubmit = () => {
     // Convert input string value to number for price
     const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
-    wcs.sendMessage({ message, description, gasPrice: finalGasData, method });
+
+    wcs.sendMessage({
+      message,
+      description,
+      gasPrice: finalGasData,
+      method,
+    });
   };
 
   const clickUseSampleButton = () => {
