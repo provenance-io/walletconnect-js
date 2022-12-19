@@ -55,7 +55,7 @@ export const WALLET_LIST: WalletList = [
       window.document.dispatchEvent(sendMessageEvent);
     },
     walletUrl:
-      'https://chrome.google.com/webstore/detail/figure-blockchain-wal/pfcpdmimlaffecihgamfbnfffmdlhkmh',
+      'https://chrome.google.com/webstore/detail/figure-wallet/mgbfflhghaohmaecmaggieniidindaoc',
     walletCheck: () =>
       !!(window?.figureWalletExtension && window?.figureWalletExtension?.isFigure),
   },
