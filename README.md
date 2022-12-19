@@ -89,7 +89,7 @@ List of WINDOW_MESSAGES:
 };
 ```
 
-Example Usesage: 
+Example Usage: 
 ```js
 // (Example using sendMessage)
 

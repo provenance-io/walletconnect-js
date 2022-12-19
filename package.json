@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "2.0.9",
+  "version": "2.1.0",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -111,6 +111,7 @@
     "prebuild": "npm run test",
     "start:watch": "nodemon -e js,ts,tsx --watch src --exec 'npm run build'",
     "start": "npm run build:local && npm run start:example-react",
+    "start:newDomain": "cd examples/example-react && npm run start",
     "test": "",
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
     "tsc:esm": "tsc --module es2015 --outDir esm"
