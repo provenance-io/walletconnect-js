@@ -1,7 +1,7 @@
 import type WalletConnectClient from '@walletconnect/client';
 import type { IClientMeta } from './IClientMeta';
 import type { WalletId } from './WalletList';
-import type { WalletInfo } from './ConnectData';
+import type {MasterGroupPolicy, WalletInfo} from './ConnectData';
 
 export type WalletConnectClientType = WalletConnectClient;
 
@@ -28,6 +28,7 @@ export interface WCSState {
   signedJWT: string;
   walletApp?: WalletId | '';
   walletInfo: WalletInfo;
+  representedGroupPolicy: MasterGroupPolicy;
 }
 
 export type WCSSetState = (state: Partial<WCSState>) => void;

@@ -305,13 +305,14 @@ React hook which contains `walletConnectService` and `walletConnectState`
     signedJWT: '', // Signed JWT token [string]
     walletApp: '', // What type of wallet is this "provenance_extension" | "provenance_mobile" | "figure_web"
     walletInfo: {}, // Contains wallet coin, id, and name
+    representedGroupPolicy: {}, //Present when the wallet holder is acting on behalf of a group
   }
   ```
 
 ## Web App
 
-This package comes bundled with a full React demo that you can run locally to test out the various features of `walletconnect-js`.
-To see how to initiate and run the webDemo, look through the [webDemo README.md](./webDemo/README.md)
+This package comes bundled with a full demos that you can run locally to test out the various features of `walletconnect-js`.
+To see how to initiate and run the different examples, look through the [README.md](./examples/README.md)
 
 - Quick Start:
   1. Pull down the latest `walletconnect-js`.

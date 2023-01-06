@@ -9,6 +9,7 @@ import type {
   WalletConnectClientType,
   WalletId,
   WalletInfo,
+  MasterGroupPolicy,
   WCJSLocalState,
   WCSSetFullState,
   WCSSetState,
@@ -62,6 +63,7 @@ const defaultState: WCSState = {
   signedJWT: '',
   walletApp: '',
   walletInfo: {},
+  representedGroupPolicy: {},
 };
 
 // Pull values out of local storage if they exist
@@ -83,6 +85,8 @@ const getAccountItem = (itemName: keyof AccountObject) => {
         return accountsArray[2];
       // No walletInfo in old array method
       case 'walletInfo':
+        return {};
+      case 'representedGroupPolicy':
         return {};
       default:
         return '';
@@ -118,6 +122,8 @@ const initialState: WCSState = {
   walletApp: existingWCJSState.walletApp || defaultState.walletApp,
   walletInfo:
     (getAccountItem('walletInfo') as WalletInfo) || defaultState.walletInfo,
+  representedGroupPolicy:
+    (getAccountItem('representedGroupPolicy') as MasterGroupPolicy) || defaultState.representedGroupPolicy,
 };
 
 export class WalletConnectService {
