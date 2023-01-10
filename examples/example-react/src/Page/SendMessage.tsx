@@ -1,6 +1,10 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
+import {
+  WINDOW_MESSAGES,
+  useWalletConnect,
+  BroadcastResults,
+} from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
@@ -46,21 +50,22 @@ export const SendMessage: React.FC = () => {
 
   // Create all event listeners for this Action Card method
   useEffect(() => {
-    const completeEvent = (result: any) => {
+    const completeEvent = (data: BroadcastResults) => {
       setResults({
         action: 'sendMessage',
         status: 'success',
         message: 'WalletConnectJS | Send Message Complete',
-        data: result,
+        data,
       });
     };
-    const failEvent = (result: any) => {
-      const { error } = result;
+    const failEvent = (data: BroadcastResults) => {
+      const { error } = data;
+      const message = error?.message || 'Unknown error';
       setResults({
         action: 'sendMessage',
         status: 'failed',
-        message: error.message,
-        data: result,
+        message,
+        data,
       });
     };
     // First load, if windowMessages passed in, create events

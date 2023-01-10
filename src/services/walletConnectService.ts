@@ -4,8 +4,8 @@ import type {
   AccountInfo,
   AccountObject,
   Broadcast,
-  BroadcastResults,
-  SendMessageData,
+  BroadcastResult,
+  MethodSendMessageData,
   WalletConnectClientType,
   WalletId,
   WalletInfo,
@@ -207,7 +207,7 @@ export class WalletConnectService {
   };
 
   // Create listeners used with eventEmitter/broadcast results
-  addListener(eventName: string, callback: (results: BroadcastResults) => void) {
+  addListener(eventName: string, callback: (results: BroadcastResult) => void) {
     this.#eventEmitter.addListener(eventName, callback);
   }
 
@@ -224,7 +224,7 @@ export class WalletConnectService {
   }
 
   // Remove listener w/specific eventName used with eventEmitter/broadcast results
-  removeListener(eventName: string, callback: (results: BroadcastResults) => void) {
+  removeListener(eventName: string, callback: (results: BroadcastResult) => void) {
     this.#eventEmitter.removeListener(eventName, callback);
   }
 
@@ -371,7 +371,7 @@ export class WalletConnectService {
     extensionOptions,
     nonCriticalExtensionOptions,
     memo,
-  }: SendMessageData) => {
+  }: MethodSendMessageData) => {
     // Loading while we wait for mobile to respond
     this.setState({ loading: 'sendMessage' });
     const result = await sendMessageMethod(this.state, {

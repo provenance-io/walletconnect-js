@@ -1,9 +1,9 @@
 import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { verifySignature } from '../../helpers';
-import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
 import { rngNum } from '../../utils';
-import type { BaseResults, WCSState, WCSSetState } from '../../types';
+import type { BroadcastResult, WCSState, WCSSetState } from '../../types';
 
 /**
  *
@@ -16,7 +16,7 @@ export const signJWT = async (
   state: WCSState,
   setState: WCSSetState,
   expires?: number // Custom expiration time in seconds from now
-): Promise<BaseResults> => {
+): Promise<BroadcastResult> => {
   let valid = false;
   const nowSec = Math.round(Date.now() / 1000); // Current time seconds
   const customExpiresGiven = expires !== undefined;
@@ -25,7 +25,7 @@ export const signJWT = async (
   const finalExpiresSec =
     nowSec + (customExpiresGiven ? (customExpiresSec as number) : defaultExpireSec);
   const { connector, address, publicKey: pubKeyB64, walletApp } = state;
-  const method = 'provenance_sign';
+  const method = PROVENANCE_METHODS.sign;
   const description = 'Sign JWT Token';
   const metadata = JSON.stringify({
     description,
@@ -42,7 +42,12 @@ export const signJWT = async (
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
   if (!connector)
-    return { valid, data: finalExpiresSec, request, error: 'No wallet connected' };
+    return {
+      valid,
+      data: { expires: finalExpiresSec },
+      request,
+      error: 'No wallet connected',
+    };
   // Build JWT
   const header = JSON.stringify({ alg: 'ES256K', typ: 'JWT' });
   const headerEncoded = base64url(header);
@@ -76,8 +81,13 @@ export const signJWT = async (
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     // Update JWT within the wcjs state
     setState({ signedJWT });
-    return { valid, result, data: finalExpiresSec, signedJWT, request };
+    return {
+      valid,
+      result,
+      data: { signedJWT, expires: finalExpiresSec },
+      request,
+    };
   } catch (error) {
-    return { valid, error: `${error}`, data: finalExpiresSec, request };
+    return { valid, error: `${error}`, data: { expires: finalExpiresSec }, request };
   }
 };

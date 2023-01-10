@@ -1,15 +1,17 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import { SendMessageData } from '../../types';
-import type { WCSState } from '../../types';
-import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import type { WCSState, BroadcastResult, MethodSendMessageData } from '../../types';
+import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
 import { rngNum } from '../../utils';
 
-export const sendMessage = async (state: WCSState, data: SendMessageData) => {
+export const sendMessage = async (
+  state: WCSState,
+  data: MethodSendMessageData
+): Promise<BroadcastResult> => {
   let valid = false;
   const {
     message: rawB64Message,
     description = 'Send Message',
-    method = 'provenance_sendTransaction',
+    method = PROVENANCE_METHODS.send,
     gasPrice,
     feeGranter,
     feePayer,
@@ -63,6 +65,6 @@ export const sendMessage = async (state: WCSState, data: SendMessageData) => {
     // result is a hex encoded signature
     return { valid, result, data, request };
   } catch (error) {
-    return { valid, error, data, request };
+    return { valid, error: `${error}`, data, request };
   }
 };
