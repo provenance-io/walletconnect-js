@@ -305,7 +305,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
     signedJWT: '', // Signed JWT token [string]
     walletApp: '', // What type of wallet is this "provenance_extension" | "provenance_mobile" | "figure_web"
     walletInfo: {}, // Contains wallet coin, id, and name
-    representedGroupPolicy: undefined, //Present when the wallet holder is acting on behalf of a group
+    representedGroupPolicy: null, //Present when the wallet holder is acting on behalf of a group
   }
   ```
 

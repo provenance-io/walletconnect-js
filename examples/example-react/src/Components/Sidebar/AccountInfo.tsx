@@ -33,10 +33,10 @@ export const AccountInfo: React.FC = () => {
     address,
     walletInfo = {},
     bridge,
-    representedGroupPolicy = {},
+    representedGroupPolicy,
   } = walletConnectState;
   const { name: walletName } = walletInfo;
-  const { address: groupAddress } = representedGroupPolicy;
+  const groupAddress = representedGroupPolicy?.address;
 
   return (
     <>

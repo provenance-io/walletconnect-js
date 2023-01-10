@@ -63,7 +63,7 @@ const defaultState: WCSState = {
   signedJWT: '',
   walletApp: '',
   walletInfo: {},
-  representedGroupPolicy: undefined,
+  representedGroupPolicy: null,
 };
 
 // Pull values out of local storage if they exist
@@ -88,7 +88,7 @@ const getAccountItem = (itemName: keyof AccountObject) => {
         return {};
       // No representedGroupPolicy in old array method
       case 'representedGroupPolicy':
-        return undefined;
+        return null;
       default:
         return '';
     }

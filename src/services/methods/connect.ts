@@ -45,10 +45,22 @@ export const connect = async ({
     if (isString) {
       const [address, publicKey, jwt] = accounts as string[];
       // No walletInfo will be available on the old accounts array
-      return { address, publicKey, jwt, walletInfo: {}, representedGroupPolicy: {} };
+      return {
+        address,
+        publicKey,
+        jwt,
+        walletInfo: {},
+        representedGroupPolicy: null,
+      };
     }
     // Data is in an object, pull keys from first item
-    const { address, publicKey, jwt, walletInfo, representedGroupPolicy } = firstAccount;
+    const {
+      address,
+      publicKey,
+      jwt,
+      walletInfo,
+      representedGroupPolicy = null,
+    } = firstAccount;
     return { address, publicKey, jwt, walletInfo, representedGroupPolicy };
   };
   // ----------------
@@ -188,7 +200,7 @@ export const connect = async ({
       publicKey,
       jwt: lastConnectJWT,
       walletInfo,
-      representedGroupPolicy
+      representedGroupPolicy,
     } = getAccountInfo(accounts);
     const signedJWT = state.signedJWT || lastConnectJWT;
     // Are we already connected
@@ -205,7 +217,7 @@ export const connect = async ({
       publicKey,
       signedJWT,
       walletInfo,
-      representedGroupPolicy
+      representedGroupPolicy,
     });
   };
   // ----------------------------

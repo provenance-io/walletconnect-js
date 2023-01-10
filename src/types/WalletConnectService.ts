@@ -28,7 +28,7 @@ export interface WCSState {
   signedJWT: string;
   walletApp?: WalletId | '';
   walletInfo: WalletInfo;
-  representedGroupPolicy?: MasterGroupPolicy;
+  representedGroupPolicy: MasterGroupPolicy | null;
 }
 
 export type WCSSetState = (state: Partial<WCSState>) => void;
