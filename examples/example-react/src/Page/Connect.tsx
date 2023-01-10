@@ -2,7 +2,7 @@ import {
   useWalletConnect,
   QRCodeModal,
   WINDOW_MESSAGES,
-  BroadcastResults,
+  BroadcastResult,
 } from '@provenanceio/walletconnect-js';
 import { Button, Card, Dropdown, Results } from 'Components';
 import { ICON_NAMES, BRIDGE_URLS } from 'consts';
@@ -30,7 +30,7 @@ export const Connect: React.FC = () => {
 
   // Listen for a connection, then redirect to action page
   useEffect(() => {
-    const handleConnectedEvent = (results: BroadcastResults) => {
+    const handleConnectedEvent = (results: BroadcastResult) => {
       setResults(results);
     };
     wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);

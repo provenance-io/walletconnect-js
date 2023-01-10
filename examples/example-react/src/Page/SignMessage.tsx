@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   useWalletConnect,
   WINDOW_MESSAGES,
-  BroadcastResults,
+  BroadcastResult,
 } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
@@ -19,7 +19,7 @@ export const SignMessage: React.FC = () => {
 
   // Create all event listeners for this Action Card method
   useEffect(() => {
-    const completeEvent = (data: BroadcastResults) => {
+    const completeEvent = (data: BroadcastResult) => {
       setResults({
         action: 'signMessage',
         status: 'success',
@@ -27,9 +27,9 @@ export const SignMessage: React.FC = () => {
         data,
       });
     };
-    const failEvent = (data: BroadcastResults) => {
+    const failEvent = (data: BroadcastResult) => {
       const { error } = data;
-      const message = error?.message || 'Unknown error';
+      const message = error || 'Unknown error';
       setResults({
         action: 'signMessage',
         status: 'failed',

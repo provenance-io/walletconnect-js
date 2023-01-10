@@ -5,4 +5,4 @@ export * from './services';
 export * from './consts/windowMessages';
 export * from './consts/walletList';
 
-export type { BroadcastResults } from './types';
+export type { BroadcastResult, ProvenanceMethod } from './types';

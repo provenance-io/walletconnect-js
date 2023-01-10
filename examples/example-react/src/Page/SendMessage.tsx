@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import {
   WINDOW_MESSAGES,
   useWalletConnect,
-  BroadcastResults,
+  BroadcastResult,
+  ProvenanceMethod,
 } from '@provenanceio/walletconnect-js';
-import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
+import { Button, Input, ActionCard, ActionGas, Results, Dropdown } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
 
@@ -24,7 +25,9 @@ export const SendMessage: React.FC = () => {
     [key: string]: any;
   } | null>({});
   const [initialLoad, setInitialLoad] = useState(true);
-  const [method, setMethod] = useState('provenance_sendTransaction');
+  const [method, setMethod] = useState<ProvenanceMethod>(
+    'provenance_sendTransaction'
+  );
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { loading } = walletConnectState;
@@ -50,7 +53,7 @@ export const SendMessage: React.FC = () => {
 
   // Create all event listeners for this Action Card method
   useEffect(() => {
-    const completeEvent = (data: BroadcastResults) => {
+    const completeEvent = (data: BroadcastResult) => {
       setResults({
         action: 'sendMessage',
         status: 'success',
@@ -58,9 +61,9 @@ export const SendMessage: React.FC = () => {
         data,
       });
     };
-    const failEvent = (data: BroadcastResults) => {
+    const failEvent = (data: BroadcastResult) => {
       const { error } = data;
-      const message = error?.message || 'Unknown error';
+      const message = error || 'Unknown error';
       setResults({
         action: 'sendMessage',
         status: 'failed',
@@ -98,13 +101,12 @@ export const SendMessage: React.FC = () => {
         bottomGap
         disabled={sendMessageLoading}
       />
-      <Input
+      <Dropdown
         value={method}
         label="Message method"
-        placeholder="Enter the message method"
         onChange={setMethod}
         bottomGap
-        disabled={sendMessageLoading}
+        options={['provenance_sign', 'provenance_sendTransaction']}
       />
       <Input
         value={description}
