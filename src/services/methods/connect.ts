@@ -45,11 +45,23 @@ export const connect = async ({
     if (isString) {
       const [address, publicKey, jwt] = accounts as string[];
       // No walletInfo will be available on the old accounts array
-      return { address, publicKey, jwt, walletInfo: {} };
+      return {
+        address,
+        publicKey,
+        jwt,
+        walletInfo: {},
+        representedGroupPolicy: null,
+      };
     }
     // Data is in an object, pull keys from first item
-    const { address, publicKey, jwt, walletInfo } = firstAccount;
-    return { address, publicKey, jwt, walletInfo };
+    const {
+      address,
+      publicKey,
+      jwt,
+      walletInfo,
+      representedGroupPolicy = null,
+    } = firstAccount;
+    return { address, publicKey, jwt, walletInfo, representedGroupPolicy };
   };
   // ----------------
   // SESSION UPDATE
@@ -67,6 +79,7 @@ export const connect = async ({
         publicKey,
         jwt: lastConnectJWT,
         walletInfo,
+        representedGroupPolicy,
       } = getAccountInfo(accounts);
       const signedJWT = state.signedJWT || lastConnectJWT;
       setState({
@@ -78,6 +91,7 @@ export const connect = async ({
         peer,
         connectionEST,
         walletInfo,
+        representedGroupPolicy,
       });
       const broadcastData = {
         data: newConnector,
@@ -101,6 +115,7 @@ export const connect = async ({
       publicKey,
       jwt: signedJWT,
       walletInfo,
+      representedGroupPolicy,
     } = getAccountInfo(accounts);
     // Get connection issued/expires times (auto-logout)
     const connectionEST = Date.now();
@@ -115,6 +130,7 @@ export const connect = async ({
       signedJWT,
       connectionEXP,
       walletInfo,
+      representedGroupPolicy,
     });
     const broadcastData = {
       data: payload,
@@ -184,6 +200,7 @@ export const connect = async ({
       publicKey,
       jwt: lastConnectJWT,
       walletInfo,
+      representedGroupPolicy,
     } = getAccountInfo(accounts);
     const signedJWT = state.signedJWT || lastConnectJWT;
     // Are we already connected
@@ -200,6 +217,7 @@ export const connect = async ({
       publicKey,
       signedJWT,
       walletInfo,
+      representedGroupPolicy,
     });
   };
   // ----------------------------

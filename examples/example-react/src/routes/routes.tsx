@@ -6,6 +6,7 @@ import {
   AUTO_CONNECT,
   RESET_CONNECTION,
   SEND_MESSAGE,
+  SEND_COIN,
   SIGN_JWT,
   SIGN_MESSAGE,
 } from './actions';
@@ -19,6 +20,7 @@ export const routes = [
       AUTO_CONNECT,
       CONNECT,
       RESET_CONNECTION,
+      SEND_COIN,
       SEND_MESSAGE,
       SIGN_JWT,
       SIGN_MESSAGE,

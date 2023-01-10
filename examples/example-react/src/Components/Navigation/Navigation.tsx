@@ -7,6 +7,7 @@ import {
   CONNECT_URL,
   ICON_NAMES,
   RESET_CONNECTION_URL,
+  SEND_COIN_URL,
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
   SIGN_MESSAGE_URL,
@@ -66,6 +67,11 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       name: 'Reset Connection',
       icon: ICON_NAMES.RELOAD,
       url: RESET_CONNECTION_URL,
+    },
+    {
+      name: 'Send Coin',
+      icon: ICON_NAMES.HASH,
+      url: SEND_COIN_URL,
     },
     {
       name: 'Send Message',

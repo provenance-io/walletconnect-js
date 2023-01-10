@@ -29,8 +29,14 @@ const RowInfoValue = styled.div`
 
 export const AccountInfo: React.FC = () => {
   const { walletConnectState } = useWalletConnect();
-  const { address, walletInfo = {}, bridge } = walletConnectState;
+  const {
+    address,
+    walletInfo = {},
+    bridge,
+    representedGroupPolicy,
+  } = walletConnectState;
   const { name: walletName } = walletInfo;
+  const groupAddress = representedGroupPolicy?.address;
 
   return (
     <>
@@ -50,6 +56,19 @@ export const AccountInfo: React.FC = () => {
             <RowInfoValue>
               {address}
               <CopyValue value={address} />
+            </RowInfoValue>
+          </>
+        </RowInfo>
+      ) : null}
+      {groupAddress ? (
+        <RowInfo>
+          <>
+            <RowInfoTitle title="Connected wallet representing group address">
+              Representing Group Address
+            </RowInfoTitle>
+            <RowInfoValue>
+              {groupAddress}
+              <CopyValue value={groupAddress} />
             </RowInfoValue>
           </>
         </RowInfo>
