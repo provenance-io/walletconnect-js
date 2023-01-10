@@ -31,7 +31,7 @@ export const AccountInfo: React.FC = () => {
   const { walletConnectState } = useWalletConnect();
   const { address, walletInfo = {}, bridge, representedGroupPolicy = {} } = walletConnectState;
   const { name: walletName } = walletInfo;
-  const { address: groupAddress } = representedGroupPolicy;
+  const { address: groupAddress = undefined } = representedGroupPolicy;
 
   return (
     <>

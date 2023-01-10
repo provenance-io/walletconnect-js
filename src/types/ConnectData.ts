@@ -24,7 +24,7 @@ export type AccountObject = {
   jwt: string,
   publicKey: string,
   walletInfo: WalletInfo,
-  representedGroupPolicy: MasterGroupPolicy,
+  representedGroupPolicy?: MasterGroupPolicy | undefined,
 }
 
 export type AccountInfo = string[] | AccountObject[] | undefined;
