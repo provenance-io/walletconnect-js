@@ -4,6 +4,7 @@ import {
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
   SIGN_MESSAGE_URL,
+  SEND_COIN_URL,
 } from 'consts';
 import {
   AutoConnect,
@@ -11,6 +12,7 @@ import {
   SendMessage,
   SignJWT,
   SignMessage,
+  SendCoin,
 } from 'Page';
 
 export const AUTO_CONNECT = {
@@ -35,4 +37,9 @@ export const SIGN_JWT = {
 export const SIGN_MESSAGE = {
   path: SIGN_MESSAGE_URL,
   element: <SignMessage />,
+};
+
+export const SEND_COIN = {
+  path: SEND_COIN_URL,
+  element: <SendCoin />,
 };

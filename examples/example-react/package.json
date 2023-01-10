@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@microlink/react-json-view": "1.22.2",
+    "@provenanceio/wallet-utils": "2.4.1",
     "@provenanceio/walletconnect-js": "file:../@provenanceio-wcjs-local",
     "react": "file:../../node_modules/react",
     "react-dom": "^18.2.0",

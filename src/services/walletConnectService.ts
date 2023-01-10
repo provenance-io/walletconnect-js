@@ -63,7 +63,7 @@ const defaultState: WCSState = {
   signedJWT: '',
   walletApp: '',
   walletInfo: {},
-  representedGroupPolicy: {},
+  representedGroupPolicy: undefined,
 };
 
 // Pull values out of local storage if they exist
@@ -86,8 +86,9 @@ const getAccountItem = (itemName: keyof AccountObject) => {
       // No walletInfo in old array method
       case 'walletInfo':
         return {};
+      // No representedGroupPolicy in old array method
       case 'representedGroupPolicy':
-        return {};
+        return undefined;
       default:
         return '';
     }
@@ -123,7 +124,8 @@ const initialState: WCSState = {
   walletInfo:
     (getAccountItem('walletInfo') as WalletInfo) || defaultState.walletInfo,
   representedGroupPolicy:
-    (getAccountItem('representedGroupPolicy') as MasterGroupPolicy) || defaultState.representedGroupPolicy,
+    (getAccountItem('representedGroupPolicy') as MasterGroupPolicy) ||
+    defaultState.representedGroupPolicy,
 };
 
 export class WalletConnectService {
