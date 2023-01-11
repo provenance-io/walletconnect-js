@@ -69,6 +69,7 @@
     "babel-plugin-styled-components": "2.0.7",
     "concurrently": "7.4.0",
     "css-loader": "6.7.1",
+    "enquirer": "2.3.6",
     "env-cmd": "10.1.0",
     "eslint": "8.24.0",
     "eslint-config-airbnb": "19.0.4",
@@ -115,7 +116,9 @@
     "start:newDomain": "cd examples/example-react && npm run start",
     "test": "",
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
-    "tsc:esm": "tsc --module es2015 --outDir esm"
+    "tsc:esm": "tsc --module es2015 --outDir esm",
+    "versionUp": "node -e 'require(\"./scripts/versionUp.js\").versionUp()'",
+    "vup": "npm run versionUp"
   },
   "browserslist": [
     "defaults"

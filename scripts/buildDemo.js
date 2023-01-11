@@ -30,3 +30,9 @@ module.exports.buildDemo = function () {
   // INIT
   cloneExampleApp();
 };
+
+/*
+  DIFFERENCES BETWEEN EXAMPLE APP AND DEMO APP:
+  - Package.json
+    - "@provenanceio/walletconnect-js" import version needs to match wcjs latest version
+*/
