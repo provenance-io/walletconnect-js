@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useWalletConnect, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
+import {
+  useWalletConnect,
+  WINDOW_MESSAGES,
+  BroadcastResult,
+} from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 
@@ -15,21 +19,22 @@ export const SignMessage: React.FC = () => {
 
   // Create all event listeners for this Action Card method
   useEffect(() => {
-    const completeEvent = (result: any) => {
+    const completeEvent = (data: BroadcastResult) => {
       setResults({
         action: 'signMessage',
         status: 'success',
         message: 'WalletConnectJS | Sign Message Complete',
-        data: result,
+        data,
       });
     };
-    const failEvent = (result: any) => {
-      const { error } = result;
+    const failEvent = (data: BroadcastResult) => {
+      const { error } = data;
+      const message = error || 'Unknown error';
       setResults({
         action: 'signMessage',
         status: 'failed',
-        message: error.message,
-        data: result,
+        message,
+        data,
       });
     };
     // First load, if windowMessages passed in, create events

@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
+import {
+  WINDOW_MESSAGES,
+  useWalletConnect,
+  BroadcastResult,
+  ProvenanceMethod,
+} from '@provenanceio/walletconnect-js';
 import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
 import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
@@ -34,7 +39,7 @@ export const SendCoin: React.FC = () => {
       const msg = createAnyMessageBase64('MsgSend', msgSend);
 
       const message = {
-        method: 'provenance_sendTransaction',
+        method: 'provenance_sendTransaction' as ProvenanceMethod,
         gasPrice: finalGasData,
         description: `Send ${amount}${denom} to ${toAddress}`,
         message: msg,
@@ -56,21 +61,22 @@ export const SendCoin: React.FC = () => {
 
   // Create all event listeners for this Action Card method
   useEffect(() => {
-    const completeEvent = (result: any) => {
+    const completeEvent = (data: BroadcastResult) => {
       setResults({
         action: 'sendMessage',
         status: 'success',
         message: 'WalletConnectJS | Send Message Complete',
-        data: result,
+        data,
       });
     };
-    const failEvent = (result: any) => {
-      const { error } = result;
+    const failEvent = (data: BroadcastResult) => {
+      const { error } = data;
+      const message = error || 'Unknown error';
       setResults({
         action: 'sendMessage',
         status: 'failed',
-        message: error.message,
-        data: result,
+        message,
+        data,
       });
     };
     // First load, if windowMessages passed in, create events

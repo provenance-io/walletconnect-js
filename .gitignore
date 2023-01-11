@@ -38,4 +38,5 @@ yarn-error.log*
 ignored/
 .eslintcache
 /examples/@provenanceio-wcjs-local
+/figure-tech-walletconnect
 *.tgz

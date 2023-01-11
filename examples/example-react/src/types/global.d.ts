@@ -1,6 +1,10 @@
 interface Window {
-  provenance: {
+  provenance?: {
     version: string;
     isProvenance: boolean;
+  };
+  figureWalletExtension?: {
+    version: string;
+    isFigure: boolean;
   };
 }

@@ -38,4 +38,5 @@ yarn-error.log*
 ignored/
 .eslintcache
 
-commentSniffer.ts
+/scripts
+/figure-tech-walletconnect

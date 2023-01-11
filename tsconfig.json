@@ -27,6 +27,8 @@
   },
   "include": [
     "src",
-    "custom.d.ts"
+    "custom.d.ts",
+    ".eslintrc.js",
+    "scripts",
   ],
 }

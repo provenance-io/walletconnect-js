@@ -1,7 +1,12 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { WINDOW_MESSAGES, useWalletConnect } from '@provenanceio/walletconnect-js';
-import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
+import {
+  WINDOW_MESSAGES,
+  useWalletConnect,
+  BroadcastResult,
+  ProvenanceMethod,
+} from '@provenanceio/walletconnect-js';
+import { Button, Input, ActionCard, ActionGas, Results, Dropdown } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
 
@@ -20,7 +25,9 @@ export const SendMessage: React.FC = () => {
     [key: string]: any;
   } | null>({});
   const [initialLoad, setInitialLoad] = useState(true);
-  const [method, setMethod] = useState('provenance_sendTransaction');
+  const [method, setMethod] = useState<ProvenanceMethod>(
+    'provenance_sendTransaction'
+  );
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { loading } = walletConnectState;
@@ -46,21 +53,22 @@ export const SendMessage: React.FC = () => {
 
   // Create all event listeners for this Action Card method
   useEffect(() => {
-    const completeEvent = (result: any) => {
+    const completeEvent = (data: BroadcastResult) => {
       setResults({
         action: 'sendMessage',
         status: 'success',
         message: 'WalletConnectJS | Send Message Complete',
-        data: result,
+        data,
       });
     };
-    const failEvent = (result: any) => {
-      const { error } = result;
+    const failEvent = (data: BroadcastResult) => {
+      const { error } = data;
+      const message = error || 'Unknown error';
       setResults({
         action: 'sendMessage',
         status: 'failed',
-        message: error.message,
-        data: result,
+        message,
+        data,
       });
     };
     // First load, if windowMessages passed in, create events
@@ -93,13 +101,12 @@ export const SendMessage: React.FC = () => {
         bottomGap
         disabled={sendMessageLoading}
       />
-      <Input
+      <Dropdown
         value={method}
         label="Message method"
-        placeholder="Enter the message method"
         onChange={setMethod}
         bottomGap
-        disabled={sendMessageLoading}
+        options={['provenance_sign', 'provenance_sendTransaction']}
       />
       <Input
         value={description}

@@ -1,14 +1,8 @@
 import WalletConnectClient from '@walletconnect/client';
 import QRCode from 'qrcode';
-import type {
-  Broadcast,
-  ConnectData,
-  AccountInfo,
-  WCSState,
-  WCSSetState,
-} from '../../types';
-import { WINDOW_MESSAGES } from '../../consts';
-import { clearLocalStorage } from '../../utils';
+import type { Broadcast, ConnectData, WCSState, WCSSetState } from '../../types';
+import { CONNECTION_TYPES, CONNECTOR_EVENTS, WINDOW_MESSAGES } from '../../consts';
+import { clearLocalStorage, getAccountInfo } from '../../utils';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 interface ConnectProps {
@@ -32,40 +26,9 @@ export const connect = async ({
   startConnectionTimer,
   state,
 }: ConnectProps) => {
-  // -------------------
-  // PULL ACCOUNT INFO
-  // -------------------
-  const getAccountInfo = (accounts: AccountInfo) => {
-    if (!accounts || !Array.isArray(accounts) || !accounts.length) return {};
-    const firstAccount = accounts[0];
-    // Accounts can either be an array of strings or an array of objects
-    // Check the first value in the array to determine to type of data
-    const isString = typeof firstAccount === 'string';
-    // If it's a string, return data in the form of [address, publicKey, lastConnectJWT] from accounts
-    if (isString) {
-      const [address, publicKey, jwt] = accounts as string[];
-      // No walletInfo will be available on the old accounts array
-      return {
-        address,
-        publicKey,
-        jwt,
-        walletInfo: {},
-        representedGroupPolicy: null,
-      };
-    }
-    // Data is in an object, pull keys from first item
-    const {
-      address,
-      publicKey,
-      jwt,
-      walletInfo,
-      representedGroupPolicy = null,
-    } = firstAccount;
-    return { address, publicKey, jwt, walletInfo, representedGroupPolicy };
-  };
-  // ----------------
-  // SESSION UPDATE
-  // ----------------
+  // --------------------------------
+  // HANDLE SESSION UPDATE EVENT
+  // --------------------------------
   const onSessionUpdate = (newConnector: WalletConnectClient) => {
     // Get connection issued time
     const connectionEST = Date.now();
@@ -94,19 +57,19 @@ export const connect = async ({
         representedGroupPolicy,
       });
       const broadcastData = {
-        data: newConnector,
+        connector: newConnector,
         connectionEST,
-        connectionEXP: state.connectionEXP,
-        connectionType: 'existing session',
+        connectionEXP: state.connectionEXP || 0,
+        connectionType: CONNECTION_TYPES.existing_session,
       };
-      broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
+      broadcast(WINDOW_MESSAGES.CONNECTED, { data: broadcastData });
       // Start the auto-logoff timer
       startConnectionTimer();
     }
   };
-  // ----------------
-  // CONNECTED
-  // ----------------
+  // --------------------------------
+  // HANDLE CONNECT EVENT
+  // --------------------------------
   const onConnect = (payload: ConnectData) => {
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
@@ -136,14 +99,15 @@ export const connect = async ({
       data: payload,
       connectionEST,
       connectionEXP,
+      connectionType: CONNECTION_TYPES.new_session,
     };
     broadcast(WINDOW_MESSAGES.CONNECTED, broadcastData);
     // Start the auto-logoff timer
     startConnectionTimer();
   };
-  // --------------------
-  // WALLET DISCONNECT
-  // --------------------
+  // --------------------------------
+  // HANDLE DISCONNECT EVENT
+  // --------------------------------
   const onDisconnect = () => {
     // Get the latest state values
     const latestState = getState();
@@ -161,39 +125,28 @@ export const connect = async ({
     // Manually clear out all of walletconnect-js from localStorage
     clearLocalStorage('walletconnect-js');
   };
-  // --------------------------
-  // SUBSCRIBE TO WC EVENTS
-  // --------------------------
+  // -----------------------------------
+  // SUBSCRIBE TO CONNECTOR EVENTS
+  // -----------------------------------
   const subscribeToEvents = (newConnector: WalletConnectClient) => {
     if (!newConnector) return;
-    /* Pulled RESERVED_EVENTS from wallet connect:
-      "session_request",
-      "session_update", [used]
-      "exchange_key",
-      "connect", [used]
-      "disconnect", [used]
-      "display_uri",
-      "modal_closed",
-      "transport_open",
-      "transport_close",
-      "transport_error",
-    */
-    // Session Update
-    newConnector.on('session_update', (error) => {
+    newConnector.on(CONNECTOR_EVENTS.session_update, (error) => {
       if (error) throw error;
       onSessionUpdate(newConnector);
     });
-    // Connect
-    newConnector.on('connect', (error, payload) => {
+    newConnector.on(CONNECTOR_EVENTS.connect, (error, payload) => {
       if (error) throw error;
       onConnect(payload);
     });
-    // Disconnect
-    newConnector.on('disconnect', (error) => {
+    newConnector.on(CONNECTOR_EVENTS.disconnect, (error) => {
       if (error) throw error;
       onDisconnect();
     });
-    // Latest values
+  };
+  // -------------------------------------------------------------
+  // UPDATE WALLETCONNECTSERVICE WITH NEWCONNECTOR VALUES
+  // -------------------------------------------------------------
+  const updateWalletConnectService = (newConnector: WalletConnectClient) => {
     const { accounts, peerMeta: peer } = newConnector;
     const {
       address,
@@ -203,11 +156,11 @@ export const connect = async ({
       representedGroupPolicy,
     } = getAccountInfo(accounts);
     const signedJWT = state.signedJWT || lastConnectJWT;
-    // Are we already connected
+    // Are we already connected, run the session_update event
     if (newConnector.connected) {
       onSessionUpdate(newConnector);
     }
-    // Update Connector
+    // Update WalletConnectService State w/latest info
     setState({
       address,
       bridge,
@@ -220,32 +173,34 @@ export const connect = async ({
       representedGroupPolicy,
     });
   };
-  // ----------------------------
-  // CREATE NEW WC CONNECTION
-  // ----------------------------
-  // Create custom QRCode modal
-  class QRCodeModal {
-    open = async (data: string) => {
-      const qrcode = await QRCode.toDataURL(data);
-      setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: !noPopup });
-    };
+  // ------------------------
+  // CREATE NEW CONNECTOR
+  // ------------------------
+  const createNewConnector = () => {
+    class QRCodeModal {
+      open = async (data: string) => {
+        const qrcode = await QRCode.toDataURL(data);
+        setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: !noPopup });
+      };
 
-    close = () => {
-      setState({ showQRCodeModal: false });
-    };
-  }
-  const qrcodeModal = new QRCodeModal();
-  // create new connector
-  const newConnector = new WalletConnectClient({ bridge, qrcodeModal });
-  // check if already connected
+      close = () => {
+        setState({ showQRCodeModal: false });
+      };
+    }
+    const qrcodeModal = new QRCodeModal();
+    // create new connector
+    const newConnector = new WalletConnectClient({ bridge, qrcodeModal });
+    return newConnector;
+  };
+
+  const newConnector = createNewConnector();
+  // check if this new connector is already connected to a dApp
   if (!newConnector.connected) {
-    // create new session
+    // Since it's not already connected, create a new session
     await newConnector.createSession();
   }
-  // ----------------------------------------------
-  // RUN SUBSCRIPTION WITH NEW WC CONNECTION
-  // ----------------------------------------------
   subscribeToEvents(newConnector);
+  updateWalletConnectService(newConnector);
 
   return;
 };

@@ -6,7 +6,6 @@ import { COLORS } from 'theme';
 import { Countdowns } from './Countdowns';
 import { AccountInfo } from './AccountInfo';
 import { useState } from 'react';
-import { REACT_APP_WCJS_VERSION } from '../../version';
 
 const FullSidebar = styled.div<{ mobileShow: boolean }>`
   width: 200px;
@@ -98,7 +97,7 @@ export const Sidebar: React.FC = () => {
           target="_blank"
           rel="noreferrer"
         >
-          v{REACT_APP_WCJS_VERSION || 'v??.??.??'}
+          v{process.env.REACT_APP_VERSION || 'v??.??.??'}
         </a>
       </MobileHeader>
       <FullSidebar
@@ -114,7 +113,7 @@ export const Sidebar: React.FC = () => {
             target="_blank"
             rel="noreferrer"
           >
-            v{REACT_APP_WCJS_VERSION || 'v??.??.??'}
+            v{process.env.REACT_APP_VERSION || 'v??.??.??'}
           </Version>
         </SubtitleSection>
         {connected && (

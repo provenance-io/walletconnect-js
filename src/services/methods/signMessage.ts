@@ -1,12 +1,15 @@
 import { verifySignature } from '../../helpers';
-import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
+import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
 import { rngNum } from '../../utils';
-import type { WCSState } from '../../types';
+import type { WCSState, BroadcastResult } from '../../types';
 
-export const signMessage = async (state: WCSState, message: string) => {
+export const signMessage = async (
+  state: WCSState,
+  message: string
+): Promise<BroadcastResult> => {
   let valid = false;
   const { connector, address, publicKey: pubKeyB64, walletApp } = state;
-  const method = 'provenance_sign';
+  const method = PROVENANCE_METHODS.sign;
   const description = 'Sign Message';
   const metadata = JSON.stringify({
     description,
@@ -40,6 +43,6 @@ export const signMessage = async (state: WCSState, message: string) => {
     valid = await verifySignature(message, signature, pubKeyB64);
     return { valid, result, data: message, request };
   } catch (error) {
-    return { valid, error, data: message, request };
+    return { valid, error: `${error}`, data: message, request };
   }
 };
