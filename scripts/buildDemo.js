@@ -6,8 +6,11 @@ module.exports.buildDemo = function () {
   // CONSTANTS
   const exampleDirectory = 'examples/example-react';
   const demoFileName = 'figure-tech-walletconnect';
-  const packageJsonFile = require(`../${exampleDirectory}/package.json`);
+  const packageJsonFile = require('../package.json');
   const version = packageJsonFile.version;
+  const reactVersion = packageJsonFile.devDependencies.react;
+  const styledComponentsVersion =
+    packageJsonFile.devDependencies['styled-components'];
   // FUNCTIONS
   async function copyDir(src, dest) {
     await fs.promises.mkdir(dest, { recursive: true });
@@ -15,8 +18,11 @@ module.exports.buildDemo = function () {
 
     for (let entry of entries) {
       let srcPath = path.join(src, entry.name);
-      // Don't copy any node_modules
-      if (!srcPath.includes('node_modules')) {
+      // Don't copy any node_modules nor package-lock
+      if (
+        !srcPath.includes('node_modules') &&
+        !srcPath.includes('package-lock.json')
+      ) {
         let destPath = path.join(dest, entry.name);
 
         entry.isDirectory()
@@ -28,9 +34,11 @@ module.exports.buildDemo = function () {
 
   // Change package.json to use latest version value (both example and wcjs use same version)
   const updatePackageJson = async () => {
-    const regularExpressionStartScript = /"start":(.+),/i;
-    const regularExpressionWcjsPackage = /"@provenanceio\/walletconnect-js":(.+),/i;
-    const packageLocations = ['package.json', 'package-lock.json'];
+    const regularExpressionStartScript = /"start":(.+),/g;
+    const regularExpressionWcjsPackage = /"@provenanceio\/walletconnect-js":(.+),/g;
+    const regularExpressionReactPackage = /"react":(.+),/g;
+    const regularExpressionStyledComponentsPackage = /"styled-components":(.+),/g;
+    const packageLocations = ['package.json'];
 
     // Loop through each package location to update the wcjs import
     packageLocations.forEach((packageLocation) => {
@@ -45,13 +53,21 @@ module.exports.buildDemo = function () {
           regularExpressionWcjsPackage,
           `"@provenanceio/walletconnect-js": "${version}",`
         );
-        if (packageLocation.includes('package.json')) {
-          // find the start script and update it
-          updatedPackageData = updatedPackageData.replace(
-            regularExpressionStartScript,
-            `"start": "react-scripts start",`
-          );
-        }
+        // find the start script and update it
+        updatedPackageData = updatedPackageData.replace(
+          regularExpressionStartScript,
+          '"start": "react-scripts start",'
+        );
+        // Update react package import
+        updatedPackageData = updatedPackageData.replace(
+          regularExpressionReactPackage,
+          `"react": "${reactVersion}",`
+        );
+        // Update styled components package import
+        updatedPackageData = updatedPackageData.replace(
+          regularExpressionStyledComponentsPackage,
+          `"styled-components": "${styledComponentsVersion}",`
+        );
         fs.writeFileSync(`${demoFileName}/${packageLocation}`, updatedPackageData);
       }
     });
