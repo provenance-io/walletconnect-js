@@ -6,9 +6,11 @@ import { clearLocalStorage, getAccountInfo } from '../../utils';
 import { WALLET_LIST, WALLET_APP_EVENTS } from '../../consts';
 
 interface ConnectProps {
+  address?: string;
   bridge: string;
   broadcast: Broadcast;
   getState: () => WCSState;
+  prohibitGroups?: boolean;
   noPopup?: boolean;
   resetState: () => void;
   setState: WCSSetState;
@@ -17,6 +19,8 @@ interface ConnectProps {
 }
 
 export const connect = async ({
+  address: requiredAddress,
+  prohibitGroups,
   bridge,
   broadcast,
   getState,
@@ -179,8 +183,13 @@ export const connect = async ({
   const createNewConnector = () => {
     class QRCodeModal {
       open = async (data: string) => {
-        const qrcode = await QRCode.toDataURL(data);
-        setState({ QRCode: qrcode, QRCodeUrl: data, showQRCodeModal: !noPopup });
+        const requiredAddressParam = requiredAddress
+          ? `&address=${requiredAddress}`
+          : '';
+        const prohibitGroupsParam = prohibitGroups ? `&prohibitGroups=true` : '';
+        const fullData = `${data}${requiredAddressParam}${prohibitGroupsParam}`;
+        const qrcode = await QRCode.toDataURL(fullData);
+        setState({ QRCode: qrcode, QRCodeUrl: fullData, showQRCodeModal: !noPopup });
       };
 
       close = () => {
