@@ -192,6 +192,8 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | bridge | string | no       | `"wss://figure.tech/service-wallet-connect-bridge/ws/external"` | `"wss://custom.bridge"` | Custom bridge to connect into |
   | duration | number | no       | `1800` | `3600` | Custom connection timeout in seconds |
   | noPopup | boolean | no       | false | true | Should the QRCodeModal popup automatically on connect call |
+  | address | string | no       | `''` | `tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh` | Required address for dApp connection |
+  | prohibitGroups | boolean | no       | `false` | `true` | Prohibit group accounts from connecting to this dApp |
 
 - #### disconnect
 
