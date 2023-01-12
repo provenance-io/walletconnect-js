@@ -2,6 +2,7 @@ export * from './ActionCard';
 export * from './ActionGas';
 export * from './Button';
 export * from './Card';
+export * from './Checkbox';
 export * from './CopyValue';
 export * from './CountdownTimer';
 export * from './Dropdown';

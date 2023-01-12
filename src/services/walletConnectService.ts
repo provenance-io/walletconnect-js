@@ -317,24 +317,32 @@ export class WalletConnectService {
    * @param bridge - (optional) URL string of bridge to connect into
    * @param duration - (optional) Time before connection is timed out (seconds)
    * @param noPopup - (optional) Prevent the QRCodeModal from automatically popping up
+   * @param address - (optional) Address to establish connection with, note, it must exist
+   * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    */
   connect = async ({
     bridge,
     duration,
     noPopup,
+    address,
+    prohibitGroups,
   }: {
     bridge?: string;
     duration?: number;
     noPopup?: boolean;
+    address?: string;
+    prohibitGroups?: boolean;
   } = {}) => {
     // Update the duration of this connection
     this.setState({
       connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
     });
     await connectMethod({
+      address,
       bridge: bridge || this.state.bridge,
       broadcast: this.#broadcastEvent,
       getState: this.#getState,
+      prohibitGroups,
       noPopup,
       resetState: this.resetState,
       setState: this.setState,

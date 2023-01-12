@@ -4,7 +4,7 @@ import {
   WINDOW_MESSAGES,
   BroadcastResult,
 } from '@provenanceio/walletconnect-js';
-import { Button, Card, Dropdown, Results } from 'Components';
+import { Button, Card, Dropdown, Input, Results, Checkbox } from 'Components';
 import { ICON_NAMES, BRIDGE_URLS } from 'consts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,8 @@ const QRCodeModalStyled = styled(QRCodeModal)`
 
 export const Connect: React.FC = () => {
   const [selectedBridge, setSelectedBridge] = useState(BRIDGE_URLS[0]);
+  const [address, setAddress] = useState('');
+  const [groupsAllowed, setGroupsAllowed] = useState(true);
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>(null);
@@ -60,8 +62,27 @@ export const Connect: React.FC = () => {
         label="Select Bridge"
         bottomGap
       />
+      <Input
+        onChange={setAddress}
+        value={address}
+        label="Enter wallet address to connect with (optional)"
+        placeholder="Enter wallet address (optional)"
+        bottomGap
+      />
+      <Checkbox
+        label="Group Accounts Allowed"
+        checked={groupsAllowed}
+        onChange={setGroupsAllowed}
+      />
       <Button
-        onClick={() => wcs.connect({ bridge: selectedBridge, duration: 3600 })}
+        onClick={() =>
+          wcs.connect({
+            bridge: selectedBridge,
+            duration: 3600,
+            address,
+            prohibitGroups: !groupsAllowed,
+          })
+        }
       >
         Connect
       </Button>
