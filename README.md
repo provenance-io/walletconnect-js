@@ -496,3 +496,5 @@ This application is under heavy development. The upcoming public blockchain is t
 Current development is being supported by [Figure Technologies](https://figure.com).
 
 [Back to top](#Provenance.io-WalletConnect-JS)
+
+
