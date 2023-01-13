@@ -53,13 +53,15 @@ export const SignMessage: React.FC = () => {
     <ActionCard
       icon={ICON_NAMES.PENCIL}
       title="Sign Message"
-      description="Send a sign request message to the wallet"
+      description="Send a sign message request message to the wallet.
+                   The message to be signed must be hex encoded to allow for signing of bytes.
+                   The wallet will decode the hex message and sign the underlying bytes."
       status={results?.status}
     >
       <Input
         value={value}
-        label="Message"
-        placeholder="Enter message"
+        label="Hex Encoded Message"
+        placeholder="Enter hex encoded message"
         onChange={setValue}
         bottomGap
         disabled={signMessageLoading}

@@ -5,7 +5,7 @@ import type { WCSState, BroadcastResult } from '../../types';
 
 export const signMessage = async (
   state: WCSState,
-  message: string
+  hexMessage: string
 ): Promise<BroadcastResult> => {
   let valid = false;
   const { connector, address, publicKey: pubKeyB64, walletApp } = state;
@@ -26,9 +26,8 @@ export const signMessage = async (
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
   if (!connector)
-    return { valid, data: message, request, error: 'No wallet connected' };
-  // encode message (hex)
-  request.params.push(message);
+    return { valid, data: hexMessage, request, error: 'No wallet connected' };
+  request.params.push(hexMessage);
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
@@ -39,10 +38,12 @@ export const signMessage = async (
     const result = await connector.sendCustomRequest(request);
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
+    // un-hex the message to verify the signature (the wallet signs the un-hexed message)
+    const message = Buffer.from(hexMessage, 'hex').toString();
     // verify signature
     valid = await verifySignature(message, signature, pubKeyB64);
-    return { valid, result, data: message, request };
+    return { valid, result, data: hexMessage, request };
   } catch (error) {
-    return { valid, error: `${error}`, data: message, request };
+    return { valid, error: `${error}`, data: hexMessage, request };
   }
 };
