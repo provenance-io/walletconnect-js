@@ -1,9 +1,5 @@
-import { useState, useEffect } from 'react';
-import {
-  useWalletConnect,
-  WINDOW_MESSAGES,
-  BroadcastResult,
-} from '@provenanceio/walletconnect-js';
+import { useState } from 'react';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 
@@ -12,41 +8,18 @@ export const SignMessage: React.FC = () => {
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
-  const [initialLoad, setInitialLoad] = useState(true);
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { loading } = walletConnectState;
   const signMessageLoading = loading === 'signMessage';
 
-  // Create all event listeners for this Action Card method
-  useEffect(() => {
-    const completeEvent = (data: BroadcastResult) => {
-      setResults({
-        action: 'signMessage',
-        status: 'success',
-        message: 'WalletConnectJS | Sign Message Complete',
-        data,
-      });
-    };
-    const failEvent = (data: BroadcastResult) => {
-      const { error } = data;
-      const message = error || 'Unknown error';
-      setResults({
-        action: 'signMessage',
-        status: 'failed',
-        message,
-        data,
-      });
-    };
-    // First load, if windowMessages passed in, create events
-    if (initialLoad) {
-      setInitialLoad(false);
-      wcs.addListener(WINDOW_MESSAGES.SIGN_MESSAGE_COMPLETE, completeEvent);
-      wcs.addListener(WINDOW_MESSAGES.SIGN_MESSAGE_FAILED, failEvent);
-    }
-  }, [initialLoad, wcs]);
-
-  const handleSubmit = () => {
-    wcs.signMessage(value);
+  const handleSubmit = async () => {
+    const data = await wcs.signMessage(value);
+    setResults({
+      action: 'signMessage',
+      status: data.error ? 'failed' : 'success',
+      message: data.error ? data.error : 'WalletConnectJS | Sign Message Complete',
+      data: data,
+    });
   };
 
   return (
