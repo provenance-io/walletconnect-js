@@ -349,10 +349,12 @@ export class WalletConnectService {
       startConnectionTimer: this.#startConnectionTimer,
       state: this.state,
     });
+    return;
   };
 
   disconnect = async () => {
     if (this?.state?.connector) await this.state.connector.killSession();
+    return;
   };
 
   /**
@@ -403,6 +405,8 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
+
+    return result;
   };
 
   /**
@@ -422,6 +426,8 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
+
+    return result;
   };
 
   /**
@@ -442,5 +448,7 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
+
+    return result;
   };
 }
