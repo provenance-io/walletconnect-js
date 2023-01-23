@@ -111,6 +111,7 @@ walletConnectService.removeListener(
 React context provider to supply state to every child within
 
 - Include as parent to all Components using `walletconnect-js`
+- Optional: You may pass your own instance of walletConnectService into the context provider under the param `service`
 - Usage Example (w/React.js):
 
   ```js
