@@ -9,13 +9,19 @@ interface ProviderState {
 }
 
 const StateContext = createContext<ProviderState | undefined>(undefined);
-const walletConnectService = new WalletConnectService();
+const newService = new WalletConnectService();
 
 interface Props {
   children: React.ReactNode;
+  service?: WalletConnectService;
 }
 
-const WalletConnectContextProvider: React.FC<Props> = ({ children }) => {
+const WalletConnectContextProvider: React.FC<Props> = ({
+  children,
+  service: existingService,
+}) => {
+  // Allow users to pass in an instance of the service themselves
+  const walletConnectService = existingService || newService;
   const [walletConnectState, setWalletConnectState] = useState<WCSState>({
     ...walletConnectService.state,
   });
