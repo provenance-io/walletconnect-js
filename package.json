@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "2.1.8",
+  "version": "2.2.0",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -104,8 +104,9 @@
     "commentSniff": "node -e 'require(\"./scripts/commentSniffer.js\").commentSniffer()'",
     "build:demo": "node -e 'require(\"./scripts/buildDemo.js\").buildDemo()' && cd figure-tech-walletconnect && npm i --package-lock-only",
     "start:example-react": "cd examples/example-react && npm i && npm run start",
+    "watch:example-react": "cd examples/example-react && npm run start",
     "prebuild": "npm run test",
-    "start:watch": "nodemon -e js,ts,tsx --watch src --exec 'npm run build:pack && npm run start:example-react'",
+    "start:watch": "nodemon -e js,ts,tsx --watch src --exec 'npm run build:pack && npm run watch:example-react'",
     "start": "npm run start:watch && npm run start:example-react",
     "test": "",
     "tsc:commonjs": "tsc --module commonjs --outDir lib",

@@ -3,7 +3,6 @@ import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Sprite } from 'Components';
 import { useState } from 'react';
 import {
-  AUTOCONNECT_URL,
   CONNECT_URL,
   ICON_NAMES,
   RESET_CONNECTION_URL,
@@ -58,11 +57,6 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
   const [activePage, setActivePage] = useState('connect');
   // List of links
   const navItems = [
-    {
-      name: 'Auto Connect',
-      icon: ICON_NAMES.CHECK,
-      url: AUTOCONNECT_URL,
-    },
     {
       name: 'Reset Connection',
       icon: ICON_NAMES.RELOAD,
