@@ -13,12 +13,14 @@ export const SignMessage: React.FC = () => {
   const signMessageLoading = loading === 'signMessage';
 
   const handleSubmit = async () => {
-    const data = await wcs.signMessage(value);
+    const result = await wcs.signMessage(value);
     setResults({
       action: 'signMessage',
-      status: data.error ? 'failed' : 'success',
-      message: data.error ? data.error : 'WalletConnectJS | Sign Message Complete',
-      data: data,
+      status: result.error ? 'failed' : 'success',
+      message: result.error
+        ? result.error
+        : 'WalletConnectJS | Sign Message Complete',
+      data: result,
     });
   };
 

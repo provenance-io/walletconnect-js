@@ -1,10 +1,5 @@
-import { useState, useEffect } from 'react';
-import {
-  WINDOW_MESSAGES,
-  useWalletConnect,
-  BroadcastResult,
-  ProvenanceMethod,
-} from '@provenanceio/walletconnect-js';
+import { useState } from 'react';
+import { useWalletConnect, ProvenanceMethod } from '@provenanceio/walletconnect-js';
 import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
 import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
@@ -18,7 +13,6 @@ export const SendCoin: React.FC = () => {
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
-  const [initialLoad, setInitialLoad] = useState(true);
   const [feeGranter, setFeeGranter] = useState('');
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
@@ -26,7 +20,7 @@ export const SendCoin: React.FC = () => {
   const groupAddress = representedGroupPolicy?.address;
   const sendMessageLoading = loading === 'sendMessage';
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const sendMessage = {
       fromAddress: groupAddress ? groupAddress : address,
       toAddress,
@@ -47,7 +41,13 @@ export const SendCoin: React.FC = () => {
       };
 
       // Convert input string value to number for price
-      wcs.sendMessage(message);
+      const result = await wcs.sendMessage(message);
+      setResults({
+        action: 'signMessage',
+        status: result.error ? 'failed' : 'success',
+        message: result.error ? result.error : 'WalletConnectJS | SendCoin Complete',
+        data: result,
+      });
     } else {
       // No msgSend, show an error
       setResults({
@@ -58,34 +58,6 @@ export const SendCoin: React.FC = () => {
       });
     }
   };
-
-  // Create all event listeners for this Action Card method
-  useEffect(() => {
-    const completeEvent = (data: BroadcastResult) => {
-      setResults({
-        action: 'sendMessage',
-        status: 'success',
-        message: 'WalletConnectJS | Send Message Complete',
-        data,
-      });
-    };
-    const failEvent = (data: BroadcastResult) => {
-      const { error } = data;
-      const message = error || 'Unknown error';
-      setResults({
-        action: 'sendMessage',
-        status: 'failed',
-        message,
-        data,
-      });
-    };
-    // First load, if windowMessages passed in, create events
-    if (initialLoad) {
-      setInitialLoad(false);
-      wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE, completeEvent);
-      wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_FAILED, failEvent);
-    }
-  }, [initialLoad, wcs]);
 
   return (
     <ActionCard

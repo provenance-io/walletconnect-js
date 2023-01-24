@@ -33,8 +33,18 @@ const WalletConnectContextProvider: React.FC<Props> = ({
   // If the dApp passed in a connectionRedirect then monitor "connector.connected" and redirect the user when disconnected
   useEffect(() => {
     if (connectionRedirect && !connector?.connected) {
-      // Prevent any funny business by not passing in a string
-      if (typeof connectionRedirect === 'string')
+      const currentUrl = window.location.href;
+      const isValidUrl = (url: string) => {
+        try {
+          new URL(url);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+      const validUrl = isValidUrl(connectionRedirect);
+      // Prevent any funny business by not passing in a string, also make sure we're not already where we need to be
+      if (validUrl && currentUrl !== connectionRedirect)
         window.location.href = connectionRedirect;
     }
   }, [connectionRedirect, connector?.connected]);

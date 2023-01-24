@@ -432,7 +432,6 @@ export class WalletConnectService {
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
-
     return result;
   };
 

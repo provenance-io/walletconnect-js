@@ -1,9 +1,6 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { Sidebar } from 'Components';
 import styled from 'styled-components';
-import { useWalletConnect } from '@provenanceio/walletconnect-js';
-import { useEffect } from 'react';
-import { CONNECT_URL } from 'consts';
 
 const RootContainer = styled.div`
   position: relative;
@@ -22,26 +19,11 @@ const PageContent = styled.div`
   }
 `;
 
-export const Root: React.FC = () => {
-  const { walletConnectState } = useWalletConnect();
-  const { connected } = walletConnectState;
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // If we are disconnected/not connected, redirect ot the connect page
-  useEffect(() => {
-    const connectPage = location.pathname.includes('/connect');
-    const urlParams = new URL(window.location.href).searchParams.toString();
-    if (!connected && !connectPage)
-      navigate(`${CONNECT_URL}${urlParams ? `?${urlParams}` : ''}`);
-  }, [connected, navigate, location.pathname]);
-
-  return (
-    <RootContainer>
-      <Sidebar />
-      <PageContent>
-        <Outlet />
-      </PageContent>
-    </RootContainer>
-  );
-};
+export const Root: React.FC = () => (
+  <RootContainer>
+    <Sidebar />
+    <PageContent>
+      <Outlet />
+    </PageContent>
+  </RootContainer>
+);
