@@ -51,9 +51,9 @@ export const connect = async ({
       const signedJWT = state.signedJWT || lastConnectJWT;
       setState({
         address,
-        bridge,
+        bridge: newConnector.bridge,
         publicKey,
-        connected: true,
+        connected: newConnector.connected,
         signedJWT,
         peer,
         connectionEST,
@@ -167,8 +167,8 @@ export const connect = async ({
     // Update WalletConnectService State w/latest info
     setState({
       address,
-      bridge,
-      connected: !!address,
+      bridge: newConnector.bridge,
+      connected: newConnector.connected,
       connector: newConnector,
       peer,
       publicKey,
@@ -183,6 +183,7 @@ export const connect = async ({
   const createNewConnector = () => {
     class QRCodeModal {
       open = async (data: string) => {
+        // Check for address and prohibit groups values to append to the wc value for the wallet to read when connecting
         const requiredAddressParam = requiredAddress
           ? `&address=${requiredAddress}`
           : '';

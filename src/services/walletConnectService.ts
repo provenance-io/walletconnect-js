@@ -47,8 +47,9 @@ const defaultState: WCSState = {
   address: '',
   bridge: WALLETCONNECT_BRIDGE_URL,
   connected: false,
-  connectionEXP: null,
   connectionEST: null,
+  connectionEXP: null,
+  connectionPending: false,
   connectionTimeout: CONNECTION_TIMEOUT,
   connector: null,
   figureConnected: false,
@@ -59,11 +60,11 @@ const defaultState: WCSState = {
   publicKey: '',
   QRCode: '',
   QRCodeUrl: '',
+  representedGroupPolicy: null,
   showQRCodeModal: false,
   signedJWT: '',
   walletApp: '',
   walletInfo: {},
-  representedGroupPolicy: null,
 };
 
 // Pull values out of local storage if they exist
@@ -104,6 +105,7 @@ const initialState: WCSState = {
   connected: existingWCState.connected || defaultState.connected,
   connectionEXP: existingWCJSState.connectionEXP || defaultState.connectionEXP,
   connectionEST: existingWCJSState.connectionEST || defaultState.connectionEST,
+  connectionPending: defaultState.connectionPending,
   connectionTimeout:
     existingWCJSState.connectionTimeout || defaultState.connectionTimeout,
   connector: existingWCState || defaultState.connector,
@@ -336,6 +338,7 @@ export class WalletConnectService {
     // Update the duration of this connection
     this.setState({
       connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
+      connectionPending: true,
     });
     await connectMethod({
       address,
@@ -348,6 +351,9 @@ export class WalletConnectService {
       setState: this.setState,
       startConnectionTimer: this.#startConnectionTimer,
       state: this.state,
+    });
+    this.setState({
+      connectionPending: false,
     });
     return;
   };

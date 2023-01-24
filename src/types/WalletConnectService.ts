@@ -12,6 +12,7 @@ export interface WCSState {
   address: string;
   bridge: string;
   connected: boolean;
+  connectionPending: boolean;
   connectionEXP: number | null;
   connectionEST: number | null;
   connectionTimeout: number;

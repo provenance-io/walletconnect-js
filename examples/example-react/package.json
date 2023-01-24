@@ -26,7 +26,8 @@
     "typescript": "^4.8.3"
   },
   "scripts": {
-    "start": "node -p \"'export const REACT_APP_WCJS_VERSION = ' + JSON.stringify(require('../@provenanceio-wcjs-local/package.json').version)\" > src/version.ts && react-scripts start",
+    "clean:cache": "rm -rf ./node_modules/.cache",
+    "start": "clean:cache && react-scripts start",
     "build": "react-scripts build",
     "build:staging": "npm run build"
   },
