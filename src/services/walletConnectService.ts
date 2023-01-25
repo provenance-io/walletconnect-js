@@ -7,7 +7,6 @@ import type {
   BroadcastResult,
   MethodSendMessageData,
   WalletConnectClientType,
-  WalletId,
   WalletInfo,
   MasterGroupPolicy,
   WCJSLocalState,
@@ -22,10 +21,12 @@ import {
   WALLETCONNECT_BRIDGE_URL,
 } from '../consts';
 import {
-  connect as connectMethod,
   sendMessage as sendMessageMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
+  createConnector,
+  createConnectorEvents,
+  updateService,
 } from './methods';
 import {
   getFromLocalStorage,
@@ -296,26 +297,6 @@ export class WalletConnectService {
   }
 
   /**
-   *
-   * @param url - URL to send user (with wcjs functionality)
-   * @param walletId - (optional) wallet id to auto load upon landing on new url
-   * @param duration - (optional) new connection timeout in seconds
-   * @returns URL redirect string
-   */
-  generateAutoConnectUrl = ({
-    url,
-    walletId,
-    duration,
-  }: {
-    url: string;
-    walletId?: WalletId;
-    duration?: number;
-  }) =>
-    `${url}?wcjs_wallet=${walletId || this.state.walletApp}&wcjs_bridge=${
-      this.state.bridge
-    }&wcjs_duration=${duration ? duration * 1000 : this.state.connectionTimeout}`;
-
-  /**
    * @param bridge - (optional) URL string of bridge to connect into
    * @param duration - (optional) Time before connection is timed out (seconds)
    * @param noPopup - (optional) Prevent the QRCodeModal from automatically popping up
@@ -340,22 +321,38 @@ export class WalletConnectService {
       connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
       connectionPending: true,
     });
-    await connectMethod({
-      address,
+    // Build the new connector
+    const newConnector = createConnector({
+      requiredAddress: address,
+      bridge: bridge || this.state.bridge,
+      noPopup,
+      prohibitGroups,
+      setState: this.setState,
+    });
+    // Set up all connector event listeners
+    createConnectorEvents({
       bridge: bridge || this.state.bridge,
       broadcast: this.#broadcastEvent,
+      connector: newConnector,
       getState: this.#getState,
-      prohibitGroups,
-      noPopup,
       resetState: this.resetState,
       setState: this.setState,
       startConnectionTimer: this.#startConnectionTimer,
       state: this.state,
     });
+    // Update the state based on the newConnector information
+    updateService({
+      broadcast: this.#broadcastEvent,
+      connector: newConnector,
+      setState: this.setState,
+      startConnectionTimer: this.#startConnectionTimer,
+      state: this.state,
+    });
+    if (!newConnector.connected) newConnector.createSession();
     this.setState({
       connectionPending: false,
     });
-    return;
+    return '';
   };
 
   disconnect = async () => {

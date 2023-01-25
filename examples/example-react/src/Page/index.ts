@@ -1,4 +1,3 @@
-export * from './AutoConnect';
 export * from './Connect';
 export * from './ResetConnectionTimeout';
 export * from './Root';

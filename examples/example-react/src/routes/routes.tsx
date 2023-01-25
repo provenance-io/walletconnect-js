@@ -3,7 +3,6 @@ import { CONNECT } from './connect';
 import { Connect } from 'Page';
 import { Root } from 'Page';
 import {
-  AUTO_CONNECT,
   RESET_CONNECTION,
   SEND_MESSAGE,
   SEND_COIN,
@@ -17,7 +16,6 @@ export const routes = [
     element: <Root />,
     children: [
       { index: true, element: <Connect /> },
-      AUTO_CONNECT,
       CONNECT,
       RESET_CONNECTION,
       SEND_COIN,

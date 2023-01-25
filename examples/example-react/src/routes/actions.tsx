@@ -1,5 +1,4 @@
 import {
-  AUTOCONNECT_URL,
   RESET_CONNECTION_URL,
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
@@ -7,7 +6,6 @@ import {
   SEND_COIN_URL,
 } from 'consts';
 import {
-  AutoConnect,
   ResetConnectionTimeout,
   SendMessage,
   SignJWT,
@@ -15,10 +13,6 @@ import {
   SendCoin,
 } from 'Page';
 
-export const AUTO_CONNECT = {
-  path: AUTOCONNECT_URL,
-  element: <AutoConnect />,
-};
 export const RESET_CONNECTION = {
   path: RESET_CONNECTION_URL,
   element: <ResetConnectionTimeout />,

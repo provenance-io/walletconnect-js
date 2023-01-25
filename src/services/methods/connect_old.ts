@@ -38,8 +38,10 @@ export const connect = async ({
     const connectionEST = Date.now();
     const connectionEXP = state.connectionEXP;
     // If the session is already expired (re-opened closed/idle tab), kill the session
-    if (!connectionEXP || connectionEST >= connectionEXP) newConnector.killSession();
-    else {
+    if (!connectionEXP || connectionEST >= connectionEXP) {
+      newConnector.killSession();
+      return '';
+    } else {
       const { accounts, peerMeta: peer } = newConnector;
       const {
         address,
@@ -70,6 +72,7 @@ export const connect = async ({
       // Start the auto-logoff timer
       startConnectionTimer();
     }
+    return '';
   };
   // --------------------------------
   // HANDLE CONNECT EVENT
@@ -136,15 +139,15 @@ export const connect = async ({
     if (!newConnector) return;
     newConnector.on(CONNECTOR_EVENTS.session_update, (error) => {
       if (error) throw error;
-      onSessionUpdate(newConnector);
+      return onSessionUpdate(newConnector);
     });
     newConnector.on(CONNECTOR_EVENTS.connect, (error, payload) => {
       if (error) throw error;
-      onConnect(payload);
+      return onConnect(payload);
     });
     newConnector.on(CONNECTOR_EVENTS.disconnect, (error) => {
       if (error) throw error;
-      onDisconnect();
+      return onDisconnect();
     });
   };
   // -------------------------------------------------------------
@@ -212,5 +215,5 @@ export const connect = async ({
   subscribeToEvents(newConnector);
   updateWalletConnectService(newConnector);
 
-  return;
+  return '';
 };
