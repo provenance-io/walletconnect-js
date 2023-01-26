@@ -46,6 +46,9 @@ import {
 } from "@provenanceio/walletconnect-js";
 ```
 
+- NOTE: If using react-scripts 4 and below, you must be using walletconnect-js version 2.1.1 or below.
+version 2.1.2 and above require react-scripts 5.x.x+.
+
 ## Window Messages
 
 Each method will return a window message indicating whether it failed or was completed as well as the result
