@@ -33,25 +33,12 @@ export const Connect: React.FC = () => {
 
   // Listen for a connection, then redirect to action page
   useEffect(() => {
-    console.log(
-      'example-react | Connect.tsx | useEffect | walletConnectState: ',
-      walletConnectState,
-      initialLoad
-    );
     if (initialLoad) {
       setInitialLoad(false);
 
       const handleConnectedEvent = (results: BroadcastResult) => {
         setResults(results);
-        console.log(
-          'example-react | Connect.tsx | useEffect | handleConnectedEvent | walletConnectState: ',
-          walletConnectState
-        );
       };
-      console.log(
-        'example-react | Connect.tsx | useEffect | create event listener for ',
-        WINDOW_MESSAGES.CONNECTED
-      );
       wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
     }
   }, [wcs, navigate, initialLoad]);

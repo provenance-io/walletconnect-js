@@ -139,10 +139,6 @@ export class WalletConnectService {
   // Instead of having to use walletConnectService.eventEmitter.addListener()
   // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
   #broadcastEvent: Broadcast = (eventName, data) => {
-    console.log('wcjs | walletConnectService.ts | #broadcastEvent | params: ', {
-      eventName,
-      data,
-    });
     this.#eventEmitter.emit(eventName, data);
   };
 
@@ -279,10 +275,6 @@ export class WalletConnectService {
         peer: peerMeta,
       };
     }
-    console.log(
-      'wcjs | walletConnectService.ts | setState | finalUpdatedState: ',
-      finalUpdatedState
-    );
     // Loop through each to update
     this.state = { ...this.state, ...finalUpdatedState };
     this.updateState();
