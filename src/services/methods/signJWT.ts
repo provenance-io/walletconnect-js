@@ -24,7 +24,7 @@ export const signJWT = async (
   const customExpiresSec = customExpiresGiven && expires;
   const finalExpiresSec =
     nowSec + (customExpiresGiven ? (customExpiresSec as number) : defaultExpireSec);
-  const { connector, address, publicKey: pubKeyB64, walletApp } = state;
+  const { connector, address, publicKey: pubKeyB64, walletAppId } = state;
   const method = PROVENANCE_METHODS.sign;
   const description = 'Sign JWT Token';
   const metadata = JSON.stringify({
@@ -40,7 +40,7 @@ export const signJWT = async (
     params: [metadata],
   };
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
   if (!connector)
     return {
       valid,

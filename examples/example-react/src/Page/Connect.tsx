@@ -22,6 +22,7 @@ const QRCodeModalStyled = styled(QRCodeModal)`
 export const Connect: React.FC = () => {
   const [selectedBridge, setSelectedBridge] = useState(BRIDGE_URLS[0]);
   const [address, setAddress] = useState('');
+  const [initialLoad, setInitialLoad] = useState(true);
   const [groupsAllowed, setGroupsAllowed] = useState(true);
   const [results, setResults] = useState<{
     [key: string]: any;
@@ -32,15 +33,19 @@ export const Connect: React.FC = () => {
 
   // Listen for a connection, then redirect to action page
   useEffect(() => {
-    const handleConnectedEvent = (results: BroadcastResult) => {
-      setResults(results);
-    };
-    wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
-    return () => {
-      wcs.removeListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
-      setResults({});
-    };
-  }, [wcs, navigate]);
+    if (initialLoad) {
+      setInitialLoad(false);
+
+      const handleConnectedEvent = (results: BroadcastResult) => {
+        setResults(results);
+        console.log(
+          'example-react | Connect.tsx | useEffect | walletConnectState: ',
+          walletConnectState
+        );
+      };
+      wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
+    }
+  }, [wcs, navigate, initialLoad]);
 
   return connected ? (
     <Card

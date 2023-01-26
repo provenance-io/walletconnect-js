@@ -20,7 +20,7 @@ export const sendMessage = async (
     extensionOptions,
     nonCriticalExtensionOptions,
   } = data;
-  const { connector, address, walletApp } = state;
+  const { connector, address, walletAppId } = state;
   const metadata = JSON.stringify({
     description,
     address,
@@ -41,7 +41,7 @@ export const sendMessage = async (
     params: [metadata],
   };
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
   if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // If message isn't an array, turn it into one

@@ -5,32 +5,32 @@ import type {
   AccountObject,
   Broadcast,
   BroadcastResult,
+  MasterGroupPolicy,
   MethodSendMessageData,
   WalletConnectClientType,
   WalletInfo,
-  MasterGroupPolicy,
   WCJSLocalState,
   WCSSetFullState,
   WCSSetState,
   WCSState,
 } from '../types';
 import {
-  WINDOW_MESSAGES,
-  WALLET_APP_EVENTS,
   CONNECTION_TIMEOUT,
+  WALLET_APP_EVENTS,
   WALLETCONNECT_BRIDGE_URL,
+  WINDOW_MESSAGES,
 } from '../consts';
 import {
+  connect as connectMethod,
   sendMessage as sendMessageMethod,
   signJWT as signJWTMethod,
   signMessage as signMessageMethod,
-  createConnector,
-  createConnectorEvents,
-  updateService,
 } from './methods';
 import {
-  getFromLocalStorage,
   addToLocalStorage,
+  clearLocalStorage,
+  getAccountInfo,
+  getFromLocalStorage,
   isMobile,
   sendWalletEvent,
 } from '../utils';
@@ -44,7 +44,6 @@ const existingWCState: WalletConnectClientType =
 const existingWCJSState: WCJSLocalState = getFromLocalStorage('walletconnect-js');
 
 const defaultState: WCSState = {
-  account: '',
   address: '',
   bridge: WALLETCONNECT_BRIDGE_URL,
   connected: false,
@@ -53,10 +52,8 @@ const defaultState: WCSState = {
   connectionPending: true,
   connectionTimeout: CONNECTION_TIMEOUT,
   connector: null,
-  figureConnected: false,
   isMobile: isMobile(),
   loading: '',
-  newAccount: false,
   peer: null,
   publicKey: '',
   QRCode: '',
@@ -64,7 +61,7 @@ const defaultState: WCSState = {
   representedGroupPolicy: null,
   showQRCodeModal: false,
   signedJWT: '',
-  walletApp: '',
+  walletAppId: '',
   walletInfo: {},
 };
 
@@ -100,7 +97,6 @@ const getAccountItem = (itemName: keyof AccountObject) => {
 };
 
 const initialState: WCSState = {
-  account: existingWCJSState.account || defaultState.account,
   address: (getAccountItem('address') as string) || defaultState.address,
   bridge: existingWCState.bridge || defaultState.bridge,
   connected: defaultState.connected,
@@ -110,20 +106,19 @@ const initialState: WCSState = {
   connectionTimeout:
     existingWCJSState.connectionTimeout || defaultState.connectionTimeout,
   connector: existingWCState || defaultState.connector,
-  figureConnected: !!existingWCJSState.account && defaultState.connected,
   isMobile: defaultState.isMobile,
   loading: defaultState.loading,
-  newAccount: existingWCJSState.newAccount || defaultState.newAccount,
   peer: defaultState.peer,
   publicKey: (getAccountItem('publicKey') as string) || defaultState.publicKey,
   QRCode: defaultState.QRCode,
   QRCodeUrl: defaultState.QRCodeUrl,
   showQRCodeModal: defaultState.showQRCodeModal,
+  // Note: we are pulling from wcjs storage first incase the user generated a newer JWT since connecting
   signedJWT:
     existingWCJSState.signedJWT ||
     (getAccountItem('jwt') as string) ||
     defaultState.signedJWT,
-  walletApp: existingWCJSState.walletApp || defaultState.walletApp,
+  walletAppId: existingWCJSState.walletAppId || defaultState.walletAppId,
   walletInfo:
     (getAccountItem('walletInfo') as WalletInfo) || defaultState.walletInfo,
   representedGroupPolicy:
@@ -144,6 +139,10 @@ export class WalletConnectService {
   // Instead of having to use walletConnectService.eventEmitter.addListener()
   // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
   #broadcastEvent: Broadcast = (eventName, data) => {
+    console.log('wcjs | walletConnectService.ts | #broadcastEvent | params: ', {
+      eventName,
+      data,
+    });
     this.#eventEmitter.emit(eventName, data);
   };
 
@@ -183,25 +182,19 @@ export class WalletConnectService {
   #updateLocalStorage = (updatedState: Partial<WCSState>) => {
     // Special values to look for
     const {
-      account,
       connectionEXP,
       connectionEST,
       connectionTimeout,
-      figureConnected,
-      newAccount,
       signedJWT,
-      walletApp,
+      walletAppId,
     } = updatedState;
     // If the value was changed, add it to the localStorage updates
     const storageUpdates = {
-      ...(account !== undefined && { account }),
       ...(connectionEXP !== undefined && { connectionEXP }),
       ...(connectionEST !== undefined && { connectionEST }),
       ...(connectionTimeout !== undefined && { connectionTimeout }),
-      ...(figureConnected !== undefined && { figureConnected }),
-      ...(newAccount !== undefined && { newAccount }),
       ...(signedJWT !== undefined && { signedJWT }),
-      ...(walletApp !== undefined && { walletApp }),
+      ...(walletAppId !== undefined && { walletAppId }),
     };
     // If we have updated 1 or more special values, update localStorage
     if (Object.keys(storageUpdates).length) {
@@ -249,9 +242,9 @@ export class WalletConnectService {
     // Start a new timer
     this.#startConnectionTimer();
     // Send connected wallet custom event with the new connection details
-    if (this.state.walletApp) {
+    if (this.state.walletAppId) {
       sendWalletEvent(
-        this.state.walletApp,
+        this.state.walletAppId,
         WALLET_APP_EVENTS.RESET_TIMEOUT,
         newConnectionTimeout
       );
@@ -262,19 +255,38 @@ export class WalletConnectService {
   resetState = () => {
     this.state = { ...defaultState };
     this.updateState();
+    clearLocalStorage('walletconnect-js');
   };
 
   // Change the class state
   setState: WCSSetState = (updatedState) => {
-    // Check if connected and account exists to update 'figureConnected' state
-    const figureConnected =
-      (!!this.state.account || !!updatedState.account) &&
-      (!!this.state.connected || !!updatedState.connected);
+    let finalUpdatedState = { ...updatedState };
+    // If we get a new "connector" passed in, pull various data keys out before saving state
+    if (updatedState.connector) {
+      const { bridge, peerMeta, accounts } = updatedState.connector;
+      const { address, jwt, publicKey, representedGroupPolicy, walletInfo } =
+        getAccountInfo(accounts);
+      finalUpdatedState = {
+        ...updatedState,
+        address,
+        bridge,
+        // We always want to use the jwt in the state over the connector since newer jwts won't show up in the connector
+        signedJWT: this.state.signedJWT || jwt,
+        publicKey,
+        representedGroupPolicy,
+        walletInfo,
+        peer: peerMeta,
+      };
+    }
+    console.log(
+      'wcjs | walletConnectService.ts | setState | finalUpdatedState: ',
+      finalUpdatedState
+    );
     // Loop through each to update
-    this.state = { ...this.state, ...updatedState, figureConnected };
+    this.state = { ...this.state, ...finalUpdatedState };
     this.updateState();
     // Write state changes into localStorage as needed
-    this.#updateLocalStorage({ ...updatedState, figureConnected });
+    this.#updateLocalStorage(finalUpdatedState);
   };
 
   // Create a stateUpdater, used for context to be able to auto change this class state
@@ -303,7 +315,7 @@ export class WalletConnectService {
    * @param address - (optional) Address to establish connection with, note, it must exist
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    */
-  connect = async ({
+  connect = ({
     bridge,
     duration,
     noPopup,
@@ -321,38 +333,21 @@ export class WalletConnectService {
       connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
       connectionPending: true,
     });
-    // Build the new connector
-    const newConnector = createConnector({
-      requiredAddress: address,
-      bridge: bridge || this.state.bridge,
-      noPopup,
-      prohibitGroups,
-      setState: this.setState,
-    });
-    // Set up all connector event listeners
-    createConnectorEvents({
+    connectMethod({
       bridge: bridge || this.state.bridge,
       broadcast: this.#broadcastEvent,
-      connector: newConnector,
       getState: this.#getState,
+      noPopup,
+      prohibitGroups,
+      requiredAddress: address,
       resetState: this.resetState,
       setState: this.setState,
       startConnectionTimer: this.#startConnectionTimer,
       state: this.state,
     });
-    // Update the state based on the newConnector information
-    updateService({
-      broadcast: this.#broadcastEvent,
-      connector: newConnector,
-      setState: this.setState,
-      startConnectionTimer: this.#startConnectionTimer,
-      state: this.state,
-    });
-    if (!newConnector.connected) newConnector.createSession();
     this.setState({
       connectionPending: false,
     });
-    return '';
   };
 
   disconnect = async () => {

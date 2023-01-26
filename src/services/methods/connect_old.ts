@@ -120,7 +120,7 @@ export const connect = async ({
     const latestState = getState();
     // Check for a known wallet app with special callback functions
     const knownWalletApp = WALLET_LIST.find(
-      (wallet) => wallet.id === latestState.walletApp
+      (wallet) => wallet.id === latestState.walletAppId
     );
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {

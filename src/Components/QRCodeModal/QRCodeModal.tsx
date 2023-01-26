@@ -320,7 +320,7 @@ export const QRCodeModal: React.FC<Props> = ({
       if (wallet.eventAction) {
         // Set the name of the wallet into the walletconnect-js state (to use as a reference)
         // If a custom extension ID has been set, note it (need to handle this better)
-        wcs.setState({ walletApp: wallet.id });
+        wcs.setState({ walletAppId: wallet.id });
         // Build eventdata to send to the extension
         const eventData: EventData = {
           uri: encodedQRCodeUrl,
@@ -397,8 +397,8 @@ export const QRCodeModal: React.FC<Props> = ({
                 target="_blank"
                 key={id}
                 onClick={() => {
-                  // Update the walletApp value to be this mobile wallet id
-                  wcs.setState({ walletApp: wallet.id });
+                  // Update the walletAppId value to be this mobile wallet id
+                  wcs.setState({ walletAppId: wallet.id });
                 }}
               >
                 {!!icon && (

@@ -1,10 +1,7 @@
-export type EventValueNames = 'RESET_TIMEOUT' | 'DISCONNECT' | 'EVENT' | 'INIT';
-export type EventValue =
-  | 'walletconnect_event'
-  | 'walletconnect_init'
-  | 'walletconnect_disconnect'
-  | 'resetConnectionTimeout';
-export type EventOptions = { [Key in EventValueNames]: EventValue };
+import { WALLET_APP_EVENTS } from '../consts';
+
+export type WalletEventKey = keyof typeof WALLET_APP_EVENTS;
+export type WalletEventValue = typeof WALLET_APP_EVENTS[WalletEventKey];
 export type WalletType = 'mobile' | 'extension' | 'web';
 export type WalletId =
   | 'provenance_extension'
@@ -23,7 +20,7 @@ export type CustomEventData =
   | [];
 
 export interface EventData {
-  event?: EventValue;
+  event?: WalletEventValue;
   uri?: string;
   address?: string;
   duration?: number;

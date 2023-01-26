@@ -1,6 +1,7 @@
 import type { GasPrice } from './GasPriceType';
-import { WalletConnectClientType } from './WalletConnectService';
+import { WCSState } from './WalletConnectService';
 import { ConnectData } from './ConnectData';
+import { WINDOW_MESSAGES } from '../consts';
 
 export type ProvenanceMethod = 'provenance_sign' | 'provenance_sendTransaction';
 
@@ -24,7 +25,6 @@ export type MethodConnectData =
       connectionEST: number;
       connectionEXP: number;
       connectionType: ConnectionType;
-      connector: WalletConnectClientType;
     }
   | ConnectData;
 
@@ -46,13 +46,18 @@ interface MethodRequest {
   params: MetaData[] | string[];
 }
 
+type BroadcastEventKeys = keyof typeof WINDOW_MESSAGES;
+export type BroadcastEvent = typeof WINDOW_MESSAGES[BroadcastEventKeys];
+
+type BroadcastResultData =
+  | MethodSendMessageData
+  | MethodConnectData
+  | MethodSignJWTData
+  | number
+  | string;
+
 export interface BroadcastResult {
-  data?:
-    | MethodSendMessageData
-    | MethodConnectData
-    | MethodSignJWTData
-    | number
-    | string;
+  data?: BroadcastResultData;
   error?: string;
   request?: MethodRequest;
   // result comes from walletconnect, can't change the "any" type
@@ -60,4 +65,12 @@ export interface BroadcastResult {
   valid?: boolean;
 }
 
-export type Broadcast = (eventName: string, data?: BroadcastResult) => void;
+export type Broadcast = (eventName: BroadcastEvent, data?: BroadcastResult) => void;
+
+export interface ConnectorEventData {
+  broadcastData?: {
+    eventName: BroadcastEvent;
+    payload?: BroadcastResult;
+  };
+  stateData?: 'reset' | Partial<WCSState>;
+}

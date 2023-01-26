@@ -8,7 +8,7 @@ export const signMessage = async (
   hexMessage: string
 ): Promise<BroadcastResult> => {
   let valid = false;
-  const { connector, address, publicKey: pubKeyB64, walletApp } = state;
+  const { connector, address, publicKey: pubKeyB64, walletAppId } = state;
   const method = PROVENANCE_METHODS.sign;
   const description = 'Sign Message';
   const metadata = JSON.stringify({
@@ -24,7 +24,7 @@ export const signMessage = async (
     params: [metadata],
   };
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
   if (!connector)
     return { valid, data: hexMessage, request, error: 'No wallet connected' };
   request.params.push(hexMessage);

@@ -91,7 +91,7 @@ const renderWalletList = () => {
         // If the wallet has an eventAction (they should all have an event action...)
         if (eventAction) {
           // Set the name of the wallet into the walletconnect-js state (to use as a reference)
-          walletConnectService.setState({ walletApp: id });
+          walletConnectService.setState({ walletAppId: id });
           // Build eventdata to send to the extension
           const eventData = {
             uri: encodeURIComponent(walletConnectService.state.QRCodeUrl),
