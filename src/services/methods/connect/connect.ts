@@ -1,14 +1,5 @@
-import { CONNECTOR_EVENTS } from '../../../consts';
-import { connectEvent } from './connectEvent';
-import { disconnectEvent } from './disconnectEvent';
-import { sessionUpdateEvent } from './sessionUpdateEvent';
 import { createConnector } from './createConnector';
-import type {
-  Broadcast,
-  WCSState,
-  WCSSetState,
-  ConnectorEventData,
-} from '../../../types';
+import type { Broadcast, WCSState, WCSSetState } from '../../../types';
 
 interface Props {
   bridge: string;

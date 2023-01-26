@@ -1,10 +1,10 @@
 import { WALLET_LIST } from '../consts';
-import { WalletId, EventValue, CustomEventData } from '../types';
+import { WalletId, WalletEventValue, WalletEventData } from '../types';
 
 export const sendWalletEvent = (
   targetId: WalletId,
-  event: EventValue,
-  data?: CustomEventData
+  event: WalletEventValue,
+  data?: WalletEventData
 ) => {
   // Check for a known wallet app with special callback functions
   const targetWallet = WALLET_LIST.find((wallet) => wallet.id === targetId);

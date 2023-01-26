@@ -11,7 +11,7 @@ export const CONNECTOR_EVENTS = {
   transport_open: 'transport_open',
   transport_close: 'transport_close',
   transport_error: 'transport_error',
-};
+} as const;
 
 export const CONNECTION_TYPES: {
   existing_session: ConnectionType;
@@ -19,4 +19,4 @@ export const CONNECTION_TYPES: {
 } = {
   existing_session: 'existing session',
   new_session: 'new session',
-};
+} as const;

@@ -263,13 +263,14 @@ export class WalletConnectService {
     let finalUpdatedState = { ...updatedState };
     // If we get a new "connector" passed in, pull various data keys out before saving state
     if (updatedState.connector) {
-      const { bridge, peerMeta, accounts } = updatedState.connector;
+      const { bridge, peerMeta, accounts, connected } = updatedState.connector;
       const { address, jwt, publicKey, representedGroupPolicy, walletInfo } =
         getAccountInfo(accounts);
       finalUpdatedState = {
         ...updatedState,
         address,
         bridge,
+        connected,
         // We always want to use the jwt in the state over the connector since newer jwts won't show up in the connector
         signedJWT: this.state.signedJWT || jwt,
         publicKey,

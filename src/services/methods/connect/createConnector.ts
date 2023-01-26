@@ -1,21 +1,13 @@
 import WalletConnectClient from '@walletconnect/client';
 import QRCode from 'qrcode';
-import type {
-  Broadcast,
-  ConnectorEventData,
-  WCSSetState,
-  WCSState,
-  WalletEventValue,
-} from '../../../types';
+import type { Broadcast, WCSSetState, WCSState, ConnectData } from '../../../types';
 import {
   CONNECTION_TYPES,
   CONNECTOR_EVENTS,
   WALLET_APP_EVENTS,
-  WALLET_LIST,
   WINDOW_MESSAGES,
 } from '../../../consts';
-import { getAccountInfo } from '../../../utils';
-import { sessionUpdateEvent } from './sessionUpdateEvent';
+import { getAccountInfo, sendWalletEvent } from '../../../utils';
 
 interface Props {
   bridge: string;
@@ -61,30 +53,6 @@ export const createConnector = ({
   const qrcodeModal = new QRCodeModal();
   // Create new connector
   const newConnector = new WalletConnectClient({ bridge, qrcodeModal });
-  const walletAppEvent = (event: WalletEventValue) => {
-    const { walletAppId } = getState();
-    if (walletAppId) {
-      // Check for a known wallet app with special callback functions
-      const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
-      // If the wallet app has an eventAction (web/extension) trigger it
-      if (knownWalletApp && knownWalletApp.eventAction) {
-        const eventData = { event };
-        knownWalletApp.eventAction(eventData);
-      }
-    }
-  };
-  // Create all the connector events we want to listen for (connect, disconnect, session_update)
-  // Handle all connector.on events as they trigger (update state and broadcast results)
-  const handleEvent = (eventData: ConnectorEventData) => {
-    const { stateData, broadcastData } = eventData;
-    if (stateData) {
-      if (stateData === 'reset') resetState();
-      else setState(stateData);
-    }
-    if (broadcastData) {
-      broadcast(broadcastData.eventName, broadcastData.payload);
-    }
-  };
   // ------------------------
   // SESSION_UPDATE EVENT
   // ------------------------
@@ -96,8 +64,6 @@ export const createConnector = ({
   // - Trigger wallet event for "session_update" (let the wallet know)
   newConnector.on(CONNECTOR_EVENTS.session_update, (error) => {
     if (error) throw error;
-    // Check for a current signedJWT
-    const existingSignedJWT = state.signedJWT;
     const connectionEST = Date.now();
     const connectionEXP = state.connectionEXP;
     const connected = newConnector.connected;
@@ -105,15 +71,20 @@ export const createConnector = ({
     if (connected && (!connectionEXP || connectionEST >= connectionEXP))
       newConnector.killSession();
     else {
-      const eventData = sessionUpdateEvent({
+      setState({
         connector: newConnector,
-        signedJWT: existingSignedJWT,
-        connectionEST,
-        connectionEXP: connectionEXP || 0,
       });
-      // If we're connected we want to use the broadcast from session_update, if not, then just update the state
-      handleEvent(connected ? eventData : { stateData: eventData.stateData });
+      broadcast(WINDOW_MESSAGES.CONNECTED, {
+        data: {
+          connectionEST,
+          connectionEXP: connectionEXP || 0,
+          connectionType: CONNECTION_TYPES.existing_session,
+        },
+      });
       startConnectionTimer();
+      const { walletAppId } = getState();
+      if (walletAppId)
+        sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
     }
   });
   // ------------------------
@@ -124,7 +95,7 @@ export const createConnector = ({
   // - Save accounts (account data), peer, and connection EST/EXP to walletConnectService
   // - Broadcast "connect" event (let the dApp know)
   // - Trigger wallet event for "connect" (let the wallet know)
-  newConnector.on(CONNECTOR_EVENTS.connect, (error, payload) => {
+  newConnector.on(CONNECTOR_EVENTS.connect, (error, payload: ConnectData) => {
     if (error) throw error;
     const connectionEST = Date.now();
     const connectionEXP = state.connectionTimeout + connectionEST;
@@ -141,6 +112,7 @@ export const createConnector = ({
       address,
       connectionEST,
       connectionEXP,
+      connected: true, // Manually set to true since the connected event was triggered.
       peer,
       publicKey,
       representedGroupPolicy,
@@ -155,7 +127,8 @@ export const createConnector = ({
       },
     });
     startConnectionTimer();
-    walletAppEvent(WALLET_APP_EVENTS.CONNECT);
+    const { walletAppId } = getState();
+    if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.CONNECT);
   });
   // ------------------------
   // DISCONNECT EVENT
@@ -166,7 +139,8 @@ export const createConnector = ({
   // - Trigger wallet event for "disconnect" (let the wallet know)
   newConnector.on(CONNECTOR_EVENTS.disconnect, (error) => {
     if (error) throw error;
-    walletAppEvent(WALLET_APP_EVENTS.DISCONNECT);
+    const { walletAppId } = getState();
+    if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.DISCONNECT);
     resetState();
     broadcast(WINDOW_MESSAGES.DISCONNECT);
   });

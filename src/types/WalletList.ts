@@ -13,7 +13,7 @@ export type WalletId =
   | 'figure_mobile_test';
 export type WalletIcons = 'provenance' | 'figure';
 
-export type CustomEventData =
+export type WalletEventData =
   | { [key: string]: Record<string, unknown> }
   | string
   | number
@@ -24,7 +24,7 @@ export interface EventData {
   uri?: string;
   address?: string;
   duration?: number;
-  data?: CustomEventData;
+  data?: WalletEventData;
   referral?: string;
 }
 
