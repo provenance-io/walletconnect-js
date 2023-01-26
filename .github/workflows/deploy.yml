@@ -35,14 +35,14 @@ jobs:
           CI: true
 
       - name: NPM Publish Main
-        if: github.base_ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{secrets.NPM_TOKEN}}
           access: "public"
 
       - name: NPM Publish Develop
-        if: github.base_ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/develop'
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{secrets.NPM_TOKEN}}
