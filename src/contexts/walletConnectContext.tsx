@@ -69,8 +69,6 @@ const WalletConnectContextProvider: React.FC<Props> = ({
         walletConnectService.setState({ connectionPending: false });
       }
     }
-
-    return () => walletConnectService.removeAllListeners();
   }, [
     initialLoad,
     bridge,
