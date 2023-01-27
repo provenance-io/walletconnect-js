@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import styled from 'styled-components';
 import { WalletConnectService } from '../../services';
-import { APP_STORE_GOOGLE_PLAY, APP_STORE_APPLE, WALLET_LIST } from '../../consts';
+import {
+  APP_STORE_GOOGLE_PLAY_FIGURE,
+  APP_STORE_APPLE_FIGURE,
+  WALLET_LIST,
+} from '../../consts';
 import appleAppStoreImg from '../../images/appStoreBadge.svg';
 import googlePlayImg from '../../images/googlePlayBadge.png';
 import { WALLET_ICONS } from '../../images';
@@ -290,21 +294,21 @@ export const QRCodeModal: React.FC<Props> = ({
           Copy QR Code
         </CopyButton>
       )}
-      <Text className="wcjs-qr-text">Download Provenance Mobile Wallet</Text>
+      <Text className="wcjs-qr-text">Download Figure Mobile Wallet</Text>
       <AppStoreIcons className="wcjs-qr-appicons">
         <AppIcon
-          href={APP_STORE_APPLE}
+          href={APP_STORE_APPLE_FIGURE}
           target="_blank"
           rel="no-referrer"
-          title="Get the Provenance Blockchain Wallet in the Apple App store."
+          title="Get the Figure Wallet in the Apple App store."
         >
           <img src={appleAppStoreImg} height="42px" alt="Apple App Store badge" />
         </AppIcon>
         <AppIcon
-          href={APP_STORE_GOOGLE_PLAY}
+          href={APP_STORE_GOOGLE_PLAY_FIGURE}
           target="_blank"
           rel="no-referrer"
-          title="Get the Provenance Blockchain Wallet in the Google Play store."
+          title="Get the Figure Wallet in the Google Play store."
         >
           <img src={googlePlayImg} height="42px" alt="Google Play Store badge" />
         </AppIcon>

@@ -1,10 +1,14 @@
 import { WalletList } from '../types';
 import {
-  FIREBASE_FETCH_WALLET_URL,
+  FIREBASE_FETCH_WALLET_URL_FIGURE,
+  FIREBASE_FETCH_WALLET_URL_PROVENANCE,
   FIGURE_WEB_WALLET_PROD_URL,
   FIGURE_WEB_WALLET_TEST_URL,
 } from './urls';
-import { DYNAMIC_LINK_INFO_PROD } from './dynamicLinkInfo';
+import {
+  DYNAMIC_LINK_INFO_PROD_FIGURE,
+  DYNAMIC_LINK_INFO_PROD_PROVENANCE,
+} from './dynamicLinkInfo';
 
 export const WALLET_LIST: WalletList = [
   {
@@ -12,15 +16,37 @@ export const WALLET_LIST: WalletList = [
     type: 'mobile',
     title: 'Provenance Wallet',
     icon: 'provenance',
+    dev: true,
     generateUrl: async (QRCodeUrl) => {
-      const url = FIREBASE_FETCH_WALLET_URL;
+      const url = FIREBASE_FETCH_WALLET_URL_PROVENANCE;
       const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
-      const linkProd = `${DYNAMIC_LINK_INFO_PROD.link}?data=${linkData}`;
+      const linkProd = `${DYNAMIC_LINK_INFO_PROD_PROVENANCE.link}?data=${linkData}`;
       // First fetch prod, then dev
       return fetch(url, {
         method: 'POST',
         body: JSON.stringify({
-          dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD, link: linkProd },
+          dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD_PROVENANCE, link: linkProd },
+        }),
+      })
+        .then((response) => response.json())
+        .then(({ shortLink }) => shortLink)
+        .catch(() => 'unavailable');
+    },
+  },
+  {
+    id: 'figure_mobile',
+    type: 'mobile',
+    title: 'Figure Wallet',
+    icon: 'figure',
+    generateUrl: async (QRCodeUrl) => {
+      const url = FIREBASE_FETCH_WALLET_URL_FIGURE;
+      const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
+      const linkProd = `${DYNAMIC_LINK_INFO_PROD_FIGURE.link}?data=${linkData}`;
+      // First fetch prod, then dev
+      return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD_FIGURE, link: linkProd },
         }),
       })
         .then((response) => response.json())
@@ -31,6 +57,7 @@ export const WALLET_LIST: WalletList = [
   {
     id: 'provenance_extension',
     type: 'extension',
+    dev: true,
     title: 'Provenance Extension',
     icon: 'provenance',
     eventAction: (eventData) => {
