@@ -56,11 +56,11 @@ export const createConnector = ({
   // ------------------------
   // SESSION_UPDATE EVENT
   // ------------------------
-  // Session Update Goals:
   // - Check existing connection EXP vs now to see if session expired
   //    - Note: connectionEXP must exist to "update" the session
-  // - Save accounts (account data) and peer to walletConnectService
+  // - Save newConnector to walletConnectService state (data inside likely changed due to this event)
   // - Broadcast "session_update" event (let the dApp know)
+  // - Start the "connection timer" to auto-disconnect wcjs when session is expired
   // - Trigger wallet event for "session_update" (let the wallet know)
   newConnector.on(CONNECTOR_EVENTS.session_update, (error) => {
     if (error) throw error;
@@ -90,10 +90,10 @@ export const createConnector = ({
   // ------------------------
   // CONNECT EVENT
   // ------------------------
-  // Connect Goals:
-  // - Calculate connection EST/EXP
-  // - Save accounts (account data), peer, and connection EST/EXP to walletConnectService
+  // - Calculate new connection EST/EXP
+  // - Save accounts (account data), peer, connection EST/EXP, and connected value to walletConnectService
   // - Broadcast "connect" event (let the dApp know)
+  // - Start the "connection timer" to auto-disconnect wcjs when session is expired
   // - Trigger wallet event for "connect" (let the wallet know)
   newConnector.on(CONNECTOR_EVENTS.connect, (error, payload: ConnectData) => {
     if (error) throw error;
@@ -112,7 +112,7 @@ export const createConnector = ({
       address,
       connectionEST,
       connectionEXP,
-      connected: true, // Manually set to true since the connected event was triggered.
+      connected: true, // Manually set to true since the "connected" event was triggered.
       peer,
       publicKey,
       representedGroupPolicy,
@@ -133,10 +133,9 @@ export const createConnector = ({
   // ------------------------
   // DISCONNECT EVENT
   // ------------------------
-  // Disconnect Goals:
+  // - Trigger wallet event for "disconnect" (let the wallet know)
   // - Reset the walletConnectService state to default values
   // - Broadcast "disconnect" event (let the dApp know)
-  // - Trigger wallet event for "disconnect" (let the wallet know)
   newConnector.on(CONNECTOR_EVENTS.disconnect, (error) => {
     if (error) throw error;
     const { walletAppId } = getState();

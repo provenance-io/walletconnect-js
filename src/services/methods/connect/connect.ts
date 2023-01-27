@@ -15,10 +15,9 @@ interface Props {
 }
 
 // This connect method has three parts:
-// Creating a new connector
-// Setting up the new connector.on() events (connect, session_update, and disconnect)
-// Note: connector.on() events are unpredicably async
-// Manually run session_update event action to update walletConnectService state (instead of waiting for connector.on() event)
+// Creating a new connector w/connector.on() events (connect, session_update, and disconnect)
+// Update the walletConnectService state with the newly created connector
+// If we're not already connected, start a new session (Triggers a connect modal popup)
 export const connect = ({
   bridge,
   broadcast,

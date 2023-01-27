@@ -24,9 +24,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
 7. [walletConnectState](#walletConnectState)
 8. [Web App](#Web-App)
 9. [Non React Setup](#Non-React-Setup)
-10. [Webpack 5 Issues](#Webpack-5-Issues)
-11. [Clone LocalStorage](#Automatic-localSession-copy)
-12. [WalletConnect-js Status](#Status)
+10. [WalletConnect-js Status](#Status)
 
 ## Installation
 
@@ -40,9 +38,19 @@ Importable items:
 
 ```js
 import {
+  // Constants
+  WALLET_LIST,
   WINDOW_MESSAGES,
-  WalletConnectContextProvider,
+  // Services/Providers
   useWalletConnect,
+  useWalletConnectService,
+  WalletConnectContextProvider,
+  WalletConnectService,
+  // Components
+  QRCodeModal
+  // Types
+  BroadcastResult,
+  ProvenanceMethod
 } from "@provenanceio/walletconnect-js";
 ```
 
@@ -93,17 +101,11 @@ walletConnectService.addListener(
   WINDOW_MESSAGES.SEND_MESSAGE_FAILED,
   failAction
 );
+```
 
-// Unmount listeners once they are no longer needed (typically in useEffect return)
-// Remove event listeners once no longer needed (Node: Each requires specific function to remove, see Note B above)
-walletConnectService.removeListener(
-  WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE,
-  successAction
-);
-walletConnectService.removeListener(
-  WINDOW_MESSAGES.SEND_MESSAGE_FAILED,
-  failAction
-);
+Alternatively, each method (other than connect) is an async method and the results can simply be awaited for:
+```js
+  const result = await walletConnectService.signMessage("test");
 ```
 
 ## WalletConnectContextProvider
@@ -111,7 +113,8 @@ walletConnectService.removeListener(
 React context provider to supply state to every child within
 
 - Include as parent to all Components using `walletconnect-js`
-- Optional: You may pass your own instance of walletConnectService into the context provider under the param `service`
+- Optional: You may pass your own instance of walletConnectService into the context provider using the param `service`
+- Optional: You may pass an auto-redirect url when disconnected into the provider using the param `connectionRedirect`
 - Usage Example (w/React.js):
 
   ```js
@@ -135,6 +138,7 @@ To start the connection from dApp to wallet you will need to initiate the connec
   - `devWallets`: Array of allowed dev wallets to connect into. (Optional)
   - `hideWallets`: Array of prod wallets to hide from user. (Optional)
   - For list of available wallets and their IDs see `src/consts/walletList.ts`
+
 - Usage:
   ```js
   // App.js
@@ -152,7 +156,10 @@ To start the connection from dApp to wallet you will need to initiate the connec
     )
   };
   ```
-- Note: This modal is built with React.js and will only work within a react project. If you are not using React.js look through the `examples` folder to see how to initiate the connection without QRCodeModal manually.
+- Notes
+  - This modal is built with React.js and will only work within a react project. If you are not using React.js look through the `examples` folder to see how to initiate the connection without QRCodeModal manually.
+
+  - If using react-scripts 4 and below, you must be using walletconnect-js version 2.1.1 or below. Version 2.1.2 and above require react-scripts 5.x.x+ to use the QRCodeModal.
 
 ## useWalletConnect
 
@@ -188,18 +195,6 @@ React hook which contains `walletConnectService` and `walletConnectState`
   // WINDOW_MESSAGE: DISCONNECT
   ```
 
-- #### generateAutoConnectUrl
-
-  Change the amount of connection time remaining for the currenct walletconnect session
-  ```js
-  walletConnectService.generateAutoConnectUrl({ url, duration, walletId });
-  ```
-  | Param   | Type   | Required | Default | Example               | Info                   |
-  | ------- | ------ | -------- | ------- | --------------------- | ---------------------- |
-  | url | string | yes      | -       | 'https://figure.com' | URL to send user (with wcjs functionality) |
-  | duration | number | no      | current connected wallet timeout       | 3600 | Seconds to set future connection to |
-  | walletId | string | no      | current connected wallet type id       | 'provenance_extension' | Which wallet to auto-connect with |
-
 - #### resetConnectionTimeout
 
   Change the amount of connection time remaining for the currenct walletconnect session
@@ -212,7 +207,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
 
 - #### signJWT
 
-  Prompt user to sign a generated JWT
+  Prompt user to sign a generated JWT (Async)
 
   ```js
   walletConnectService.signJWT(expire);
@@ -225,7 +220,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
 
 - #### sendMessage
 
-  Pass through a custom base64 encoded message
+  Pass through a custom base64 encoded message (Async)
 
   ```js
   walletConnectService.sendMessage({
@@ -257,7 +252,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | nonCriticalExtensionOptions    | any[]         | no       | - | `['CiwvcHJvdmVuYW5jZS5tZX...']` | Specify tx nonCriticalExtensionOptions |
 
 - #### signMessage
-  Prompt user to sign a custom message
+  Prompt user to sign a custom hex string message (Async)
   ```js
   walletConnectService.signMessage(message);
   // WINDOW_MESSAGES: SIGN_MESSAGE_COMPLETE, SIGN_MESSAGE_FAILED
@@ -271,7 +266,6 @@ React hook which contains `walletConnectService` and `walletConnectState`
 - Holds current walletconnect-js state values
   ```js
   initialState: {
-    account: '', // Figure account uuid [string]
     address: '', // Wallet address [string]
     bridge: 'wss://figure.tech/service-wallet-connect-bridge/ws/external', // WalletConnect bridge used for connection [string]
     connected: false, // WalletConnect connected [bool]
@@ -279,17 +273,15 @@ React hook which contains `walletConnectService` and `walletConnectState`
     connectionIat: null, // WalletConnect initialized at time [number]
     connectionTimeout: 1800, // Default timeout duration (seconds)
     connector: null, // WalletConnect connector
-    figureConnected: false, // Account and address both exist [bool]
     isMobile: false, // Is the connected browser a mobile device [bool]
     loading: '', // Are any methods currently loading/pending [string]
-    newAccount: false, // Is this a newly created account
     peer: {}, // Connected wallet info [object]
     publicKey: '', // Wallet public key (base64url encoded)
     QRCode: '', // QRCode image data to connect to WalletConnect bridge [string]
     QRCodeUrl: '', // QRCode url contained within image [string]
     showQRCodeModal: false, // Should the QR modal be open [bool]
     signedJWT: '', // Signed JWT token [string]
-    walletApp: '', // What type of wallet is this "provenance_extension" | "provenance_mobile" | "figure_web"
+    walletAppId: '', // What type of wallet is this "provenance_extension" | "provenance_mobile" | "figure_web"
     walletInfo: {}, // Contains wallet coin, id, and name
     representedGroupPolicy: null, //Present when the wallet holder is acting on behalf of a group
   }
@@ -317,166 +309,6 @@ You can find this package on `https://unpkg.com/`: - Note: Change the version in
 ### Using Imports
 
 There are a few differences in getting setup and running: 1) Note [Webpack 5 Issues](#Webpack-5-Issues) 2) When connecting, you will need to manually generate the QR code image element (Component is only available to React.js apps) 3) Don't use the default imports (`@provenanceio/walletconnect-js`), instead pull the service from `@provenanceio/walletconnect-js/lib/service` 4) Don't forget to set up event and loading listeners \* Basic non-React.js example with
-
-```js
-import { WalletConnectService, WINDOW_MESSAGES } from '@provenanceio/walletconnect-js/lib/service';
-
-      // Pull out the service (includes methods and state)
-      const walletConnectService = new WalletConnectService();
-      // Function to generate a QR code img element
-      const generateQRImgElement = () => {
-        // Pull `QRCode` from `WalletConnectService` state and use it as the element `src`
-        const QRCodeData = walletConnectService.state.QRCode;
-        const QRImage = document.createElement('img');
-        QRImage.src = QRCodeData;
-        return QRImage;
-      };
-      // Function to generate a custom button element
-      const Button = (content: string, id?: string, onClick?: () => void) => {
-        const button = document.createElement('button');
-        button.textContent = content;
-        button.id = id;
-        if (onClick) button.addEventListener('click', onClick);
-        return button;
-      };
-      // Initialize wcjs connection (builds qrCode into state)
-      const connect = async () => {
-        await walletConnectService.connect();
-        // Build QRCode img element
-        const QRImageElement = generateQRImgElement();
-        // Take this QR element and appendChild to wherever you wanted to render it
-        document.body.appendChild(QRImageElement);
-        // User can now scan the QR code to connect
-      }
-      // Manually disconnect from the wc-js session
-      const disconnect = async () => { await walletConnectService.disconnect(); };
-      // wc-js has returned a connection event, we should have data to use
-      const connectionEvent = (result) => {
-        const { address, publicKey } = walletConnectService.state;
-        document.body.innerHTML = `
-          <div>Status: Connected to wallet via ${result.connectionType}</div>
-          <div>Address: ${address}</div>
-          <div>PublicKey: ${publicKey}</div>
-        `;
-        document.body.appendChild(Button('Disconnect', 'disconnect', disconnect));
-      }
-      // Something has caused wc-js to return a disconnect event, we're no longer connected
-      const disconnectEvent = (result) => {
-        // Clear everything out, re-add the connect button
-        document.body.innerHTML = '';
-        document.body.appendChild(Button('Connect', 'connect', connect));
-      };
-      // Listen for specific walletconnect-js events
-      const setupEventListeners = () => {
-        // Connected
-        walletConnectService.addListener(WINDOW_MESSAGES.CONNECTED, connectionEvent)
-        // Disconnected
-        walletConnectService.addListener(WINDOW_MESSAGES.DISCONNECT, disconnectEvent)
-      }
-      // Initial function when page/app loads
-      const init = () => {
-        setupEventListeners();
-        document.body.appendChild(Button('Connect', 'connect', connect));
-      };
-      // Run on app load
-      init();
-```
-
-## Webpack 5 Issues
-
-If you are on Webpack version 5+ (Note: Create React App 5+ uses Webpack 5+) then you will likely encounter a message like this:
-
-```
-BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default.
-This is no longer the case. Verify if you need this module and configure a polyfill for it.
-```
-
-To fix this issue, add the following plugins and module rules to your `webpack.config.js`:
-
-```js
-const webpack = require('webpack');
-...
-module.exports = {
-  ...
-  plugins: [
-    ...
-    // Work around for Buffer is undefined:
-    // https://github.com/webpack/changelog-v5/issues/10
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-    }),
-    new webpack.ProvidePlugin({
-        process: 'process/browser',
-    }),
-  ],
-  resolve: {
-    extensions: ['.js'],
-    fallback: {
-      crypto: require.resolve('crypto-browserify'),
-      buffer: require.resolve("buffer/"),
-      util: require.resolve("util/"),
-      stream: require.resolve("stream-browserify")
-    },
-  },
-};
-```
-If using React Create App, you will need to install a new package called `react-app-rewired`.  After installing, swap your `react-scripts` start command with `react-app-rewired` start. Create a new file named `config-overrides.js` in the root of your project as follows:
-```js
-const webpack = require("webpack");
-
-module.exports = function override(config) {
-  // Pull any existing fallbacks from config, or make a new fallback object
-  const fallback = config.resolve.fallback || {};
-  // Merge/add new webpack fallbacks
-  Object.assign(fallback, {
-    crypto: require.resolve("crypto-browserify"),
-    buffer: require.resolve("buffer/"),
-    stream: require.resolve("stream-browserify"),
-    util: require.resolve("util/"),
-  });
-  // Set new fallback into config
-  config.resolve.fallback = fallback;
-  // Combine new plugins with any existing plugins
-  config.plugins = (config.plugins || []).concat([
-    new webpack.ProvidePlugin({
-      process: "process/browser",
-      Buffer: ["buffer", "Buffer"],
-    }),
-  ]);
-  // Return updated/modified webpack config
-  return config;
-};
-
-```
-
-Next, make sure to have the following packages added into your `package.json` dependencies or devDependencies list:
-
-```json
-  "buffer",
-  "crypto-browserify",
-  "process",
-  "stream-browserify",
-  "util"
-```
-Quickly add these to your dependencies with this command: 
-```js
-npm i --save-dev buffer crypto-browserify process stream-browserify util
-```
-For more information/examples, look through the `webDemo` files and structure which uses these methods.
-
-## Automatic localSession copy
-
-Copy `window.localStorage` values from one site to another (mainly, to `localHost`)
-
-1. Run this command in console on the first page you with to copy from
-
-```js
-copy(`Object.entries(${JSON.stringify(localStorage)})
-.forEach(([k,v])=>localStorage.setItem(k,v))`);
-```
-
-2. Paste result (clipboard should automatically have been filled) into target page console.
-3. Refresh page, storage values should be synced.
 
 ## Status
 
