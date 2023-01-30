@@ -6,9 +6,11 @@ export type WalletType = 'mobile' | 'extension' | 'web';
 export type WalletId =
   | 'provenance_extension'
   | 'provenance_mobile'
+  | 'provenance_mobile_test'
   | 'figure_extension'
   | 'figure_web'
   | 'figure_mobile'
+  | 'figure_mobile_test'
   | 'figure_web_test'
   | 'figure_mobile_test';
 export type WalletIcons = 'provenance' | 'figure';
@@ -36,7 +38,7 @@ export interface Wallet {
   icon?: WalletIcons; // Icon to display next to the wallet selection
   id: WalletId; // Id to reference this specific wallet
   title: string; // Title to display when selecting wallets
-  type: WalletType; // Is this wallet mobile, web, or an extension
+  type: WalletType | WalletType[]; // Is this wallet mobile, web, or an extension
   walletCheck?: () => boolean; // Check if the wallet exists, runs background actions as needed, returns a boolean indicating existance
   walletUrl?: string; // Location of wallet download
 }

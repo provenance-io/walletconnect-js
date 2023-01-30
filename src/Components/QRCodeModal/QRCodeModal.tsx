@@ -225,7 +225,7 @@ export const QRCodeModal: React.FC<Props> = ({
     const allMobileWallets = WALLET_LIST.filter(
       ({ type, dev, id }) =>
         // Has to be a mobile wallet
-        type === 'mobile' &&
+        type.includes('mobile') &&
         // If a dev wallet, has to be included in devWallets list
         (!dev || devWallets?.includes(id)) &&
         // Cannot be included in hideWallets list
@@ -362,7 +362,7 @@ export const QRCodeModal: React.FC<Props> = ({
       .filter(
         ({ type, dev, id }) =>
           // Has to either be a web or extension wallet
-          (type === 'web' || type === 'extension') &&
+          (type.includes('web') || type.includes('extension')) &&
           // Not dev, or if dev, included in devWallets list
           (!dev || devWallets?.includes(id)) &&
           // Cannot be included in hideWallets list

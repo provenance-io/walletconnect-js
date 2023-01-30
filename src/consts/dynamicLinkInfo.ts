@@ -13,7 +13,7 @@ export const DYNAMIC_LINK_INFO_PROD_PROVENANCE = {
   },
 };
 
-export const DYNAMIC_LINK_INFO_DEV_PROVENANCE = {
+export const DYNAMIC_LINK_INFO_TEST_PROVENANCE = {
   domainUriPrefix: 'https://provenancewallet.page.link',
   link: `https://provenance.io/wallet-connect`,
   androidInfo: {
@@ -43,7 +43,7 @@ export const DYNAMIC_LINK_INFO_PROD_FIGURE = {
   },
 };
 
-export const DYNAMIC_LINK_INFO_DEV_FIGURE = {
+export const DYNAMIC_LINK_INFO_TEST_FIGURE = {
   domainUriPrefix: 'https://figurewallet.page.link',
   link: `https://figure.com/wallet-connect?data=$encodedWalletConnectData`,
   androidInfo: {
