@@ -23,7 +23,8 @@ export const webFigure = {
     const windowOptions = `popup=1 height=${height} width=${width} top=${top} left=${left} resizable=1, scrollbars=1, fullscreen=0, toolbar=0, menubar=0, status=1`;
     // Redirect to Figure Connect page in new tab for connection requests
     if (event === 'walletconnect_init') window.open(url);
-    else window.open(url, undefined, windowOptions);
+    else if (event !== 'walletconnect_connect')
+      window.open(url, undefined, windowOptions);
   },
 } as Wallet;
 
@@ -50,6 +51,7 @@ export const webFigureTest = {
     const windowOptions = `popup=1 height=${height} width=${width} top=${top} left=${left} resizable=1, scrollbars=1, fullscreen=0, toolbar=0, menubar=0, status=1`;
     // Redirect to Figure Connect page in new tab for connection requests
     if (event === 'walletconnect_init') window.open(url);
-    else window.open(url, undefined, windowOptions);
+    else if (event !== 'walletconnect_connect')
+      window.open(url, undefined, windowOptions);
   },
 } as Wallet;
