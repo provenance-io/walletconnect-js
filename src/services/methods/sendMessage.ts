@@ -1,12 +1,26 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import type { WCSState, BroadcastResult, MethodSendMessageData } from '../../types';
+import type {
+  BroadcastResult,
+  MethodSendMessageData,
+  WalletConnectClientType,
+  WalletId,
+} from '../../types';
 import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
 import { rngNum } from '../../utils';
 
-export const sendMessage = async (
-  state: WCSState,
-  data: MethodSendMessageData
-): Promise<BroadcastResult> => {
+interface SendMessage {
+  address: string;
+  connector?: WalletConnectClientType;
+  data: MethodSendMessageData;
+  walletAppId?: WalletId;
+}
+
+export const sendMessage = async ({
+  address,
+  connector,
+  data,
+  walletAppId,
+}: SendMessage): Promise<BroadcastResult> => {
   let valid = false;
   const {
     message: rawB64Message,
@@ -20,7 +34,6 @@ export const sendMessage = async (
     extensionOptions,
     nonCriticalExtensionOptions,
   } = data;
-  const { connector, address, walletAppId } = state;
   const metadata = JSON.stringify({
     description,
     address,
@@ -40,9 +53,10 @@ export const sendMessage = async (
     method,
     params: [metadata],
   };
+  if (!connector || !walletAppId)
+    return { valid, data, request, error: 'No wallet connected' };
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
-  if (!connector) return { valid, data, request, error: 'No wallet connected' };
 
   // If message isn't an array, turn it into one
   const b64MessageArray = Array.isArray(rawB64Message)

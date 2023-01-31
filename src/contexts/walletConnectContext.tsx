@@ -27,12 +27,11 @@ const WalletConnectContextProvider: React.FC<Props> = ({
     ...walletConnectService.state,
   });
   const [initialLoad, setInitialLoad] = useState(true);
-  const { connectionTimeout, bridge, connectionPending, connector } =
-    walletConnectState;
+  const { connectionTimeout, bridge, status } = walletConnectState;
 
   // If the dApp passed in a connectionRedirect then monitor "connector.connected" and redirect the user when disconnected
   useEffect(() => {
-    if (connectionRedirect && !connector?.connected) {
+    if (connectionRedirect && status === 'disconnected') {
       const currentUrl = window.location.href;
       const isValidUrl = (url: string) => {
         try {
@@ -47,36 +46,22 @@ const WalletConnectContextProvider: React.FC<Props> = ({
       if (validUrl && currentUrl !== connectionRedirect)
         window.location.href = connectionRedirect;
     }
-  }, [connectionRedirect, connector?.connected]);
+  }, [connectionRedirect, status]);
 
   // This useEffect should only run once
   useEffect(() => {
     if (initialLoad) {
       setInitialLoad(false);
-      // ------------------------------------------------------------------
       // Whenever we change the react state, update the class state
-      // ------------------------------------------------------------------
       walletConnectService.setStateUpdater(setWalletConnectState);
-      // ------------------------------------------------------------------
-      // Connection already exists, resume session
-      // ------------------------------------------------------------------
-      if (connectionPending && connector?.connected) {
+      // Connection might already exist, attempt to resume session
+      if (status === 'pending') {
         // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
         const duration = connectionTimeout ? connectionTimeout / 1000 : undefined;
         walletConnectService.connect({ duration, bridge });
-      } else if (connectionPending && !connector?.connected) {
-        // Normal walletConnectService startup, just set connectionPending to false, it isn't resuming a connection
-        walletConnectService.setState({ connectionPending: false });
       }
     }
-  }, [
-    initialLoad,
-    bridge,
-    connectionTimeout,
-    walletConnectService,
-    connectionPending,
-    connector?.connected,
-  ]);
+  }, [initialLoad, bridge, connectionTimeout, walletConnectService, status]);
 
   return (
     <StateContext.Provider value={{ walletConnectService, walletConnectState }}>

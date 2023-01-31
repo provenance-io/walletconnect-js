@@ -1,6 +1,12 @@
 import WalletConnectClient from '@walletconnect/client';
 import QRCode from 'qrcode';
-import type { Broadcast, WCSSetState, WCSState, ConnectData } from '../../../types';
+import type {
+  Broadcast,
+  WCSSetState,
+  WCSState,
+  ConnectData,
+  ModalData,
+} from '../../../types';
 import {
   CONNECTION_TYPES,
   CONNECTOR_EVENTS,
@@ -20,6 +26,7 @@ interface Props {
   setState: WCSSetState;
   startConnectionTimer: () => void;
   state: WCSState;
+  updateModal: (newModalData: Partial<ModalData>) => void;
 }
 
 export const createConnector = ({
@@ -33,6 +40,7 @@ export const createConnector = ({
   setState,
   state,
   startConnectionTimer,
+  updateModal,
 }: Props) => {
   class QRCodeModal {
     open = async (data: string) => {
@@ -43,50 +51,17 @@ export const createConnector = ({
       const prohibitGroupsParam = prohibitGroups ? `&prohibitGroups=true` : '';
       const fullData = `${data}${requiredAddressParam}${prohibitGroupsParam}`;
       const qrcode = await QRCode.toDataURL(fullData);
-      setState({ QRCode: qrcode, QRCodeUrl: fullData, showQRCodeModal: !noPopup });
+      updateModal({ QRCode: qrcode, QRCodeUrl: fullData, showModal: !noPopup });
     };
 
     close = () => {
-      setState({ showQRCodeModal: false });
+      updateModal({ showModal: false });
     };
   }
   const qrcodeModal = new QRCodeModal();
   // Create new connector
   const newConnector = new WalletConnectClient({ bridge, qrcodeModal });
-  // ------------------------
-  // SESSION_UPDATE EVENT
-  // ------------------------
-  // - Check existing connection EXP vs now to see if session expired
-  //    - Note: connectionEXP must exist to "update" the session
-  // - Save newConnector to walletConnectService state (data inside likely changed due to this event)
-  // - Broadcast "session_update" event (let the dApp know)
-  // - Start the "connection timer" to auto-disconnect wcjs when session is expired
-  // - Trigger wallet event for "session_update" (let the wallet know)
-  newConnector.on(CONNECTOR_EVENTS.session_update, (error) => {
-    if (error) throw error;
-    const connectionEST = Date.now();
-    const connectionEXP = state.connectionEXP;
-    const connected = newConnector.connected;
-    // If we're already connected but the session is expired, kill it
-    if (connected && (!connectionEXP || connectionEST >= connectionEXP))
-      newConnector.killSession();
-    else {
-      setState({
-        connector: newConnector,
-      });
-      broadcast(WINDOW_MESSAGES.CONNECTED, {
-        data: {
-          connectionEST,
-          connectionEXP: connectionEXP || 0,
-          connectionType: CONNECTION_TYPES.existing_session,
-        },
-      });
-      startConnectionTimer();
-      const { walletAppId } = getState();
-      if (walletAppId)
-        sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
-    }
-  });
+
   // ------------------------
   // CONNECT EVENT
   // ------------------------
@@ -112,7 +87,7 @@ export const createConnector = ({
       address,
       connectionEST,
       connectionEXP,
-      connected: true, // Manually set to true since the "connected" event was triggered.
+      status: 'connected',
       peer,
       publicKey,
       representedGroupPolicy,
@@ -143,5 +118,44 @@ export const createConnector = ({
     resetState();
     broadcast(WINDOW_MESSAGES.DISCONNECT);
   });
+
+  // ------------------------
+  // SESSION RESUME EVENT
+  // ------------------------
+  // Walletconnect doesn't provide an event for .on(session_resume) or anything similar so we have to run that ourselves here
+  // - Check existing connection EXP vs now to see if session expired
+  //    - Note: connectionEXP must exist to "update" the session
+  // - Save newConnector to walletConnectService state (data inside likely changed due to this event)
+  // - Broadcast "session_update" event (let the dApp know)
+  // - Start the "connection timer" to auto-disconnect wcjs when session is expired
+  // - Trigger wallet event for "session_update" (let the wallet know)
+  const resumeResumeEvent = () => {
+    const connectionEST = Date.now();
+    const connectionEXP = state.connectionEXP;
+    const connected = newConnector.connected;
+    // If we're already connected but the session is expired, kill it
+    if (connected && (!connectionEXP || connectionEST >= connectionEXP))
+      newConnector.killSession();
+    else {
+      setState({
+        connector: newConnector,
+      });
+      broadcast(WINDOW_MESSAGES.CONNECTED, {
+        data: {
+          connectionEST,
+          connectionEXP: connectionEXP || 0,
+          connectionType: CONNECTION_TYPES.existing_session,
+        },
+      });
+      startConnectionTimer();
+      const { walletAppId } = getState();
+      if (walletAppId)
+        sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
+    }
+  };
+
+  // The session had already previously existed, trigger the existing connection event
+  if (newConnector.connected) resumeResumeEvent();
+
   return newConnector;
 };

@@ -12,7 +12,10 @@ if (process.env.BABEL_ENV === 'es') {
   ];
 }
 
-const productionPlugins = ['@babel/plugin-transform-react-constant-elements'];
+const productionPlugins = [
+  '@babel/plugin-transform-react-constant-elements',
+  '@babel/plugin-proposal-object-rest-spread',
+];
 module.exports = {
   presets: defaultPresets.concat([
     '@babel/preset-typescript',

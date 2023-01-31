@@ -7,7 +7,7 @@ import {
   SEND_MESSAGE,
   SEND_COIN,
   SIGN_JWT,
-  SIGN_MESSAGE,
+  SIGN_HEX_MESSAGE,
 } from './actions';
 
 export const routes = [
@@ -21,7 +21,7 @@ export const routes = [
       SEND_COIN,
       SEND_MESSAGE,
       SIGN_JWT,
-      SIGN_MESSAGE,
+      SIGN_HEX_MESSAGE,
     ],
   },
   // { path: FOUR_OH_FOUR_URL, element: <NotFound /> },

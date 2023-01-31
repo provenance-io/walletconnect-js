@@ -9,7 +9,7 @@ import {
   SEND_COIN_URL,
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
-  SIGN_MESSAGE_URL,
+  SIGN_HEX_MESSAGE_URL,
 } from 'consts';
 import { COLORS } from 'theme';
 import { useNavigate } from 'react-router-dom';
@@ -78,16 +78,17 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       url: SIGN_JWT_URL,
     },
     {
-      name: 'Sign Message',
+      name: 'Sign Hex Message',
       icon: ICON_NAMES.PENCIL,
-      url: SIGN_MESSAGE_URL,
+      url: SIGN_HEX_MESSAGE_URL,
     },
   ];
 
   const navigate = useNavigate();
   // eslint-disable-line react/prop-types
   const { walletConnectService, walletConnectState } = useWalletConnect();
-  const { connected } = walletConnectState;
+  const { status } = walletConnectState;
+  const connected = status === 'connected';
 
   const handleDisconnect = () => {
     walletConnectService.disconnect();

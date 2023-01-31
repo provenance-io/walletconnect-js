@@ -195,8 +195,8 @@ export const QRCodeModal: React.FC<Props> = ({
   hideWallets,
 }) => {
   const { state } = wcs;
-  const { showQRCodeModal, QRCode, QRCodeUrl, isMobile, connectionTimeout } = state;
-  const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
+  const { connectionTimeout, modal } = state;
+  const { isMobile, showModal, QRCode, QRCodeUrl } = modal;
   const options = ['qr', isMobile ? 'mobile' : 'desktop'];
   // Which tab of the popup is currently open (qr/desktop/mobile)
   const [view, setView] = useState('qr');
@@ -208,6 +208,7 @@ export const QRCodeModal: React.FC<Props> = ({
   const [initialLoad, setInitialLoad] = useState(true);
   // Display a message to the user that a reload is required
   const [showReloadNotice, setShowReloadNotice] = useState(false);
+  const encodedQRCodeUrl = encodeURIComponent(QRCodeUrl);
   // On unload, remove any running 'copied' timeoutInstances (prevent memory leaks)
   useEffect(
     () => () => {
@@ -250,19 +251,12 @@ export const QRCodeModal: React.FC<Props> = ({
       setMobileWallets(newMobileWallets);
     };
     // Only run this when the modal is open
-    if (showQRCodeModal && initialLoad) {
+    if (showModal && initialLoad) {
       setInitialLoad(false);
       // Only run if wallets exist
       if (allMobileWallets.length) asyncBuildMobileWallets();
     }
-  }, [
-    QRCodeUrl,
-    mobileWallets,
-    initialLoad,
-    showQRCodeModal,
-    devWallets,
-    hideWallets,
-  ]);
+  }, [QRCodeUrl, mobileWallets, initialLoad, showModal, devWallets, hideWallets]);
   // -----------------------------------------------------------------------------------------------
   // Ability to copy the QR code to the clipboard as a string (success message has a timeout)
   // -----------------------------------------------------------------------------------------------
@@ -324,7 +318,7 @@ export const QRCodeModal: React.FC<Props> = ({
       if (wallet.eventAction) {
         // Set the name of the wallet into the walletconnect-js state (to use as a reference)
         // If a custom extension ID has been set, note it (need to handle this better)
-        wcs.setState({ walletAppId: wallet.id });
+        wcs.setWalletAppId(wallet.id);
         // Build eventdata to send to the extension
         const eventData: EventData = {
           uri: encodedQRCodeUrl,
@@ -402,7 +396,7 @@ export const QRCodeModal: React.FC<Props> = ({
                 key={id}
                 onClick={() => {
                   // Update the walletAppId value to be this mobile wallet id
-                  wcs.setState({ walletAppId: wallet.id });
+                  wcs.setWalletAppId(wallet.id);
                 }}
               >
                 {!!icon && (
@@ -438,18 +432,18 @@ export const QRCodeModal: React.FC<Props> = ({
 
   const DesktopWalletsList = buildDesktopWallets();
 
-  return showQRCodeModal ? (
+  return showModal ? (
     <QRCodeModalContainer
       className={className}
       id="wcjs-qr-modal"
-      onClick={() => wcs.showQRCode(false)}
+      onClick={() => wcs.updateModal({ showModal: false })}
     >
       <QRModalContent
         onClick={(e) => e.stopPropagation()}
         className="wcjs-qr-content"
       >
         <CloseQRModal
-          onClick={() => wcs.showQRCode(false)}
+          onClick={() => wcs.updateModal({ showModal: false })}
           className="wcjs-qr-close"
         >
           <svg

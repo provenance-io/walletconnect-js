@@ -16,9 +16,9 @@ export const SendCoin: React.FC = () => {
   const [feeGranter, setFeeGranter] = useState('');
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { loading, address, representedGroupPolicy } = walletConnectState;
+  const { pendingMethod, address, representedGroupPolicy } = walletConnectState;
   const groupAddress = representedGroupPolicy?.address;
-  const sendMessageLoading = loading === 'sendMessage';
+  const sendMessageLoading = pendingMethod === 'sendMessage';
 
   const handleSubmit = async () => {
     const sendMessage = {

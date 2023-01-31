@@ -19,8 +19,8 @@ export const SignJWT: React.FC = () => {
     [key: string]: any;
   } | null>({});
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { loading } = walletConnectState;
-  const signJWTLoading = loading === 'signJWT';
+  const { pendingMethod } = walletConnectState;
+  const signJWTLoading = pendingMethod === 'signJWT';
 
   const newExpirationDate = new Date(
     Date.now() + Number(value) * 1000

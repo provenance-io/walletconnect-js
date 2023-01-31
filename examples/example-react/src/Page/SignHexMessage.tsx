@@ -3,23 +3,23 @@ import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 
-export const SignMessage: React.FC = () => {
+export const SignHexMessage: React.FC = () => {
   const [value, setValue] = useState('');
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { loading } = walletConnectState;
-  const signMessageLoading = loading === 'signMessage';
+  const { pendingMethod } = walletConnectState;
+  const signMessageLoading = pendingMethod === 'signHexMessage';
 
   const handleSubmit = async () => {
-    const result = await wcs.signMessage(value);
+    const result = await wcs.signHexMessage(value);
     setResults({
-      action: 'signMessage',
+      action: 'signHexMessage',
       status: result.error ? 'failed' : 'success',
       message: result.error
         ? result.error
-        : 'WalletConnectJS | Sign Message Complete',
+        : 'WalletConnectJS | Sign Hex Message Complete',
       data: result,
     });
   };
@@ -27,7 +27,7 @@ export const SignMessage: React.FC = () => {
   return (
     <ActionCard
       icon={ICON_NAMES.PENCIL}
-      title="Sign Message"
+      title="Sign Hex Message"
       description="Send a sign message request message to the wallet.
                    The message to be signed must be hex encoded to allow for signing of bytes.
                    The wallet will decode the hex message and sign the underlying bytes."

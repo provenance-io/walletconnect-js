@@ -2,14 +2,14 @@ import {
   RESET_CONNECTION_URL,
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
-  SIGN_MESSAGE_URL,
+  SIGN_HEX_MESSAGE_URL,
   SEND_COIN_URL,
 } from 'consts';
 import {
   ResetConnectionTimeout,
   SendMessage,
   SignJWT,
-  SignMessage,
+  SignHexMessage,
   SendCoin,
 } from 'Page';
 
@@ -28,9 +28,9 @@ export const SIGN_JWT = {
   element: <SignJWT />,
 };
 
-export const SIGN_MESSAGE = {
-  path: SIGN_MESSAGE_URL,
-  element: <SignMessage />,
+export const SIGN_HEX_MESSAGE = {
+  path: SIGN_HEX_MESSAGE_URL,
+  element: <SignHexMessage />,
 };
 
 export const SEND_COIN = {

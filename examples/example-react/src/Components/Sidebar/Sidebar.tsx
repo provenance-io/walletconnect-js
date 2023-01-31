@@ -79,7 +79,7 @@ const RowSplitter = styled.div`
 export const Sidebar: React.FC = () => {
   const { walletConnectState } = useWalletConnect();
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
-  const { connected } = walletConnectState;
+  const { status } = walletConnectState;
 
   const toggleMobileSidebar = (status?: boolean) => {
     setShowSidebarMobile(!showSidebarMobile);
@@ -123,7 +123,7 @@ export const Sidebar: React.FC = () => {
             v{process.env.REACT_APP_VERSION || 'v??.??.??'}
           </Version>
         </SubtitleSection>
-        {connected && (
+        {status === 'connected' && (
           <>
             <Countdowns />
             <RowSplitter />

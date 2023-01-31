@@ -1,35 +1,41 @@
-import type WalletConnectClient from '@walletconnect/client';
+import WalletConnectClient from '@walletconnect/client';
 import type { IClientMeta } from './IClientMeta';
 import type { WalletId } from './WalletList';
 import type { MasterGroupPolicy, WalletInfo } from './ConnectData';
 
 export type WalletConnectClientType = WalletConnectClient;
 
-type WCSLoadingValue = '' | 'sendMessage' | 'signJWT' | 'signMessage';
+type WCSPendingMethod = '' | 'sendMessage' | 'signJWT' | 'signHexMessage';
+
+export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
+
+export interface ModalData {
+  QRCode: string;
+  QRCodeUrl: string;
+  showModal: boolean;
+  isMobile: boolean;
+}
 
 export interface WCSState {
   address: string;
   bridge: string;
-  connected: boolean;
-  connectionPending: boolean;
+  status: WalletConnectServiceStatus;
   connectionEXP: number | null;
   connectionEST: number | null;
   connectionTimeout: number;
-  connector: WalletConnectClientType | null;
-  isMobile: boolean;
-  loading: WCSLoadingValue;
+  pendingMethod: WCSPendingMethod;
   peer: IClientMeta | null;
   publicKey: string;
-  QRCode: string;
-  QRCodeUrl: string;
-  showQRCodeModal: boolean;
+  modal: ModalData;
   signedJWT: string;
-  walletAppId?: WalletId | '';
+  walletAppId?: WalletId;
   walletInfo: WalletInfo;
   representedGroupPolicy: MasterGroupPolicy | null;
 }
 
-export type WCSSetState = (state: Partial<WCSState>) => void;
+type WCSSetStateParam = WCSState & { connector?: WalletConnectClient };
+
+export type WCSSetState = (state: Partial<WCSSetStateParam>) => void;
 export type WCSSetFullState = (state: WCSState) => void;
 
 export interface WCJSLocalState {

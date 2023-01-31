@@ -10,16 +10,16 @@ const container = document.getElementById('root');
 const root = createRoot(container!);
 
 root.render(
-  <StrictMode>
-    <Router>
-      <WalletConnectContextProvider
-        connectionRedirect={`${window.location.origin}${CONNECT_URL}`}
-      >
-        <Theme>
-          <div id="portal" />
-          <App />
-        </Theme>
-      </WalletConnectContextProvider>
-    </Router>
-  </StrictMode>
+  // <StrictMode>
+  <Router>
+    <WalletConnectContextProvider
+      connectionRedirect={`${window.location.origin}${CONNECT_URL}`}
+    >
+      <Theme>
+        <div id="portal" />
+        <App />
+      </Theme>
+    </WalletConnectContextProvider>
+  </Router>
+  // </StrictMode>
 );

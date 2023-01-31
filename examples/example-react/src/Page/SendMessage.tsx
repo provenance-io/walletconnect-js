@@ -24,8 +24,8 @@ export const SendMessage: React.FC = () => {
   );
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { loading } = walletConnectState;
-  const sendMessageLoading = loading === 'sendMessage';
+  const { pendingMethod } = walletConnectState;
+  const sendMessageLoading = pendingMethod === 'sendMessage';
 
   const handleSubmit = async () => {
     // Convert input string value to number for price

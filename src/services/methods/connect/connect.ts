@@ -1,5 +1,5 @@
 import { createConnector } from './createConnector';
-import type { Broadcast, WCSState, WCSSetState } from '../../../types';
+import type { Broadcast, WCSState, WCSSetState, ModalData } from '../../../types';
 
 interface Props {
   bridge: string;
@@ -12,6 +12,7 @@ interface Props {
   setState: WCSSetState;
   startConnectionTimer: () => void;
   state: WCSState;
+  updateModal: (newModalData: Partial<ModalData>) => void;
 }
 
 // This connect method has three parts:
@@ -29,6 +30,7 @@ export const connect = ({
   setState,
   state,
   startConnectionTimer,
+  updateModal,
 }: Props) => {
   // Create a new walletconnect connector class and set up all walletconnect event listeners for it
   const newConnector = createConnector({
@@ -42,11 +44,11 @@ export const connect = ({
     setState,
     state,
     startConnectionTimer,
+    updateModal,
   });
-
-  // Save this new connector into walletConnectService state
-  setState({ connector: newConnector });
 
   // If we're not connected, initiate a connection to this newConnector and dApp
   if (!newConnector.connected) newConnector.createSession();
+
+  return newConnector;
 };
