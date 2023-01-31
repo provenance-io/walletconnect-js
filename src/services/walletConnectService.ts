@@ -343,7 +343,7 @@ export class WalletConnectService {
       connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
       status: 'pending',
     });
-    connectMethod({
+    const newConnector = connectMethod({
       bridge: bridge || this.state.bridge,
       broadcast: this.#broadcastEvent,
       getState: this.#getState,
@@ -356,6 +356,8 @@ export class WalletConnectService {
       state: this.state,
       updateModal: this.updateModal,
     });
+
+    this.#connector = newConnector;
   };
 
   disconnect = async () => {

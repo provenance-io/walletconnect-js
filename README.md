@@ -44,7 +44,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
    - [signHexMessage](#signHexMessage)
 6. [QRCodeModal](#QRCodeModal)
 7. [Window messages](#Window-Messages)
-8. [Examples](#Examples,SetupConfigurations,andAlternateimports)
+8. [Examples](#Examples,-Setup-Configurations,-and-Alternate-imports)
 10. [Status](#Status)
 
 ## Installation
