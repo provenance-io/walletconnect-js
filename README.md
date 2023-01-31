@@ -6,35 +6,54 @@ Library to interface with Provenance Wallet using WalletConnect.
 
 For more information about [Provenance Inc](https://provenance.io) visit https://provenance.io
 
+## Version 3.x.x breaking changes:
+- `walletConnectService`
+  - Renamed `signMessage` to `signHexMessage`
+  - Results of methods (other than `connect` can now all use `await`)
+    - eg: `const result = await walletConnectService.signHexMessage('test');` 
+  - Removed `generateAutoConnectUrl` method.  Will revisit at a later time
+  - Removed `setState` and `resetState` methods
+- `walletConnectState` shape changed
+  - `connected` is now `status` which can be `"connected"`, `"disconnected"`, or `"pending"`
+  - `walletApp` is now `walletAppId`
+  - `loading` is now `pendingMethod`
+  - QRCode values now moved into `modal` state object
+  - Removed `account`, `figureConnected`, `newAccount`, and `connector` values
+- `QRCodeModal` wallet changes
+  - Moved Provenance Blockchain wallets into `dev`
+  - Added Figure Mobile wallets as responsive mobile options
+  - Package now transpiles optional chaining
+- WalletConnectContext
+  - Optional `connectionRedirect` string url value will auto-redirect users when disconnected
+  - Optional `service` lets dApps manually pass in their own instance of `walletConnectService`
+- WINDOW_MESSAGES
+  - Renamed `SIGN_MESSAGE` events to `SIGN_HEX_MESSAGE`
+
 ## Table of Contents
 
 1. [Installation](#Installation)
-2. [Window messages](#Window-Messages)
-3. [WalletConnectContextProvider](#WalletConnectContextProvider)
-4. [QRCodeModal](#QRCodeModal)
-5. [useWalletConnect](#useWalletConnect)
-6. [walletConnectService](#walletConnectService)
+2. [WalletConnectContextProvider](#WalletConnectContextProvider)
+3. [useWalletConnect](#useWalletConnect)
+4. [walletConnectState](#walletConnectState)
+5. [walletConnectService](#walletConnectService)
    - [connect](#connect)
    - [disconnect](#disconnect)
-   - [generateAutoConnectUrl](#generateAutoConnectUrl)
    - [resetConnectionTimeout](#resetConnectionTimeout)
    - [signJWT](#signJWT)
    - [sendMessage](#sendMessage)
-   - [signMessage](#signMessage)
-7. [walletConnectState](#walletConnectState)
-8. [Web App](#Web-App)
-9. [Non React Setup](#Non-React-Setup)
-10. [WalletConnect-js Status](#Status)
+   - [signHexMessage](#signHexMessage)
+6. [QRCodeModal](#QRCodeModal)
+7. [Window messages](#Window-Messages)
+8. [Examples](#Examples,SetupConfigurations,andAlternateimports)
+10. [Status](#Status)
 
 ## Installation
-
-Import the dependency
 
 ```bash
 npm install @provenanceio/walletconnect-js --save
 ```
 
-Importable items:
+Exported items:
 
 ```js
 import {
@@ -50,77 +69,21 @@ import {
   QRCodeModal
   // Types
   BroadcastResult,
-  ProvenanceMethod
+  ProvenanceMethod,
+  WalletConnectServiceStatus,
 } from "@provenanceio/walletconnect-js";
-```
-
-## Window Messages
-
-Each method will return a window message indicating whether it failed or was completed as well as the result
-
-_Note A: See `walletConnectService` for all `WINDOW_MESSAGES` based on method._
-_Note B: All of these are based off Node.js Event Emitters, read more on them here: [Node.js Event Emitters](https://nodejs.org/api/events.html#event-newlistener)_
-
-List of WINDOW_MESSAGES:
-```js
-  export const WINDOW_MESSAGES = {
-  // WalletConnect Connected
-  CONNECTED: 'FWC_CONNECTED',
-  // WalletConnect Disconnect
-  DISCONNECT: 'FWC_DISCONNECT',
-  // Send Message
-  SEND_MESSAGE_COMPLETE: 'SEND_MESSAGE_COMPLETE',
-  SEND_MESSAGE_FAILED: 'SEND_MESSAGE_FAILED',
-  // JWT
-  SIGN_JWT_COMPLETE: 'SIGN_JWT_COMPLETE',
-  SIGN_JWT_FAILED: 'SIGN_JWT_FAILED',
-  // Sign
-  SIGN_MESSAGE_COMPLETE: 'SIGN_MESSAGE_COMPLETE',
-  SIGN_MESSAGE_FAILED: 'SIGN_MESSAGE_FAILED',
-};
-```
-
-Example Usage: 
-```js
-// (Example using sendMessage)
-
-// Listen for complete/success
-const successAction = (result) => {
-  console.log(`WalletConnectJS | Send Message Complete | Result: `, result);
-};
-walletConnectService.addListener(
-  WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE,
-  successAction
-);
-// Listen for error/failure
-const failAction = (result) => {
-  const { error } = result;
-  console.log(`WalletConnectJS | Send Message Failed | result, error: `, result, error);
-};
-walletConnectService.addListener(
-  WINDOW_MESSAGES.SEND_MESSAGE_FAILED,
-  failAction
-);
-```
-
-Alternatively, each method (other than connect) is an async method and the results can simply be awaited for:
-```js
-  const result = await walletConnectService.signMessage("test");
 ```
 
 ## WalletConnectContextProvider
 
-React context provider to supply state to every child within
-
-- Include as parent to all Components using `walletconnect-js`
-- Optional: You may pass your own instance of walletConnectService into the context provider using the param `service`
-- Optional: You may pass an auto-redirect url when disconnected into the provider using the param `connectionRedirect`
-- Usage Example (w/React.js):
-
+React context provider which provides all children components with state and hooks
+Optional Params:
+  - `service`: Manual instance of `walletConnectService` to use/reference
+  - `connectionRedirect`: Auto-redirect string url to redirect user when `status` is `disconnected`
+- React.js example:
   ```js
   // index.js
   ...
-
   ReactDOM.render(
     <WalletConnectContextProvider>
       <App />
@@ -129,52 +92,50 @@ React context provider to supply state to every child within
   );
   ```
 
-## QRCodeModal
-
-To start the connection from dApp to wallet you will need to initiate the connection using the QRCodeModal component.
-
-- Takes in the following params:
-  - `walletConnectService`: Service pulled out of `useWalletConnect()` hook (Required)
-  - `devWallets`: Array of allowed dev wallets to connect into. (Optional)
-  - `hideWallets`: Array of prod wallets to hide from user. (Optional)
-  - For list of available wallets and their IDs see `src/consts/walletList.ts`
-
-- Usage:
-  ```js
-  // App.js
-  import { useWalletConnect, QRCodeModal } from '@provenanceio/walletconnect-js';
-  ...
-  export const App = () => {
-    const { walletConnectService: wcs } = useWalletConnect();
-    ...
-    return (
-      <QRCodeModal
-        walletConnectService={wcs}
-        devWallets={['figure_web_test', 'figure_mobile_test']}
-        hideWallets={['figure_web', 'figure_mobile']}
-      />
-    )
-  };
-  ```
-- Notes
-  - This modal is built with React.js and will only work within a react project. If you are not using React.js look through the `examples` folder to see how to initiate the connection without QRCodeModal manually.
-
-  - If using react-scripts 4 and below, you must be using walletconnect-js version 2.1.1 or below. Version 2.1.2 and above require react-scripts 5.x.x+ to use the QRCodeModal.
-
 ## useWalletConnect
 
-React hook which contains `walletConnectService` and `walletConnectState`
+React hook which containing `walletConnectService` and `walletConnectState`
 
-## walletConnectService
+### walletConnectState
 
-- Holds all main methods and functions to use WalletConnect service
+Holds current walletconnect-js state values
+  ```js
+  initialState: {
+    address: '', // Wallet address [string]
+    bridge: 'wss://figure.tech/service-wallet-connect-bridge/ws/external', // WalletConnect bridge used for connection [string]
+    status: 'disconnected', // connection status connected ['connected', 'pending', 'disconnected]
+    connectionEat: null, // WalletConnect expires at time [number]
+    connectionIat: null, // WalletConnect initialized at time [number]
+    connectionTimeout: 1800, // Default timeout duration (seconds)
+    modal: { // QRCodeModal values
+      showModal: false, // Should the QR modal be open [bool]
+      QRCodeUrl: '', // QRCode url contained within image [string]
+      QRCode: '', // QRCode image data to connect to WalletConnect bridge [string]
+      isMobile: false, // Is the connected browser a mobile device [bool]
+    },
+    peer: {}, // Connected wallet info [object]
+    pendingMethod: '', // Are any methods currently pending [string]
+    publicKey: '', // Wallet public key (base64url encoded)
+    signedJWT: '', // Signed JWT token [string]
+    walletAppId: '', // Type of wallet [string]
+    walletInfo: { // Information about the currently connected wallet account
+      coin: '', // [string]
+      id: '', // [string]
+      name: '', // [string]
+    },
+    representedGroupPolicy: null, //Present when the wallet holder is acting on behalf of a group
+  }
+  ```
+### walletConnectService
+
+Used to call walletconnect-js methods
 
 - #### connect
 
-  Connect a WalletConnect wallet
+  Connect a supported wallet
 
   ```js
-  walletConnectService.connect({bridge, duration, noPopup});
+  walletConnectService.connect(options);
   // WINDOW_MESSAGE: CONNECTED
   ```
 
@@ -198,6 +159,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
 - #### resetConnectionTimeout
 
   Change the amount of connection time remaining for the currenct walletconnect session
+  _Note: This feature is currently only available in extension wallets_
   ```js
   walletConnectService.resetConnectionTimeout(connectionTimeout);
   ```
@@ -207,7 +169,7 @@ React hook which contains `walletConnectService` and `walletConnectState`
 
 - #### signJWT
 
-  Prompt user to sign a generated JWT (Async)
+  Prompt user to sign a generated JWT (async)
 
   ```js
   walletConnectService.signJWT(expire);
@@ -220,21 +182,10 @@ React hook which contains `walletConnectService` and `walletConnectState`
 
 - #### sendMessage
 
-  Pass through a custom base64 encoded message (Async)
+  Submit custom base64 encoded message (async)
 
   ```js
-  walletConnectService.sendMessage({
-    message,
-    description,
-    method,
-    gasPrice,
-    feeGranter,
-    feePayer,
-    memo,
-    timeoutHeight,
-    extensionOptions,
-    nonCriticalExtensionOptions,
-  });
+  walletConnectService.sendMessage(options);
   // WINDOW_MESSAGES: SEND_MESSAGE_COMPLETE, SEND_MESSAGE_FAILED
   ```
 
@@ -251,64 +202,55 @@ React hook which contains `walletConnectService` and `walletConnectState`
   | extensionOptions    | any[]         | no       | - | `['CiwvcHJvdmVuYW5jZS5tZX...']` | Specify tx extensionOptions |
   | nonCriticalExtensionOptions    | any[]         | no       | - | `['CiwvcHJvdmVuYW5jZS5tZX...']` | Specify tx nonCriticalExtensionOptions |
 
-- #### signMessage
-  Prompt user to sign a custom hex string message (Async)
+- #### signHexMessage
+  Sign a custom hex string message (async)
   ```js
-  walletConnectService.signMessage(message);
-  // WINDOW_MESSAGES: SIGN_MESSAGE_COMPLETE, SIGN_MESSAGE_FAILED
+  walletConnectService.signHexMessage(message);
+  // WINDOW_MESSAGES: SIGN_HEX_MESSAGE_COMPLETE, SIGN_HEX_MESSAGE_FAILED
   ```
   | Param   | Type   | Required | Default | Example               | Info                   |
   | ------- | ------ | -------- | ------- | --------------------- | ---------------------- |
-  | message | hex string | yes      | -       | `'My Custom Message'` | Hex string message to send |
+  | message | string | yes      | -       | `'My Custom Message'` | Hex string message to send |
 
-## walletConnectState
+## QRCodeModal
 
-- Holds current walletconnect-js state values
-  ```js
-  initialState: {
-    address: '', // Wallet address [string]
-    bridge: 'wss://figure.tech/service-wallet-connect-bridge/ws/external', // WalletConnect bridge used for connection [string]
-    connected: false, // WalletConnect connected [bool]
-    connectionEat: null, // WalletConnect expires at time [number]
-    connectionIat: null, // WalletConnect initialized at time [number]
-    connectionTimeout: 1800, // Default timeout duration (seconds)
-    connector: null, // WalletConnect connector
-    isMobile: false, // Is the connected browser a mobile device [bool]
-    loading: '', // Are any methods currently loading/pending [string]
-    peer: {}, // Connected wallet info [object]
-    publicKey: '', // Wallet public key (base64url encoded)
-    QRCode: '', // QRCode image data to connect to WalletConnect bridge [string]
-    QRCodeUrl: '', // QRCode url contained within image [string]
-    showQRCodeModal: false, // Should the QR modal be open [bool]
-    signedJWT: '', // Signed JWT token [string]
-    walletAppId: '', // What type of wallet is this "provenance_extension" | "provenance_mobile" | "figure_web"
-    walletInfo: {}, // Contains wallet coin, id, and name
-    representedGroupPolicy: null, //Present when the wallet holder is acting on behalf of a group
-  }
-  ```
+Optional React.js component which creates a popup connection interface.
 
-## Web App
+- Params:
+  - `walletConnectService`: Service pulled out of `useWalletConnect()` hook (Required)
+  - `devWallets`: Array of allowed dev wallets to connect into. (Optional)
+  - `hideWallets`: Array of prod wallets to hide from user. (Optional)
+  - `className`: CSS class to customize the styling (Optional)
+  - `title`: Title displayed on top of the modal (Optional)
+
+- Usage: _(See example apps for in-code usage)_
+  - Import the component in the same page as you call `walletConnectService.connect()`
+  
+- Note:
+  - `src/consts/walletList.ts` contains a list of available `walletsAppID`s 
+  - This modal is built with React.js and will only work within a react project. If you are not using React.js look through the `examples` folder to see how to initiate the connection without this QRCodeModal.
+
+## Window Messages
+
+Each method will return a window message indicating whether it failed or was completed as well as the result.
+
+_Note A: You can use `await` for most `walletConnectService` methods instead._
+_Note B: All of these are based off Node.js Event Emitters, read more on them here: [Node.js Event Emitters](https://nodejs.org/api/events.html#event-newlistener)_
+
+Window Messages:
+ `CONNECTED`, `DISCONNECT`, `SEND_MESSAGE_COMPLETE`, `SEND_MESSAGE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `SIGN_HEX_MESSAGE_COMPLETE`, `SIGN_HEX_MESSAGE_FAILED`
+
+_(See example apps for more detailed usage)_
+
+## Examples, Setup Configurations, and Alternate imports
 
 This package comes bundled with a full demos that you can run locally to test out the various features of `walletconnect-js`.
 To see how to initiate and run the different examples, look through the [README.md](./examples/README.md)
 
-- Quick Start:
-  1. Pull down the latest `walletconnect-js`.
-  2. Run `npm i` to install all the required node packages
-  3. Run `npm run start` to launch a localhost demo.
-
-## Non React Setup
-
-This package works without react and with any other javascipt library/framework (tested with vanilla js)
-
-### Using a CDN Import
-
-You can find this package on `https://unpkg.com/`: - Note: Change the version in the url as needed: `https://unpkg.com/@provenanceio/walletconnect-js@2.0.0/umd/walletconnect-js.min.js` - Example use:
-`js <script src="https://unpkg.com/@provenanceio/walletconnect-js@2.0.0/umd/walletconnect-js.min.js"></script> `
-
-### Using Imports
-
-There are a few differences in getting setup and running: 1) Note [Webpack 5 Issues](#Webpack-5-Issues) 2) When connecting, you will need to manually generate the QR code image element (Component is only available to React.js apps) 3) Don't use the default imports (`@provenanceio/walletconnect-js`), instead pull the service from `@provenanceio/walletconnect-js/lib/service` 4) Don't forget to set up event and loading listeners \* Basic non-React.js example with
+- Non React Setup
+  - See examples folder for demo apps
+- Using a CDN Import
+  - You can find this package on `https://unpkg.com/`: - Note: Change the version in the url as needed: `https://unpkg.com/@provenanceio/walletconnect-js@2.0.0/umd/walletconnect-js.min.js`
 
 ## Status
 

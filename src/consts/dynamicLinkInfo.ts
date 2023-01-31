@@ -1,6 +1,6 @@
 export const DYNAMIC_LINK_INFO_PROD_PROVENANCE = {
   domainUriPrefix: 'https://provenancewallet.page.link',
-  link: `https://provenance.io/wallet-connect`,
+  link: 'https://provenance.io/wallet-connect',
   androidInfo: {
     androidPackageName: 'io.provenance.wallet',
   },
@@ -15,7 +15,7 @@ export const DYNAMIC_LINK_INFO_PROD_PROVENANCE = {
 
 export const DYNAMIC_LINK_INFO_TEST_PROVENANCE = {
   domainUriPrefix: 'https://provenancewallet.page.link',
-  link: `https://provenance.io/wallet-connect`,
+  link: 'https://provenance.io/wallet-connect',
   androidInfo: {
     androidPackageName: 'io.provenance.wallet.dev',
   },
@@ -30,7 +30,7 @@ export const DYNAMIC_LINK_INFO_TEST_PROVENANCE = {
 
 export const DYNAMIC_LINK_INFO_PROD_FIGURE = {
   domainUriPrefix: 'https://figurewallet.page.link',
-  link: `https://figure.com/wallet-connect?data=$encodedWalletConnectData`,
+  link: 'https://figure.com/wallet-connect',
   androidInfo: {
     androidPackageName: 'com.figure.mobile.wallet',
   },
@@ -45,7 +45,7 @@ export const DYNAMIC_LINK_INFO_PROD_FIGURE = {
 
 export const DYNAMIC_LINK_INFO_TEST_FIGURE = {
   domainUriPrefix: 'https://figurewallet.page.link',
-  link: `https://figure.com/wallet-connect?data=$encodedWalletConnectData`,
+  link: 'https://figure.com/wallet-connect',
   androidInfo: {
     androidPackageName: 'com.figure.mobile.wallet.dev',
   },

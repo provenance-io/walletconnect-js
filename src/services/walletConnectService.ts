@@ -209,6 +209,9 @@ export class WalletConnectService {
     let finalUpdatedState = { ...updatedState };
     // If we get a new "connector" passed in, pull various data keys out
     if (updatedState.connector) {
+      // Update private connector value
+      this.#connector = updatedState.connector;
+      // Pull out/surface connector data for state
       const { bridge, peerMeta, accounts, connected } = updatedState.connector;
       const status = connected ? 'connected' : 'disconnected';
       const { address, jwt, publicKey, representedGroupPolicy, walletInfo } =
@@ -340,7 +343,7 @@ export class WalletConnectService {
       connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
       status: 'pending',
     });
-    const newConnector = connectMethod({
+    connectMethod({
       bridge: bridge || this.state.bridge,
       broadcast: this.#broadcastEvent,
       getState: this.#getState,
@@ -353,8 +356,6 @@ export class WalletConnectService {
       state: this.state,
       updateModal: this.updateModal,
     });
-    // Update private connector value
-    this.#connector = newConnector;
   };
 
   disconnect = async () => {
@@ -465,8 +466,8 @@ export class WalletConnectService {
     this.#setState({ pendingMethod: '' });
     // Broadcast result of method
     const windowMessage = result.error
-      ? WINDOW_MESSAGES.SIGN_MESSAGE_FAILED
-      : WINDOW_MESSAGES.SIGN_MESSAGE_COMPLETE;
+      ? WINDOW_MESSAGES.SIGN_HEX_MESSAGE_FAILED
+      : WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
