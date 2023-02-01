@@ -56,6 +56,20 @@ type BroadcastResultData =
   | number
   | string;
 
+// type SignHexMessageWCResult = string
+// type SendMessageWCResult = string
+// // "8deff4b1fd5a32c7ccbbaca25476b212a42efa1e97fb5dd097aa35b5cb84429b1baab1c20096d93e10681f5a4b8873a8829785ef4088696a8c7c00e179a5e29c"
+// type SignJWTWCResult = string;
+// type ConnectWCResult = string
+// type DisconnectWCResult = string
+
+// type BroadcastWalletConnectResult =
+//   | SignHexMessageWCResult
+//   | SendMessageWCResult
+//   | SignJWTWCResult
+//   | ConnectWCResult
+//   | DisconnectWCResult;
+
 export interface BroadcastResult {
   data?: BroadcastResultData;
   error?: string;

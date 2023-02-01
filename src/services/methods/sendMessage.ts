@@ -53,8 +53,7 @@ export const sendMessage = async ({
     method,
     params: [metadata],
   };
-  if (!connector || !walletAppId)
-    return { valid, data, request, error: 'No wallet connected' };
+  if (!connector) return { valid, data, request, error: 'No wallet connected' };
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
 

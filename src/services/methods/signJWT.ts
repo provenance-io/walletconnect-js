@@ -48,7 +48,7 @@ export const signJWT = async ({
     method,
     params: [metadata],
   };
-  if (!connector || !walletAppId)
+  if (!connector)
     return {
       valid,
       data: { expires: finalExpiresSec },
