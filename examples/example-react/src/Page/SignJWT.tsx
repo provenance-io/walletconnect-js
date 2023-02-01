@@ -28,6 +28,10 @@ export const SignJWT: React.FC = () => {
 
   const handleSubmit = async () => {
     const result = await wcs.signJWT(Number(value));
+    console.log(
+      'example-react | SignJWT.tsx | handleSubmit | signJWT result: ',
+      result
+    );
     setResults({
       action: 'signJWT',
       status: result.error ? 'failed' : 'success',

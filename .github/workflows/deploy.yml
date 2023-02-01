@@ -48,3 +48,22 @@ jobs:
           token: ${{secrets.NPM_TOKEN}}
           tag: "develop"
           access: "public"
+
+  slack:
+    runs-on: [self-hosted, linux]
+    needs: [build] # Include all jobs that should be in message
+    steps:
+      - name: Checkout Figure shared actions
+        uses: actions/checkout@v3
+        with:
+          repository: FigureTechnologies/shared-actions
+          ref: v1
+          token: ${{ secrets.PAT }}
+          path: shared-actions
+
+      - uses: ./shared-actions/slack-notification
+        with:
+          emoji: ":snowboarder:"
+          channel: walletconnect-js
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          github_needs_context: ${{ toJSON(needs) }}

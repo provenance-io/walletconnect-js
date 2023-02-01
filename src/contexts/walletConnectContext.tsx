@@ -29,7 +29,7 @@ const WalletConnectContextProvider: React.FC<Props> = ({
   const [initialLoad, setInitialLoad] = useState(true);
   const { connectionTimeout, bridge, status } = walletConnectState;
 
-  // If the dApp passed in a connectionRedirect then monitor "connector.connected" and redirect the user when disconnected
+  // Auto-redirect was passed in.  Act on disconnected status
   useEffect(() => {
     if (connectionRedirect && status === 'disconnected') {
       const currentUrl = window.location.href;

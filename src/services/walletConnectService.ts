@@ -206,13 +206,15 @@ export class WalletConnectService {
 
   // Change the class state
   #setState: WCSSetState = (updatedState) => {
-    let finalUpdatedState = { ...updatedState };
+    // If the updatedState passes a connector value we want to use it but save it separatly from the public state
+    const { connector, ...filteredUpdatedState } = updatedState;
+    let finalUpdatedState = { ...filteredUpdatedState };
     // If we get a new "connector" passed in, pull various data keys out
-    if (updatedState.connector) {
+    if (connector) {
       // Update private connector value
-      this.#connector = updatedState.connector;
+      this.#connector = connector;
       // Pull out/surface connector data for state
-      const { bridge, peerMeta, accounts, connected } = updatedState.connector;
+      const { bridge, peerMeta, accounts, connected } = connector;
       const status = connected ? 'connected' : 'disconnected';
       const { address, jwt, publicKey, representedGroupPolicy, walletInfo } =
         getAccountInfo(accounts);

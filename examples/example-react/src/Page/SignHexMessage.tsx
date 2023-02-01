@@ -14,6 +14,10 @@ export const SignHexMessage: React.FC = () => {
 
   const handleSubmit = async () => {
     const result = await wcs.signHexMessage(value);
+    console.log(
+      'example-react | SignHexMessage.tsx | handleSubmit | signHexMessage result: ',
+      result
+    );
     setResults({
       action: 'signHexMessage',
       status: result.error ? 'failed' : 'success',
