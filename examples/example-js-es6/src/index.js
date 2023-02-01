@@ -42,7 +42,6 @@ const walletConnectedUpdates = (data) => {
     data ? 'New Connection Established' : 'Existing Connection Established'
   }`;
   // Build list object to display about connection values
-  console.log('walletConnectService.state: ', walletConnectService.state);
   const list = {
     address,
     publicKey,
