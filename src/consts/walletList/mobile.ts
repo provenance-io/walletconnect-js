@@ -9,9 +9,10 @@ import {
   DYNAMIC_LINK_INFO_PROD_PROVENANCE,
   DYNAMIC_LINK_INFO_TEST_PROVENANCE,
 } from '../dynamicLinkInfo';
+import { WALLET_APP_IDS } from '../walletAppIds';
 
 export const mobileProvenance = {
-  id: 'provenance_mobile',
+  id: WALLET_APP_IDS.PROVENANCE_MOBILE,
   type: 'mobile',
   title: 'Provenance Mobile',
   icon: 'provenance',
@@ -34,7 +35,7 @@ export const mobileProvenance = {
 } as Wallet;
 
 export const mobileProvenanceTest = {
-  id: 'provenance_mobile_test',
+  id: WALLET_APP_IDS.PROVENANCE_MOBILE_TEST,
   type: 'mobile',
   title: 'Provenance Mobile (Test)',
   icon: 'provenance',
@@ -57,7 +58,7 @@ export const mobileProvenanceTest = {
 } as Wallet;
 
 export const mobileFigure = {
-  id: 'figure_mobile',
+  id: WALLET_APP_IDS.FIGURE_MOBILE,
   type: 'mobile',
   title: 'Figure Mobile',
   icon: 'figure',
@@ -79,7 +80,7 @@ export const mobileFigure = {
 } as Wallet;
 
 export const mobileFigureTest = {
-  id: 'figure_mobile_test',
+  id: WALLET_APP_IDS.FIGURE_MOBILE_TEST,
   type: 'mobile',
   title: 'Figure Mobile (Test)',
   icon: 'figure',

@@ -37,10 +37,6 @@ export const SendMessage: React.FC = () => {
       gasPrice: finalGasData,
       method,
     });
-    console.log(
-      'example-react | SendMessage.tsx | handleSubmit | sendMessage result: ',
-      result
-    );
     setResults({
       action: 'sendMessage',
       status: result.error ? 'failed' : 'success',

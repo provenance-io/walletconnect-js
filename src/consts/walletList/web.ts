@@ -1,8 +1,9 @@
 import { Wallet } from '../../types';
+import { WALLET_APP_IDS } from '../walletAppIds';
 import { FIGURE_WEB_WALLET_PROD_URL, FIGURE_WEB_WALLET_TEST_URL } from '../urls';
 
 export const webFigure = {
-  id: 'figure_web',
+  id: WALLET_APP_IDS.FIGURE_WEB,
   type: ['web', 'mobile'],
   title: 'Figure Web',
   icon: 'figure',
@@ -29,7 +30,7 @@ export const webFigure = {
 
 export const webFigureTest = {
   dev: true,
-  id: 'figure_web_test',
+  id: WALLET_APP_IDS.FIGURE_WEB_TEST,
   type: ['web', 'mobile'],
   title: 'Figure Web (Test)',
   icon: 'figure',

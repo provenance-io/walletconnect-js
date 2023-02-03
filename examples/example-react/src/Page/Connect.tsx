@@ -37,16 +37,14 @@ export const Connect: React.FC = () => {
       setInitialLoad(false);
 
       const handleConnectedEvent = (results: BroadcastResult) => {
-        console.log(
-          'example-react | Connect.tsx | useEffect | handleConnectedEvent | broadcastResult: ',
-          results
-        );
-        setResults(results);
+        setResults({
+          data: { ...walletConnectState, broadcastResult: results },
+        });
       };
       wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
       wcs.addListener(WINDOW_MESSAGES.DISCONNECT, handleConnectedEvent);
     }
-  }, [wcs, navigate, initialLoad]);
+  }, [wcs, navigate, initialLoad, walletConnectState]);
 
   if (status === 'connected')
     return (

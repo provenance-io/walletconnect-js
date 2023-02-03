@@ -21,6 +21,7 @@ import {
   WALLET_APP_EVENTS,
   WALLETCONNECT_BRIDGE_URL,
   WINDOW_MESSAGES,
+  LOCAL_STORAGE_NAMES,
 } from '../consts';
 import {
   connect as connectMethod,
@@ -41,9 +42,12 @@ import {
 if (window.Buffer === undefined) window.Buffer = Buffer;
 
 // Check for existing values from localStorage
-const existingWCState: WalletConnectClientType =
-  getFromLocalStorage('walletconnect');
-const existingWCJSState: WCJSLocalState = getFromLocalStorage('walletconnect-js');
+const existingWCState: WalletConnectClientType = getFromLocalStorage(
+  LOCAL_STORAGE_NAMES.WALLETCONNECT
+);
+const existingWCJSState: WCJSLocalState = getFromLocalStorage(
+  LOCAL_STORAGE_NAMES.WALLETCONNECTJS
+);
 
 const defaultState: WCSState = {
   address: '',

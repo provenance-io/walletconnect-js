@@ -42,10 +42,6 @@ export const SendCoin: React.FC = () => {
 
       // Convert input string value to number for price
       const result = await wcs.sendMessage(message);
-      console.log(
-        'example-react | SendCoin | handleSubmit | sendMessage result: ',
-        result
-      );
       setResults({
         action: 'signMessage',
         status: result.error ? 'failed' : 'success',

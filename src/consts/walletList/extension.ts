@@ -1,7 +1,8 @@
+import { WALLET_APP_IDS } from '../walletAppIds';
 import { Wallet } from '../../types';
 
 export const extensionProvenance = {
-  id: 'provenance_extension',
+  id: WALLET_APP_IDS.PROVENANCE_EXTENSION,
   type: 'extension',
   dev: true,
   title: 'Provenance Extension',
@@ -18,7 +19,7 @@ export const extensionProvenance = {
 } as Wallet;
 
 export const extensionFigure = {
-  id: 'figure_extension',
+  id: WALLET_APP_IDS.FIGURE_EXTENSION,
   type: 'extension',
   title: 'Figure Extension',
   icon: 'figure',
