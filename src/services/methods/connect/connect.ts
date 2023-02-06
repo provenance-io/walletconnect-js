@@ -5,6 +5,7 @@ interface Props {
   bridge: string;
   broadcast: Broadcast;
   getState: () => WCSState;
+  jwtExpiration?: number;
   noPopup?: boolean;
   prohibitGroups?: boolean;
   requiredAddress?: string;
@@ -23,13 +24,14 @@ export const connect = ({
   bridge,
   broadcast,
   getState,
+  jwtExpiration,
   noPopup,
   prohibitGroups,
   requiredAddress,
   resetState,
   setState,
-  state,
   startConnectionTimer,
+  state,
   updateModal,
 }: Props) => {
   // Create a new walletconnect connector class and set up all walletconnect event listeners for it
@@ -37,6 +39,7 @@ export const connect = ({
     bridge,
     broadcast,
     getState,
+    jwtExpiration,
     noPopup,
     prohibitGroups,
     requiredAddress,
@@ -48,7 +51,10 @@ export const connect = ({
   });
 
   // If we're not connected, initiate a connection to this newConnector and dApp
-  if (!newConnector.connected) newConnector.createSession();
+  if (!newConnector.connected) {
+    console.log('wcjs | connect.ts | newConnector.createSession()');
+    newConnector.createSession();
+  }
 
   return newConnector;
 };

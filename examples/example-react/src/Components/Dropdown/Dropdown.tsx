@@ -33,11 +33,11 @@ const StyledSelect = styled.select`
   height: 100%;
   font-size: 1.6rem;
   color: ${COLORS.NEUTRAL_700};
+  background: ${COLORS.WHITE};
   padding: 10px 40px 10px 16px;
   border-radius: inherit;
   border: none;
   outline: none;
-  background: none;
   appearance: none;
 `;
 const DropdownIcon = styled.div`

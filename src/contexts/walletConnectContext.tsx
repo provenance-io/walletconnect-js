@@ -49,18 +49,21 @@ const WalletConnectContextProvider: React.FC<Props> = ({
   }, [connectionRedirect, status]);
 
   // Whenever we get a pending status, attempt to reconnect
-  useEffect(() => {
-    // If we suspect a previous existing connection run a connection check
-    const handlePreviousConnectionCheck = () => {
-      // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
-      const duration = connectionTimeout ? connectionTimeout / 1000 : undefined;
-      walletConnectService.connect({ duration, bridge });
-    };
-    // Connection might already exist, attempt to resume session
-    if (status === 'pending') {
-      handlePreviousConnectionCheck();
-    }
-  }, [bridge, connectionTimeout, walletConnectService, status]);
+  // useEffect(() => {
+  //   // If we suspect a previous existing connection run a connection check
+  //   const handlePreviousConnectionCheck = () => {
+  //     console.log(
+  //       'wcjs | walletConnectContext.tsx | useEffect | handlePreviousConnectionCheck'
+  //     );
+  //     // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
+  //     const duration = connectionTimeout ? connectionTimeout / 1000 : undefined;
+  //     walletConnectService.connect({ duration, bridge });
+  //   };
+  //   // Connection might already exist, attempt to resume session
+  //   if (status === 'pending') {
+  //     handlePreviousConnectionCheck();
+  //   }
+  // }, [bridge, connectionTimeout, walletConnectService, status]);
 
   // This useEffect should only run once
   useEffect(() => {

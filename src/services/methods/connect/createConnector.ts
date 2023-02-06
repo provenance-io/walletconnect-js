@@ -19,6 +19,7 @@ interface Props {
   bridge: string;
   broadcast: Broadcast;
   getState: () => WCSState;
+  jwtExpiration?: number;
   noPopup?: boolean;
   prohibitGroups?: boolean;
   requiredAddress?: string;
@@ -33,13 +34,14 @@ export const createConnector = ({
   bridge,
   broadcast,
   getState,
+  jwtExpiration,
   noPopup,
   prohibitGroups,
   requiredAddress,
   resetState,
   setState,
-  state,
   startConnectionTimer,
+  state,
   updateModal,
 }: Props) => {
   class QRCodeModal {
@@ -49,7 +51,11 @@ export const createConnector = ({
         ? `&address=${requiredAddress}`
         : '';
       const prohibitGroupsParam = prohibitGroups ? `&prohibitGroups=true` : '';
-      const fullData = `${data}${requiredAddressParam}${prohibitGroupsParam}`;
+      const jwtExpirationParam = jwtExpiration
+        ? `&jwtExpiration=${jwtExpiration}`
+        : '';
+      const fullData = `${data}${requiredAddressParam}${prohibitGroupsParam}${jwtExpirationParam}`;
+      console.log('fullData: ', fullData);
       const qrcode = await QRCode.toDataURL(fullData);
       updateModal({ QRCode: qrcode, QRCodeUrl: fullData, showModal: !noPopup });
     };

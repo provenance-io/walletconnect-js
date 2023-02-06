@@ -116,6 +116,19 @@ export class WalletConnectService {
       representedGroupPolicy:
         localStorageRepresentedGroupPolicy || defaultState.representedGroupPolicy,
     };
+    // If the status is "pending" attempt to reconnect
+    // REMOVE: Vig return here, trying to move logic from context to service about resuming an existing connection
+    // I think there's a problem with automatically updating and setting the state over and over when wcjs and walletconnect changes.
+    if (newState.status === 'pending') {
+      console.log(
+        'walletConnectService.ts | #buildInitialState | status === pending'
+      );
+      // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
+      const duration = newState.connectionTimeout
+        ? newState.connectionTimeout / 1000
+        : undefined;
+      this.connect({ duration, bridge: newState.bridge });
+    }
     this.#setState(newState);
   };
 
@@ -367,12 +380,14 @@ export class WalletConnectService {
    * @param noPopup - (optional) Prevent the QRCodeModal from automatically popping up
    * @param address - (optional) Address to establish connection with, note, it must exist
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
+   * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
    */
   connect = ({
+    address,
     bridge,
     duration,
+    jwtExpiration,
     noPopup,
-    address,
     prohibitGroups,
   }: {
     bridge?: string;
@@ -380,6 +395,7 @@ export class WalletConnectService {
     noPopup?: boolean;
     address?: string;
     prohibitGroups?: boolean;
+    jwtExpiration?: number;
   } = {}) => {
     // Update the duration of this connection
     this.#setState({
@@ -390,6 +406,7 @@ export class WalletConnectService {
       bridge: bridge || this.state.bridge,
       broadcast: this.#broadcastEvent,
       getState: this.#getState,
+      jwtExpiration,
       noPopup,
       prohibitGroups,
       requiredAddress: address,
