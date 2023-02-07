@@ -1,7 +1,7 @@
 import WalletConnectClient from '@walletconnect/client';
 import type { IClientMeta } from './IClientMeta';
 import type { WalletId } from './WalletList';
-import type { MasterGroupPolicy, WalletInfo } from './ConnectData';
+import type { AccountObject, MasterGroupPolicy, WalletInfo } from './ConnectData';
 
 export type WalletConnectClientType = WalletConnectClient;
 
@@ -33,7 +33,9 @@ export interface WCSState {
   representedGroupPolicy: MasterGroupPolicy | null;
 }
 
-type WCSSetStateParam = WCSState & { connector?: WalletConnectClient };
+export interface WCSSetStateParam extends WCSState {
+  connector?: WalletConnectClient;
+}
 
 export type WCSSetState = (
   state: Partial<WCSSetStateParam>,
@@ -48,3 +50,20 @@ export interface WCJSLocalState {
   signedJWT: string;
   walletAppId?: WalletId | '';
 }
+
+export interface WCLocalState {
+  connected: boolean;
+  accounts: AccountObject[];
+  chainId: number;
+  bridge: string;
+  key: string;
+  clientId: string;
+  clientMeta: IClientMeta | null;
+  peerId: string;
+  peerMeta: IClientMeta | null;
+  handshakeId: number;
+  handshakeTopic: string;
+}
+
+export type WCJSLocalStateKeys = keyof WCJSLocalState;
+export type WCLocalStateKeys = keyof WCLocalState;

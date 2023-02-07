@@ -39,6 +39,7 @@ export const Connect: React.FC = () => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [groupsAllowed, setGroupsAllowed] = useState(true);
   const [jwtExpiration, setJwtExpiration] = useState('');
+  const [sessionDuration, setSessionDuration] = useState('3600');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [results, setResults] = useState<{
     [key: string]: any;
@@ -110,6 +111,13 @@ export const Connect: React.FC = () => {
               placeholder="Use default (24 hours)"
               bottomGap
             />
+            <Input
+              onChange={setSessionDuration}
+              value={sessionDuration}
+              label="Custom session duration in seconds (optional)"
+              placeholder="Use default (3600 seconds/1 hour)"
+              bottomGap
+            />
             <Checkbox
               label="Group Accounts Allowed"
               checked={groupsAllowed}
@@ -121,7 +129,7 @@ export const Connect: React.FC = () => {
           onClick={() =>
             wcs.connect({
               bridge: selectedBridge,
-              duration: 3600,
+              duration: Number(sessionDuration),
               address,
               prohibitGroups: !groupsAllowed,
               jwtExpiration: Number(jwtExpiration),

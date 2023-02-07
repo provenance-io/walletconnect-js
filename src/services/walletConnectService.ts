@@ -9,6 +9,10 @@ import type {
   WalletConnectClientType,
   WalletConnectServiceStatus,
   WalletId,
+  WCJSLocalState,
+  WCJSLocalStateKeys,
+  WCLocalState,
+  WCLocalStateKeys,
   WCSSetFullState,
   WCSSetState,
   WCSState,
@@ -132,10 +136,7 @@ export class WalletConnectService {
   #buildInitialState = () => {
     // Get the latest state using defaultState values (initial = true)
     const newState = this.#getLocalStorageState(defaultState);
-    console.log(
-      'walletConnectService.ts | #buildInitialState | newState.status: ',
-      newState.status
-    );
+    this.state = newState;
     // If the status is "pending" attempt to reconnect
     if (newState.status === 'pending') {
       // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
@@ -144,26 +145,21 @@ export class WalletConnectService {
         : undefined;
       this.connect({ duration, bridge: newState.bridge });
     }
-    this.state = newState;
   };
 
   // Populate the state when localStorage updated.  Trigger "setState" function
   // Note: We want to skip updating localStorage with the setState
   #updateState = () => {
     // Get latest state based on current state values
-    const newState = this.#getLocalStorageState(this.state);
-    console.log(
-      'walletConnectService.ts | #updateState | newState.status: ',
-      newState.status
-    );
-    this.#setState(newState, false);
+    const currentState = this.#getLocalStorageState(defaultState);
+    this.#setState(currentState, false);
     // If the status is "pending" attempt to reconnect
-    if (newState.status === 'pending') {
+    if (currentState.status === 'pending') {
       // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
-      const duration = newState.connectionTimeout
-        ? newState.connectionTimeout / 1000
+      const duration = currentState.connectionTimeout
+        ? currentState.connectionTimeout / 1000
         : undefined;
-      this.connect({ duration, bridge: newState.bridge });
+      this.connect({ duration, bridge: currentState.bridge });
     }
   };
 
@@ -333,33 +329,43 @@ export class WalletConnectService {
   // One or more values within localStorage have changed, see if we care about any of the values and update the state as needed
   handleLocalStorageChange = (storageEvent: StorageEvent) => {
     const { key: storageEventKey, newValue, oldValue } = storageEvent;
-    const newValueObj = JSON.parse(newValue || '{}');
-    const oldValueObj = JSON.parse(oldValue || '{}');
+    const newValueObj = JSON.parse(newValue || '{}') as Partial<
+      WCJSLocalState & WCLocalState
+    >;
+    const oldValueObj = JSON.parse(oldValue || '{}') as Partial<
+      WCJSLocalState & WCLocalState
+    >;
     // Keys to look for within 'walletconnect' storage object
-    const targetWCValues = [
+    const targetWCValues: Partial<WCLocalStateKeys>[] = [
       'accounts',
-      'address',
       'bridge',
-      'publicKey',
       'connected',
-    ] as const;
+    ];
+
     // Keys to look for within 'walletconnect-js' storage object
-    const targetWCJSValues = [
+    const targetWCJSValues: WCJSLocalStateKeys[] = [
       'connectionEXP',
       'connectionEST',
       'connectionTimeout',
       'signedJWT',
       'walletAppId',
-    ] as const;
-    type TargetValues = typeof targetWCValues | typeof targetWCJSValues;
+    ];
     // Look for specific changed key values in the objects and return a final object with all the changes
-    const findChangedValues = (targetValues: TargetValues) => {
-      const foundChangedValues = {} as Record<TargetValues[number], unknown>;
+    const findChangedValues = (
+      targetValues: typeof targetWCValues | typeof targetWCJSValues
+    ) => {
+      const foundChangedValues = {} as Record<
+        WCLocalStateKeys[number] | WCJSLocalStateKeys[number],
+        unknown
+      >;
       targetValues.forEach((targetKey) => {
         // Accounts array holds an object with data, but we only want to look at the address value
+        // Idea here is that if the account changed we should reload the connection to get the full new data
         if (targetKey === 'accounts') {
-          if (newValueObj.accounts?.address !== oldValueObj[targetKey]?.address) {
-            foundChangedValues.address = newValueObj[targetKey]?.address;
+          if (
+            newValueObj?.accounts?.[0].address !== oldValueObj.accounts?.[0].address
+          ) {
+            foundChangedValues.address = newValueObj?.accounts?.[0].address;
           }
         } else if (newValueObj[targetKey] !== oldValueObj[targetKey]) {
           foundChangedValues[targetKey] = newValueObj[targetKey];
@@ -376,12 +382,7 @@ export class WalletConnectService {
 
     const changedValues = { ...changedValuesWC, ...changedValuesWCJS };
     const totalChangedValues = Object.keys(changedValues).length;
-
     if (totalChangedValues) {
-      console.log(
-        'wcjs | handleLocalStorageChange | changedValues: ',
-        changedValues
-      );
       this.#updateState();
     }
   };
@@ -433,10 +434,6 @@ export class WalletConnectService {
     prohibitGroups?: boolean;
     jwtExpiration?: number;
   } = {}) => {
-    console.log(
-      'wcjs | walletConnectService.js | connect | this.state.status: ',
-      this.state.status
-    );
     // Only create a new connector when we're not already connected
     if (this.state.status !== 'connected') {
       // Update the duration of this connection

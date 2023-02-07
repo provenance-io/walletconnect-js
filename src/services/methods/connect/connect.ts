@@ -52,7 +52,6 @@ export const connect = ({
 
   // If we're not connected, initiate a connection to this newConnector and dApp
   if (!newConnector.connected) {
-    console.log('wcjs | connect.ts | newConnector.createSession()');
     newConnector.createSession();
   }
 

@@ -55,7 +55,6 @@ export const createConnector = ({
         ? `&jwtExpiration=${jwtExpiration}`
         : '';
       const fullData = `${data}${requiredAddressParam}${prohibitGroupsParam}${jwtExpirationParam}`;
-      console.log('fullData: ', fullData);
       const qrcode = await QRCode.toDataURL(fullData);
       updateModal({ QRCode: qrcode, QRCodeUrl: fullData, showModal: !noPopup });
     };
@@ -136,20 +135,21 @@ export const createConnector = ({
   // - Start the "connection timer" to auto-disconnect wcjs when session is expired
   // - Trigger wallet event for "session_update" (let the wallet know)
   const resumeResumeEvent = () => {
-    const connectionEST = Date.now();
+    const connectionEST = state.connectionEST;
     const connectionEXP = state.connectionEXP;
+    const connectionDateValue =
+      !!connectionEST && !!connectionEXP && connectionEST < connectionEXP;
     const connected = newConnector.connected;
-    // If we're already connected but the session is expired, kill it
-    if (connected && (!connectionEXP || connectionEST >= connectionEXP))
-      newConnector.killSession();
-    else {
+    const connectionValid = connectionDateValue && connected;
+    // Connection already exists and is not expired
+    if (connectionValid) {
       setState({
         connector: newConnector,
       });
       broadcast(WINDOW_MESSAGES.CONNECTED, {
         data: {
           connectionEST,
-          connectionEXP: connectionEXP || 0,
+          connectionEXP,
           connectionType: CONNECTION_TYPES.existing_session,
         },
       });
@@ -157,6 +157,10 @@ export const createConnector = ({
       const { walletAppId } = getState();
       if (walletAppId)
         sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
+    }
+    // If we're already connected but the session is expired (or times are missing), kill it
+    else if (connected && !connectionDateValue) {
+      newConnector.killSession();
     }
   };
 

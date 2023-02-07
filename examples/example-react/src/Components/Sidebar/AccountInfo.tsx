@@ -20,6 +20,16 @@ const RowInfoTitle = styled.p`
   flex-basis: 100%;
   margin-bottom: 2px;
 `;
+const RowClickItem = styled.p`
+  font-weight: 700;
+  font-size: 0.8rem;
+  user-select: none;
+  flex-basis: 100%;
+  margin-bottom: 2px;
+  color: ${COLORS.PRIMARY_400};
+  cursor: pointer;
+  font-style: italic;
+`;
 const RowInfoValue = styled.div`
   display: flex;
   align-items: flex-start;
@@ -37,6 +47,10 @@ export const AccountInfo: React.FC = () => {
   } = walletConnectState;
   const { name: walletName } = walletInfo;
   const groupAddress = representedGroupPolicy?.address;
+
+  const logCurrentState = () => {
+    console.log('walletConnectState: ', walletConnectState);
+  };
 
   return (
     <>
@@ -86,6 +100,11 @@ export const AccountInfo: React.FC = () => {
           </>
         </RowInfo>
       ) : null}
+      {walletConnectState && (
+        <RowInfo>
+          <RowClickItem onClick={logCurrentState}>Log current state</RowClickItem>
+        </RowInfo>
+      )}
     </>
   );
 };
