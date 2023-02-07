@@ -75,7 +75,7 @@ const WalletConnectContextProvider: React.FC<Props> = ({
         walletConnectService.handleLocalStorageChange
       );
       // Whenever we change the react state, update the class state
-      walletConnectService.setStateUpdater(setWalletConnectState);
+      walletConnectService.setContextUpdater(setWalletConnectState);
     }
   }, [initialLoad, walletConnectService]);
 

@@ -12,7 +12,9 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
   - Results of methods (other than `connect` can now all use `await`)
     - eg: `const result = await walletConnectService.signHexMessage('test');` 
   - Removed `generateAutoConnectUrl` method.  Will revisit at a later time
-  - Removed `setState` and `resetState` methods
+  - Removed `setState`, `resetState`, `removeAllListeners` and `on` methods
+    - `addListener` should be use in place of `on`
+    - `removeListener('all')` should be used in place of `removeAllListeners`
 - `walletConnectState` shape changed
   - `connected` is now `status` which can be `"connected"`, `"disconnected"`, or `"pending"`
   - `walletApp` is now `walletAppId`

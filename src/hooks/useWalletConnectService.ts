@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from 'react'; // eslint-disable-line impo
 import { WalletConnectService } from '../services';
 
 export const useWalletConnectService = () => {
-  const walletConnectService = useRef(new WalletConnectService()).current // Note: Why does wallet-lib use "useRef" here?
-  const [walletConnectState, setWalletConnectState] = useState({ ...walletConnectService.state });
+  const walletConnectService = useRef(new WalletConnectService()).current; // Note: Why does wallet-lib use "useRef" here?
+  const [walletConnectState, setWalletConnectState] = useState({
+    ...walletConnectService.state,
+  });
 
   useEffect(() => {
-    walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
+    walletConnectService.setContextUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
 
-    return () => walletConnectService.removeAllListeners();
+    return () => walletConnectService.removeListener('all');
   }, [walletConnectService]);
 
   return { walletConnectState, walletConnectService };

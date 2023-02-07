@@ -35,7 +35,10 @@ export interface WCSState {
 
 type WCSSetStateParam = WCSState & { connector?: WalletConnectClient };
 
-export type WCSSetState = (state: Partial<WCSSetStateParam>) => void;
+export type WCSSetState = (
+  state: Partial<WCSSetStateParam>,
+  updateLocalStorage?: boolean
+) => void;
 export type WCSSetFullState = (state: WCSState) => void;
 
 export interface WCJSLocalState {
