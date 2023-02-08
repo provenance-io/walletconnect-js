@@ -299,33 +299,6 @@ export class WalletConnectService {
     }
   }
 
-  /**
-   *
-   * @param connectionTimeout (optional) Seconds to bump the connection timeout by
-   */
-  resetConnectionTimeout = (connectionTimeout?: number) => {
-    // Use the new (convert to ms) or existing connection timeout
-    const newConnectionTimeout = connectionTimeout
-      ? connectionTimeout * 1000
-      : this.state.connectionTimeout;
-    // Kill the last timer (if it exists)
-    this.#clearConnectionTimer();
-    // Build a new connectionEXP (Iat + connectionTimeout)
-    const connectionEXP = newConnectionTimeout + Date.now();
-    // Save these new values (needed for session restore functionality/page refresh)
-    this.#setState({ connectionTimeout: newConnectionTimeout, connectionEXP });
-    // Start a new timer
-    this.#startConnectionTimer();
-    // Send connected wallet custom event with the new connection details
-    if (this.state.walletAppId) {
-      sendWalletEvent(
-        this.state.walletAppId,
-        WALLET_APP_EVENTS.RESET_TIMEOUT,
-        newConnectionTimeout
-      );
-    }
-  };
-
   // One or more values within localStorage have changed, see if we care about any of the values and update the state as needed
   handleLocalStorageChange = (storageEvent: StorageEvent) => {
     const { key: storageEventKey, newValue, oldValue } = storageEvent;
@@ -409,6 +382,33 @@ export class WalletConnectService {
     )
       status = 'disconnected';
     this.#setState({ modal: newModal, status });
+  };
+
+  /**
+   *
+   * @param connectionTimeout (optional) Seconds to bump the connection timeout by
+   */
+  resetConnectionTimeout = (connectionTimeout?: number) => {
+    // Use the new (convert to ms) or existing connection timeout
+    const newConnectionTimeout = connectionTimeout
+      ? connectionTimeout * 1000
+      : this.state.connectionTimeout;
+    // Kill the last timer (if it exists)
+    this.#clearConnectionTimer();
+    // Build a new connectionEXP (Iat + connectionTimeout)
+    const connectionEXP = newConnectionTimeout + Date.now();
+    // Save these new values (needed for session restore functionality/page refresh)
+    this.#setState({ connectionTimeout: newConnectionTimeout, connectionEXP });
+    // Start a new timer
+    this.#startConnectionTimer();
+    // Send connected wallet custom event with the new connection details
+    if (this.state.walletAppId) {
+      sendWalletEvent(
+        this.state.walletAppId,
+        WALLET_APP_EVENTS.RESET_TIMEOUT,
+        newConnectionTimeout
+      );
+    }
   };
 
   /**

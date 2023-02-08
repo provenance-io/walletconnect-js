@@ -106,8 +106,8 @@ Holds current walletconnect-js state values
     address: '', // Wallet address [string]
     bridge: 'wss://figure.tech/service-wallet-connect-bridge/ws/external', // WalletConnect bridge used for connection [string]
     status: 'disconnected', // connection status connected ['connected', 'pending', 'disconnected]
-    connectionEat: null, // WalletConnect expires at time [number]
-    connectionIat: null, // WalletConnect initialized at time [number]
+    connectionEST: null, // WalletConnect expires at time [number]
+    connectionEXP: null, // WalletConnect initialized at time [number]
     connectionTimeout: 1800, // Default timeout duration (seconds)
     modal: { // QRCodeModal values
       showModal: false, // Should the QR modal be open [bool]
@@ -148,6 +148,7 @@ Used to call walletconnect-js methods
   | noPopup | boolean | no       | false | true | Should the QRCodeModal popup automatically on connect call |
   | address | string | no       | `''` | `tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh` | Required address for dApp connection |
   | prohibitGroups | boolean | no       | `false` | `true` | Prohibit group accounts from connecting to this dApp |
+  | jwtExpiration | number | no       | `''` | `3600` | Time from now in seconds to expire new JWT returned |
 
 - #### disconnect
 
