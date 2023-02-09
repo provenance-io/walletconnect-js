@@ -4,7 +4,6 @@
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
-  "module": "esm/index.js",
   "license": "Apache-2.0",
   "files": [
     "lib",

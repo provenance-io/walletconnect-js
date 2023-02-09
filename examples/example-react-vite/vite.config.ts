@@ -8,6 +8,6 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 export default defineConfig({
   plugins: [tsconfigPaths(), react(), nodePolyfills({ protocolImports: false })],
   define: {
-    'process.env': process.env,
+    APP_VERSION: JSON.stringify(process.env.npm_package_version),
   },
 });

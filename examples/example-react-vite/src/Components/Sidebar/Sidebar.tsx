@@ -6,7 +6,6 @@ import { COLORS } from 'theme';
 import { Countdowns } from './Countdowns';
 import { AccountInfo } from './AccountInfo';
 import { useState } from 'react';
-import packageJSON from '../../../package.json';
 
 const FullSidebar = styled.div<{ mobileShow: boolean }>`
   width: 200px;
@@ -103,7 +102,7 @@ export const Sidebar: React.FC = () => {
           target="_blank"
           rel="noreferrer"
         >
-          v{packageJSON.version || 'v?.?.?'}
+          v{APP_VERSION || 'v?.?.?'}
         </a>
       </MobileHeader>
       <FullSidebar
@@ -121,7 +120,7 @@ export const Sidebar: React.FC = () => {
             target="_blank"
             rel="noreferrer"
           >
-            v{packageJSON.version || 'v?.?.?'}
+            v{APP_VERSION || 'v?.?.?'}
           </Version>
         </SubtitleSection>
         {status === 'connected' && (
