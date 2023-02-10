@@ -28,6 +28,7 @@ export interface EventData {
   duration?: number;
   data?: WalletEventData;
   referral?: string;
+  redirectUrl?: string;
 }
 
 export interface Wallet {

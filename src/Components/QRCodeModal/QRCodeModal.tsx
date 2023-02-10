@@ -324,6 +324,7 @@ export const QRCodeModal: React.FC<Props> = ({
           uri: encodedQRCodeUrl,
           event: 'walletconnect_init',
           duration: connectionTimeout,
+          redirectUrl: window.location.href,
         };
         // Trigger the event action based on the wallet
         wallet.eventAction(eventData);

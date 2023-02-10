@@ -62,6 +62,8 @@ import {
   // Constants
   WALLET_LIST,
   WINDOW_MESSAGES,
+  CONNECTOR_EVENTS,
+  CONNECTION_TYPES,
   // Services/Providers
   useWalletConnect,
   useWalletConnectService,
