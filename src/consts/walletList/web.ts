@@ -23,9 +23,10 @@ export const webFigure = {
     const top = window.outerHeight / 2 + window.screenY - height / 2;
     const left = window.outerWidth / 2 + window.screenX - width / 2;
     const windowOptions = `popup=1 height=${height} width=${width} top=${top} left=${left} resizable=1, scrollbars=1, fullscreen=0, toolbar=0, menubar=0, status=1`;
-    // Redirect to Figure Connect page in new tab for connection requests
-    if (event === 'walletconnect_init' || event === 'walletconnect_event')
-      window.location.href = url;
+    // Redirect to connect page
+    if (event === 'walletconnect_init') window.location.href = url;
+    // Open popup for transactions and send message
+    if (event === 'walletconnect_event') window.open(url, undefined, windowOptions);
   },
 } as Wallet;
 
@@ -51,12 +52,9 @@ export const webFigureTest = {
     const top = window.outerHeight / 2 + window.screenY - height / 2;
     const left = window.outerWidth / 2 + window.screenX - width / 2;
     const windowOptions = `popup=1 height=${height} width=${width} top=${top} left=${left} resizable=1, scrollbars=1, fullscreen=0, toolbar=0, menubar=0, status=1`;
-    // Redirect to Figure Connect page in new tab for connection requests
-    // NEW TAB
-    // if (event === 'walletconnect_init') window.open(url);
-    // if (event === 'walletconnect_event') window.open(url, undefined, windowOptions);
-    // SAME PAGE REDIRECT
-    if (event === 'walletconnect_init' || event === 'walletconnect_event')
-      window.location.href = url;
+    // Redirect to connect page
+    if (event === 'walletconnect_init') window.location.href = url;
+    // Open popup for transactions and send message
+    if (event === 'walletconnect_event') window.open(url, undefined, windowOptions);
   },
 } as Wallet;
