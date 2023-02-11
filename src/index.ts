@@ -10,4 +10,5 @@ export type {
   BroadcastResult,
   ProvenanceMethod,
   WalletConnectServiceStatus,
+  ConnectProps,
 } from './types';

@@ -4,6 +4,7 @@ import type {
   Broadcast,
   BroadcastEvent,
   BroadcastResult,
+  ConnectProps,
   MethodSendMessageData,
   ModalData,
   WalletConnectClientType,
@@ -432,14 +433,7 @@ export class WalletConnectService {
     jwtExpiration,
     noPopup,
     prohibitGroups,
-  }: {
-    bridge?: string;
-    duration?: number;
-    noPopup?: boolean;
-    address?: string;
-    prohibitGroups?: boolean;
-    jwtExpiration?: number;
-  } = {}) => {
+  }: ConnectProps = {}) => {
     // Only create a new connector when we're not already connected
     if (this.state.status !== 'connected') {
       // Update the duration of this connection

@@ -42,3 +42,12 @@ export type ConnectData = {
     }
   ];
 };
+
+export type ConnectProps = {
+  bridge?: string;
+  duration?: number;
+  noPopup?: boolean;
+  address?: string;
+  prohibitGroups?: boolean;
+  jwtExpiration?: number;
+};
