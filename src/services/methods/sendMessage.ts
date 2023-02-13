@@ -1,7 +1,7 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import type {
   BroadcastResult,
-  MethodSendMessageData,
+  SendMessageMethod,
   WalletConnectClientType,
   WalletId,
   SendMessageResult,
@@ -12,7 +12,7 @@ import { rngNum } from '../../utils';
 interface SendMessage {
   address: string;
   connector?: WalletConnectClientType;
-  data: MethodSendMessageData;
+  data: SendMessageMethod;
   walletAppId?: WalletId;
 }
 

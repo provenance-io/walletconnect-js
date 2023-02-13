@@ -75,6 +75,7 @@ import {
   BroadcastResult,
   ProvenanceMethod,
   WalletConnectServiceStatus,
+  ConnectMethod,
 } from "@provenanceio/walletconnect-js";
 ```
 

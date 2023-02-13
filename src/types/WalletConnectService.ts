@@ -2,6 +2,8 @@ import WalletConnectClient from '@walletconnect/client';
 import type { IClientMeta } from './IClientMeta';
 import type { WalletId } from './WalletList';
 import type { AccountObject, MasterGroupPolicy, WalletInfo } from './ConnectData';
+import type { ProvenanceMethod } from './Broadcast';
+import type { GasPrice } from './GasPriceType';
 
 export type WalletConnectClientType = WalletConnectClient;
 
@@ -67,3 +69,25 @@ export interface WCLocalState {
 
 export type WCJSLocalStateKeys = keyof WCJSLocalState;
 export type WCLocalStateKeys = keyof WCLocalState;
+
+export interface ConnectMethod {
+  bridge?: string;
+  duration?: number;
+  noPopup?: boolean;
+  address?: string;
+  prohibitGroups?: boolean;
+  jwtExpiration?: number;
+}
+
+export interface SendMessageMethod {
+  message: string | string[];
+  description?: string;
+  method?: ProvenanceMethod;
+  gasPrice?: GasPrice;
+  feeGranter?: string;
+  feePayer?: string;
+  memo?: string;
+  timeoutHeight?: number;
+  extensionOptions?: string[];
+  nonCriticalExtensionOptions?: string[];
+}

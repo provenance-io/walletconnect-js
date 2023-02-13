@@ -4,7 +4,8 @@ import type {
   Broadcast,
   BroadcastEvent,
   BroadcastResult,
-  MethodSendMessageData,
+  ConnectMethod,
+  SendMessageMethod,
   ModalData,
   WalletConnectClientType,
   WalletConnectServiceStatus,
@@ -432,14 +433,7 @@ export class WalletConnectService {
     jwtExpiration,
     noPopup,
     prohibitGroups,
-  }: {
-    bridge?: string;
-    duration?: number;
-    noPopup?: boolean;
-    address?: string;
-    prohibitGroups?: boolean;
-    jwtExpiration?: number;
-  } = {}) => {
+  }: ConnectMethod = {}) => {
     // Only create a new connector when we're not already connected
     if (this.state.status !== 'connected') {
       // Update the duration of this connection
@@ -497,7 +491,7 @@ export class WalletConnectService {
     extensionOptions,
     nonCriticalExtensionOptions,
     memo,
-  }: MethodSendMessageData) => {
+  }: SendMessageMethod) => {
     // Loading while we wait for mobile to respond
     this.#setState({ pendingMethod: 'sendMessage' });
     const result = await sendMessageMethod({

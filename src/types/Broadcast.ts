@@ -1,22 +1,8 @@
-import type { GasPrice } from './GasPriceType';
-import { WCSState } from './WalletConnectService';
+import { WCSState, SendMessageMethod } from './WalletConnectService';
 import { ConnectData } from './ConnectData';
 import { WINDOW_MESSAGES } from '../consts';
 
 export type ProvenanceMethod = 'provenance_sign' | 'provenance_sendTransaction';
-
-export interface MethodSendMessageData {
-  message: string | string[];
-  description?: string;
-  method?: ProvenanceMethod;
-  gasPrice?: GasPrice;
-  feeGranter?: string;
-  feePayer?: string;
-  memo?: string;
-  timeoutHeight?: number;
-  extensionOptions?: string[];
-  nonCriticalExtensionOptions?: string[];
-}
 
 export type ConnectionType = 'existing session' | 'new session';
 
@@ -50,7 +36,7 @@ type BroadcastEventKeys = keyof typeof WINDOW_MESSAGES;
 export type BroadcastEvent = typeof WINDOW_MESSAGES[BroadcastEventKeys];
 
 type BroadcastResultData =
-  | MethodSendMessageData
+  | SendMessageMethod
   | MethodConnectData
   | MethodSignJWTData
   | number
