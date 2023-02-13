@@ -1,16 +1,13 @@
 export const WALLETCONNECT_BRIDGE_URL =
   'wss://figure.tech/service-wallet-connect-bridge/ws/external';
 
-// MOBILE WALLET FIREBASE KEYS/APIS
-// -- Provenance
-const FIREBASE_PROJECT_API_KEY_PROVENANCE =
-  'AIzaSyBNzgtDMBU_7Df1MjTGjHyj4_3pLYtdOY8';
-const FIREBASE_PROJECT_URL =
-  'https://firebasedynamiclinks.googleapis.com/v1/shortLinks';
-export const FIREBASE_FETCH_WALLET_URL_PROVENANCE = `${FIREBASE_PROJECT_URL}?key=${FIREBASE_PROJECT_API_KEY_PROVENANCE}`;
-// -- Figure
-const FIREBASE_PROJECT_API_KEY_FIGURE = 'AIzaSyDgxmYAGpQGHKCoJ3LW6CnD9B_utl3sLkY';
-export const FIREBASE_FETCH_WALLET_URL_FIGURE = `${FIREBASE_PROJECT_URL}?key=${FIREBASE_PROJECT_API_KEY_FIGURE}`;
+// FIGURE MOBILE WALLET DYNAMIC URLS
+export const DYNAMIC_LINK_FIGURE_MOBILE_URL = 'https://figurewallet.page.link';
+export const FIGURE_MOBILE_WALLET_CONNECT_URL = 'https://figure.com/wallet-connect';
+export const FIGURE_MOBILE_WALLET_APP_ID = '6444263900';
+export const FIGURE_MOBILE_WALLET_APP_ID_TEST = '6444293331';
+export const FIGURE_MOBILE_WALLET_PACKAGE_NAME = 'com.figure.mobile.wallet';
+export const FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST = 'com.figure.mobile.wallet.dev';
 
 // APP STORE ICONS
 export const APP_STORE_GOOGLE_PLAY_PROVENANCE =

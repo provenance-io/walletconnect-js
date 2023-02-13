@@ -1,81 +1,33 @@
 import { Wallet } from '../../types';
 import {
-  FIREBASE_FETCH_WALLET_URL_FIGURE,
-  FIREBASE_FETCH_WALLET_URL_PROVENANCE,
+  DYNAMIC_LINK_FIGURE_MOBILE_URL,
+  FIGURE_MOBILE_WALLET_CONNECT_URL,
+  FIGURE_MOBILE_WALLET_APP_ID,
+  FIGURE_MOBILE_WALLET_APP_ID_TEST,
+  FIGURE_MOBILE_WALLET_PACKAGE_NAME,
+  FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST,
 } from '../urls';
-import {
-  DYNAMIC_LINK_INFO_PROD_FIGURE,
-  DYNAMIC_LINK_INFO_TEST_FIGURE,
-  DYNAMIC_LINK_INFO_PROD_PROVENANCE,
-  DYNAMIC_LINK_INFO_TEST_PROVENANCE,
-} from '../dynamicLinkInfo';
 import { WALLET_APP_IDS } from '../walletAppIds';
-
-export const mobileProvenance = {
-  id: WALLET_APP_IDS.PROVENANCE_MOBILE,
-  type: 'mobile',
-  title: 'Provenance Mobile',
-  icon: 'provenance',
-  dev: true,
-  generateUrl: async (QRCodeUrl) => {
-    const url = FIREBASE_FETCH_WALLET_URL_PROVENANCE;
-    const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
-    const linkProd = `${DYNAMIC_LINK_INFO_PROD_PROVENANCE.link}?data=${linkData}`;
-    // First fetch prod, then dev
-    return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD_PROVENANCE, link: linkProd },
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ shortLink }) => shortLink)
-      .catch(() => 'unavailable');
-  },
-} as Wallet;
-
-export const mobileProvenanceTest = {
-  id: WALLET_APP_IDS.PROVENANCE_MOBILE_TEST,
-  type: 'mobile',
-  title: 'Provenance Mobile (Test)',
-  icon: 'provenance',
-  dev: true,
-  generateUrl: async (QRCodeUrl) => {
-    const url = FIREBASE_FETCH_WALLET_URL_PROVENANCE;
-    const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
-    const linkProd = `${DYNAMIC_LINK_INFO_TEST_PROVENANCE.link}?data=${linkData}`;
-    // First fetch prod, then dev
-    return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_TEST_PROVENANCE, link: linkProd },
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ shortLink }) => shortLink)
-      .catch(() => 'unavailable');
-  },
-} as Wallet;
 
 export const mobileFigure = {
   id: WALLET_APP_IDS.FIGURE_MOBILE,
   type: 'mobile',
   title: 'Figure Mobile',
   icon: 'figure',
-  generateUrl: async (QRCodeUrl) => {
-    const url = FIREBASE_FETCH_WALLET_URL_FIGURE;
-    const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
-    const linkProd = `${DYNAMIC_LINK_INFO_PROD_FIGURE.link}?data=${linkData}`;
-    // First fetch prod, then dev
-    return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_PROD_FIGURE, link: linkProd },
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ shortLink }) => shortLink)
-      .catch(() => 'unavailable');
+  generateUrl: (QRCodeUrl) => {
+    const doubleEncodedWCData = encodeURIComponent(encodeURIComponent(QRCodeUrl));
+    const finalUrl = new URL(DYNAMIC_LINK_FIGURE_MOBILE_URL);
+    const linkParam = `${FIGURE_MOBILE_WALLET_CONNECT_URL}?data=${doubleEncodedWCData}`;
+    const apnParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME;
+    const ibiParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME;
+    const isiParam = FIGURE_MOBILE_WALLET_APP_ID;
+    const efrParam = '1';
+    finalUrl.searchParams.append('link', linkParam);
+    finalUrl.searchParams.append('apn', apnParam);
+    finalUrl.searchParams.append('ibi', ibiParam);
+    finalUrl.searchParams.append('isi', isiParam);
+    finalUrl.searchParams.append('efr', efrParam);
+    return finalUrl.toString();
   },
 } as Wallet;
 
@@ -84,19 +36,19 @@ export const mobileFigureTest = {
   type: 'mobile',
   title: 'Figure Mobile (Test)',
   icon: 'figure',
-  generateUrl: async (QRCodeUrl) => {
-    const url = FIREBASE_FETCH_WALLET_URL_FIGURE;
-    const linkData = encodeURIComponent(decodeURIComponent(QRCodeUrl));
-    const linkProd = `${DYNAMIC_LINK_INFO_TEST_FIGURE.link}?data=${linkData}`;
-    // First fetch prod, then dev
-    return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        dynamicLinkInfo: { ...DYNAMIC_LINK_INFO_TEST_FIGURE, link: linkProd },
-      }),
-    })
-      .then((response) => response.json())
-      .then(({ shortLink }) => shortLink)
-      .catch(() => 'unavailable');
+  generateUrl: (QRCodeUrl) => {
+    const doubleEncodedWCData = encodeURIComponent(encodeURIComponent(QRCodeUrl));
+    const finalUrl = new URL(DYNAMIC_LINK_FIGURE_MOBILE_URL);
+    const linkParam = `${FIGURE_MOBILE_WALLET_CONNECT_URL}?data=${doubleEncodedWCData}`;
+    const apnParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST;
+    const ibiParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST;
+    const isiParam = FIGURE_MOBILE_WALLET_APP_ID_TEST;
+    const efrParam = '1';
+    finalUrl.searchParams.append('link', linkParam);
+    finalUrl.searchParams.append('apn', apnParam);
+    finalUrl.searchParams.append('ibi', ibiParam);
+    finalUrl.searchParams.append('isi', isiParam);
+    finalUrl.searchParams.append('efr', efrParam);
+    return finalUrl.toString();
   },
 } as Wallet;
