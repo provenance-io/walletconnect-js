@@ -6,6 +6,7 @@ import { COLORS } from 'theme';
 interface StyledProps {
   disabled?: boolean;
   labelClick?: boolean;
+  background?: string;
 }
 
 const CheckboxContainer = styled.div<StyledProps>`
@@ -20,7 +21,8 @@ const CheckboxContainer = styled.div<StyledProps>`
 const StyledCheckbox = styled.div<StyledProps>`
   height: 20px;
   width: 20px;
-  border: 2px solid ${COLORS.PRIMARY_500};
+  border: ${({ background }) =>
+    `2px solid ${background ? background : COLORS.PRIMARY_500}`};
   border-radius: 2px;
   position: relative;
   display: flex;
@@ -36,8 +38,8 @@ const StyledCheckbox = styled.div<StyledProps>`
     cursor: not-allowed;
   }
 `;
-const Label = styled.label`
-  color: ${COLORS.NEUTRAL_500};
+const Label = styled.label<{ color?: string }>`
+  color: ${({ color }) => (color ? color : COLORS.NEUTRAL_500)};
   font-size: 1.4rem;
   font-weight: 500;
   line-height: 2.24rem;
@@ -48,6 +50,8 @@ const Label = styled.label`
 
 interface Props {
   checked?: boolean;
+  background?: string;
+  color?: string;
   onChange: (e: any) => void;
   label?: string;
   className?: string;
@@ -57,10 +61,12 @@ interface Props {
 
 export const Checkbox: React.FC<Props> = ({
   checked,
+  background,
   onChange,
   label,
   className,
   disabled,
+  color,
   labelClick = true,
   ...rest
 }) => {
@@ -80,12 +86,21 @@ export const Checkbox: React.FC<Props> = ({
         if (labelClick) handleClick();
       }}
     >
-      <StyledCheckbox onClick={handleClick} disabled={disabled} tabIndex={0}>
+      <StyledCheckbox
+        onClick={handleClick}
+        disabled={disabled}
+        tabIndex={0}
+        background={background}
+      >
         {checked && (
-          <Sprite icon={ICON_NAMES.CHECK} size="1.8rem" color={COLORS.PRIMARY_600} />
+          <Sprite
+            icon={ICON_NAMES.CHECK}
+            size="1.8rem"
+            color={background ? background : COLORS.PRIMARY_600}
+          />
         )}
       </StyledCheckbox>
-      {label && <Label>{label}</Label>}
+      {label && <Label color={color}>{label}</Label>}
     </CheckboxContainer>
   );
 };

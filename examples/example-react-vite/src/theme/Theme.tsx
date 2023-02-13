@@ -7,12 +7,12 @@ import { SpriteSheet } from 'Components';
 import { BaseTypographyLoader, FONTS } from './fonts';
 import { COLORS } from './colors';
 
-export const baseTheme: DefaultTheme = {
+const baseTheme: DefaultTheme = {
   colors: { ...COLORS },
   fonts: { ...FONTS },
 };
 
-export const GlobalStyles = createGlobalStyle`
+const GlobalStyles = createGlobalStyle`
   ${normalize}
 
   // React local causes iframe when error process is not defined shows up.
@@ -64,10 +64,10 @@ export const GlobalStyles = createGlobalStyle`
   }
 `;
 
-export type ThemeProps = {
+interface ThemeProps {
   children: ReactNode;
   theme?: object;
-};
+}
 
 export const Theme = ({ children, theme = {} }: ThemeProps) => (
   <ThemeProvider theme={{ ...baseTheme, ...theme }}>

@@ -1,18 +1,20 @@
 import styled from 'styled-components';
-import { Navigation, Sprite } from 'Components';
+import { useCallback, useEffect, useState } from 'react';
+import { Navigation, Sprite, Checkbox } from 'Components';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { CONNECT_URL, ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
+import { handleLocalStorageChange } from 'utils';
 import { Countdowns } from './Countdowns';
 import { AccountInfo } from './AccountInfo';
-import { useState } from 'react';
 
 const FullSidebar = styled.div<{ mobileShow: boolean }>`
   width: 200px;
   height: 100%;
   overflow-y: auto;
   padding-bottom: 6px;
-  background: white;
+  background: ${COLORS.WHITE};
+  color: ${COLORS.NEUTRAL_500};
   position: fixed;
   top: 0;
   left: 0;
@@ -23,11 +25,15 @@ const FullSidebar = styled.div<{ mobileShow: boolean }>`
     padding-top: 40px;
     box-shadow: ${COLORS.BLACK_10} 4px 0px 8px;
   }
+  a {
+    color: ${COLORS.PRIMARY_500};
+  }
 `;
 const MobileHeader = styled.div`
   display: none;
   background: ${COLORS.WHITE};
-  padding: 10px 40px;
+  color: ${COLORS.NEUTRAL_500};
+  padding: 10px 20px;
   justify-content: space-between;
   align-items: center;
   position: relative;
@@ -38,6 +44,7 @@ const MobileHeader = styled.div`
   }
   div,
   a {
+    color: ${COLORS.PRIMARY_500};
     font-size: 2rem;
     @media screen and (max-width: 500px) {
       font-size: 1.5rem;
@@ -47,6 +54,7 @@ const MobileHeader = styled.div`
     cursor: pointer;
     user-select: none;
     transition: 250ms all;
+    margin-right: 20px;
   }
 `;
 
@@ -58,31 +66,79 @@ const SubtitleSection = styled.div`
   margin-bottom: 80px;
 `;
 const Subtitle = styled.p`
-  color: ${COLORS.NEUTRAL_650};
   font-size: 1.4rem;
   max-width: 100%;
   text-shadow: 0px 0px 4px ${COLORS.BLACK_20};
   a {
-    color: ${COLORS.NEUTRAL_650};
+    color: inherit;
   }
 `;
 const Version = styled.a`
   font-size: 1rem;
   width: 100%;
+  margin-top: 10px;
   font-weight: bold;
 `;
 const RowSplitter = styled.div`
   margin: 22px 40px 28px 40px;
   border-bottom: 1px solid ${COLORS.NEUTRAL_200};
 `;
+const ExtraSettings = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 0 20px;
+`;
+const SettingRow = styled.div``;
 
 export const Sidebar: React.FC = () => {
   const { walletConnectState } = useWalletConnect();
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
+  const [loggingActive, setLoggingActive] = useState(false);
+  const [nightmode, setNightmode] = useState(false);
   const { status } = walletConnectState;
+  const version = `v${APP_VERSION || 'v?.?.?'}`;
 
-  const toggleMobileSidebar = (status?: boolean) => {
+  // Hack: At some later point should implement a real thememing system, for now, the white background just needs a way to be disabled
+  const changeBackground = useCallback((currentNightmode: boolean) => {
+    if (currentNightmode) {
+      document.documentElement.style.filter = 'invert(100%)';
+    } else {
+      document.documentElement.style.filter = 'invert(0%)';
+    }
+  }, []);
+
+  useEffect(() => {
+    changeBackground(nightmode);
+  }, [nightmode]);
+
+  // When mobile, open/close the sidebar with menu hamburger click
+  const toggleMobileSidebar = () => {
     setShowSidebarMobile(!showSidebarMobile);
+  };
+
+  const destroyLoggingEvents = () => {
+    window.removeEventListener('storage', handleLocalStorageChange, true);
+  };
+
+  const createLoggingEvents = () => {
+    // Destroy the event incase it's already created
+    destroyLoggingEvents();
+    // Create event listener for localStorage changes
+    window.addEventListener('storage', handleLocalStorageChange, true);
+  };
+
+  const handleLoggingChange = (newToggleValue: boolean) => {
+    // Logging turned on
+    if (newToggleValue) {
+      setLoggingActive(true);
+      createLoggingEvents();
+    }
+    // Logging turned off
+    else {
+      setLoggingActive(false);
+      destroyLoggingEvents();
+    }
   };
 
   return (
@@ -92,7 +148,7 @@ export const Sidebar: React.FC = () => {
           icon={ICON_NAMES.HAMBURGER}
           size="4rem"
           onClick={toggleMobileSidebar}
-          spin={showSidebarMobile ? 15 : 0}
+          color={showSidebarMobile ? COLORS.PRIMARY_500 : COLORS.NEUTRAL_500}
         />
         <div>
           <a href={CONNECT_URL}>WalletConnect-JS Example App</a>
@@ -102,12 +158,12 @@ export const Sidebar: React.FC = () => {
           target="_blank"
           rel="noreferrer"
         >
-          v{APP_VERSION || 'v?.?.?'}
+          {version}
         </a>
       </MobileHeader>
       <FullSidebar
         mobileShow={showSidebarMobile}
-        onClick={() => {
+        onBlur={() => {
           setShowSidebarMobile(false);
         }}
       >
@@ -120,7 +176,7 @@ export const Sidebar: React.FC = () => {
             target="_blank"
             rel="noreferrer"
           >
-            v{APP_VERSION || 'v?.?.?'}
+            {version}
           </Version>
         </SubtitleSection>
         {status === 'connected' && (
@@ -132,6 +188,22 @@ export const Sidebar: React.FC = () => {
           </>
         )}
         <Navigation />
+        <ExtraSettings>
+          <SettingRow>
+            <Checkbox
+              checked={loggingActive}
+              onChange={handleLoggingChange}
+              label="Logging"
+            />
+          </SettingRow>
+          <SettingRow>
+            <Checkbox
+              checked={nightmode}
+              onChange={setNightmode}
+              label="Nightmode"
+            />
+          </SettingRow>
+        </ExtraSettings>
       </FullSidebar>
     </>
   );

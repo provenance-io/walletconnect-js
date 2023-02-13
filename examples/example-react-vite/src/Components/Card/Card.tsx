@@ -73,7 +73,7 @@ export const Card: React.FC<Props> = ({
   bannerName = 'figureEarth',
 }) => {
   return (
-    <CardContainer>
+    <CardContainer id="actionCard">
       <Banner bannerName={bannerName} />
       <Content>
         {logoIcon && (
