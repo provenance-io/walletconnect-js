@@ -6,6 +6,7 @@ import type {
   BroadcastResult,
   ConnectMethod,
   SendMessageMethod,
+  SendWalletMessageMethod,
   ModalData,
   WalletConnectClientType,
   WalletConnectServiceStatus,
@@ -28,6 +29,7 @@ import {
 import {
   connect as connectMethod,
   sendMessage as sendMessageMethod,
+  sendWalletMessage as sendWalletMessageMethod,
   signJWT as signJWTMethod,
   signHexMessage as signHexMessageMethod,
 } from './methods';
@@ -517,6 +519,45 @@ export class WalletConnectService {
     const windowMessage = result.error
       ? WINDOW_MESSAGES.SEND_MESSAGE_FAILED
       : WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.resetConnectionTimeout();
+
+    return result;
+  };
+
+  /**
+   *
+   * @param action Wallet Message action
+   * @param payload JSON payload for wallet to handle
+   * @param description (optional) Additional information for wallet to display
+   * @param method (optional) What method is used to send this message
+   */
+  sendWalletMessage = async ({
+                         action,
+                         payload,
+                         description,
+                         method,
+                       }: SendWalletMessageMethod) => {
+    // Loading while we wait for mobile to respond
+    this.#setState({ pendingMethod: 'sendWalletMessage' });
+    const result = await sendWalletMessageMethod({
+      connector: this.#connector,
+      walletAppId: this.state.walletAppId,
+      setState: this.#setState,
+      data: {
+        action,
+        payload,
+        description,
+        method,
+      },
+    });
+    // No longer loading
+    this.#setState({ pendingMethod: '' });
+    // Broadcast result of method
+    const windowMessage = result.error
+        ? WINDOW_MESSAGES.SEND_WALLET_MESSAGE_FAILED
+        : WINDOW_MESSAGES.SEND_WALLET_MESSAGE_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();

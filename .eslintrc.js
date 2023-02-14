@@ -78,4 +78,7 @@ module.exports = {
       },
     },
   },
+  parserOptions: {
+    project: ["tsconfig.json","examples/example-react-vite/tsconfig.json"]
+  }
 };

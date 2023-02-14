@@ -1,4 +1,8 @@
-import { WCSState, SendMessageMethod } from './WalletConnectService';
+import {
+  WCSState,
+  SendMessageMethod,
+  SendWalletMessageMethod
+} from './WalletConnectService';
 import { ConnectData } from './ConnectData';
 import { WINDOW_MESSAGES } from '../consts';
 
@@ -37,6 +41,7 @@ export type BroadcastEvent = typeof WINDOW_MESSAGES[BroadcastEventKeys];
 
 type BroadcastResultData =
   | SendMessageMethod
+  | SendWalletMessageMethod
   | MethodConnectData
   | MethodSignJWTData
   | number

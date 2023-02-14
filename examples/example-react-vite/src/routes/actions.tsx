@@ -4,12 +4,14 @@ import {
   SIGN_JWT_URL,
   SIGN_HEX_MESSAGE_URL,
   SEND_COIN_URL,
+  SEND_WALLET_MESSAGE_URL,
 } from 'consts';
 import {
   ResetConnectionTimeout,
   SendMessage,
   SignJWT,
   SignHexMessage,
+  SendWalletMessage,
   SendCoin,
 } from 'Page';
 
@@ -21,6 +23,11 @@ export const RESET_CONNECTION = {
 export const SEND_MESSAGE = {
   path: SEND_MESSAGE_URL,
   element: <SendMessage />,
+};
+
+export const SEND_WALLET_MESSAGE = {
+  path: SEND_WALLET_MESSAGE_URL,
+  element: <SendWalletMessage />,
 };
 
 export const SIGN_JWT = {

@@ -33,6 +33,40 @@ export const ALL_ACTIONS: Action[] = [
       },
     ],
   },
+  {
+    icon: ICON_NAMES.GEAR,
+    name: 'Send Wallet Message',
+    windowMessage: 'SEND_WALLET_MESSAGE',
+    method: 'sendWalletMessage',
+    description: 'Pass along a plain JSON message to the wallet w/o broadcast or signing.',
+    fields: [
+      {
+        name: 'payload',
+        label: 'JSON Message',
+        value: '',
+        placeholder: 'JSON Message',
+      },
+      {
+        name: 'action',
+        label: 'Action',
+        value: '',
+        placeholder: 'Action',
+      },
+      {
+        name: 'method',
+        label: 'Message method',
+        value: 'provenance_sendTransaction',
+        placeholder: 'Enter the message method',
+      },
+      {
+        name: 'description',
+        label: 'Wallet message description (Optional)',
+        value: '',
+        placeholder: 'Enter message description',
+      },
+    ],
+  },
+
   // ------------------------------
   // Sign JWT Method/Action
   // ------------------------------
