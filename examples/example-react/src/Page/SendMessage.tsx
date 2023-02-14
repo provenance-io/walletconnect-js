@@ -14,15 +14,16 @@ const TestMessage = styled.span`
 `;
 
 export const SendMessage: React.FC = () => {
+  const sendTransaction = 'provenance_sendTransaction';
+  const walletMessage = 'wallet_message';
   const [b64Message, setB64Message] = useState('');
   const [message, setMessage] = useState('');
   const [description, setDescription] = useState('');
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
-  const [method, setMethod] = useState<ProvenanceMethod>(
-    'provenance_sendTransaction'
-  );
+  const [method, setMethod] = useState<ProvenanceMethod>(sendTransaction);
+
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
@@ -30,9 +31,10 @@ export const SendMessage: React.FC = () => {
 
 
   const disableSubmit = () => {
-    return ((!b64Message && !message) || !method) ||
-          ((!!b64Message && !!message)) ||
-          (!!message && !isJSON(message));
+    return (!!b64Message && method !== sendTransaction) ||
+           (!b64Message && method === sendTransaction) ||
+           (!!message && !isJSON(message) && method !== walletMessage) ||
+           (!message && method === walletMessage);
   }
 
   const handleSubmit = async () => {
@@ -55,22 +57,22 @@ export const SendMessage: React.FC = () => {
     });
   };
 
-  const messageError = () => {
-    if (!!b64Message && !!message) {
-      return 'Only 1 of Base 64 Encoded Message or Plain Message allowed.';
-    }
-    if (!isJSON(message)) {
-      return 'Not valid JSON.';
+  const b64MessageValidator = () => {
+    if(!!b64Message && method !== sendTransaction) {
+      return 'Message Method must be provenance_sendTransaction when using Base64 encoded message.';
     }
     return '';
   }
 
-  const methodError = () => {
-    if(!method) {
-      return 'Method must be entered';
+  const jsonMessageValidator = () => {
+    if (!!b64Message && !!message) {
+      return 'Only 1 of Base 64 Encoded Message or Plain Message allowed.';
     }
-    if(method === customMethod) {
-      return 'Invalid method. Select a Common Method Message or enter a custom method in Send Message Method.';
+    if (!!message && method !== walletMessage) {
+      return `Message Method must be wallet_message when using Plain JSON message.`;
+    }
+    if (!isJSON(message)) {
+      return 'Not valid JSON.';
     }
     return '';
   }
@@ -113,6 +115,7 @@ export const SendMessage: React.FC = () => {
         onChange={setB64Message}
         bottomGap
         disabled={sendMessageLoading}
+        error={b64MessageValidator()}
       />
       <Input
           width="100%"
@@ -122,28 +125,18 @@ export const SendMessage: React.FC = () => {
           onChange={setMessage}
           bottomGap
           disabled={sendMessageLoading}
-          error={messageError()}
+          error={jsonMessageValidator()}
       />
       <Dropdown
         value={method}
-        label="Common Message Methods"
+        label="Message Method"
         onChange={setMethod}
         bottomGap
-        options={[customMethod,'provenance_sign', 'provenance_sendTransaction']}
+        options={['wallet_message','provenance_sendTransaction']}
       />
-      <Input
-          value={method}
-          label="Send Message Method"
-          placeholder="Enter Message Method"
-          onChange={setMethod}
-          bottomGap
-          disabled={sendMessageLoading}
-          error={methodError()}
-      />
-
       <Input
         value={description}
-        label="Wallet message description (Optional)"
+        label="Message description (Optional)"
         placeholder="Enter message description"
         onChange={setDescription}
         bottomGap

@@ -2,7 +2,7 @@ import { WCSState, SendMessageMethod } from './WalletConnectService';
 import { ConnectData } from './ConnectData';
 import { WINDOW_MESSAGES } from '../consts';
 
-export type ProvenanceMethod = 'provenance_sign' | 'provenance_sendTransaction' | string;
+export type ProvenanceMethod = 'provenance_sign' | 'provenance_sendTransaction' | 'wallet_message';
 
 export type ConnectionType = 'existing session' | 'new session';
 
