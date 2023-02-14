@@ -14,6 +14,7 @@ const TestMessage = styled.span`
 `;
 
 export const SendMessage: React.FC = () => {
+  const [b64Message, setB64Message] = useState('');
   const [message, setMessage] = useState('');
   const [description, setDescription] = useState('');
   const [results, setResults] = useState<{
@@ -27,12 +28,19 @@ export const SendMessage: React.FC = () => {
   const { pendingMethod } = walletConnectState;
   const sendMessageLoading = pendingMethod === 'sendMessage';
 
+
+  const disableSubmit = () => {
+    return ((!b64Message && !message) || !method) ||
+          ((!!b64Message && !!message)) ||
+          (!!message && !isJSON(message));
+  }
+
   const handleSubmit = async () => {
     // Convert input string value to number for price
     const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
 
     const result = await wcs.sendMessage({
-      message,
+      message: !!message ? message : b64Message,
       description,
       gasPrice: finalGasData,
       method,
@@ -47,8 +55,39 @@ export const SendMessage: React.FC = () => {
     });
   };
 
+  const messageError = () => {
+    if (!!b64Message && !!message) {
+      return 'Only 1 of Base 64 Encoded Message or Plain Message allowed.';
+    }
+    if (!isJSON(message)) {
+      return 'Not valid JSON.';
+    }
+    return '';
+  }
+
+  const methodError = () => {
+    if(!method) {
+      return 'Method must be entered';
+    }
+    if(method === customMethod) {
+      return 'Invalid method. Select a Common Method Message or enter a custom method in Send Message Method.';
+    }
+    return '';
+  }
+
+  const isJSON = (data:string) => {
+    try {
+      if(!!data) {
+        JSON.parse(data);
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   const clickUseSampleButton = () => {
-    setMessage(
+    setB64Message(
       'ChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEmwKKXRwMWtuc3hmbm4wbHE0OG1tbmtmbmtndGtrOHFueHhkdTB5MnRrbGtoEil0cDFrbnN4Zm5uMGxxNDhtbW5rZm5rZ3Rrazhxbnh4ZHUweTJ0a2xraBoUCgVuaGFzaBILMTAwMDAwMDAwMDA='
     );
   };
@@ -57,7 +96,7 @@ export const SendMessage: React.FC = () => {
     <ActionCard
       icon={ICON_NAMES.GEAR}
       title="Send Message"
-      description="Pass along an encoded base64 message to the wallet"
+      description="Pass along a message to the wallet"
       status={results?.status}
     >
       <TestMessage
@@ -68,20 +107,40 @@ export const SendMessage: React.FC = () => {
       </TestMessage>
       <Input
         width="100%"
-        value={message}
+        value={b64Message}
         label="Base64 Encoded Message"
         placeholder="Enter Base64 Encoded Message"
-        onChange={setMessage}
+        onChange={setB64Message}
         bottomGap
         disabled={sendMessageLoading}
       />
+      <Input
+          width="100%"
+          value={message}
+          label="Plain JSON Message"
+          placeholder="Plain Message"
+          onChange={setMessage}
+          bottomGap
+          disabled={sendMessageLoading}
+          error={messageError()}
+      />
       <Dropdown
         value={method}
-        label="Message method"
+        label="Common Message Methods"
         onChange={setMethod}
         bottomGap
-        options={['provenance_sign', 'provenance_sendTransaction']}
+        options={[customMethod,'provenance_sign', 'provenance_sendTransaction']}
       />
+      <Input
+          value={method}
+          label="Send Message Method"
+          placeholder="Enter Message Method"
+          onChange={setMethod}
+          bottomGap
+          disabled={sendMessageLoading}
+          error={methodError()}
+      />
+
       <Input
         value={description}
         label="Wallet message description (Optional)"
@@ -94,7 +153,7 @@ export const SendMessage: React.FC = () => {
       <Button
         loading={sendMessageLoading}
         onClick={handleSubmit}
-        disabled={!message || !method}
+        disabled={disableSubmit()}
       >
         Submit
       </Button>
