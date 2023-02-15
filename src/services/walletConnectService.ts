@@ -528,7 +528,7 @@ export class WalletConnectService {
 
   /**
    *
-   * @param action Wallet Message action
+   * @param action Wallet Action that the wallet should take (e.g. `switchToGroup`)
    * @param payload JSON payload for wallet to handle
    * @param description (optional) Additional information for wallet to display
    * @param method (optional) What method is used to send this message
@@ -544,7 +544,6 @@ export class WalletConnectService {
     const result = await sendWalletActionMethod({
       connector: this.#connector,
       walletAppId: this.state.walletAppId,
-      setState: this.#setState,
       data: {
         action,
         payload,

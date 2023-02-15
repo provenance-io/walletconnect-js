@@ -2,7 +2,6 @@ import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts
 import { rngNum } from '../../utils';
 import type {
   BroadcastResult,
-  WCSSetState,
   WalletConnectClientType,
   WalletId,
   SendWalletActionMethod,
@@ -11,17 +10,14 @@ import type {
 interface SendWalletAction {
   connector?: WalletConnectClientType;
   data: SendWalletActionMethod;
-  setState: WCSSetState;
   walletAppId?: WalletId;
 }
 
 export const sendWalletAction = async ({
                                 connector,
-                                setState,
                                 walletAppId,
                                 data,
                               }: SendWalletAction): Promise<BroadcastResult> => {
-  let valid = false;
   const {
     description = 'Send Wallet Action',
     method = PROVENANCE_METHODS.action,
@@ -40,7 +36,7 @@ export const sendWalletAction = async ({
     method,
     params: [metadata],
   };
-  if (!connector) return { valid, data, request, error: 'No wallet connected' };
+  if (!connector) return { valid: false, data, request, error: 'No wallet connected' };
 
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
@@ -52,24 +48,16 @@ export const sendWalletAction = async ({
       knownWalletApp.eventAction(eventData);
     }
 
-    console.dir(request);
     // send message
     const result = (await connector.sendCustomRequest(request));
 
-    console.dir(result);
-
-    // TODO what to do with Action response? Is it state altering or is that
-    // to be handled by a session update?
-
-    // TODO Update _thing_ within the wcjs state
-    //setState({ signedJWT });
     return {
-      valid,
+      valid: result,
       result,
       data,
       request,
     };
   } catch (error) {
-    return { valid, error: `${error}`, data, request };
+    return { valid: false, error: `${error}`, data, request };
   }
 };
