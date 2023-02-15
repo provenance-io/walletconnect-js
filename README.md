@@ -20,6 +20,7 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
   - `walletApp` is now `walletAppId`
   - `loading` is now `pendingMethod`
   - QRCode values now moved into `modal` state object
+    - `QRCode` is now `QRCodeImg`
   - Removed `account`, `figureConnected`, `newAccount`, and `connector` values
 - `QRCodeModal` wallet changes
   - Moved Provenance Blockchain wallets into `dev`
@@ -115,7 +116,7 @@ Holds current walletconnect-js state values
     modal: { // QRCodeModal values
       showModal: false, // Should the QR modal be open [bool]
       QRCodeUrl: '', // QRCode url contained within image [string]
-      QRCode: '', // QRCode image data to connect to WalletConnect bridge [string]
+      QRCodeImg: '', // QRCode image data to connect to WalletConnect bridge [string]
       isMobile: false, // Is the connected browser a mobile device [bool]
     },
     peer: {}, // Connected wallet info [object]

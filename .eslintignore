@@ -40,3 +40,4 @@ ignored/
 
 /scripts
 /figure-tech-walletconnect
+**/__tests__/**

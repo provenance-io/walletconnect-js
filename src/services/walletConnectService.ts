@@ -55,7 +55,7 @@ const defaultState: WCSState = {
   modal: {
     showModal: false,
     isMobile: isMobile(),
-    QRCode: '',
+    QRCodeImg: '',
     QRCodeUrl: '',
   },
   peer: null,

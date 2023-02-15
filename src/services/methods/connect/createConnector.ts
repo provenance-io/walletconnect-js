@@ -56,7 +56,7 @@ export const createConnector = ({
         : '';
       const fullData = `${data}${requiredAddressParam}${prohibitGroupsParam}${jwtExpirationParam}`;
       const qrcode = await QRCode.toDataURL(fullData);
-      updateModal({ QRCode: qrcode, QRCodeUrl: fullData, showModal: !noPopup });
+      updateModal({ QRCodeImg: qrcode, QRCodeUrl: fullData, showModal: !noPopup });
     };
 
     close = () => {

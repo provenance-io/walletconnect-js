@@ -12,7 +12,7 @@ type WCSPendingMethod = '' | 'sendMessage' | 'signJWT' | 'signHexMessage' | 'sen
 export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
 
 export interface ModalData {
-  QRCode: string;
+  QRCodeImg: string;
   QRCodeUrl: string;
   showModal: boolean;
   isMobile: boolean;
