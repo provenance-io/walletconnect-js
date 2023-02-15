@@ -11,7 +11,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "checkJs": false,
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
