@@ -1,3 +1,4 @@
+import { generateDynamicUrl } from '../../utils';
 import { Wallet } from '../../types';
 import {
   DYNAMIC_LINK_FIGURE_MOBILE_URL,
@@ -14,21 +15,14 @@ export const mobileFigure = {
   type: 'mobile',
   title: 'Figure Mobile',
   icon: 'figure',
-  generateUrl: (QRCodeUrl) => {
-    const doubleEncodedWCData = encodeURIComponent(encodeURIComponent(QRCodeUrl));
-    const finalUrl = new URL(DYNAMIC_LINK_FIGURE_MOBILE_URL);
-    const linkParam = `${FIGURE_MOBILE_WALLET_CONNECT_URL}?data=${doubleEncodedWCData}`;
-    const apnParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME;
-    const ibiParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME;
-    const isiParam = FIGURE_MOBILE_WALLET_APP_ID;
-    const efrParam = '1';
-    finalUrl.searchParams.append('link', linkParam);
-    finalUrl.searchParams.append('apn', apnParam);
-    finalUrl.searchParams.append('ibi', ibiParam);
-    finalUrl.searchParams.append('isi', isiParam);
-    finalUrl.searchParams.append('efr', efrParam);
-    return finalUrl.toString();
-  },
+  generateUrl: (qRCodeUrl) =>
+    generateDynamicUrl({
+      qRCodeUrl,
+      appId: FIGURE_MOBILE_WALLET_APP_ID,
+      originUrl: DYNAMIC_LINK_FIGURE_MOBILE_URL,
+      packageName: FIGURE_MOBILE_WALLET_PACKAGE_NAME,
+      walletConnectUrl: FIGURE_MOBILE_WALLET_CONNECT_URL,
+    }),
 } as Wallet;
 
 export const mobileFigureTest = {
@@ -36,18 +30,12 @@ export const mobileFigureTest = {
   type: 'mobile',
   title: 'Figure Mobile (Test)',
   icon: 'figure',
-  generateUrl: (QRCodeUrl) => {
-    const linkParam = `${FIGURE_MOBILE_WALLET_CONNECT_URL}?data=${QRCodeUrl}`;
-    const apnParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST;
-    const ibiParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST;
-    const isiParam = FIGURE_MOBILE_WALLET_APP_ID_TEST;
-    const efrParam = '1';
-    const allUrlParams = `?link=${linkParam}&apn=${apnParam}&ibi=${ibiParam}&isi=${isiParam}&efr=${efrParam}`;
-    const doubleEncodedUrlParams = encodeURIComponent(
-      encodeURIComponent(allUrlParams)
-    );
-    const fullUrl = `${DYNAMIC_LINK_FIGURE_MOBILE_URL}${doubleEncodedUrlParams}`;
-
-    return fullUrl;
-  },
+  generateUrl: (qRCodeUrl) =>
+    generateDynamicUrl({
+      qRCodeUrl,
+      appId: FIGURE_MOBILE_WALLET_APP_ID_TEST,
+      originUrl: DYNAMIC_LINK_FIGURE_MOBILE_URL,
+      packageName: FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST,
+      walletConnectUrl: FIGURE_MOBILE_WALLET_CONNECT_URL,
+    }),
 } as Wallet;
