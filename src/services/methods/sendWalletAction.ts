@@ -23,7 +23,7 @@ export const sendWalletAction = async ({
                               }: SendWalletAction): Promise<BroadcastResult> => {
   let valid = false;
   const {
-    description = 'Send Wallet Message',
+    description = 'Send Wallet Action',
     method = PROVENANCE_METHODS.action,
     action,
     payload,

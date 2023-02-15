@@ -35,7 +35,7 @@ export const ALL_ACTIONS: Action[] = [
   },
   {
     icon: ICON_NAMES.GEAR,
-    name: 'Send Wallet Message',
+    name: 'Send Wallet Action',
     windowMessage: 'SEND_WALLET_ACTION',
     method: 'sendWalletAction',
     description: 'Pass along a plain JSON message for the wallet to take action on.',

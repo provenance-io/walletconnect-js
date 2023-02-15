@@ -45,7 +45,7 @@ export const SendWalletAction: React.FC = () => {
       status: result.error ? 'failed' : 'success',
       message: result.error
         ? result.error
-        : 'WalletConnectJS | Send Wallet Message Complete',
+        : 'WalletConnectJS | Send Wallet Action Complete',
       data: result,
     });
   };
@@ -63,7 +63,7 @@ export const SendWalletAction: React.FC = () => {
   return (
     <ActionCard
       icon={ICON_NAMES.GEAR}
-      title="Send Wallet Message"
+      title="Send Wallet Action"
       description="Pass along a message to the wallet"
       status={results?.status}
     >

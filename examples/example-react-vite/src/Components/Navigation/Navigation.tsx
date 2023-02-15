@@ -74,7 +74,7 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       url: SEND_MESSAGE_URL,
     },
     {
-      name: 'Send Wallet Message',
+      name: 'Send Wallet Action',
       icon: ICON_NAMES.GEAR,
       url: SEND_WALLET_ACTION_URL,
     },
