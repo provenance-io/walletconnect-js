@@ -7,7 +7,7 @@ import type { GasPrice } from './GasPriceType';
 
 export type WalletConnectClientType = WalletConnectClient;
 
-type WCSPendingMethod = '' | 'sendMessage' | 'signJWT' | 'signHexMessage' | 'sendWalletMessage';
+type WCSPendingMethod = '' | 'sendMessage' | 'signJWT' | 'signHexMessage' | 'sendWalletAction';
 
 export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
 
@@ -92,7 +92,7 @@ export interface SendMessageMethod {
   nonCriticalExtensionOptions?: string[];
 }
 
-export interface SendWalletMessageMethod {
+export interface SendWalletActionMethod {
   method?: ProvenanceMethod;
   description?: string;
   action: string;

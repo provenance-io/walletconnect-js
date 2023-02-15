@@ -4,14 +4,14 @@ import {
   SIGN_JWT_URL,
   SIGN_HEX_MESSAGE_URL,
   SEND_COIN_URL,
-  SEND_WALLET_MESSAGE_URL,
+  SEND_WALLET_ACTION_URL,
 } from 'consts';
 import {
   ResetConnectionTimeout,
   SendMessage,
   SignJWT,
   SignHexMessage,
-  SendWalletMessage,
+  SendWalletAction,
   SendCoin,
 } from 'Page';
 
@@ -25,9 +25,9 @@ export const SEND_MESSAGE = {
   element: <SendMessage />,
 };
 
-export const SEND_WALLET_MESSAGE = {
-  path: SEND_WALLET_MESSAGE_URL,
-  element: <SendWalletMessage />,
+export const SEND_WALLET_ACTION = {
+  path: SEND_WALLET_ACTION_URL,
+  element: <SendWalletAction />,
 };
 
 export const SIGN_JWT = {

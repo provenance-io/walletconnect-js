@@ -1,23 +1,21 @@
-import styled from 'styled-components';
 import { useState } from 'react';
 import { useWalletConnect, ProvenanceMethod } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, Results, Dropdown } from 'Components';
 import { ICON_NAMES } from 'consts';
-import { COLORS } from 'theme';
 
-export const SendWalletMessage: React.FC = () => {
-  const walletMessage = 'wallet_message';
+export const SendWalletAction: React.FC = () => {
+  const walletAction = 'wallet_action';
   const [payload, setPayload] = useState('')
   const [description, setDescription] = useState('');
   const [action, setAction] = useState('');
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
-  const [method, setMethod] = useState<ProvenanceMethod>(walletMessage);
+  const [method, setMethod] = useState<ProvenanceMethod>(walletAction);
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
-  const sendMessageLoading = pendingMethod === 'sendWalletMessage';
+  const sendMessageLoading = pendingMethod === 'sendWalletAction';
 
   const isJSON = (data:string) => {
     try {
@@ -36,14 +34,14 @@ export const SendWalletMessage: React.FC = () => {
 
   const handleSubmit = async () => {
 
-    const result = await wcs.sendWalletMessage({
+    const result = await wcs.sendWalletAction({
       action,
       payload: JSON.parse(payload),
       description,
       method,
     });
     setResults({
-      action: 'sendWalletMessage',
+      action: 'sendWalletAction',
       status: result.error ? 'failed' : 'success',
       message: result.error
         ? result.error
@@ -53,8 +51,8 @@ export const SendWalletMessage: React.FC = () => {
   };
 
   const jsonMessageValidator = () => {
-    if (!!payload && method !== walletMessage) {
-      return `Message Method must be wallet_message when using Plain JSON message.`;
+    if (!!payload && method !== walletAction) {
+      return `Message Method must be wallet_action when using Plain JSON message.`;
     }
     if (!isJSON(payload)) {
       return 'Not valid JSON.';
@@ -71,10 +69,10 @@ export const SendWalletMessage: React.FC = () => {
     >
       <Dropdown
         value={method}
-        label="Message Method"
+        label="Wallet Action"
         onChange={setMethod}
         bottomGap
-        options={['wallet_message']}
+        options={['wallet_action']}
       />
       <Input
           width="100%"

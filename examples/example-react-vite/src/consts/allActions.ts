@@ -36,9 +36,9 @@ export const ALL_ACTIONS: Action[] = [
   {
     icon: ICON_NAMES.GEAR,
     name: 'Send Wallet Message',
-    windowMessage: 'SEND_WALLET_MESSAGE',
-    method: 'sendWalletMessage',
-    description: 'Pass along a plain JSON message to the wallet w/o broadcast or signing.',
+    windowMessage: 'SEND_WALLET_ACTION',
+    method: 'sendWalletAction',
+    description: 'Pass along a plain JSON message for the wallet to take action on.',
     fields: [
       {
         name: 'payload',
@@ -55,7 +55,7 @@ export const ALL_ACTIONS: Action[] = [
       {
         name: 'method',
         label: 'Message method',
-        value: 'provenance_sendTransaction',
+        value: 'wallet_action',
         placeholder: 'Enter the message method',
       },
       {

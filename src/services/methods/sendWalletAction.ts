@@ -5,26 +5,26 @@ import type {
   WCSSetState,
   WalletConnectClientType,
   WalletId,
-  SendWalletMessageMethod,
+  SendWalletActionMethod,
 } from '../../types';
 
-interface SendWalletMessage {
+interface SendWalletAction {
   connector?: WalletConnectClientType;
-  data: SendWalletMessageMethod;
+  data: SendWalletActionMethod;
   setState: WCSSetState;
   walletAppId?: WalletId;
 }
 
-export const sendWalletMessage = async ({
+export const sendWalletAction = async ({
                                 connector,
                                 setState,
                                 walletAppId,
                                 data,
-                              }: SendWalletMessage): Promise<BroadcastResult> => {
+                              }: SendWalletAction): Promise<BroadcastResult> => {
   let valid = false;
   const {
     description = 'Send Wallet Message',
-    method = PROVENANCE_METHODS.message,
+    method = PROVENANCE_METHODS.action,
     action,
     payload,
   } = data;
@@ -58,7 +58,10 @@ export const sendWalletMessage = async ({
 
     console.dir(result);
 
-    // Update _thing_ within the wcjs state
+    // TODO what to do with Action response? Is it state altering or is that
+    // to be handled by a session update?
+
+    // TODO Update _thing_ within the wcjs state
     //setState({ signedJWT });
     return {
       valid,

@@ -14,35 +14,25 @@ const TestMessage = styled.span`
 `;
 
 export const SendMessage: React.FC = () => {
-  const sendTransaction = 'provenance_sendTransaction';
-  const walletMessage = 'wallet_message';
-  const [b64Message, setB64Message] = useState('');
   const [message, setMessage] = useState('');
   const [description, setDescription] = useState('');
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
-  const [method, setMethod] = useState<ProvenanceMethod>(sendTransaction);
-
+  const [method, setMethod] = useState<ProvenanceMethod>(
+    'provenance_sendTransaction'
+  );
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
   const sendMessageLoading = pendingMethod === 'sendMessage';
-
-
-  const disableSubmit = () => {
-    return (!!b64Message && method !== sendTransaction) ||
-           (!b64Message && method === sendTransaction) ||
-           (!!message && !isJSON(message) && method !== walletMessage) ||
-           (!message && method === walletMessage);
-  }
 
   const handleSubmit = async () => {
     // Convert input string value to number for price
     const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
 
     const result = await wcs.sendMessage({
-      message: !!message ? message : b64Message,
+      message,
       description,
       gasPrice: finalGasData,
       method,
@@ -57,39 +47,8 @@ export const SendMessage: React.FC = () => {
     });
   };
 
-  const b64MessageValidator = () => {
-    if(!!b64Message && method !== sendTransaction) {
-      return 'Message Method must be provenance_sendTransaction when using Base64 encoded message.';
-    }
-    return '';
-  }
-
-  const jsonMessageValidator = () => {
-    if (!!b64Message && !!message) {
-      return 'Only 1 of Base 64 Encoded Message or Plain Message allowed.';
-    }
-    if (!!message && method !== walletMessage) {
-      return `Message Method must be wallet_message when using Plain JSON message.`;
-    }
-    if (!isJSON(message)) {
-      return 'Not valid JSON.';
-    }
-    return '';
-  }
-
-  const isJSON = (data:string) => {
-    try {
-      if(!!data) {
-        JSON.parse(data);
-      }
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
   const clickUseSampleButton = () => {
-    setB64Message(
+    setMessage(
       'ChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEmwKKXRwMWtuc3hmbm4wbHE0OG1tbmtmbmtndGtrOHFueHhkdTB5MnRrbGtoEil0cDFrbnN4Zm5uMGxxNDhtbW5rZm5rZ3Rrazhxbnh4ZHUweTJ0a2xraBoUCgVuaGFzaBILMTAwMDAwMDAwMDA='
     );
   };
@@ -98,7 +57,7 @@ export const SendMessage: React.FC = () => {
     <ActionCard
       icon={ICON_NAMES.GEAR}
       title="Send Message"
-      description="Pass along a message to the wallet"
+      description="Pass along an encoded base64 message to the wallet"
       status={results?.status}
     >
       <TestMessage
@@ -109,34 +68,23 @@ export const SendMessage: React.FC = () => {
       </TestMessage>
       <Input
         width="100%"
-        value={b64Message}
+        value={message}
         label="Base64 Encoded Message"
         placeholder="Enter Base64 Encoded Message"
-        onChange={setB64Message}
-        bottomGap
-        disabled={sendMessageLoading}
-        error={b64MessageValidator()}
-      />
-      <Input
-          width="100%"
-          value={message}
-          label="Plain JSON Message"
-          placeholder="Plain Message"
           onChange={setMessage}
           bottomGap
           disabled={sendMessageLoading}
-          error={jsonMessageValidator()}
       />
       <Dropdown
         value={method}
-        label="Message Method"
+        label="Message method"
         onChange={setMethod}
         bottomGap
-        options={['wallet_message','provenance_sendTransaction']}
+        options={['provenance_sign', 'provenance_sendTransaction']}
       />
       <Input
         value={description}
-        label="Message description (Optional)"
+        label="Wallet message description (Optional)"
         placeholder="Enter message description"
         onChange={setDescription}
         bottomGap
@@ -146,7 +94,7 @@ export const SendMessage: React.FC = () => {
       <Button
         loading={sendMessageLoading}
         onClick={handleSubmit}
-        disabled={disableSubmit()}
+        disabled={!message || !method}
       >
         Submit
       </Button>
