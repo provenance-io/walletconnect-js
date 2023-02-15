@@ -1,5 +1,4 @@
 export * from './connectionTimeouts';
-export * from './dynamicLinkInfo';
 export * from './provenance';
 export * from './storage';
 export * from './urls';

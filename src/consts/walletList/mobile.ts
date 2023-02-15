@@ -37,18 +37,17 @@ export const mobileFigureTest = {
   title: 'Figure Mobile (Test)',
   icon: 'figure',
   generateUrl: (QRCodeUrl) => {
-    const doubleEncodedWCData = encodeURIComponent(encodeURIComponent(QRCodeUrl));
-    const finalUrl = new URL(DYNAMIC_LINK_FIGURE_MOBILE_URL);
-    const linkParam = `${FIGURE_MOBILE_WALLET_CONNECT_URL}?data=${doubleEncodedWCData}`;
+    const linkParam = `${FIGURE_MOBILE_WALLET_CONNECT_URL}?data=${QRCodeUrl}`;
     const apnParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST;
     const ibiParam = FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST;
     const isiParam = FIGURE_MOBILE_WALLET_APP_ID_TEST;
     const efrParam = '1';
-    finalUrl.searchParams.append('link', linkParam);
-    finalUrl.searchParams.append('apn', apnParam);
-    finalUrl.searchParams.append('ibi', ibiParam);
-    finalUrl.searchParams.append('isi', isiParam);
-    finalUrl.searchParams.append('efr', efrParam);
-    return finalUrl.toString();
+    const allUrlParams = `?link=${linkParam}&apn=${apnParam}&ibi=${ibiParam}&isi=${isiParam}&efr=${efrParam}`;
+    const doubleEncodedUrlParams = encodeURIComponent(
+      encodeURIComponent(allUrlParams)
+    );
+    const fullUrl = `${DYNAMIC_LINK_FIGURE_MOBILE_URL}${doubleEncodedUrlParams}`;
+
+    return fullUrl;
   },
 } as Wallet;

@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "3.0.0-develop.10",
+  "version": "3.0.0-develop.11",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
@@ -54,6 +54,7 @@
     "@types/chrome": "0.0.197",
     "@types/create-hash": "1.2.2",
     "@types/google-protobuf": "3.15.6",
+    "@types/jest": "29.4.0",
     "@types/node": "18.7.23",
     "@types/qrcode": "1.5.0",
     "@types/react": "18.0.21",
@@ -80,14 +81,15 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "file-loader": "6.2.0",
     "husky": "8.0.1",
+    "jest": "29.4.3",
     "json-schema-to-typescript": "11.0.2",
     "nodemon": "2.0.20",
     "prettier": "2.7.1",
     "pretty-error": "4.0.0",
     "process": "0.11.10",
     "react": "^18.2.0",
-    "styled-components": "^5.3.6",
     "style-loader": "3.3.1",
+    "styled-components": "^5.3.6",
     "ts-loader": "9.4.1",
     "typescript": "4.8.3",
     "webpack": "5.74.0",
@@ -107,7 +109,7 @@
     "prebuild": "npm run test",
     "start:watch": "nodemon -e js,ts,tsx --watch src --exec 'npm run build:pack && npm run watch:example-react'",
     "start": "npm run start:watch && npm run start:example-react",
-    "test": "",
+    "test": "jest --watch",
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "versionUp": "node -e 'require(\"./scripts/versionUp.js\").versionUp()'",
@@ -120,6 +122,11 @@
     "extends": [
       "react-app",
       "prettier"
+    ]
+  },
+  "jest": {
+    "testMatch": [
+      "**/__tests__/unit/*.test.ts"
     ]
   }
 }

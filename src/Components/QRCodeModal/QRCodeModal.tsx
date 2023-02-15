@@ -45,7 +45,7 @@ export const QRCodeModal: React.FC<Props> = ({
 }) => {
   const { state } = wcs;
   const { connectionTimeout, modal } = state;
-  const { isMobile, showModal, QRCode, QRCodeUrl } = modal;
+  const { isMobile, showModal, QRCodeImg, QRCodeUrl } = modal;
   const options = ['qr', isMobile ? 'mobile' : 'desktop'];
   // Which tab of the popup is currently open (qr/desktop/mobile)
   const [view, setView] = useState('qr');
@@ -82,7 +82,7 @@ export const QRCodeModal: React.FC<Props> = ({
     <>
       <Text className="wcjs-qr-text">{title}</Text>
       <ImgContainer className="wcjs-qr-img">
-        <img src={QRCode} alt="WalletConnect QR Code" />
+        <img src={QRCodeImg} alt="WalletConnect QR Code" />
       </ImgContainer>
       {copied ? (
         <CopyButton disabled className="wcjs-qr-copy">
@@ -201,7 +201,7 @@ export const QRCodeModal: React.FC<Props> = ({
       )
       .map((wallet) => {
         const { title: walletTitle, icon, id, generateUrl } = wallet;
-        const dynamicLink = generateUrl ? generateUrl(QRCode) : '';
+        const dynamicLink = generateUrl ? generateUrl(QRCodeUrl) : '';
         return (
           <WalletRow
             className="wcjs-qr-row"
