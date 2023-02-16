@@ -173,10 +173,15 @@ export const createConnector = ({
   // - Trigger wallet event for "session_update" (let the wallet know)
   newConnector.on(CONNECTOR_EVENTS.wc_sessionUpdate, (error, payload: ConnectData) => {
     if (error) throw error;
-    const connectionEST = Date.now();
-    const connectionEXP = state.connectionTimeout + connectionEST;
     const data = payload.params[0];
     const { accounts, peerMeta: peer } = data;
+
+    if(!accounts) { //if no accounts, likely a post disconnect update - bail
+      return;
+    }
+    const connectionEST = Date.now();
+    const connectionEXP = state.connectionTimeout + connectionEST;
+
     const {
       address,
       jwt: signedJWT,
