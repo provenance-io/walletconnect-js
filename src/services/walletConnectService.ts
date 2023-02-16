@@ -566,6 +566,23 @@ export class WalletConnectService {
 
   /**
    *
+   * @param groupPolicyAddress the Group Policy to switch the wallet to
+   * @param description (optional) provide description to display in the wallet when
+   *        switching to group policy address
+   */
+  switchToGroup = async (groupPolicyAddress: string, description?: string) => {
+    return this.sendWalletAction({
+      action: 'switchToGroup',
+      payload: {
+        "address": groupPolicyAddress
+      },
+      description,
+      method: 'wallet_action',
+    })
+  };
+
+  /**
+   *
    * @param expires Time from now in seconds to expire new JWT
    */
   signJWT = async (expires: number) => {

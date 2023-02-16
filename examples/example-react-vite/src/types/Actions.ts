@@ -6,7 +6,7 @@ export interface Field {
   width?: string;
   type?: 'number' | 'string';
 }
-export type WindowMessages = 'SEND_MESSAGE' | 'SIGN_JWT' | 'SIGNATURE' | 'SEND_WALLET_ACTION';
+export type WindowMessages = 'SEND_MESSAGE' | 'SIGN_JWT' | 'SIGNATURE' | 'SEND_WALLET_ACTION' | 'SWITCH_TO_GROUP';
 
 export type WCJSMethod = 'sendMessage' | 'signJWT' | 'signMessage' | 'sendWalletAction';
 

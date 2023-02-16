@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { useWalletConnect, ProvenanceMethod } from '@provenanceio/walletconnect-js';
-import { Button, Input, ActionCard, Results, Dropdown } from 'Components';
+import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 
 export const SendWalletAction: React.FC = () => {
-  const walletAction = 'wallet_action';
   const [payload, setPayload] = useState('')
   const [description, setDescription] = useState('');
   const [action, setAction] = useState('');
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
-  const [method, setMethod] = useState<ProvenanceMethod>(walletAction);
+  const method: ProvenanceMethod = 'wallet_action';
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
@@ -28,9 +27,7 @@ export const SendWalletAction: React.FC = () => {
     }
   }
 
-  const disableSubmit = () => {
-    return (!payload || !action);
-  }
+  const disableSubmit = () => (!payload || !action);
 
   const handleSubmit = async () => {
 
@@ -51,9 +48,6 @@ export const SendWalletAction: React.FC = () => {
   };
 
   const jsonMessageValidator = () => {
-    if (!!payload && method !== walletAction) {
-      return `Message Method must be wallet_action when using Plain JSON message.`;
-    }
     if (!isJSON(payload)) {
       return 'Not valid JSON.';
     }
@@ -67,13 +61,6 @@ export const SendWalletAction: React.FC = () => {
       description="Pass along a message to the wallet"
       status={results?.status}
     >
-      <Dropdown
-        value={method}
-        label="Wallet Action"
-        onChange={setMethod}
-        bottomGap
-        options={['wallet_action']}
-      />
       <Input
           width="100%"
           value={payload}

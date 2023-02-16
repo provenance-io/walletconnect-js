@@ -1,7 +1,7 @@
 import { HOMEPAGE_URL } from 'consts';
-import { CONNECT } from './connect';
 import { Connect } from 'Page';
 import { Root } from 'Page';
+import { CONNECT } from './connect';
 import {
   RESET_CONNECTION,
   SEND_MESSAGE,
@@ -9,6 +9,7 @@ import {
   SIGN_JWT,
   SIGN_HEX_MESSAGE,
   SEND_WALLET_ACTION,
+  SWITCH_TO_GROUP_ACTION,
 } from './actions';
 
 export const routes = [
@@ -24,6 +25,7 @@ export const routes = [
       SIGN_JWT,
       SIGN_HEX_MESSAGE,
       SEND_WALLET_ACTION,
+      SWITCH_TO_GROUP_ACTION,
     ],
   },
   // { path: FOUR_OH_FOUR_URL, element: <NotFound /> },

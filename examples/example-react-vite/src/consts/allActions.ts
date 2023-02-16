@@ -66,6 +66,27 @@ export const ALL_ACTIONS: Action[] = [
       },
     ],
   },
+  {
+    icon: ICON_NAMES.GEAR,
+    name: 'Switch to Group',
+    windowMessage: 'SWITCH_TO_GROUP',
+    method: 'sendWalletAction',
+    description: 'Switch to Group Policy',
+    fields: [
+      {
+        name: 'groupPolicyAddress',
+        label: 'Group Policy Address',
+        value: '',
+        placeholder: 'Group Policy Address',
+      },
+      {
+        name: 'description',
+        label: 'Description (Optional)',
+        value: '',
+        placeholder: 'Enter description',
+      },
+    ],
+  },
 
   // ------------------------------
   // Sign JWT Method/Action

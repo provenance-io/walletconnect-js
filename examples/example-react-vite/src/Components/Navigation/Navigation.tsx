@@ -10,7 +10,7 @@ import {
   SEND_MESSAGE_URL,
   SIGN_JWT_URL,
   SIGN_HEX_MESSAGE_URL,
-  SEND_WALLET_ACTION_URL,
+  SEND_WALLET_ACTION_URL, SWITCH_TO_GROUP_URL,
 } from 'consts';
 import { COLORS } from 'theme';
 import { useNavigate } from 'react-router-dom';
@@ -77,6 +77,11 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       name: 'Send Wallet Action',
       icon: ICON_NAMES.GEAR,
       url: SEND_WALLET_ACTION_URL,
+    },
+    {
+      name: 'Switch to Group',
+      icon: ICON_NAMES.GEAR,
+      url: SWITCH_TO_GROUP_URL,
     },
 
     {
