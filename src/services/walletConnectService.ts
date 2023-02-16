@@ -6,7 +6,6 @@ import type {
   BroadcastResult,
   ConnectMethod,
   SendMessageMethod,
-  SendWalletActionMethod,
   ModalData,
   WalletConnectClientType,
   WalletConnectServiceStatus,
@@ -528,57 +527,36 @@ export class WalletConnectService {
 
   /**
    *
-   * @param action Wallet Action that the wallet should take (e.g. `switchToGroup`)
-   * @param payload JSON payload for wallet to handle
-   * @param description (optional) Additional information for wallet to display
-   * @param method (optional) What method is used to send this message
+   * @param groupPolicyAddress the Group Policy to switch the wallet to
+   * @param description (optional) provide description to display in the wallet when
+   *        switching to group policy address
    */
-  sendWalletAction = async ({
-                         action,
-                         payload,
-                         description,
-                         method,
-                       }: SendWalletActionMethod) => {
+  switchToGroup = async (groupPolicyAddress: string, description?: string): Promise<BroadcastResult> => {
     // Loading while we wait for mobile to respond
-    this.#setState({ pendingMethod: 'sendWalletAction' });
+    this.#setState({ pendingMethod: 'switchToGroup' });
     const result = await sendWalletActionMethod({
       connector: this.#connector,
       walletAppId: this.state.walletAppId,
       data: {
-        action,
-        payload,
+        action: 'switchToGroup',
+        payload: {
+          "address": groupPolicyAddress
+        },
         description,
-        method,
+        method: 'wallet_action',
       },
     });
     // No longer loading
     this.#setState({ pendingMethod: '' });
     // Broadcast result of method
     const windowMessage = result.error
-        ? WINDOW_MESSAGES.SEND_WALLET_ACTION_FAILED
-        : WINDOW_MESSAGES.SEND_WALLET_ACTION_COMPLETE;
+        ? WINDOW_MESSAGES.SWITCH_TO_GROUP_FAILED
+        : WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
 
     return result;
-  };
-
-  /**
-   *
-   * @param groupPolicyAddress the Group Policy to switch the wallet to
-   * @param description (optional) provide description to display in the wallet when
-   *        switching to group policy address
-   */
-  switchToGroup = async (groupPolicyAddress: string, description?: string) => {
-    return this.sendWalletAction({
-      action: 'switchToGroup',
-      payload: {
-        "address": groupPolicyAddress
-      },
-      description,
-      method: 'wallet_action',
-    })
   };
 
   /**

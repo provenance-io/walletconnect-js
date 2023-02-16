@@ -8,7 +8,6 @@ import {
   SEND_COIN,
   SIGN_JWT,
   SIGN_HEX_MESSAGE,
-  SEND_WALLET_ACTION,
   SWITCH_TO_GROUP_ACTION,
 } from './actions';
 
@@ -24,7 +23,6 @@ export const routes = [
       SEND_MESSAGE,
       SIGN_JWT,
       SIGN_HEX_MESSAGE,
-      SEND_WALLET_ACTION,
       SWITCH_TO_GROUP_ACTION,
     ],
   },

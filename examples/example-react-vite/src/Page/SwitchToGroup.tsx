@@ -12,7 +12,7 @@ export const SwitchToGroup: React.FC = () => {
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
-  const sendMessageLoading = pendingMethod === 'sendWalletAction';
+  const switchToGroupLoading = pendingMethod === 'switchToGroup';
 
   const handleSubmit = async () => {
 
@@ -41,7 +41,7 @@ export const SwitchToGroup: React.FC = () => {
           placeholder="Enter group policy address"
           onChange={setGroupPolicyAddress}
           bottomGap
-          disabled={sendMessageLoading}
+          disabled={switchToGroupLoading}
       />
       <Input
           value={description}
@@ -49,11 +49,11 @@ export const SwitchToGroup: React.FC = () => {
           placeholder="Enter description (optional)"
           onChange={setDescription}
           bottomGap
-          disabled={sendMessageLoading}
+          disabled={switchToGroupLoading}
       />
 
       <Button
-        loading={sendMessageLoading}
+        loading={switchToGroupLoading}
         onClick={handleSubmit}
         disabled={ !groupPolicyAddress }
       >

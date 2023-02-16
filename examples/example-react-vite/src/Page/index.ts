@@ -4,5 +4,5 @@ export * from './Root';
 export * from './SendMessage';
 export * from './SignJWT';
 export * from './SignHexMessage';
-export * from './SendWalletAction';
+export * from './SwitchToGroup';
 export * from './SendCoin';

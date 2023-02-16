@@ -7,9 +7,11 @@ import type { GasPrice } from './GasPriceType';
 
 export type WalletConnectClientType = WalletConnectClient;
 
-type WCSPendingMethod = '' | 'sendMessage' | 'signJWT' | 'signHexMessage' | 'sendWalletAction';
+type WCSPendingMethod = '' | 'sendMessage' | 'signJWT' | 'signHexMessage' | 'switchToGroup';
 
 export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
+
+export type WalletAction = 'switchToGroup';
 
 export interface ModalData {
   QRCodeImg: string;
@@ -95,6 +97,6 @@ export interface SendMessageMethod {
 export interface SendWalletActionMethod {
   method?: ProvenanceMethod;
   description?: string;
-  action: string;
+  action: WalletAction;
   payload: Record<string, unknown>;
 }

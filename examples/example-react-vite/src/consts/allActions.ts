@@ -35,42 +35,9 @@ export const ALL_ACTIONS: Action[] = [
   },
   {
     icon: ICON_NAMES.GEAR,
-    name: 'Send Wallet Action',
-    windowMessage: 'SEND_WALLET_ACTION',
-    method: 'sendWalletAction',
-    description: 'Pass along a plain JSON message for the wallet to take action on.',
-    fields: [
-      {
-        name: 'payload',
-        label: 'JSON Message',
-        value: '',
-        placeholder: 'JSON Message',
-      },
-      {
-        name: 'action',
-        label: 'Action',
-        value: '',
-        placeholder: 'Action',
-      },
-      {
-        name: 'method',
-        label: 'Message method',
-        value: 'wallet_action',
-        placeholder: 'Enter the message method',
-      },
-      {
-        name: 'description',
-        label: 'Wallet message description (Optional)',
-        value: '',
-        placeholder: 'Enter message description',
-      },
-    ],
-  },
-  {
-    icon: ICON_NAMES.GEAR,
     name: 'Switch to Group',
     windowMessage: 'SWITCH_TO_GROUP',
-    method: 'sendWalletAction',
+    method: 'switchToGroup',
     description: 'Switch to Group Policy',
     fields: [
       {
