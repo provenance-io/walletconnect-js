@@ -84,10 +84,7 @@ const RowSplitter = styled.div`
   border-bottom: 1px solid ${COLORS.NEUTRAL_200};
 `;
 const ExtraSettings = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  padding: 0 20px;
+  padding: 0px 40px;
 `;
 const SettingRow = styled.div``;
 
@@ -188,6 +185,7 @@ export const Sidebar: React.FC = () => {
           </>
         )}
         <Navigation />
+        <RowSplitter />
         <ExtraSettings>
           <SettingRow>
             <Checkbox
