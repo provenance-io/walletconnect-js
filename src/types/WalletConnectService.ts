@@ -4,14 +4,13 @@ import type { WalletId } from './WalletList';
 import type { AccountObject, MasterGroupPolicy, WalletInfo } from './ConnectData';
 import type { ProvenanceMethod } from './Broadcast';
 import type { GasPrice } from './GasPriceType';
+import {WalletAction} from "../consts/walletActions";
 
 export type WalletConnectClientType = WalletConnectClient;
 
 type WCSPendingMethod = '' | 'sendMessage' | 'signJWT' | 'signHexMessage' | 'switchToGroup';
 
 export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
-
-export type WalletAction = 'switchToGroup';
 
 export interface ModalData {
   QRCodeImg: string;
