@@ -97,5 +97,5 @@ export interface SendWalletActionMethod {
   method?: ProvenanceMethod;
   description?: string;
   action: WalletAction;
-  payload: Record<string, unknown>;
+  payload?: Record<string, unknown>;
 }

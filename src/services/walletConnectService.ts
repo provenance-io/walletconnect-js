@@ -527,11 +527,12 @@ export class WalletConnectService {
 
   /**
    *
-   * @param groupPolicyAddress the Group Policy to switch the wallet to
+   * @param groupPolicyAddress the Group Policy to switch the wallet to - if null, the wallet
+   *        will "unswitch" the group
    * @param description (optional) provide description to display in the wallet when
    *        switching to group policy address
    */
-  switchToGroup = async (groupPolicyAddress: string, description?: string): Promise<BroadcastResult> => {
+  switchToGroup = async (groupPolicyAddress?: string, description?: string): Promise<BroadcastResult> => {
     // Loading while we wait for mobile to respond
     this.#setState({ pendingMethod: 'switchToGroup' });
     const result = await sendWalletActionMethod({
@@ -539,9 +540,7 @@ export class WalletConnectService {
       walletAppId: this.state.walletAppId,
       data: {
         action: 'switchToGroup',
-        payload: {
-          "address": groupPolicyAddress
-        },
+        payload: (groupPolicyAddress ? {"address": groupPolicyAddress} : undefined),
         description,
         method: 'wallet_action',
       },
