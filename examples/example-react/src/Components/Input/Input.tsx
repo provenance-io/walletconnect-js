@@ -40,10 +40,19 @@ const Label = styled.label`
   margin-bottom: 3px;
 `;
 
+const ErrorMessage = styled.span`
+  font-size: 1.1rem;
+  color: ${COLORS.LIGHT_RED};
+  font-weight: bold;
+  margin-bottom: 8px;
+  margin-top: 8px;
+`;
+
 interface Props {
   className?: string;
   label?: string;
   value?: string;
+  error?: string;
   onChange: (value: string) => void;
   placeholder?: string;
   width?: string;
@@ -56,6 +65,7 @@ export const Input: React.FC<Props> = ({
   className,
   label,
   value,
+  error,
   onChange,
   placeholder = 'Enter Value',
   width = '100%',
@@ -74,5 +84,8 @@ export const Input: React.FC<Props> = ({
       }}
       disabled={disabled}
     />
+    { !!error &&
+        <ErrorMessage>{error}</ErrorMessage>
+    }
   </InputContainer>
 );

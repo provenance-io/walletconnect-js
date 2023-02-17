@@ -4,6 +4,7 @@ import {
   SIGN_JWT_URL,
   SIGN_HEX_MESSAGE_URL,
   SEND_COIN_URL,
+  SWITCH_TO_GROUP_URL,
 } from 'consts';
 import {
   ResetConnectionTimeout,
@@ -12,6 +13,7 @@ import {
   SignHexMessage,
   SendCoin,
 } from 'Page';
+import {SwitchToGroup} from "../Page/SwitchToGroup";
 
 export const RESET_CONNECTION = {
   path: RESET_CONNECTION_URL,
@@ -21,6 +23,11 @@ export const RESET_CONNECTION = {
 export const SEND_MESSAGE = {
   path: SEND_MESSAGE_URL,
   element: <SendMessage />,
+};
+
+export const SWITCH_TO_GROUP_ACTION = {
+  path: SWITCH_TO_GROUP_URL,
+  element: <SwitchToGroup />,
 };
 
 export const SIGN_JWT = {

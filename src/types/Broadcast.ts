@@ -1,8 +1,12 @@
-import { WCSState, SendMessageMethod } from './WalletConnectService';
+import {
+  WCSState,
+  SendMessageMethod,
+  SendWalletActionMethod
+} from './WalletConnectService';
 import { ConnectData } from './ConnectData';
 import { WINDOW_MESSAGES } from '../consts';
 
-export type ProvenanceMethod = 'provenance_sign' | 'provenance_sendTransaction';
+export type ProvenanceMethod = 'provenance_sign' | 'provenance_sendTransaction' | 'wallet_action';
 
 export type ConnectionType = 'existing session' | 'new session';
 
@@ -37,6 +41,7 @@ export type BroadcastEvent = typeof WINDOW_MESSAGES[BroadcastEventKeys];
 
 type BroadcastResultData =
   | SendMessageMethod
+  | SendWalletActionMethod
   | MethodConnectData
   | MethodSignJWTData
   | number

@@ -71,9 +71,9 @@ export const SendMessage: React.FC = () => {
         value={message}
         label="Base64 Encoded Message"
         placeholder="Enter Base64 Encoded Message"
-        onChange={setMessage}
-        bottomGap
-        disabled={sendMessageLoading}
+          onChange={setMessage}
+          bottomGap
+          disabled={sendMessageLoading}
       />
       <Dropdown
         value={method}

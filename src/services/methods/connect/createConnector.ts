@@ -164,6 +164,54 @@ export const createConnector = ({
     }
   };
 
+  // ------------------------
+  // UPDATE SESSION EVENT
+  // ------------------------
+  // - Save accounts (account data), peer, connection EST/EXP, and connected value to walletConnectService
+  // - Broadcast "session_update" event (let the dApp know)
+  // - Start the "connection timer" to auto-disconnect wcjs when session is expired
+  // - Trigger wallet event for "session_update" (let the wallet know)
+  newConnector.on(CONNECTOR_EVENTS.wc_sessionUpdate, (error, payload: ConnectData) => {
+    if (error) throw error;
+    const data = payload.params[0];
+    const { accounts, peerMeta: peer } = data;
+
+    if(!accounts) { //if no accounts, likely a post disconnect update - bail
+      return;
+    }
+    const connectionEST = Date.now();
+    const connectionEXP = state.connectionTimeout + connectionEST;
+
+    const {
+      address,
+      jwt: signedJWT,
+      publicKey,
+      representedGroupPolicy,
+      walletInfo,
+    } = getAccountInfo(accounts);
+    setState({
+      address,
+      connectionEST,
+      connectionEXP,
+      status: 'connected',
+      peer,
+      publicKey,
+      representedGroupPolicy,
+      signedJWT,
+      walletInfo,
+    });
+    broadcast(WINDOW_MESSAGES.SESSION_UPDATED, {
+      data: {
+        connectionEST,
+        connectionEXP,
+        connectionType: CONNECTION_TYPES.existing_session,
+      },
+    });
+    startConnectionTimer();
+    const { walletAppId } = getState();
+    if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
+  });
+
   // The session had already previously existed, trigger the existing connection event
   if (newConnector.connected) resumeResumeEvent();
 

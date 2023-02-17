@@ -28,6 +28,7 @@ import {
 import {
   connect as connectMethod,
   sendMessage as sendMessageMethod,
+  sendWalletAction as sendWalletActionMethod,
   signJWT as signJWTMethod,
   signHexMessage as signHexMessageMethod,
 } from './methods';
@@ -517,6 +518,39 @@ export class WalletConnectService {
     const windowMessage = result.error
       ? WINDOW_MESSAGES.SEND_MESSAGE_FAILED
       : WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.resetConnectionTimeout();
+
+    return result;
+  };
+
+  /**
+   *
+   * @param groupPolicyAddress the Group Policy to switch the wallet to - if null, the wallet
+   *        will "unswitch" the group
+   * @param description (optional) provide description to display in the wallet when
+   *        switching to group policy address
+   */
+  switchToGroup = async (groupPolicyAddress?: string, description?: string): Promise<BroadcastResult> => {
+    // Loading while we wait for mobile to respond
+    this.#setState({ pendingMethod: 'switchToGroup' });
+    const result = await sendWalletActionMethod({
+      connector: this.#connector,
+      walletAppId: this.state.walletAppId,
+      data: {
+        action: 'switchToGroup',
+        payload: (groupPolicyAddress ? {"address": groupPolicyAddress} : undefined),
+        description,
+        method: 'wallet_action',
+      },
+    });
+    // No longer loading
+    this.#setState({ pendingMethod: '' });
+    // Broadcast result of method
+    const windowMessage = result.error
+        ? WINDOW_MESSAGES.SWITCH_TO_GROUP_FAILED
+        : WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
