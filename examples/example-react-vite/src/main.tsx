@@ -10,7 +10,11 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <Router>
       <WalletConnectContextProvider
-        connectionRedirect={`${window.location.origin}${CONNECT_URL}`}
+        connectionRedirect={
+          !window.location.href.includes('dapp')
+            ? `${window.location.origin}${CONNECT_URL}`
+            : undefined
+        }
       >
         <Theme>
           <div id="portal" />

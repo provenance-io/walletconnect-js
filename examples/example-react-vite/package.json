@@ -2,7 +2,7 @@
   "name": "example-react-vite",
   "private": true,
   "version": "3.0.0-develop.13",
-  "homepage": "/walletconnect",
+  "homepage": "/walletconnect-demo",
   "type": "module",
   "scripts": {
     "dev": "vite",

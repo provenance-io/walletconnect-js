@@ -2,6 +2,7 @@ import { HOMEPAGE_URL } from 'consts';
 import { Connect } from 'Page';
 import { Root } from 'Page';
 import { CONNECT } from './connect';
+import { DAPP } from './dApp';
 import {
   RESET_CONNECTION,
   SEND_MESSAGE,
@@ -18,11 +19,12 @@ export const routes = [
     children: [
       { index: true, element: <Connect /> },
       CONNECT,
+      DAPP,
       RESET_CONNECTION,
       SEND_COIN,
       SEND_MESSAGE,
-      SIGN_JWT,
       SIGN_HEX_MESSAGE,
+      SIGN_JWT,
       SWITCH_TO_GROUP_ACTION,
     ],
   },
