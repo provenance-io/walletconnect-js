@@ -52,10 +52,8 @@ export const signHexMessage = async ({
     const result = (await connector.sendCustomRequest(request)) as string;
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
-    // un-hex the message to verify the signature (the wallet signs the un-hexed message)
-    const message = Buffer.from(hexMessage, 'hex').toString();
     // verify signature
-    valid = await verifySignature(message, signature, pubKeyB64);
+    valid = await verifySignature(hexMessage, signature, pubKeyB64);
     return { valid, result, data: hexMessage, request };
   } catch (error) {
     return { valid, error: `${error}`, data: hexMessage, request };
