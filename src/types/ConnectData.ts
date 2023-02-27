@@ -7,7 +7,7 @@ export type MasterGroupPolicy = {
   address?: string;
   groupId?: number;
   admin?: string;
-  metadataUuid?: string;
+  metadata?: string;
   version?: number;
   decisionPolicy?: DecisionPolicy;
   createdAt?: string;
