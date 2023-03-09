@@ -70,7 +70,7 @@ export const signJWT = async ({
   const payloadEncoded = base64url(payload);
   const JWT = `${headerEncoded}.${payloadEncoded}`;
 
-  const hexJWT = convertUtf8ToHex(JWT);
+  const hexJWT = convertUtf8ToHex(JWT, true);
   request.params.push(hexJWT);
 
   try {
@@ -85,7 +85,7 @@ export const signJWT = async ({
     // const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     const signature = Buffer.from(result, 'hex');
     // verify signature
-    valid = await verifySignature(JWT, signature, pubKeyB64);
+    valid = await verifySignature(hexJWT, signature, pubKeyB64);
     const signedPayloadEncoded = base64url(signature);
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     // Update JWT within the wcjs state
