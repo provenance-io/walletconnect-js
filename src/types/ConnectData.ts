@@ -1,7 +1,16 @@
-export type DecisionPolicy = {
-  typeUrl?: string;
-  value?: string;
-};
+interface TimePeriod {
+  seconds: number;
+  nanos: number;
+}
+
+interface DecisionPolicy {
+  '@type': string;
+  threshold: string;
+  windows: {
+    votingPeriod: TimePeriod;
+    minExecutionPeriod: TimePeriod;
+  };
+}
 
 export type MasterGroupPolicy = {
   address?: string;

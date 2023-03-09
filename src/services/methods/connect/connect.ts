@@ -8,7 +8,8 @@ interface Props {
   jwtExpiration?: number;
   noPopup?: boolean;
   prohibitGroups?: boolean;
-  requiredAddress?: string;
+  requiredIndividualAddress?: string;
+  requiredGroupAddress?: string;
   resetState: () => void;
   setState: WCSSetState;
   startConnectionTimer: () => void;
@@ -27,7 +28,8 @@ export const connect = ({
   jwtExpiration,
   noPopup,
   prohibitGroups,
-  requiredAddress,
+  requiredIndividualAddress,
+  requiredGroupAddress,
   resetState,
   setState,
   startConnectionTimer,
@@ -42,7 +44,8 @@ export const connect = ({
     jwtExpiration,
     noPopup,
     prohibitGroups,
-    requiredAddress,
+    requiredIndividualAddress,
+    requiredGroupAddress,
     resetState,
     setState,
     state,

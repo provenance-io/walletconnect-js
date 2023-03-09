@@ -12,6 +12,7 @@ module.exports.versionUp = function () {
   const filesToChange = [
     'examples/example-react/package.json',
     'examples/example-js-es6/package.json',
+    'examples/example-react-vite/package.json',
     'package.json',
   ];
 

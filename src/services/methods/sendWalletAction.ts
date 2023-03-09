@@ -28,6 +28,7 @@ export const sendWalletAction = async ({
     description,
     action,
     payload,
+    date: Date.now(),
   });
   // Custom Request
   const request = {

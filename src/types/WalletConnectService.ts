@@ -4,11 +4,16 @@ import type { WalletId } from './WalletList';
 import type { AccountObject, MasterGroupPolicy, WalletInfo } from './ConnectData';
 import type { ProvenanceMethod } from './Broadcast';
 import type { GasPrice } from './GasPriceType';
-import {WalletAction} from "../consts/walletActions";
+import { WalletAction } from '../consts/walletActions';
 
 export type WalletConnectClientType = WalletConnectClient;
 
-type WCSPendingMethod = '' | 'sendMessage' | 'signJWT' | 'signHexMessage' | 'switchToGroup';
+type WCSPendingMethod =
+  | ''
+  | 'sendMessage'
+  | 'signJWT'
+  | 'signHexMessage'
+  | 'switchToGroup';
 
 export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
 
@@ -75,7 +80,8 @@ export interface ConnectMethod {
   bridge?: string;
   duration?: number;
   noPopup?: boolean;
-  address?: string;
+  individualAddress?: string;
+  groupAddress?: string;
   prohibitGroups?: boolean;
   jwtExpiration?: number;
 }
