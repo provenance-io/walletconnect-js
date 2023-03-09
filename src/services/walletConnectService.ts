@@ -423,12 +423,14 @@ export class WalletConnectService {
    * @param bridge - (optional) URL string of bridge to connect into
    * @param duration - (optional) Time before connection is timed out (seconds)
    * @param noPopup - (optional) Prevent the QRCodeModal from automatically popping up
-   * @param address - (optional) Address to establish connection with, note, it must exist
+   * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
+   * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
    */
   connect = ({
-    address,
+    individualAddress,
+    groupAddress,
     bridge,
     duration,
     jwtExpiration,
@@ -449,7 +451,8 @@ export class WalletConnectService {
         jwtExpiration,
         noPopup,
         prohibitGroups,
-        requiredAddress: address,
+        requiredIndividualAddress: individualAddress,
+        requiredGroupAddress: groupAddress,
         resetState: this.#resetState,
         setState: this.#setState,
         startConnectionTimer: this.#startConnectionTimer,
@@ -532,7 +535,10 @@ export class WalletConnectService {
    * @param description (optional) provide description to display in the wallet when
    *        switching to group policy address
    */
-  switchToGroup = async (groupPolicyAddress?: string, description?: string): Promise<BroadcastResult> => {
+  switchToGroup = async (
+    groupPolicyAddress?: string,
+    description?: string
+  ): Promise<BroadcastResult> => {
     // Loading while we wait for mobile to respond
     this.#setState({ pendingMethod: 'switchToGroup' });
     const result = await sendWalletActionMethod({
@@ -540,7 +546,7 @@ export class WalletConnectService {
       walletAppId: this.state.walletAppId,
       data: {
         action: 'switchToGroup',
-        payload: (groupPolicyAddress ? {"address": groupPolicyAddress} : undefined),
+        payload: groupPolicyAddress ? { address: groupPolicyAddress } : undefined,
         description,
         method: 'wallet_action',
       },
@@ -549,8 +555,8 @@ export class WalletConnectService {
     this.#setState({ pendingMethod: '' });
     // Broadcast result of method
     const windowMessage = result.error
-        ? WINDOW_MESSAGES.SWITCH_TO_GROUP_FAILED
-        : WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE;
+      ? WINDOW_MESSAGES.SWITCH_TO_GROUP_FAILED
+      : WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();

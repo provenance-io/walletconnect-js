@@ -14,10 +14,10 @@ interface SendWalletAction {
 }
 
 export const sendWalletAction = async ({
-                                connector,
-                                walletAppId,
-                                data,
-                              }: SendWalletAction): Promise<BroadcastResult> => {
+  connector,
+  walletAppId,
+  data,
+}: SendWalletAction): Promise<BroadcastResult> => {
   const {
     description = 'Send Wallet Action',
     method = PROVENANCE_METHODS.action,
@@ -28,6 +28,7 @@ export const sendWalletAction = async ({
     description,
     action,
     payload,
+    date: Date.now(),
   });
   // Custom Request
   const request = {
@@ -36,7 +37,8 @@ export const sendWalletAction = async ({
     method,
     params: [metadata],
   };
-  if (!connector) return { valid: false, data, request, error: 'No wallet connected' };
+  if (!connector)
+    return { valid: false, data, request, error: 'No wallet connected' };
 
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
@@ -49,7 +51,7 @@ export const sendWalletAction = async ({
     }
 
     // send message
-    const result = (await connector.sendCustomRequest(request));
+    const result = await connector.sendCustomRequest(request);
 
     return {
       valid: result,

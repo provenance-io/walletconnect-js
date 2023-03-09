@@ -22,7 +22,8 @@ interface Props {
   jwtExpiration?: number;
   noPopup?: boolean;
   prohibitGroups?: boolean;
-  requiredAddress?: string;
+  requiredIndividualAddress?: string;
+  requiredGroupAddress?: string;
   resetState: () => void;
   setState: WCSSetState;
   startConnectionTimer: () => void;
@@ -37,7 +38,8 @@ export const createConnector = ({
   jwtExpiration,
   noPopup,
   prohibitGroups,
-  requiredAddress,
+  requiredIndividualAddress,
+  requiredGroupAddress,
   resetState,
   setState,
   startConnectionTimer,
@@ -47,14 +49,17 @@ export const createConnector = ({
   class QRCodeModal {
     open = async (data: string) => {
       // Check for address and prohibit groups values to append to the wc value for the wallet to read when connecting
-      const requiredAddressParam = requiredAddress
-        ? `&address=${requiredAddress}`
+      const requiredIndividualAddressParam = requiredIndividualAddress
+        ? `&individualAddress=${requiredIndividualAddress}`
+        : '';
+      const requiredGroupAddressParam = requiredGroupAddress
+        ? `&groupAddress=${requiredGroupAddress}`
         : '';
       const prohibitGroupsParam = prohibitGroups ? `&prohibitGroups=true` : '';
       const jwtExpirationParam = jwtExpiration
         ? `&jwtExpiration=${jwtExpiration}`
         : '';
-      const fullData = `${data}${requiredAddressParam}${prohibitGroupsParam}${jwtExpirationParam}`;
+      const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}`;
       const qrcode = await QRCode.toDataURL(fullData);
       updateModal({ QRCodeImg: qrcode, QRCodeUrl: fullData, showModal: !noPopup });
     };
@@ -171,46 +176,51 @@ export const createConnector = ({
   // - Broadcast "session_update" event (let the dApp know)
   // - Start the "connection timer" to auto-disconnect wcjs when session is expired
   // - Trigger wallet event for "session_update" (let the wallet know)
-  newConnector.on(CONNECTOR_EVENTS.wc_sessionUpdate, (error, payload: ConnectData) => {
-    if (error) throw error;
-    const data = payload.params[0];
-    const { accounts, peerMeta: peer } = data;
+  newConnector.on(
+    CONNECTOR_EVENTS.wc_sessionUpdate,
+    (error, payload: ConnectData) => {
+      if (error) throw error;
+      const data = payload.params[0];
+      const { accounts, peerMeta: peer } = data;
 
-    if(!accounts) { //if no accounts, likely a post disconnect update - bail
-      return;
-    }
-    const connectionEST = Date.now();
-    const connectionEXP = state.connectionTimeout + connectionEST;
+      if (!accounts) {
+        //if no accounts, likely a post disconnect update - bail
+        return;
+      }
+      const connectionEST = Date.now();
+      const connectionEXP = state.connectionTimeout + connectionEST;
 
-    const {
-      address,
-      jwt: signedJWT,
-      publicKey,
-      representedGroupPolicy,
-      walletInfo,
-    } = getAccountInfo(accounts);
-    setState({
-      address,
-      connectionEST,
-      connectionEXP,
-      status: 'connected',
-      peer,
-      publicKey,
-      representedGroupPolicy,
-      signedJWT,
-      walletInfo,
-    });
-    broadcast(WINDOW_MESSAGES.SESSION_UPDATED, {
-      data: {
+      const {
+        address,
+        jwt: signedJWT,
+        publicKey,
+        representedGroupPolicy,
+        walletInfo,
+      } = getAccountInfo(accounts);
+      setState({
+        address,
         connectionEST,
         connectionEXP,
-        connectionType: CONNECTION_TYPES.existing_session,
-      },
-    });
-    startConnectionTimer();
-    const { walletAppId } = getState();
-    if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
-  });
+        status: 'connected',
+        peer,
+        publicKey,
+        representedGroupPolicy,
+        signedJWT,
+        walletInfo,
+      });
+      broadcast(WINDOW_MESSAGES.SESSION_UPDATED, {
+        data: {
+          connectionEST,
+          connectionEXP,
+          connectionType: CONNECTION_TYPES.existing_session,
+        },
+      });
+      startConnectionTimer();
+      const { walletAppId } = getState();
+      if (walletAppId)
+        sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
+    }
+  );
 
   // The session had already previously existed, trigger the existing connection event
   if (newConnector.connected) resumeResumeEvent();
