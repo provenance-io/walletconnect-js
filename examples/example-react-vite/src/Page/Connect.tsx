@@ -2,8 +2,8 @@ import {
   useWalletConnect,
   QRCodeModal,
   WINDOW_MESSAGES,
-  BroadcastResult,
 } from '@provenanceio/walletconnect-js';
+import type { BroadcastResult } from '@provenanceio/walletconnect-js';
 import { Button, Card, Dropdown, Input, Results, Checkbox } from 'Components';
 import { ICON_NAMES, BRIDGE_URLS } from 'consts';
 import { useEffect, useState } from 'react';
@@ -35,14 +35,15 @@ const QRCodeModalStyled = styled(QRCodeModal)`
 
 export const Connect: React.FC = () => {
   const [selectedBridge, setSelectedBridge] = useState(BRIDGE_URLS[0]);
-  const [address, setAddress] = useState('');
+  const [individualAddress, setIndividualAddress] = useState('');
+  const [groupAddress, setGroupAddress] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
   const [groupsAllowed, setGroupsAllowed] = useState(true);
   const [jwtExpiration, setJwtExpiration] = useState('');
   const [sessionDuration, setSessionDuration] = useState('3600');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [results, setResults] = useState<{
-    [key: string]: any;
+    [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   } | null>(null);
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status } = walletConnectState;
@@ -53,9 +54,9 @@ export const Connect: React.FC = () => {
     if (initialLoad) {
       setInitialLoad(false);
 
-      const handleConnectedEvent = (results: BroadcastResult) => {
+      const handleConnectedEvent = (connectResults: BroadcastResult) => {
         setResults({
-          data: { ...walletConnectState, broadcastResult: results },
+          data: { ...walletConnectState, broadcastResult: connectResults },
         });
       };
       wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
@@ -98,10 +99,17 @@ export const Connect: React.FC = () => {
               bottomGap
             />
             <Input
-              onChange={setAddress}
-              value={address}
-              label="Enter wallet address to connect with (optional)"
-              placeholder="Enter wallet address (optional)"
+              onChange={setIndividualAddress}
+              value={individualAddress}
+              label="Enter individual account address to connect with (optional)"
+              placeholder="Enter individual account address (optional)"
+              bottomGap
+            />
+            <Input
+              onChange={setGroupAddress}
+              value={groupAddress}
+              label="Enter group account address to connect with (optional)"
+              placeholder="Enter group account address (optional)"
               bottomGap
             />
             <Input
@@ -130,7 +138,8 @@ export const Connect: React.FC = () => {
             wcs.connect({
               bridge: selectedBridge,
               duration: Number(sessionDuration),
-              address,
+              individualAddress,
+              groupAddress,
               prohibitGroups: !groupsAllowed,
               jwtExpiration: Number(jwtExpiration),
             })
