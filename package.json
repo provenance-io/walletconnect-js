@@ -1,10 +1,11 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "3.0.0-develop.15",
+  "version": "3.0.0-develop.16",
   "private": false,
   "sideEffects": false,
   "main": "lib/index.js",
   "license": "Apache-2.0",
+  "typings": "./esm/index.d.ts",
   "files": [
     "lib",
     "esm",
@@ -92,8 +93,8 @@
     "styled-components": "^5.3.6",
     "ts-loader": "9.4.1",
     "typescript": "4.8.3",
-    "webpack": "5.74.0",
-    "webpack-cli": "4.10.0"
+    "webpack": "5.76.1",
+    "webpack-cli": "5.0.1"
   },
   "scripts": {
     "build:commonjs": "BABEL_ENV=cjs babel ./src --extensions \".js,.jsx,.ts,.tsx\" -d lib --copy-files",
