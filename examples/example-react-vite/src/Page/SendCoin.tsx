@@ -1,8 +1,15 @@
 import { useState } from 'react';
+import styled from 'styled-components';
 import { useWalletConnect, ProvenanceMethod } from '@provenanceio/walletconnect-js';
 import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
 import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
+
+const TotalMessages = styled.div`
+  width: 100%;
+  margin-bottom: 10px;
+  font-style: italic;
+`;
 
 export const SendCoin: React.FC = () => {
   const [amount, setAmount] = useState('1000000000');
@@ -11,27 +18,30 @@ export const SendCoin: React.FC = () => {
   );
   const [denom, setDenom] = useState('nhash');
   const [results, setResults] = useState<{
-    [key: string]: any;
+    [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   } | null>({});
   const [feeGranter, setFeeGranter] = useState('');
+  const [b64MessageArray, setB64MessageArray] = useState<string[]>([]);
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod, address, representedGroupPolicy } = walletConnectState;
   const groupAddress = representedGroupPolicy?.address;
   const sendMessageLoading = pendingMethod === 'sendMessage';
 
-  const handleSubmit = async () => {
+  const buildB64Message = () => {
     const sendMessage = {
       fromAddress: groupAddress ? groupAddress : address,
       toAddress,
       amountList: [{ denom, amount }],
     };
-    const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
-
     const msgSend = buildMessage('MsgSend', sendMessage);
-    if (msgSend) {
-      const msg = createAnyMessageBase64('MsgSend', msgSend);
+    return msgSend ? createAnyMessageBase64('MsgSend', msgSend) : '';
+  };
 
+  const buildSendMessage = () => {
+    const msg = b64MessageArray.length ? b64MessageArray : buildB64Message();
+    if (msg) {
+      const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
       const message = {
         method: 'provenance_sendTransaction' as ProvenanceMethod,
         gasPrice: finalGasData,
@@ -39,7 +49,22 @@ export const SendCoin: React.FC = () => {
         message: msg,
         feeGranter,
       };
+      return message;
+    }
+    return '';
+  };
 
+  const handleAddToMsgArray = () => {
+    const newB64MessageArray = [...b64MessageArray];
+    // Just take the current state values and use them
+    const newB64Msg = buildB64Message();
+    newB64MessageArray.push(newB64Msg);
+    setB64MessageArray(newB64MessageArray);
+  };
+
+  const handleSubmit = async () => {
+    const message = buildSendMessage();
+    if (message) {
       // Convert input string value to number for price
       const result = await wcs.sendMessage(message);
       setResults({
@@ -101,6 +126,26 @@ export const SendCoin: React.FC = () => {
         disabled={sendMessageLoading}
       />
       <ActionGas setGasData={setGasData} gasData={gasData} />
+      {!!b64MessageArray.length && (
+        <TotalMessages>({b64MessageArray.length} total messages)</TotalMessages>
+      )}
+      <Button
+        loading={sendMessageLoading}
+        onClick={handleAddToMsgArray}
+        disabled={!toAddress || !amount}
+      >
+        Add to Tx Array
+      </Button>
+      {!!b64MessageArray.length && (
+        <Button
+          loading={sendMessageLoading}
+          onClick={() => {
+            setB64MessageArray([]);
+          }}
+        >
+          Clear Message Array
+        </Button>
+      )}
       <Button
         loading={sendMessageLoading}
         onClick={handleSubmit}
