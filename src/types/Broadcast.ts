@@ -1,12 +1,15 @@
 import {
   WCSState,
   SendMessageMethod,
-  SendWalletActionMethod
+  SendWalletActionMethod,
 } from './WalletConnectService';
 import { ConnectData } from './ConnectData';
 import { WINDOW_MESSAGES } from '../consts';
 
-export type ProvenanceMethod = 'provenance_sign' | 'provenance_sendTransaction' | 'wallet_action';
+export type ProvenanceMethod =
+  | 'provenance_sign'
+  | 'provenance_sendTransaction'
+  | 'wallet_action';
 
 export type ConnectionType = 'existing session' | 'new session';
 
@@ -61,7 +64,7 @@ interface TxLog {
   eventsList: {
     type: string;
     attributesList: TxEvent[];
-  };
+  }[];
 }
 interface TxResponse {
   code: number;
