@@ -427,6 +427,7 @@ export class WalletConnectService {
    * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
+   * @param onQRCodeSet - (optional) Callback to be fired with the QRCode data once set
    */
   connect = ({
     individualAddress,
@@ -436,6 +437,7 @@ export class WalletConnectService {
     jwtExpiration,
     noPopup,
     prohibitGroups,
+    onQRCodeSet,
   }: ConnectMethod = {}) => {
     // Only create a new connector when we're not already connected
     if (this.state.status !== 'connected') {
@@ -458,6 +460,7 @@ export class WalletConnectService {
         startConnectionTimer: this.#startConnectionTimer,
         state: this.state,
         updateModal: this.updateModal,
+        onQRCodeSet,
       });
 
       this.#connector = newConnector;

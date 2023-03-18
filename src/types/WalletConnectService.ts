@@ -84,6 +84,7 @@ export interface ConnectMethod {
   groupAddress?: string;
   prohibitGroups?: boolean;
   jwtExpiration?: number;
+  onQRCodeSet?: (qrCode: { img: string; url: string }) => void;
 }
 
 export interface SendMessageMethod {

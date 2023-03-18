@@ -142,6 +142,7 @@ export const Connect: React.FC = () => {
               groupAddress,
               prohibitGroups: !groupsAllowed,
               jwtExpiration: Number(jwtExpiration),
+              onQRCodeSet: console.log
             })
           }
         >

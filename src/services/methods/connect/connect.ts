@@ -1,21 +1,4 @@
-import { createConnector } from './createConnector';
-import type { Broadcast, WCSState, WCSSetState, ModalData } from '../../../types';
-
-interface Props {
-  bridge: string;
-  broadcast: Broadcast;
-  getState: () => WCSState;
-  jwtExpiration?: number;
-  noPopup?: boolean;
-  prohibitGroups?: boolean;
-  requiredIndividualAddress?: string;
-  requiredGroupAddress?: string;
-  resetState: () => void;
-  setState: WCSSetState;
-  startConnectionTimer: () => void;
-  state: WCSState;
-  updateModal: (newModalData: Partial<ModalData>) => void;
-}
+import { createConnector, type ConnectOptions } from './createConnector';
 
 // This connect method has three parts:
 // Creating a new connector w/connector.on() events (connect, session_update, and disconnect)
@@ -35,7 +18,8 @@ export const connect = ({
   startConnectionTimer,
   state,
   updateModal,
-}: Props) => {
+  onQRCodeSet,
+}: ConnectOptions) => {
   // Create a new walletconnect connector class and set up all walletconnect event listeners for it
   const newConnector = createConnector({
     bridge,
@@ -51,6 +35,7 @@ export const connect = ({
     state,
     startConnectionTimer,
     updateModal,
+    onQRCodeSet,
   });
 
   // If we're not connected, initiate a connection to this newConnector and dApp

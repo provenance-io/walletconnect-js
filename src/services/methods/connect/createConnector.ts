@@ -15,7 +15,7 @@ import {
 } from '../../../consts';
 import { getAccountInfo, sendWalletEvent } from '../../../utils';
 
-interface Props {
+export interface ConnectOptions {
   bridge: string;
   broadcast: Broadcast;
   getState: () => WCSState;
@@ -29,6 +29,7 @@ interface Props {
   startConnectionTimer: () => void;
   state: WCSState;
   updateModal: (newModalData: Partial<ModalData>) => void;
+  onQRCodeSet?: (qrCode: { img: string; url: string }) => void;
 }
 
 export const createConnector = ({
@@ -45,7 +46,8 @@ export const createConnector = ({
   startConnectionTimer,
   state,
   updateModal,
-}: Props) => {
+  onQRCodeSet,
+}: ConnectOptions) => {
   class QRCodeModal {
     open = async (data: string) => {
       // Check for address and prohibit groups values to append to the wc value for the wallet to read when connecting
@@ -62,6 +64,7 @@ export const createConnector = ({
       const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}`;
       const qrcode = await QRCode.toDataURL(fullData);
       updateModal({ QRCodeImg: qrcode, QRCodeUrl: fullData, showModal: !noPopup });
+      onQRCodeSet?.({ img: qrcode, url: fullData });
     };
 
     close = () => {

@@ -10,4 +10,9 @@ export default defineConfig({
   define: {
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
   },
+  resolve: {
+    alias: {
+      '@provenanceio/walletconnect-js': __dirname + '/../../src/index.ts',
+    },
+  },
 });
