@@ -31,6 +31,9 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
   - Optional `service` lets dApps manually pass in their own instance of `walletConnectService`
 - WINDOW_MESSAGES
   - Renamed `SIGN_MESSAGE` events to `SIGN_HEX_MESSAGE`
+- Variable names
+  - Removed all Provenance wallet support
+  - Changed `figure_web` to be `figure_hosted`
 
 ## Table of Contents
 
@@ -118,6 +121,7 @@ Holds current walletconnect-js state values
       QRCodeUrl: '', // QRCode url contained within image [string]
       QRCodeImg: '', // QRCode image data to connect to WalletConnect bridge [string]
       isMobile: false, // Is the connected browser a mobile device [bool]
+      dynamicUrl: '' // Dynamic link to open the Figure mobile wallet [string]
     },
     peer: {}, // Connected wallet info [object]
     pendingMethod: '', // Are any methods currently pending [string]
@@ -149,11 +153,11 @@ Used to call walletconnect-js methods
   | ------ | ------ | -------- | ---------------------- | ------------ | --------------------------------------- |
   | bridge | string | no       | `"wss://figure.tech/service-wallet-connect-bridge/ws/external"` | `"wss://custom.bridge"` | Custom bridge to connect into |
   | duration | number | no       | `1800` | `3600` | Custom connection timeout in seconds |
-  | noPopup | boolean | no       | false | true | Should the QRCodeModal popup automatically on connect call |
   | individualAddress | string | no       | `''` | `tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh` | Required individual address for dApp connection |
   | groupAddress | string | no       | `''` | `tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh` | Required group address for dApp connection |
   | prohibitGroups | boolean | no       | `false` | `true` | Prohibit group accounts from connecting to this dApp |
   | jwtExpiration | number | no       | `''` | `3600` | Time from now in seconds to expire new JWT returned |
+  | walletAppId | string | no | `''` | `'figure_extension'` | Open a specific wallet directly (bypassing the QRCode modal)
 
 - #### disconnect
 

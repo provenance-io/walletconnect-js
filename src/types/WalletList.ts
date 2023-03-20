@@ -2,16 +2,12 @@ import { WALLET_APP_EVENTS } from '../consts';
 
 export type WalletEventKey = keyof typeof WALLET_APP_EVENTS;
 export type WalletEventValue = typeof WALLET_APP_EVENTS[WalletEventKey];
-export type WalletType = 'mobile' | 'extension' | 'web';
+export type WalletType = 'mobile' | 'extension' | 'hosted';
 export type WalletId =
-  | 'provenance_extension'
-  | 'provenance_mobile'
-  | 'provenance_mobile_test'
   | 'figure_extension'
-  | 'figure_web'
+  | 'figure_hosted'
+  | 'figure_hosted_test'
   | 'figure_mobile'
-  | 'figure_mobile_test'
-  | 'figure_web_test'
   | 'figure_mobile_test';
 export type WalletIcons = 'provenance' | 'figure';
 

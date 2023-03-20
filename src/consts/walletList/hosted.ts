@@ -1,11 +1,14 @@
 import { Wallet } from '../../types';
 import { WALLET_APP_IDS } from '../walletAppIds';
-import { FIGURE_WEB_WALLET_PROD_URL, FIGURE_WEB_WALLET_TEST_URL } from '../urls';
+import {
+  FIGURE_HOSTED_WALLET_URL_TEST,
+  FIGURE_HOSTED_WALLET_URL_PROD,
+} from '../urls';
 
-export const webFigure = {
-  id: WALLET_APP_IDS.FIGURE_WEB,
-  type: ['web', 'mobile'],
-  title: 'Figure Web',
+export const FIGURE_HOSTED = {
+  id: WALLET_APP_IDS.FIGURE_HOSTED,
+  type: ['hosted', 'mobile'],
+  title: 'Figure Hosted',
   icon: 'figure',
   eventAction: ({ uri, address, event, redirectUrl }) => {
     // Build a full set of urlSearchParams to append to the url
@@ -15,7 +18,7 @@ export const webFigure = {
     if (event) searchParams.append('event', event);
     if (redirectUrl) searchParams.append('redirectUrl', redirectUrl);
     const searchParamsString = searchParams.toString();
-    const url = `${FIGURE_WEB_WALLET_PROD_URL}${
+    const url = `${FIGURE_HOSTED_WALLET_URL_PROD}${
       searchParamsString ? `?${searchParamsString}` : ''
     }`;
     const width = 600;
@@ -23,19 +26,15 @@ export const webFigure = {
     const top = window.outerHeight / 2 + window.screenY - height / 2;
     const left = window.outerWidth / 2 + window.screenX - width / 2;
     const windowOptions = `popup=1 height=${height} width=${width} top=${top} left=${left} resizable=1, scrollbars=1, fullscreen=0, toolbar=0, menubar=0, status=1`;
-    // Redirect Event
-    if (event === 'walletconnect_init') window.location.href = url;
-    // Popup Event
-    else if (event === 'walletconnect_event')
-      window.open(url, undefined, windowOptions);
+    window.open(url, undefined, windowOptions);
   },
 } as Wallet;
 
-export const webFigureTest = {
+export const FIGURE_HOSTED_TEST = {
   dev: true,
-  id: WALLET_APP_IDS.FIGURE_WEB_TEST,
+  id: WALLET_APP_IDS.FIGURE_HOSTED_TEST,
   type: ['web', 'mobile'],
-  title: 'Figure Web (Test)',
+  title: 'Figure Hosted (Test)',
   icon: 'figure',
   eventAction: ({ uri, address, event, redirectUrl }) => {
     // Build a full set of urlSearchParams to append to the url
@@ -45,7 +44,7 @@ export const webFigureTest = {
     if (event) searchParams.append('event', event);
     if (redirectUrl) searchParams.append('redirectUrl', redirectUrl);
     const searchParamsString = searchParams.toString();
-    const url = `${FIGURE_WEB_WALLET_TEST_URL}${
+    const url = `${FIGURE_HOSTED_WALLET_URL_TEST}${
       searchParamsString ? `?${searchParamsString}` : ''
     }`;
     const width = 600;
@@ -53,10 +52,6 @@ export const webFigureTest = {
     const top = window.outerHeight / 2 + window.screenY - height / 2;
     const left = window.outerWidth / 2 + window.screenX - width / 2;
     const windowOptions = `popup=1 height=${height} width=${width} top=${top} left=${left} resizable=1, scrollbars=1, fullscreen=0, toolbar=0, menubar=0, status=1`;
-    // Redirect Event
-    if (event === 'walletconnect_init') window.location.href = url;
-    // Popup Event
-    else if (event === 'walletconnect_event')
-      window.open(url, undefined, windowOptions);
+    window.open(url, undefined, windowOptions);
   },
 } as Wallet;
