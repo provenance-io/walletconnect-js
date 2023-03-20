@@ -33,7 +33,7 @@ export const FIGURE_HOSTED = {
 export const FIGURE_HOSTED_TEST = {
   dev: true,
   id: WALLET_APP_IDS.FIGURE_HOSTED_TEST,
-  type: ['web', 'mobile'],
+  type: ['hosted', 'mobile'],
   title: 'Figure Hosted (Test)',
   icon: 'figure',
   eventAction: ({ uri, address, event, redirectUrl }) => {
