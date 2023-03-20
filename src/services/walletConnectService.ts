@@ -394,7 +394,7 @@ export class WalletConnectService {
     this.#setState({
       modal: newModal,
       status,
-      walletAppId: newModalData.walletAppId,
+      ...(newModalData.walletAppId && { walletAppId: newModalData.walletAppId }),
     });
   };
 

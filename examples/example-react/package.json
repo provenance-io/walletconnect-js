@@ -1,6 +1,6 @@
 {
   "name": "webdemo",
-  "version": "3.0.0-develop.19",
+  "version": "3.0.0-develop.20",
   "homepage": "/walletconnect",
   "private": true,
   "dependencies": {
