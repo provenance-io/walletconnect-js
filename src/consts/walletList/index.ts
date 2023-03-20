@@ -1,12 +1,11 @@
-import { extensionFigure, extensionProvenance } from './extension';
-import { mobileFigure, mobileFigureTest } from './mobile';
-import { webFigure, webFigureTest } from './web';
+import { FIGURE_EXTENSION } from './extension';
+import { FIGURE_MOBILE, FIGURE_MOBILE_TEST } from './mobile';
+import { FIGURE_HOSTED, FIGURE_HOSTED_TEST } from './hosted';
 
 export const WALLET_LIST = [
-  extensionFigure,
-  extensionProvenance,
-  mobileFigure,
-  mobileFigureTest,
-  webFigure,
-  webFigureTest,
+  FIGURE_EXTENSION,
+  FIGURE_MOBILE,
+  FIGURE_MOBILE_TEST,
+  FIGURE_HOSTED,
+  FIGURE_HOSTED_TEST,
 ];

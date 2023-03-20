@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
-import styled from 'styled-components';
 import { WalletConnectService } from '../../services';
 import {
   APP_STORE_GOOGLE_PLAY_FIGURE,
@@ -161,8 +160,8 @@ export const QRCodeModal: React.FC<Props> = ({
       // If they are in dev mode we don't render them unless they're included in the devWallets override array
       .filter(
         ({ type, dev, id }) =>
-          // Has to either be a web or extension wallet
-          (type.includes('web') || type.includes('extension')) &&
+          // Has to either be a hosted or extension wallet
+          (type.includes('hosted') || type.includes('extension')) &&
           // Not dev, or if dev, included in devWallets list
           (!dev || devWallets?.includes(id)) &&
           // Cannot be included in hideWallets list

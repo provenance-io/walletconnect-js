@@ -28,12 +28,20 @@ const AdvancedOptions = styled.div`
   border-radius: 4px;
   margin-bottom: 20px;
 `;
+const DirectConnectButton = styled(Button)`
+  background: ${COLORS.SECONDARY_450};
+  margin-top: 20px;
+  &:hover:not(:disabled) {
+    background-color: ${COLORS.SECONDARY_350};
+  }
+`;
 const QRCodeModalStyled = styled(QRCodeModal)`
   background: ${COLORS.BLACK_70};
   font-family: ${FONTS.SECONDARY_FONT};
 `;
 
 export const Connect: React.FC = () => {
+  const [directQRCodeGenerate, setDirectQRCodeGenerate] = useState(false);
   const [selectedBridge, setSelectedBridge] = useState(BRIDGE_URLS[0]);
   const [individualAddress, setIndividualAddress] = useState('');
   const [groupAddress, setGroupAddress] = useState('');
@@ -46,7 +54,8 @@ export const Connect: React.FC = () => {
     [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   } | null>(null);
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { status } = walletConnectState;
+  const { status, modal } = walletConnectState;
+  const { QRCodeImg, dynamicUrl } = modal;
   const navigate = useNavigate();
 
   // Listen for a connection, then redirect to action page
@@ -145,8 +154,60 @@ export const Connect: React.FC = () => {
             })
           }
         >
-          Connect
+          Connect with QRCodeModal
         </Button>
+        <DirectConnectButton
+          onClick={() =>
+            wcs.connect({
+              bridge: selectedBridge,
+              duration: Number(sessionDuration),
+              individualAddress,
+              groupAddress,
+              prohibitGroups: !groupsAllowed,
+              jwtExpiration: Number(jwtExpiration),
+              walletAppId: 'figure_extension',
+            })
+          }
+        >
+          Connect directly with Figure Extension Wallet
+        </DirectConnectButton>
+        <DirectConnectButton
+          onClick={() =>
+            wcs.connect({
+              bridge: selectedBridge,
+              duration: Number(sessionDuration),
+              individualAddress,
+              groupAddress,
+              prohibitGroups: !groupsAllowed,
+              jwtExpiration: Number(jwtExpiration),
+              walletAppId: 'figure_hosted_test',
+            })
+          }
+        >
+          Connect directly with Figure Hosted Wallet
+        </DirectConnectButton>
+        <DirectConnectButton
+          onClick={() => {
+            setDirectQRCodeGenerate(true);
+            wcs.connect({
+              bridge: selectedBridge,
+              duration: Number(sessionDuration),
+              individualAddress,
+              groupAddress,
+              prohibitGroups: !groupsAllowed,
+              jwtExpiration: Number(jwtExpiration),
+              walletAppId: 'figure_mobile_test',
+            });
+          }}
+        >
+          Connect directly with Figure Mobile
+        </DirectConnectButton>
+        {directQRCodeGenerate && QRCodeImg && <img src={QRCodeImg} />}
+        {directQRCodeGenerate && dynamicUrl && (
+          <div>
+            <a href={dynamicUrl}>Dynamic Url</a>
+          </div>
+        )}
         <QRCodeModalStyled
           walletConnectService={wcs}
           devWallets={['figure_web_test', 'figure_mobile_test']}

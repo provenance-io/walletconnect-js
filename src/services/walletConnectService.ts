@@ -54,6 +54,7 @@ const defaultState: WCSState = {
   modal: {
     showModal: false,
     isMobile: isMobile(),
+    dynamicUrl: '',
     QRCodeImg: '',
     QRCodeUrl: '',
   },
@@ -379,7 +380,7 @@ export class WalletConnectService {
   };
 
   // Update the modal values
-  updateModal = (newModalData: Partial<ModalData>) => {
+  updateModal = (newModalData: Partial<ModalData> & { walletAppId?: WalletId }) => {
     const newModal = { ...this.state.modal, ...newModalData };
     let status = this.state.status;
     // If we're closing the modal and #connector isn't connected, update the status from "pending" to "disconnected"
@@ -387,9 +388,14 @@ export class WalletConnectService {
       !newModalData.showModal &&
       status === 'pending' &&
       !this.#connector?.connected
-    )
+    ) {
       status = 'disconnected';
-    this.#setState({ modal: newModal, status });
+    }
+    this.#setState({
+      modal: newModal,
+      status,
+      walletAppId: newModalData.walletAppId,
+    });
   };
 
   /**
@@ -422,11 +428,11 @@ export class WalletConnectService {
   /**
    * @param bridge - (optional) URL string of bridge to connect into
    * @param duration - (optional) Time before connection is timed out (seconds)
-   * @param noPopup - (optional) Prevent the QRCodeModal from automatically popping up
    * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
    * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
+   * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
    */
   connect = ({
     individualAddress,
@@ -434,8 +440,8 @@ export class WalletConnectService {
     bridge,
     duration,
     jwtExpiration,
-    noPopup,
     prohibitGroups,
+    walletAppId,
   }: ConnectMethod = {}) => {
     // Only create a new connector when we're not already connected
     if (this.state.status !== 'connected') {
@@ -449,15 +455,15 @@ export class WalletConnectService {
         broadcast: this.#broadcastEvent,
         getState: this.#getState,
         jwtExpiration,
-        noPopup,
         prohibitGroups,
-        requiredIndividualAddress: individualAddress,
         requiredGroupAddress: groupAddress,
+        requiredIndividualAddress: individualAddress,
         resetState: this.#resetState,
         setState: this.#setState,
         startConnectionTimer: this.#startConnectionTimer,
         state: this.state,
         updateModal: this.updateModal,
+        walletAppId,
       });
 
       this.#connector = newConnector;

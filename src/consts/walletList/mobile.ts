@@ -10,7 +10,7 @@ import {
 } from '../urls';
 import { WALLET_APP_IDS } from '../walletAppIds';
 
-export const mobileFigure = {
+export const FIGURE_MOBILE = {
   id: WALLET_APP_IDS.FIGURE_MOBILE,
   type: 'mobile',
   title: 'Figure Mobile',
@@ -25,7 +25,7 @@ export const mobileFigure = {
     }),
 } as Wallet;
 
-export const mobileFigureTest = {
+export const FIGURE_MOBILE_TEST = {
   id: WALLET_APP_IDS.FIGURE_MOBILE_TEST,
   type: 'mobile',
   title: 'Figure Mobile (Test)',

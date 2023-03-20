@@ -6,11 +6,14 @@ import type {
   WCSState,
   ConnectData,
   ModalData,
+  WalletId,
+  EventData,
 } from '../../../types';
 import {
   CONNECTION_TYPES,
   CONNECTOR_EVENTS,
   WALLET_APP_EVENTS,
+  WALLET_LIST,
   WINDOW_MESSAGES,
 } from '../../../consts';
 import { getAccountInfo, sendWalletEvent } from '../../../utils';
@@ -22,13 +25,16 @@ interface Props {
   jwtExpiration?: number;
   noPopup?: boolean;
   prohibitGroups?: boolean;
-  requiredIndividualAddress?: string;
   requiredGroupAddress?: string;
+  requiredIndividualAddress?: string;
   resetState: () => void;
   setState: WCSSetState;
   startConnectionTimer: () => void;
   state: WCSState;
-  updateModal: (newModalData: Partial<ModalData>) => void;
+  updateModal: (
+    newModalData: Partial<ModalData> & { walletAppId?: WalletId }
+  ) => void;
+  walletAppId?: WalletId;
 }
 
 export const createConnector = ({
@@ -36,16 +42,59 @@ export const createConnector = ({
   broadcast,
   getState,
   jwtExpiration,
-  noPopup,
   prohibitGroups,
-  requiredIndividualAddress,
   requiredGroupAddress,
+  requiredIndividualAddress,
   resetState,
   setState,
   startConnectionTimer,
   state,
   updateModal,
+  walletAppId: connectionWalletAppId,
 }: Props) => {
+  const openDirectWallet = (targetWalletId: WalletId, uriData: string) => {
+    // Find the target wallet based on id
+    const targetWallet = WALLET_LIST.find(
+      ({ id: walletId }) => walletId === targetWalletId
+    );
+    if (targetWallet) {
+      const runEventAction = () => {
+        // If the wallet has an eventAction (they should all have an event action...)
+        if (targetWallet.eventAction) {
+          // Build eventdata to send to the extension
+          const eventData: EventData = {
+            uri: uriData,
+            event: 'walletconnect_init',
+            duration: state.connectionTimeout,
+            redirectUrl: window.location.href,
+          };
+          // Trigger the event action based on the wallet
+          targetWallet.eventAction(eventData);
+        }
+      };
+      // Do we need to build dynamic links for this wallet (typically mobile wallets in responsive mode)
+      if (targetWallet.generateUrl) {
+        const dynamicUrl = targetWallet.generateUrl(uriData);
+        // Save the new dynamicUrl into the modal state
+        updateModal({ dynamicUrl });
+      }
+      // Wallet includes a self-existence check function
+      if (targetWallet.walletCheck) {
+        // Use function to see if wallet exists
+        const walletExists = targetWallet.walletCheck();
+        // Wallet exists, run the proper event action
+        if (walletExists) runEventAction();
+        // Wallet doesn't exist, send the user to the wallets download url (if provided)
+        else if (targetWallet.walletUrl) {
+          window.open(targetWallet.walletUrl);
+        }
+      } else {
+        // No self-existence check required, just run the event action for this wallet
+        runEventAction();
+      }
+    }
+  };
+
   class QRCodeModal {
     open = async (data: string) => {
       // Check for address and prohibit groups values to append to the wc value for the wallet to read when connecting
@@ -61,7 +110,15 @@ export const createConnector = ({
         : '';
       const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}`;
       const qrcode = await QRCode.toDataURL(fullData);
-      updateModal({ QRCodeImg: qrcode, QRCodeUrl: fullData, showModal: !noPopup });
+      // Don't trigger a QRCodeModal popup if they say "noPopup" or pass a specific walletId
+      updateModal({
+        QRCodeImg: qrcode,
+        QRCodeUrl: fullData,
+        showModal: !connectionWalletAppId,
+        walletAppId: connectionWalletAppId,
+      });
+      // If we need to open a wallet directly, we won't be opening the QRCodeModal and will instead trigger that wallet directly
+      if (connectionWalletAppId) openDirectWallet(connectionWalletAppId, fullData);
     };
 
     close = () => {

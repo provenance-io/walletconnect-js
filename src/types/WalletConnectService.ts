@@ -22,6 +22,7 @@ export interface ModalData {
   QRCodeUrl: string;
   showModal: boolean;
   isMobile: boolean;
+  dynamicUrl: string;
 }
 
 export interface WCSState {
@@ -84,6 +85,7 @@ export interface ConnectMethod {
   groupAddress?: string;
   prohibitGroups?: boolean;
   jwtExpiration?: number;
+  walletAppId?: WalletId;
 }
 
 export interface SendMessageMethod {

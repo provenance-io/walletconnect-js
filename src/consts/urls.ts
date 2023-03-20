@@ -21,5 +21,6 @@ export const APP_STORE_APPLE_FIGURE =
   'https://apps.apple.com/us/app/figure-wallet/id6444263900';
 
 // FIGURE WEB WALLET URLS
-export const FIGURE_WEB_WALLET_TEST_URL = 'https://test.figure.com/figure-wallet';
-export const FIGURE_WEB_WALLET_PROD_URL = 'https://www.figure.com/figure-wallet';
+const FIGURE_HOSTED_WALLET_URL = 'figure-wallet/connect/hosted';
+export const FIGURE_HOSTED_WALLET_URL_TEST = `https://test.figure.com/${FIGURE_HOSTED_WALLET_URL}`;
+export const FIGURE_HOSTED_WALLET_URL_PROD = `https://www.figure.com/${FIGURE_HOSTED_WALLET_URL}`;
