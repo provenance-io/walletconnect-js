@@ -383,11 +383,12 @@ export class WalletConnectService {
   updateModal = (newModalData: Partial<ModalData> & { walletAppId?: WalletId }) => {
     const newModal = { ...this.state.modal, ...newModalData };
     let status = this.state.status;
-    // If we're closing the modal and #connector isn't connected, update the status from "pending" to "disconnected"
+    // If we're closing the modal and #connector isn't connected, update the status from "pending" to "disconnected".  Note: walletAppId will prevent a popup and is different from "closing", so check for it.
     if (
       !newModalData.showModal &&
       status === 'pending' &&
-      !this.#connector?.connected
+      !this.#connector?.connected &&
+      !newModalData.walletAppId
     ) {
       status = 'disconnected';
     }
