@@ -1,8 +1,4 @@
-import {
-  WCSState,
-  SendMessageMethod,
-  SendWalletActionMethod,
-} from './WalletConnectService';
+import { SendMessageMethod, SendWalletActionMethod } from './WalletConnectService';
 import { ConnectData } from './ConnectData';
 import { WINDOW_MESSAGES } from '../consts';
 
@@ -42,10 +38,15 @@ interface MethodRequest {
 type BroadcastEventKeys = keyof typeof WINDOW_MESSAGES;
 export type BroadcastEvent = typeof WINDOW_MESSAGES[BroadcastEventKeys];
 
+interface MethodDisconnectData {
+  message?: string;
+}
+
 type BroadcastResultData =
   | SendMessageMethod
   | SendWalletActionMethod
   | MethodConnectData
+  | MethodDisconnectData
   | MethodSignJWTData
   | number
   | string;
@@ -97,10 +98,7 @@ export interface BroadcastResult {
 
 export type Broadcast = (eventName: BroadcastEvent, data?: BroadcastResult) => void;
 
-export interface ConnectorEventData {
-  broadcastData?: {
-    eventName: BroadcastEvent;
-    payload?: BroadcastResult;
-  };
-  stateData?: 'reset' | Partial<WCSState>;
+export interface WCDisconnectEvent {
+  event: string;
+  params: { message?: string }[];
 }
