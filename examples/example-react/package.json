@@ -1,12 +1,12 @@
 {
   "name": "webdemo",
-  "version": "3.0.0-develop.22",
+  "version": "2.1.8",
   "homepage": "/walletconnect",
   "private": true,
   "dependencies": {
     "@microlink/react-json-view": "1.22.2",
     "@provenanceio/wallet-utils": "2.4.1",
-    "@provenanceio/walletconnect-js": "file:../provenanceio-walletconnect-js-3.0.0-${npm_package_version}.tgz",
+    "@provenanceio/walletconnect-js": "^2.1.8",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-helmet-async": "1.3.0",

@@ -178,12 +178,12 @@ export const createConnector = ({
   // - Trigger wallet event for "disconnect" (let the wallet know)
   // - Reset the walletConnectService state to default values
   // - Broadcast "disconnect" event (let the dApp know)
-  newConnector.on(CONNECTOR_EVENTS.disconnect, (error) => {
+  newConnector.on(CONNECTOR_EVENTS.disconnect, (error, payload) => {
     if (error) throw error;
     const { walletAppId } = getState();
     if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.DISCONNECT);
     resetState();
-    broadcast(WINDOW_MESSAGES.DISCONNECT);
+    broadcast(WINDOW_MESSAGES.DISCONNECT, payload);
   });
 
   // ------------------------

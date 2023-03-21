@@ -1,6 +1,6 @@
 {
   "name": "wcjs-example-es6",
-  "version": "3.0.0-develop.22",
+  "version": "2.1.8",
   "description": "testing walletconnect-js with a non-react js app",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@provenanceio/walletconnect-js": "file:../provenanceio-walletconnect-js-${npm_package_version}.tgz",
+    "@provenanceio/walletconnect-js": "^2.1.8",
     "file-loader": "6.2.0"
   },
   "devDependencies": {
