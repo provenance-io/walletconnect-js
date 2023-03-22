@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useWalletConnect, ProvenanceMethod } from '@provenanceio/walletconnect-js';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData, ProvenanceMethod } from '@provenanceio/walletconnect-js';
 import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
 import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
@@ -17,9 +18,7 @@ export const SendCoin: React.FC = () => {
     'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6'
   );
   const [denom, setDenom] = useState('nhash');
-  const [results, setResults] = useState<{
-    [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  } | null>({});
+  const [results, setResults] = useState<BroadcastEventData | undefined>();
   const [feeGranter, setFeeGranter] = useState('');
   const [b64MessageArray, setB64MessageArray] = useState<string[]>([]);
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
@@ -67,29 +66,23 @@ export const SendCoin: React.FC = () => {
     if (message) {
       // Convert input string value to number for price
       const result = await wcs.sendMessage(message);
-      setResults({
-        action: 'signMessage',
-        status: result.error ? 'failed' : 'success',
-        message: result.error ? result.error : 'WalletConnectJS | SendCoin Complete',
-        data: result,
-      });
+      setResults(result);
     } else {
       // No msgSend, show an error
       setResults({
-        action: 'sendMessage',
-        status: 'failure',
-        message: 'Unable to send message - buildMessage failed',
-        data: {},
+        error: 'Unable to send message - buildMessage failed',
       });
     }
   };
+
+  const status = results ? results.error ? 'failure' : 'success' : undefined;
 
   return (
     <ActionCard
       icon={ICON_NAMES.HASH}
       title="Send Coin"
       description="Send coin to another address (uses sendMessage method)"
-      status={results?.status}
+      status={status}
     >
       <Input
         width="100%"

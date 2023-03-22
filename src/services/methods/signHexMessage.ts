@@ -2,9 +2,9 @@ import { verifySignature } from '../../helpers';
 import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
 import { rngNum } from '../../utils';
 import type {
-  BroadcastResult,
   WalletConnectClientType,
   WalletId,
+  BroadcastEventData,
 } from '../../types';
 
 interface SignHexMessage {
@@ -21,7 +21,7 @@ export const signHexMessage = async ({
   hexMessage,
   publicKey: pubKeyB64,
   walletAppId,
-}: SignHexMessage): Promise<BroadcastResult> => {
+}: SignHexMessage): Promise<BroadcastEventData> => {
   let valid = false;
   const method = PROVENANCE_METHODS.sign;
   const description = 'Sign Message';
@@ -37,8 +37,7 @@ export const signHexMessage = async ({
     method,
     params: [metadata],
   };
-  if (!connector)
-    return { valid, data: hexMessage, request, error: 'No wallet connected' };
+  if (!connector) return { valid, request, error: 'No wallet connected' };
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
   request.params.push(hexMessage);
@@ -54,8 +53,8 @@ export const signHexMessage = async ({
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
     valid = await verifySignature(hexMessage, signature, pubKeyB64);
-    return { valid, result, data: hexMessage, request };
+    return { valid, result: { signature: result }, request };
   } catch (error) {
-    return { valid, error: `${error}`, data: hexMessage, request };
+    return { valid, error: `${error}`, request };
   }
 };

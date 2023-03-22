@@ -1,6 +1,7 @@
 import { createConnector } from './createConnector';
 import type {
-  Broadcast,
+  BroadcastEventName,
+  BroadcastEventData,
   WCSState,
   WCSSetState,
   ModalData,
@@ -9,7 +10,7 @@ import type {
 
 interface Props {
   bridge: string;
-  broadcast: Broadcast;
+  broadcast: (eventName: BroadcastEventName, eventData: BroadcastEventData) => void;
   getState: () => WCSState;
   jwtExpiration?: number;
   noPopup?: boolean;

@@ -7,8 +7,17 @@ export * from './consts/walletList';
 export * from './consts/walletConnect';
 
 export type {
-  BroadcastResult,
   ProvenanceMethod,
   WalletConnectServiceStatus,
   ConnectMethod,
+  // Broadcast events for methods
+  BroadcastEventData,
+  SignHexMessageMethodResult,
+  SignJWTMethodResult,
+  SendMessageMethodResult,
+  DisconnectMethodResult,
+  ConnectMethodResult,
+  // Wallet info
+  WalletId,
+  WalletType,
 } from './types';

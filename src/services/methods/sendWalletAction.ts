@@ -1,7 +1,7 @@
 import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
 import { rngNum } from '../../utils';
 import type {
-  BroadcastResult,
+  BroadcastEventData,
   WalletConnectClientType,
   WalletId,
   SendWalletActionMethod,
@@ -17,7 +17,7 @@ export const sendWalletAction = async ({
   connector,
   walletAppId,
   data,
-}: SendWalletAction): Promise<BroadcastResult> => {
+}: SendWalletAction): Promise<BroadcastEventData> => {
   const {
     description = 'Send Wallet Action',
     method = PROVENANCE_METHODS.action,
@@ -37,8 +37,7 @@ export const sendWalletAction = async ({
     method,
     params: [metadata],
   };
-  if (!connector)
-    return { valid: false, data, request, error: 'No wallet connected' };
+  if (!connector) return { valid: false, request, error: 'No wallet connected' };
 
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
@@ -54,12 +53,11 @@ export const sendWalletAction = async ({
     const result = await connector.sendCustomRequest(request);
 
     return {
-      valid: result,
+      valid: !!result,
       result,
-      data,
       request,
     };
   } catch (error) {
-    return { valid: false, error: `${error}`, data, request };
+    return { valid: false, error: `${error}`, request };
   }
 };

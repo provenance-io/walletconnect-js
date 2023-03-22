@@ -4,7 +4,7 @@ import { verifySignature } from '../../helpers';
 import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
 import { rngNum } from '../../utils';
 import type {
-  BroadcastResult,
+  BroadcastEventData,
   WCSSetState,
   WalletConnectClientType,
   WalletId,
@@ -26,7 +26,7 @@ export const signJWT = async ({
   walletAppId,
   publicKey: pubKeyB64,
   expires, // Custom expiration time in seconds from now
-}: SignJWT): Promise<BroadcastResult> => {
+}: SignJWT): Promise<BroadcastEventData> => {
   let valid = false;
   const nowSec = Math.round(Date.now() / 1000); // Current time seconds
   const customExpiresGiven = expires !== undefined;
@@ -51,7 +51,6 @@ export const signJWT = async ({
   if (!connector)
     return {
       valid,
-      data: { expires: finalExpiresSec },
       request,
       error: 'No wallet connected',
     };
@@ -92,11 +91,10 @@ export const signJWT = async ({
     setState({ signedJWT });
     return {
       valid,
-      result,
-      data: { signedJWT, expires: finalExpiresSec },
+      result: { signature: result, signedJWT, expires: finalExpiresSec },
       request,
     };
   } catch (error) {
-    return { valid, error: `${error}`, data: { expires: finalExpiresSec }, request };
+    return { valid, error: `${error}`, request };
   }
 };

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import { useWalletConnect, ProvenanceMethod } from '@provenanceio/walletconnect-js';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData, ProvenanceMethod } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, ActionGas, Results, Dropdown } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
@@ -16,9 +17,7 @@ const TestMessage = styled.span`
 export const SendMessage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [description, setDescription] = useState('');
-  const [results, setResults] = useState<{
-    [key: string]: any;
-  } | null>({});
+  const [results, setResults] = useState<BroadcastEventData | undefined>();
   const [method, setMethod] = useState<ProvenanceMethod>(
     'provenance_sendTransaction'
   );
@@ -37,14 +36,7 @@ export const SendMessage: React.FC = () => {
       gasPrice: finalGasData,
       method,
     });
-    setResults({
-      action: 'sendMessage',
-      status: result.error ? 'failed' : 'success',
-      message: result.error
-        ? result.error
-        : 'WalletConnectJS | Send Message Complete',
-      data: result,
-    });
+    setResults(result);
   };
 
   const clickUseSampleButton = () => {
@@ -53,12 +45,14 @@ export const SendMessage: React.FC = () => {
     );
   };
 
+  const status = results ? results.error ? 'failure' : 'success' : undefined;
+
   return (
     <ActionCard
       icon={ICON_NAMES.GEAR}
       title="Send Message"
       description="Pass along an encoded base64 message to the wallet"
-      status={results?.status}
+      status={status}
     >
       <TestMessage
         onClick={clickUseSampleButton}

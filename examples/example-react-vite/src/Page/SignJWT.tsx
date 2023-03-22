@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 import styled from 'styled-components';
@@ -15,9 +16,7 @@ const NewExpirationDate = styled.div`
 
 export const SignJWT: React.FC = () => {
   const [value, setValue] = useState('');
-  const [results, setResults] = useState<{
-    [key: string]: any;
-  } | null>({});
+  const [results, setResults] = useState<BroadcastEventData | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
   const signJWTLoading = pendingMethod === 'signJWT';
@@ -28,20 +27,17 @@ export const SignJWT: React.FC = () => {
 
   const handleSubmit = async () => {
     const result = await wcs.signJWT(Number(value));
-    setResults({
-      action: 'signJWT',
-      status: result.error ? 'failed' : 'success',
-      message: result.error ? result.error : 'WalletConnectJS | Sign JWT Complete',
-      data: result,
-    });
+    setResults(result);
   };
+
+  const status = results ? results.error ? 'failure' : 'success' : undefined;
 
   return (
     <ActionCard
       icon={ICON_NAMES.PENCIL}
       title="Sign JWT"
       description="Sign a new JWT, updated any existing value"
-      status={results?.status}
+      status={status}
     >
       <Input
         value={value}

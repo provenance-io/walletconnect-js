@@ -1,104 +1,98 @@
-import { SendMessageMethod, SendWalletActionMethod } from './WalletConnectService';
-import { ConnectData } from './ConnectData';
 import { WINDOW_MESSAGES } from '../consts';
 
-export type ProvenanceMethod =
-  | 'provenance_sign'
-  | 'provenance_sendTransaction'
-  | 'wallet_action';
+export interface WalletConnectEventDisconnect {
+  event: string;
+  params: { message?: string }[];
+}
 
+type BroadcastEventNameKeys = keyof typeof WINDOW_MESSAGES;
+export type BroadcastEventName = typeof WINDOW_MESSAGES[BroadcastEventNameKeys];
+
+// All the different walletConnectService method results
 export type ConnectionType = 'existing session' | 'new session';
-
-interface BasicConnectData {
+export interface ConnectMethodResult {
   connectionEST: number;
   connectionEXP: number;
   connectionType: ConnectionType;
 }
 
-export type MethodConnectData = BasicConnectData | ConnectData;
-
-export interface MethodSignJWTData {
-  signedJWT?: string;
-  expires: number;
-}
-
-interface MetaData {
-  description: string;
-  address: string;
-  date: number;
-}
-
-interface MethodRequest {
-  id: number;
-  jsonrpc: string;
-  method: ProvenanceMethod;
-  params: MetaData[] | string[];
-}
-
-type BroadcastEventKeys = keyof typeof WINDOW_MESSAGES;
-export type BroadcastEvent = typeof WINDOW_MESSAGES[BroadcastEventKeys];
-
-interface MethodDisconnectData {
+export interface DisconnectMethodResult {
   message?: string;
 }
 
-type BroadcastResultData =
-  | SendMessageMethod
-  | SendWalletActionMethod
-  | MethodConnectData
-  | MethodDisconnectData
-  | MethodSignJWTData
-  | number
-  | string;
-
-interface TxEvent {
-  type: string;
-  attributesList: {
-    key: string;
-    value: string;
-    index?: boolean;
-  }[];
-}
-interface TxLog {
-  msgIndex: number;
-  log: string;
-  eventsList: {
-    type: string;
-    attributesList: TxEvent[];
-  }[];
-}
-interface TxResponse {
-  code: number;
-  codespace: string;
-  data: string;
-  eventsList: TxEvent[];
-  gasUsed: number;
-  gasWanted: number;
-  height: number;
-  info: string;
-  logsList: TxLog[];
-  rawLog: string;
-  timestamp: string;
-  txhash: string;
+export interface SendMessageMethodResult {
+  txResponse: {
+    code: number;
+    codespace: string;
+    data: string;
+    eventsList: {
+      type: string;
+      attributesList: {
+        key: string;
+        value: string;
+        index?: boolean;
+      }[];
+    }[];
+    gasUsed: number;
+    gasWanted: number;
+    height: number;
+    info: string;
+    logsList: {
+      msgIndex: number;
+      log: string;
+      eventsList: {
+        type: string;
+        attributesList: {
+          type: string;
+          attributesList: {
+            key: string;
+            value: string;
+            index?: boolean;
+          }[];
+        }[];
+      }[];
+    };
+    rawLog: string;
+    timestamp: string;
+    txhash: string;
+  };
 }
 
-export interface SendMessageResult {
-  txResponse: TxResponse;
+export interface SignJWTMethodResult {
+  signature: string;
+  signedJWT: string;
+  expires: number;
 }
 
-type BroadcastWCResult = SendMessageResult | BasicConnectData | string;
+export interface SignHexMessageMethodResult {
+  signature: string;
+}
 
-export interface BroadcastResult {
-  data?: BroadcastResultData;
+// Possible result values when a method is completed through walletconnect-js
+type BroadcastResult =
+  | SendMessageMethodResult
+  | ConnectMethodResult
+  | SignJWTMethodResult
+  | SignHexMessageMethodResult
+  | DisconnectMethodResult;
+
+// Request data passed into the walletconnect sendCustomRequest function
+export type ProvenanceMethod =
+  | 'provenance_sign'
+  | 'provenance_sendTransaction'
+  | 'wallet_action';
+
+interface BroadcastRequest {
+  id: number;
+  jsonrpc: string;
+  method: ProvenanceMethod;
+  params: string[]; // Note the first item in the params array is stringified metadata
+}
+
+// Broadcast Event Data - What a dApp gets back after calling a method or getting an action result from a listner
+export interface BroadcastEventData {
   error?: string;
-  request?: MethodRequest;
-  result?: BroadcastWCResult;
+  request?: BroadcastRequest;
+  result?: BroadcastResult;
   valid?: boolean;
-}
-
-export type Broadcast = (eventName: BroadcastEvent, data?: BroadcastResult) => void;
-
-export interface WCDisconnectEvent {
-  event: string;
-  params: { message?: string }[];
 }

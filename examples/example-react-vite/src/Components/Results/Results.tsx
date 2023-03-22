@@ -4,6 +4,7 @@ import ReactJson from '@microlink/react-json-view';
 import { COLORS, FONTS } from 'theme';
 import { useState } from 'react';
 import { ICON_NAMES } from 'consts';
+import { BroadcastEventData } from '@provenanceio/walletconnect-js';
 
 const ResultsWrapper = styled.div`
   margin-top: 40px;
@@ -39,54 +40,24 @@ const ResultsContainer = styled.div`
     word-break: break-all;
   }
 `;
-const ResultKey = styled.div`
-  min-width: 75px;
-  margin-right: 20px;
-  text-transform: capitalize;
-  border-bottom: 1px solid ${COLORS.NEUTRAL_300};
-`;
-const ResultRow = styled.div`
-  display: flex;
-  font-size: 1.3rem;
-  margin-bottom: 10px;
-`;
-const ResultValue = styled.p``;
-const FloatingButton = styled.p`
+const FloatingButton = styled(Button)`
   position: absolute;
   top: 20px;
   right: 20px;
+  padding: 6px 16px;
+  font-size: 1.2rem;
+  height: auto;
+  width: auto;
+  min-width: auto;
 `;
 
-interface Result {
-  [key: string]: any;
-}
-
 interface Props {
-  results: Result | null;
-  setResults: (results: Result | null) => void;
+  results?: BroadcastEventData;
+  setResults: (results?: BroadcastEventData) => void;
 }
 
 export const Results: React.FC<Props> = ({ results, setResults }) => {
   const [resultsVisible, setResultsVisible] = useState(false);
-
-  const renderResults = () => {
-    const keys = Object.keys(results!);
-    return keys.map((key) =>
-      key === 'data' ? (
-        <span key={key}>
-          <ResultRow>
-            <ResultKey>Raw Data:</ResultKey>
-          </ResultRow>
-          <ReactJson src={results!.data} />
-        </span>
-      ) : (
-        <ResultRow key={key}>
-          <ResultKey>{key}:</ResultKey>
-          <ResultValue>{results![key]}</ResultValue>
-        </ResultRow>
-      )
-    );
-  };
 
   return results && Object.keys(results).length ? (
     <ResultsWrapper>
@@ -98,18 +69,16 @@ export const Results: React.FC<Props> = ({ results, setResults }) => {
         <p>Results</p>
         <Sprite
           icon={ICON_NAMES.CARET}
-          size="1.2rem"
-          color={COLORS.NEUTRAL_400}
-          spin={resultsVisible ? '180' : '0'}
+          size="1.6rem"
+          color={COLORS.NEUTRAL_350}
+          spin={resultsVisible ? '0' : '180'}
         />
       </ResultsTitle>
       {resultsVisible && (
         <ResultsContainer>
-          {renderResults()}
-          <FloatingButton>
-            <Button onClick={() => setResults(null)} type="button">
-              Clear Results
-            </Button>
+          <ReactJson src={results} />
+          <FloatingButton onClick={() => setResults()} type="button">
+            Clear Results
           </FloatingButton>
         </ResultsContainer>
       )}

@@ -3,7 +3,7 @@ import {
   QRCodeModal,
   WINDOW_MESSAGES,
 } from '@provenanceio/walletconnect-js';
-import type { BroadcastResult } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData, WalletId } from '@provenanceio/walletconnect-js';
 import { Button, Card, Dropdown, Input, Results, Checkbox } from 'Components';
 import { ICON_NAMES, BRIDGE_URLS } from 'consts';
 import { useEffect, useState } from 'react';
@@ -50,9 +50,7 @@ export const Connect: React.FC = () => {
   const [jwtExpiration, setJwtExpiration] = useState('');
   const [sessionDuration, setSessionDuration] = useState('3600');
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [results, setResults] = useState<{
-    [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  } | null>(null);
+  const [results, setResults] = useState<BroadcastEventData | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status, modal } = walletConnectState;
   const { QRCodeImg, dynamicUrl } = modal;
@@ -62,11 +60,8 @@ export const Connect: React.FC = () => {
   useEffect(() => {
     if (initialLoad) {
       setInitialLoad(false);
-
-      const handleConnectedEvent = (connectResults: BroadcastResult) => {
-        setResults({
-          data: { ...walletConnectState, broadcastResult: connectResults },
-        });
+      const handleConnectedEvent = (connectResults: BroadcastEventData) => {
+        setResults(connectResults);
       };
       wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
       wcs.addListener(WINDOW_MESSAGES.DISCONNECT, handleConnectedEvent);
@@ -75,6 +70,21 @@ export const Connect: React.FC = () => {
 
   const toggleAdvancedOptions = () => {
     setShowAdvanced(!showAdvanced);
+  };
+
+  const handleConnect = (walletAppId?: WalletId) => {
+    // Clear out any existing results
+    setResults(undefined);
+    // Run connect method based on current state values
+    wcs.connect({
+      bridge: selectedBridge,
+      duration: Number(sessionDuration),
+      individualAddress,
+      groupAddress,
+      prohibitGroups: !groupsAllowed,
+      jwtExpiration: Number(jwtExpiration),
+      walletAppId,
+    })
   };
 
   if (status === 'connected')
@@ -142,64 +152,16 @@ export const Connect: React.FC = () => {
             />
           </AdvancedOptions>
         )}
-        <Button
-          onClick={() =>
-            wcs.connect({
-              bridge: selectedBridge,
-              duration: Number(sessionDuration),
-              individualAddress,
-              groupAddress,
-              prohibitGroups: !groupsAllowed,
-              jwtExpiration: Number(jwtExpiration),
-            })
-          }
-        >
+        <Button onClick={handleConnect}>
           Connect with QRCodeModal
         </Button>
-        <DirectConnectButton
-          onClick={() =>
-            wcs.connect({
-              bridge: selectedBridge,
-              duration: Number(sessionDuration),
-              individualAddress,
-              groupAddress,
-              prohibitGroups: !groupsAllowed,
-              jwtExpiration: Number(jwtExpiration),
-              walletAppId: 'figure_extension',
-            })
-          }
-        >
+        <DirectConnectButton onClick={() => handleConnect('figure_extension')}>
           Connect directly with Figure Extension Wallet
         </DirectConnectButton>
-        <DirectConnectButton
-          onClick={() =>
-            wcs.connect({
-              bridge: selectedBridge,
-              duration: Number(sessionDuration),
-              individualAddress,
-              groupAddress,
-              prohibitGroups: !groupsAllowed,
-              jwtExpiration: Number(jwtExpiration),
-              walletAppId: 'figure_hosted_test',
-            })
-          }
-        >
+        <DirectConnectButton onClick={() => handleConnect('figure_hosted_test')}>
           Connect directly with Figure Hosted Wallet
         </DirectConnectButton>
-        <DirectConnectButton
-          onClick={() => {
-            setDirectQRCodeGenerate(true);
-            wcs.connect({
-              bridge: selectedBridge,
-              duration: Number(sessionDuration),
-              individualAddress,
-              groupAddress,
-              prohibitGroups: !groupsAllowed,
-              jwtExpiration: Number(jwtExpiration),
-              walletAppId: 'figure_mobile_test',
-            });
-          }}
-        >
+        <DirectConnectButton  onClick={() => handleConnect('figure_mobile_test')}>
           Connect directly with Figure Mobile
         </DirectConnectButton>
         {directQRCodeGenerate && QRCodeImg && <img src={QRCodeImg} />}

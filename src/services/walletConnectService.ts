@@ -1,9 +1,8 @@
 import { Buffer } from 'buffer';
 import events from 'events';
 import type {
-  Broadcast,
-  BroadcastEvent,
-  BroadcastResult,
+  BroadcastEventName,
+  BroadcastEventData,
   ConnectMethod,
   SendMessageMethod,
   ModalData,
@@ -169,8 +168,12 @@ export class WalletConnectService {
   // *** Event Listener *** (https://nodejs.org/api/events.html)
   // Instead of having to use walletConnectService.eventEmitter.addListener()
   // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
-  #broadcastEvent: Broadcast = (eventName, data) => {
-    this.#eventEmitter.emit(eventName, data);
+  #broadcastEvent = (
+    eventName: BroadcastEventName,
+    eventData: BroadcastEventData
+  ) => {
+    console.log('#broadcastEvent: ', { eventName, eventData });
+    this.#eventEmitter.emit(eventName, eventData);
   };
 
   // Control auto-disconnect / timeout
@@ -281,16 +284,16 @@ export class WalletConnectService {
 
   // Create listeners used with eventEmitter/broadcast results
   addListener(
-    eventName: BroadcastEvent,
-    callback: (results: BroadcastResult) => void
+    eventName: BroadcastEventName,
+    callback: (results: BroadcastEventData) => void
   ) {
     this.#eventEmitter.addListener(eventName, callback);
   }
 
   // Remove listener w/specific eventName used with eventEmitter/broadcast results
   removeListener(
-    targetEvent: BroadcastEvent | 'all',
-    callback?: (results: BroadcastResult) => void
+    targetEvent: BroadcastEventName | 'all',
+    callback?: (results: BroadcastEventData) => void
   ) {
     if (targetEvent === 'all') {
       this.#eventEmitter.eventNames().forEach((eventName) => {
@@ -471,11 +474,15 @@ export class WalletConnectService {
     }
   };
 
-  disconnect = async () => {
+  /**
+   *
+   * @param message (optional) Custom disconnect message to send back to dApp
+   * */
+  disconnect = async (message?: string) => {
     // Clear out the existing connection timer
     this.#clearConnectionTimer();
-    if (this.#connector) await this.#connector.killSession();
-    return;
+    if (this.#connector) await this.#connector.killSession({ message });
+    return message;
   };
 
   /**
@@ -542,10 +549,7 @@ export class WalletConnectService {
    * @param description (optional) provide description to display in the wallet when
    *        switching to group policy address
    */
-  switchToGroup = async (
-    groupPolicyAddress?: string,
-    description?: string
-  ): Promise<BroadcastResult> => {
+  switchToGroup = async (groupPolicyAddress?: string, description?: string) => {
     // Loading while we wait for mobile to respond
     this.#setState({ pendingMethod: 'switchToGroup' });
     const result = await sendWalletActionMethod({

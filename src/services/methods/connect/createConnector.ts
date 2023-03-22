@@ -1,14 +1,15 @@
 import WalletConnectClient from '@walletconnect/client';
 import QRCode from 'qrcode';
 import type {
-  Broadcast,
   WCSSetState,
   WCSState,
   ConnectData,
   ModalData,
   WalletId,
   EventData,
-  WCDisconnectEvent,
+  WalletConnectEventDisconnect,
+  BroadcastEventName,
+  BroadcastEventData,
 } from '../../../types';
 import {
   CONNECTION_TYPES,
@@ -21,7 +22,7 @@ import { getAccountInfo, sendWalletEvent } from '../../../utils';
 
 interface Props {
   bridge: string;
-  broadcast: Broadcast;
+  broadcast: (eventName: BroadcastEventName, eventData: BroadcastEventData) => void;
   getState: () => WCSState;
   jwtExpiration?: number;
   noPopup?: boolean;
@@ -163,7 +164,7 @@ export const createConnector = ({
       walletInfo,
     });
     broadcast(WINDOW_MESSAGES.CONNECTED, {
-      data: {
+      result: {
         connectionEST,
         connectionEXP,
         connectionType: CONNECTION_TYPES.new_session,
@@ -181,13 +182,13 @@ export const createConnector = ({
   // - Broadcast "disconnect" event (let the dApp know)
   newConnector.on(
     CONNECTOR_EVENTS.disconnect,
-    (error, payload: WCDisconnectEvent) => {
+    (error, payload: WalletConnectEventDisconnect) => {
       if (error) throw error;
       const { walletAppId } = getState();
       if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.DISCONNECT);
       resetState();
       broadcast(WINDOW_MESSAGES.DISCONNECT, {
-        data: payload.params[0],
+        result: payload.params[0],
       });
     }
   );
@@ -215,7 +216,7 @@ export const createConnector = ({
         connector: newConnector,
       });
       broadcast(WINDOW_MESSAGES.CONNECTED, {
-        data: {
+        result: {
           connectionEST,
           connectionEXP,
           connectionType: CONNECTION_TYPES.existing_session,
@@ -272,7 +273,7 @@ export const createConnector = ({
         walletInfo,
       });
       broadcast(WINDOW_MESSAGES.SESSION_UPDATED, {
-        data: {
+        result: {
           connectionEST,
           connectionEXP,
           connectionType: CONNECTION_TYPES.existing_session,

@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { useWalletConnect, ProvenanceMethod } from '@provenanceio/walletconnect-js';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 
 export const SwitchToGroup: React.FC = () => {
   const [groupPolicyAddress, setGroupPolicyAddress] = useState('');
   const [description, setDescription] = useState('');
-  const [results, setResults] = useState<{
-    [key: string]: any;
-  } | null>({});
+  const [results, setResults] = useState<BroadcastEventData | undefined>();
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod, representedGroupPolicy } = walletConnectState;
@@ -16,22 +15,17 @@ export const SwitchToGroup: React.FC = () => {
 
   const handleSubmit = async () => {
     const result = await wcs.switchToGroup(groupPolicyAddress, description);
-    setResults({
-      action: 'switchToGroup',
-      status: result.error ? 'failed' : 'success',
-      message: result.error
-        ? result.error
-        : 'WalletConnectJS | Switch To Group Complete',
-      data: result,
-    });
+    setResults(result);
   };
+
+  const status = results ? results.error ? 'failure' : 'success' : undefined;
 
   return (
     <ActionCard
       icon={ICON_NAMES.GEAR}
       title="Switch to Group"
       description="Switch the connected account to (un)represent a group."
-      status={results?.status}
+      status={status}
     >
       <Input
           width="100%"
