@@ -15,13 +15,22 @@ export interface ConnectMethodResult {
   connectionEXP: number;
   connectionType: ConnectionType;
 }
-
-export interface DisconnectMethodResult {
-  message?: string;
+export interface ConnectMethodEventData extends BasicBroadcastEventData {
+  result?: ConnectMethodResult;
 }
 
+export interface DisconnectMethodResult extends BasicBroadcastEventData {
+  message?: string;
+}
+export interface DisconnectMethodEventData extends BasicBroadcastEventData {
+  result?: DisconnectMethodResult;
+}
+
+export interface SendMessageMethodEventData extends BasicBroadcastEventData {
+  result?: SendMessageMethodResult;
+}
 export interface SendMessageMethodResult {
-  txResponse: {
+  txResponse?: {
     code: number;
     codespace: string;
     data: string;
@@ -58,23 +67,25 @@ export interface SendMessageMethodResult {
   };
 }
 
+export interface SignJWTMethodEventData extends BasicBroadcastEventData {
+  result?: SignJWTMethodResult;
+}
 export interface SignJWTMethodResult {
   signature: string;
   signedJWT: string;
   expires: number;
 }
 
+export interface SignHexMessageMethodEventData extends BasicBroadcastEventData {
+  result?: SignHexMessageMethodResult;
+}
 export interface SignHexMessageMethodResult {
   signature: string;
 }
 
-// Possible result values when a method is completed through walletconnect-js
-type BroadcastResult =
-  | SendMessageMethodResult
-  | ConnectMethodResult
-  | SignJWTMethodResult
-  | SignHexMessageMethodResult
-  | DisconnectMethodResult;
+export interface SwitchToGroupMethodEventData extends BasicBroadcastEventData {
+  result?: string;
+}
 
 // Request data passed into the walletconnect sendCustomRequest function
 export type ProvenanceMethod =
@@ -90,9 +101,23 @@ interface BroadcastRequest {
 }
 
 // Broadcast Event Data - What a dApp gets back after calling a method or getting an action result from a listner
-export interface BroadcastEventData {
+interface BasicBroadcastEventData {
   error?: string;
-  request?: BroadcastRequest;
-  result?: BroadcastResult;
   valid?: boolean;
+  request?: BroadcastRequest;
+}
+
+// All the possible BroadcastResults mapped
+export interface BroadcastEventData {
+  [WINDOW_MESSAGES.CONNECTED]: ConnectMethodEventData;
+  [WINDOW_MESSAGES.SESSION_UPDATED]: ConnectMethodEventData;
+  [WINDOW_MESSAGES.DISCONNECT]: DisconnectMethodEventData;
+  [WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]: SendMessageMethodEventData;
+  [WINDOW_MESSAGES.SEND_MESSAGE_FAILED]: SendMessageMethodEventData;
+  [WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE]: SignHexMessageMethodEventData;
+  [WINDOW_MESSAGES.SIGN_HEX_MESSAGE_FAILED]: SignHexMessageMethodEventData;
+  [WINDOW_MESSAGES.SIGN_JWT_COMPLETE]: SignJWTMethodEventData;
+  [WINDOW_MESSAGES.SIGN_JWT_FAILED]: SignJWTMethodEventData;
+  [WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE]: SwitchToGroupMethodEventData;
+  [WINDOW_MESSAGES.SWITCH_TO_GROUP_FAILED]: SwitchToGroupMethodEventData;
 }

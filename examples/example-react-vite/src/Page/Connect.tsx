@@ -3,7 +3,7 @@ import {
   QRCodeModal,
   WINDOW_MESSAGES,
 } from '@provenanceio/walletconnect-js';
-import type { BroadcastEventData, WalletId } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData, WalletId, ConnectMethodEventData, DisconnectMethodEventData } from '@provenanceio/walletconnect-js';
 import { Button, Card, Dropdown, Input, Results, Checkbox } from 'Components';
 import { ICON_NAMES, BRIDGE_URLS } from 'consts';
 import { useEffect, useState } from 'react';
@@ -50,7 +50,7 @@ export const Connect: React.FC = () => {
   const [jwtExpiration, setJwtExpiration] = useState('');
   const [sessionDuration, setSessionDuration] = useState('3600');
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [results, setResults] = useState<BroadcastEventData | undefined>();
+  const [results, setResults] = useState<BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status, modal } = walletConnectState;
   const { QRCodeImg, dynamicUrl } = modal;
@@ -60,11 +60,14 @@ export const Connect: React.FC = () => {
   useEffect(() => {
     if (initialLoad) {
       setInitialLoad(false);
-      const handleConnectedEvent = (connectResults: BroadcastEventData) => {
+      const handleConnectedEvent = (connectResults: ConnectMethodEventData) => {
         setResults(connectResults);
       };
+      const handleDisconnectEvent = (disconnectResults: DisconnectMethodEventData) => {
+        setResults(disconnectResults);
+      }
       wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
-      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, handleConnectedEvent);
+      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, handleDisconnectEvent);
     }
   }, [wcs, navigate, initialLoad, walletConnectState]);
 

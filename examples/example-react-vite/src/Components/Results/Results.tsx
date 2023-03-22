@@ -4,7 +4,8 @@ import ReactJson from '@microlink/react-json-view';
 import { COLORS, FONTS } from 'theme';
 import { useState } from 'react';
 import { ICON_NAMES } from 'consts';
-import { BroadcastEventData } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData } from '@provenanceio/walletconnect-js';
+import { WINDOW_MESSAGES } from '@provenanceio/walletconnect-js';
 
 const ResultsWrapper = styled.div`
   margin-top: 40px;
@@ -52,8 +53,8 @@ const FloatingButton = styled(Button)`
 `;
 
 interface Props {
-  results?: BroadcastEventData;
-  setResults: (results?: BroadcastEventData) => void;
+  results?: BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined;
+  setResults: (results?: BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined) => void;
 }
 
 export const Results: React.FC<Props> = ({ results, setResults }) => {
