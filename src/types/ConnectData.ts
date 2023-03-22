@@ -3,6 +3,14 @@ interface TimePeriod {
   nanos: number;
 }
 
+export interface Metadata {
+  name: string;
+  description?: string;
+  email?: string;
+  masterPolicy?: boolean;
+  isSingleSigner?: boolean;
+}
+
 interface DecisionPolicy {
   '@type': string;
   threshold: string;
@@ -12,14 +20,28 @@ interface DecisionPolicy {
   };
 }
 
+export interface GroupMember {
+  groupId: number;
+  address: string;
+  weight: string;
+  metadata: Metadata;
+  addedAt: string;
+  hasApproved: boolean;
+}
+
 export type MasterGroupPolicy = {
   address?: string;
   groupId?: number;
   admin?: string;
-  metadata?: string;
+  metadata?: Metadata;
   version?: number;
   decisionPolicy?: DecisionPolicy;
   createdAt?: string;
+  groupData?: {
+    metadata?: Metadata;
+    totalWeight?: string;
+    members?: GroupMember[];
+  };
 };
 
 export type WalletInfo = {

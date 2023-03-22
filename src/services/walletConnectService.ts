@@ -172,7 +172,6 @@ export class WalletConnectService {
     eventName: BroadcastEventName,
     eventData: BroadcastEventData
   ) => {
-    console.log('#broadcastEvent: ', { eventName, eventData });
     this.#eventEmitter.emit(eventName, eventData);
   };
 
