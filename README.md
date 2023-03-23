@@ -23,8 +23,8 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
     - `QRCode` is now `QRCodeImg`
   - Removed `account`, `figureConnected`, `newAccount`, and `connector` values
 - `QRCodeModal` wallet changes
-  - Moved Provenance Blockchain wallets into `dev`
-  - Added Figure Mobile wallets as responsive mobile options
+  - Removed support for all Provenance wallets
+  - Added Figure Mobile wallets as responsive mobile options w/dynamic links
   - Package now transpiles optional chaining
 - WalletConnectContext
   - Optional `connectionRedirect` string url value will auto-redirect users when disconnected
@@ -34,6 +34,10 @@ For more information about [Provenance Inc](https://provenance.io) visit https:/
 - Variable names
   - Removed all Provenance wallet support
   - Changed `figure_web` to be `figure_hosted`
+- Types changes
+  - Removed `BroadcastResult` type.
+  - Added `BroadcastEventData` and all the current method/action types instead.
+  - Note: Ideally you won't need to import `BroadcastEventData` due to the improved typing for `#broadcastEvent` and `addListener`.
 
 ## Table of Contents
 
@@ -76,10 +80,25 @@ import {
   // Components
   QRCodeModal
   // Types
-  BroadcastResult,
   ProvenanceMethod,
   WalletConnectServiceStatus,
   ConnectMethod,
+  // -- Broadcast events for methods
+  BroadcastEventData,
+  SignHexMessageMethodResult,
+  SignHexMessageMethodEventData,
+  SignJWTMethodResult,
+  SignJWTMethodEventData,
+  SendMessageMethodResult,
+  SendMessageMethodEventData,
+  DisconnectMethodResult,
+  DisconnectMethodEventData,
+  ConnectMethodResult,
+  ConnectMethodEventData,
+  SwitchToGroupMethodEventData,
+  // -- Wallet info
+  WalletId,
+  WalletType,
 } from "@provenanceio/walletconnect-js";
 ```
 
