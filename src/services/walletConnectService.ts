@@ -168,9 +168,9 @@ export class WalletConnectService {
   // *** Event Listener *** (https://nodejs.org/api/events.html)
   // Instead of having to use walletConnectService.eventEmitter.addListener()
   // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
-  #broadcastEvent = (
-    eventName: BroadcastEventName,
-    eventData: BroadcastEventData
+  #broadcastEvent = <Name extends keyof BroadcastEventData>(
+    eventName: Name,
+    eventData: BroadcastEventData[Name]
   ) => {
     this.#eventEmitter.emit(eventName, eventData);
   };
@@ -282,9 +282,9 @@ export class WalletConnectService {
   };
 
   // Create listeners used with eventEmitter/broadcast results
-  addListener(
-    eventName: BroadcastEventName,
-    callback: (results: BroadcastEventData) => void
+  addListener<Name extends keyof BroadcastEventData>(
+    eventName: Name,
+    callback: (results: BroadcastEventData[Name]) => void
   ) {
     this.#eventEmitter.addListener(eventName, callback);
   }

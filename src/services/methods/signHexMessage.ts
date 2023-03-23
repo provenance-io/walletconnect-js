@@ -1,5 +1,10 @@
 import { verifySignature } from '../../helpers';
-import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
+import {
+  WALLET_LIST,
+  WALLET_APP_EVENTS,
+  PROVENANCE_METHODS,
+  WINDOW_MESSAGES,
+} from '../../consts';
 import { rngNum } from '../../utils';
 import type {
   WalletConnectClientType,
@@ -21,7 +26,9 @@ export const signHexMessage = async ({
   hexMessage,
   publicKey: pubKeyB64,
   walletAppId,
-}: SignHexMessage): Promise<BroadcastEventData> => {
+}: SignHexMessage): Promise<
+  BroadcastEventData[typeof WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE]
+> => {
   let valid = false;
   const method = PROVENANCE_METHODS.sign;
   const description = 'Sign Message';

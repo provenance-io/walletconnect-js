@@ -10,7 +10,10 @@ import type {
 
 interface Props {
   bridge: string;
-  broadcast: (eventName: BroadcastEventName, eventData: BroadcastEventData) => void;
+  broadcast: (
+    eventName: BroadcastEventName,
+    eventData: BroadcastEventData[BroadcastEventName]
+  ) => void;
   getState: () => WCSState;
   jwtExpiration?: number;
   noPopup?: boolean;

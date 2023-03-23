@@ -50,7 +50,7 @@ export const Connect: React.FC = () => {
   const [jwtExpiration, setJwtExpiration] = useState('');
   const [sessionDuration, setSessionDuration] = useState('3600');
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [results, setResults] = useState<BroadcastEventData | undefined>();
+  const [results, setResults] = useState<BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status, modal } = walletConnectState;
   const { QRCodeImg, dynamicUrl } = modal;
@@ -60,11 +60,8 @@ export const Connect: React.FC = () => {
   useEffect(() => {
     if (initialLoad) {
       setInitialLoad(false);
-      const handleConnectedEvent = (connectResults: BroadcastEventData) => {
-        setResults(connectResults);
-      };
-      wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
-      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, handleConnectedEvent);
+      wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {setResults(eventResults)});
+      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, (eventResults) => {setResults(eventResults)});
     }
   }, [wcs, navigate, initialLoad, walletConnectState]);
 

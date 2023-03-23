@@ -6,7 +6,12 @@ import type {
   SendMessageMethodResult,
   BroadcastEventData,
 } from '../../types';
-import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
+import {
+  WALLET_LIST,
+  WALLET_APP_EVENTS,
+  PROVENANCE_METHODS,
+  WINDOW_MESSAGES,
+} from '../../consts';
 import { rngNum } from '../../utils';
 
 interface SendMessage {
@@ -21,7 +26,9 @@ export const sendMessage = async ({
   connector,
   data,
   walletAppId,
-}: SendMessage): Promise<BroadcastEventData> => {
+}: SendMessage): Promise<
+  BroadcastEventData[typeof WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]
+> => {
   let valid = false;
   const {
     message: rawB64Message,

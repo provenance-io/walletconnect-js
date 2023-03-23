@@ -10,11 +10,6 @@ export const FIGURE_MOBILE_WALLET_PACKAGE_NAME = 'com.figure.mobile.wallet';
 export const FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST = 'com.figure.mobile.wallet.dev';
 
 // APP STORE ICONS
-export const APP_STORE_GOOGLE_PLAY_PROVENANCE =
-  'https://play.google.com/store/apps/details?id=io.provenance.wallet';
-export const APP_STORE_APPLE_PROVENANCE =
-  'https://apps.apple.com/us/app/provenance-blockchain-wallet/id1606428494';
-
 export const APP_STORE_GOOGLE_PLAY_FIGURE =
   'https://play.google.com/store/apps/details?id=com.figure.mobile.wallet';
 export const APP_STORE_APPLE_FIGURE =

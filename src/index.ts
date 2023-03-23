@@ -13,10 +13,16 @@ export type {
   // Broadcast events for methods
   BroadcastEventData,
   SignHexMessageMethodResult,
+  SignHexMessageMethodEventData,
   SignJWTMethodResult,
+  SignJWTMethodEventData,
   SendMessageMethodResult,
+  SendMessageMethodEventData,
   DisconnectMethodResult,
+  DisconnectMethodEventData,
   ConnectMethodResult,
+  ConnectMethodEventData,
+  SwitchToGroupMethodEventData,
   // Wallet info
   WalletId,
   WalletType,
