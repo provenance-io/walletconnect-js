@@ -4,7 +4,7 @@ interface TimePeriod {
 }
 
 export interface Metadata {
-  name: string;
+  name?: string;
   description?: string;
   email?: string;
   masterPolicy?: boolean;
@@ -24,7 +24,7 @@ export interface GroupMember {
   groupId: number;
   address: string;
   weight: string;
-  metadata: Metadata;
+  metadata?: Metadata;
   addedAt: string;
   hasApproved: boolean;
 }
