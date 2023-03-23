@@ -38,7 +38,7 @@ interface Props {
 export const QRCodeModal: React.FC<Props> = ({
   className,
   walletConnectService: wcs,
-  title = 'Scan the QRCode with your mobile Provenance Blockchain Wallet.',
+  title = 'Scan the QRCode with your Figure Mobile Wallet.',
   devWallets,
   hideWallets,
 }) => {
@@ -301,8 +301,8 @@ export const QRCodeModal: React.FC<Props> = ({
                   </svg>
                 </CloseQRModal>
                 <Text className="wcjs-qr-text">
-                  Note: You must reload this page after installing the Provenance
-                  Blockchain Wallet extension.
+                  Note: You must reload this page after installing the Figure
+                  Extension Wallet.
                 </Text>
                 <button onClick={() => setShowReloadNotice(false)}>Back</button>
                 <button onClick={() => window.location.reload()}>Reload</button>

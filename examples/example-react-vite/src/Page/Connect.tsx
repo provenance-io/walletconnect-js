@@ -3,7 +3,7 @@ import {
   QRCodeModal,
   WINDOW_MESSAGES,
 } from '@provenanceio/walletconnect-js';
-import type { BroadcastEventData, WalletId, ConnectMethodEventData, DisconnectMethodEventData } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData, WalletId } from '@provenanceio/walletconnect-js';
 import { Button, Card, Dropdown, Input, Results, Checkbox } from 'Components';
 import { ICON_NAMES, BRIDGE_URLS } from 'consts';
 import { useEffect, useState } from 'react';
@@ -60,14 +60,8 @@ export const Connect: React.FC = () => {
   useEffect(() => {
     if (initialLoad) {
       setInitialLoad(false);
-      const handleConnectedEvent = (connectResults: ConnectMethodEventData) => {
-        setResults(connectResults);
-      };
-      const handleDisconnectEvent = (disconnectResults: DisconnectMethodEventData) => {
-        setResults(disconnectResults);
-      }
-      wcs.addListener(WINDOW_MESSAGES.CONNECTED, handleConnectedEvent);
-      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, handleDisconnectEvent);
+      wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {setResults(eventResults)});
+      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, (eventResults) => {setResults(eventResults)});
     }
   }, [wcs, navigate, initialLoad, walletConnectState]);
 
