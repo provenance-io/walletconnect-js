@@ -1,14 +1,16 @@
 import base64url from 'base64url';
-import { createHash } from 'crypto';
-import { ecdsaVerify } from 'secp256k1';
+import {createHash} from 'crypto';
+import {ecdsaVerify} from 'secp256k1';
 
-export const sha256 = (message: string) => createHash('sha256').update(Buffer.from(message,"utf-8")).digest();
+export const sha256 = (hexMessage: string) => createHash('sha256').update(Buffer.from(hexMessage, 'hex')).digest();
+export const isHex = (hexMessage: string) => !!hexMessage.match("^[0-9a-fA-F]+$")
 
 export const verifySignature = async (
-  message: string, signature: Uint8Array, pubKeyB64: string,
+    hexMessage: string, signature: Uint8Array, pubKeyB64: string,
 ) => {
-  const hash = sha256(message);
-  const pubKeyDecoded = base64url.toBuffer(pubKeyB64);
+    if (!isHex(hexMessage)) throw new Error("Message parameter is not a hex value.");
 
-  return ecdsaVerify(signature, hash, pubKeyDecoded)
+    const hash = sha256(hexMessage);
+    const pubKeyDecoded = base64url.toBuffer(pubKeyB64);
+    return ecdsaVerify(signature, hash, pubKeyDecoded);
 };

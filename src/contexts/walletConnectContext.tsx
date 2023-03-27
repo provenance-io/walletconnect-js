@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { WALLET_LIST } from '../consts';
 import { WalletConnectService } from '../services';
-import type { WCSState, EventData } from '../types';
+import type { WCSState } from '../types';
 
 interface ProviderState {
   walletConnectService: WalletConnectService;
@@ -14,79 +13,54 @@ const newService = new WalletConnectService();
 interface Props {
   children: React.ReactNode;
   service?: WalletConnectService;
+  connectionRedirect?: string;
 }
 
 const WalletConnectContextProvider: React.FC<Props> = ({
   children,
   service: existingService,
+  connectionRedirect,
 }) => {
   // Allow users to pass in an instance of the service themselves
   const walletConnectService = existingService || newService;
   const [walletConnectState, setWalletConnectState] = useState<WCSState>({
     ...walletConnectService.state,
   });
-  const { address, connectionTimeout, bridge } = walletConnectState;
+  const [initialLoad, setInitialLoad] = useState(true);
+  const { status } = walletConnectState;
 
+  // Auto-redirect was passed in.  Act on disconnected status
   useEffect(() => {
-    walletConnectService.setStateUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
-    // Check if we have an address and public key, if so, auto-reconnect to session
-    if (address) {
-      // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
-      const duration = connectionTimeout ? connectionTimeout / 1000 : undefined;
-      walletConnectService.connect({ duration, bridge });
+    if (connectionRedirect && status === 'disconnected') {
+      const currentUrl = window.location.href;
+      const isValidUrl = (url: string) => {
+        try {
+          new URL(url);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+      const validUrl = isValidUrl(connectionRedirect);
+      // Prevent any funny business by not passing in a string, also make sure we're not already where we need to be
+      if (validUrl && currentUrl !== connectionRedirect)
+        window.location.href = connectionRedirect;
     }
-    // Only run this check if we arn't already connected
-    else {
-      // Check to see if resuming connection on a new domain (url params)
-      const url = new URL(window.location.href);
-      // Check for referral whos value will be the wallet type to reconnect into
-      const walletId = url.searchParams.get('wcjs_wallet');
-      // Check for custom bridge param
-      const customBridge = url.searchParams.get('wcjs_bridge');
-      // Check for custom duration param (duration is in the url as ms)
-      const customDuration = url.searchParams.get('wcjs_duration');
-      const matchingWallet = WALLET_LIST.find(({ id }) => id === walletId);
-      if (matchingWallet) {
-        const asyncConnectionEvent = async () => {
-          // Clear out search params to keep url pretty
-          url.searchParams.delete('wcjs_wallet');
-          url.searchParams.delete('wcjs_bridge');
-          url.searchParams.delete('wcjs_duration');
-          const finalUrl = url.toString();
-          window.history.replaceState(null, '', finalUrl);
-          // Need an eventAction to send the reconnect event
-          if (matchingWallet.eventAction) {
-            // Initialize a connection
-            await walletConnectService.connect({
-              bridge: customBridge || undefined,
-              noPopup: true,
-              // Duration is in the url in ms.  Connect requires duration as seconds
-              duration: customDuration ? Number(customDuration) / 1000 : undefined,
-            });
-            // Attempt to get previous page
-            const referralUrl = document.referrer;
-            // Set the wallet.id passed in
-            walletConnectService.setState({ walletApp: matchingWallet.id });
-            // Build eventData to send to the extension
-            const encodedQRCodeUrl = encodeURIComponent(
-              walletConnectService.state?.QRCodeUrl
-            );
-            const eventData: EventData = {
-              uri: encodedQRCodeUrl,
-              event: 'walletconnect_init',
-              referral: referralUrl,
-              duration: customDuration ? Number(customDuration) : undefined,
-            };
-            // Trigger the event action based on the wallet
-            matchingWallet.eventAction(eventData);
-          }
-        };
-        asyncConnectionEvent();
-      }
-    }
+  }, [connectionRedirect, status]);
 
-    return () => walletConnectService.removeAllListeners();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // This useEffect should only run once
+  useEffect(() => {
+    if (initialLoad) {
+      setInitialLoad(false);
+      // Create event listener for localStorage changes
+      window.addEventListener(
+        'storage',
+        walletConnectService.handleLocalStorageChange
+      );
+      // Whenever we change the react state, update the class state
+      walletConnectService.setContextUpdater(setWalletConnectState);
+    }
+  }, [initialLoad, walletConnectService]);
 
   return (
     <StateContext.Provider value={{ walletConnectService, walletConnectState }}>

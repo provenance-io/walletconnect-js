@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@provenanceio/walletconnect-js": "file:../@provenanceio-wcjs-local",
+    "@provenanceio/walletconnect-js": "^2.1.8",
     "file-loader": "6.2.0"
   },
   "devDependencies": {

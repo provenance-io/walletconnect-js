@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Navigation, Sprite } from 'Components';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
-import { ICON_NAMES } from 'consts';
+import { CONNECT_URL, ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
 import { Countdowns } from './Countdowns';
 import { AccountInfo } from './AccountInfo';
@@ -62,6 +62,9 @@ const Subtitle = styled.p`
   font-size: 1.4rem;
   max-width: 100%;
   text-shadow: 0px 0px 4px ${COLORS.BLACK_20};
+  a {
+    color: ${COLORS.NEUTRAL_650};
+  }
 `;
 const Version = styled.a`
   font-size: 1rem;
@@ -76,7 +79,7 @@ const RowSplitter = styled.div`
 export const Sidebar: React.FC = () => {
   const { walletConnectState } = useWalletConnect();
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
-  const { connected } = walletConnectState;
+  const { status } = walletConnectState;
 
   const toggleMobileSidebar = (status?: boolean) => {
     setShowSidebarMobile(!showSidebarMobile);
@@ -91,7 +94,9 @@ export const Sidebar: React.FC = () => {
           onClick={toggleMobileSidebar}
           spin={showSidebarMobile ? 15 : 0}
         />
-        <div>WalletConnect-JS Example App</div>
+        <div>
+          <a href={CONNECT_URL}>WalletConnect-JS Example App</a>
+        </div>
         <a
           href="https://www.npmjs.com/package/@provenanceio/walletconnect-js"
           target="_blank"
@@ -107,7 +112,9 @@ export const Sidebar: React.FC = () => {
         }}
       >
         <SubtitleSection>
-          <Subtitle>WalletConnect-JS Example App</Subtitle>
+          <Subtitle>
+            <a href={CONNECT_URL}>WalletConnect-JS Example App</a>
+          </Subtitle>
           <Version
             href="https://www.npmjs.com/package/@provenanceio/walletconnect-js"
             target="_blank"
@@ -116,7 +123,7 @@ export const Sidebar: React.FC = () => {
             v{process.env.REACT_APP_VERSION || 'v??.??.??'}
           </Version>
         </SubtitleSection>
-        {connected && (
+        {status === 'connected' && (
           <>
             <Countdowns />
             <RowSplitter />

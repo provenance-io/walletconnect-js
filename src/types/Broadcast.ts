@@ -1,63 +1,123 @@
-import type { GasPrice } from './GasPriceType';
-import { WalletConnectClientType } from './WalletConnectService';
-import { ConnectData } from './ConnectData';
+import { WINDOW_MESSAGES } from '../consts';
 
-export type ProvenanceMethod = 'provenance_sign' | 'provenance_sendTransaction';
-
-export interface MethodSendMessageData {
-  message: string | string[];
-  description?: string;
-  method?: ProvenanceMethod;
-  gasPrice?: GasPrice;
-  feeGranter?: string;
-  feePayer?: string;
-  memo?: string;
-  timeoutHeight?: number;
-  extensionOptions?: string[];
-  nonCriticalExtensionOptions?: string[];
+export interface WalletConnectEventDisconnect {
+  event: string;
+  params: { message?: string }[];
 }
 
+type BroadcastEventNameKeys = keyof typeof WINDOW_MESSAGES;
+export type BroadcastEventName = typeof WINDOW_MESSAGES[BroadcastEventNameKeys];
+
+// All the different walletConnectService method results
 export type ConnectionType = 'existing session' | 'new session';
+export interface ConnectMethodResult {
+  connectionEST: number;
+  connectionEXP: number;
+  connectionType: ConnectionType;
+}
+export interface ConnectMethodEventData extends BasicBroadcastEventData {
+  result?: ConnectMethodResult;
+}
 
-export type MethodConnectData =
-  | {
-      connectionEST: number;
-      connectionEXP: number;
-      connectionType: ConnectionType;
-      connector: WalletConnectClientType;
-    }
-  | ConnectData;
+export interface DisconnectMethodResult extends BasicBroadcastEventData {
+  message?: string;
+}
+export interface DisconnectMethodEventData extends BasicBroadcastEventData {
+  result?: DisconnectMethodResult;
+}
 
-export interface MethodSignJWTData {
-  signedJWT?: string;
+export interface SendMessageMethodEventData extends BasicBroadcastEventData {
+  result?: SendMessageMethodResult;
+}
+export interface SendMessageMethodResult {
+  txResponse?: {
+    code: number;
+    codespace: string;
+    data: string;
+    eventsList: {
+      type: string;
+      attributesList: {
+        key: string;
+        value: string;
+        index?: boolean;
+      }[];
+    }[];
+    gasUsed: number;
+    gasWanted: number;
+    height: number;
+    info: string;
+    logsList: {
+      msgIndex: number;
+      log: string;
+      eventsList: {
+        type: string;
+        attributesList: {
+          type: string;
+          attributesList: {
+            key: string;
+            value: string;
+            index?: boolean;
+          }[];
+        }[];
+      }[];
+    };
+    rawLog: string;
+    timestamp: string;
+    txhash: string;
+  };
+}
+
+export interface SignJWTMethodEventData extends BasicBroadcastEventData {
+  result?: SignJWTMethodResult;
+}
+export interface SignJWTMethodResult {
+  signature: string;
+  signedJWT: string;
   expires: number;
 }
 
-interface MetaData {
-  description: string;
-  address: string;
-  date: number;
+export interface SignHexMessageMethodEventData extends BasicBroadcastEventData {
+  result?: SignHexMessageMethodResult;
+}
+export interface SignHexMessageMethodResult {
+  signature: string;
 }
 
-interface MethodRequest {
+export interface SwitchToGroupMethodEventData extends BasicBroadcastEventData {
+  result?: string;
+}
+
+// Request data passed into the walletconnect sendCustomRequest function
+export type ProvenanceMethod =
+  | 'provenance_sign'
+  | 'provenance_sendTransaction'
+  | 'wallet_action';
+
+interface BroadcastRequest {
   id: number;
   jsonrpc: string;
   method: ProvenanceMethod;
-  params: MetaData[] | string[];
+  params: string[]; // Note the first item in the params array is stringified metadata
 }
 
-export interface BroadcastResult {
-  data?:
-    | MethodSendMessageData
-    | MethodConnectData
-    | MethodSignJWTData
-    | number
-    | string;
+// Broadcast Event Data - What a dApp gets back after calling a method or getting an action result from a listner
+interface BasicBroadcastEventData {
   error?: string;
-  request?: MethodRequest;
-  // result comes from walletconnect, can't change the "any" type
-  result?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   valid?: boolean;
+  request?: BroadcastRequest;
 }
 
-export type Broadcast = (eventName: string, data?: BroadcastResult) => void;
+// All the possible BroadcastResults mapped
+export interface BroadcastEventData {
+  [WINDOW_MESSAGES.CONNECTED]: ConnectMethodEventData;
+  [WINDOW_MESSAGES.SESSION_UPDATED]: ConnectMethodEventData;
+  [WINDOW_MESSAGES.DISCONNECT]: DisconnectMethodEventData;
+  [WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]: SendMessageMethodEventData;
+  [WINDOW_MESSAGES.SEND_MESSAGE_FAILED]: SendMessageMethodEventData;
+  [WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE]: SignHexMessageMethodEventData;
+  [WINDOW_MESSAGES.SIGN_HEX_MESSAGE_FAILED]: SignHexMessageMethodEventData;
+  [WINDOW_MESSAGES.SIGN_JWT_COMPLETE]: SignJWTMethodEventData;
+  [WINDOW_MESSAGES.SIGN_JWT_FAILED]: SignJWTMethodEventData;
+  [WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE]: SwitchToGroupMethodEventData;
+  [WINDOW_MESSAGES.SWITCH_TO_GROUP_FAILED]: SwitchToGroupMethodEventData;
+}

@@ -1,11 +1,6 @@
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
-import {
-  WINDOW_MESSAGES,
-  useWalletConnect,
-  BroadcastResult,
-  ProvenanceMethod,
-} from '@provenanceio/walletconnect-js';
+import { useState } from 'react';
+import { useWalletConnect, ProvenanceMethod } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, ActionGas, Results, Dropdown } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
@@ -24,24 +19,31 @@ export const SendMessage: React.FC = () => {
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
-  const [initialLoad, setInitialLoad] = useState(true);
   const [method, setMethod] = useState<ProvenanceMethod>(
     'provenance_sendTransaction'
   );
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { loading } = walletConnectState;
-  const sendMessageLoading = loading === 'sendMessage';
+  const { pendingMethod } = walletConnectState;
+  const sendMessageLoading = pendingMethod === 'sendMessage';
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Convert input string value to number for price
     const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
 
-    wcs.sendMessage({
+    const result = await wcs.sendMessage({
       message,
       description,
       gasPrice: finalGasData,
       method,
+    });
+    setResults({
+      action: 'sendMessage',
+      status: result.error ? 'failed' : 'success',
+      message: result.error
+        ? result.error
+        : 'WalletConnectJS | Send Message Complete',
+      data: result,
     });
   };
 
@@ -50,34 +52,6 @@ export const SendMessage: React.FC = () => {
       'ChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEmwKKXRwMWtuc3hmbm4wbHE0OG1tbmtmbmtndGtrOHFueHhkdTB5MnRrbGtoEil0cDFrbnN4Zm5uMGxxNDhtbW5rZm5rZ3Rrazhxbnh4ZHUweTJ0a2xraBoUCgVuaGFzaBILMTAwMDAwMDAwMDA='
     );
   };
-
-  // Create all event listeners for this Action Card method
-  useEffect(() => {
-    const completeEvent = (data: BroadcastResult) => {
-      setResults({
-        action: 'sendMessage',
-        status: 'success',
-        message: 'WalletConnectJS | Send Message Complete',
-        data,
-      });
-    };
-    const failEvent = (data: BroadcastResult) => {
-      const { error } = data;
-      const message = error || 'Unknown error';
-      setResults({
-        action: 'sendMessage',
-        status: 'failed',
-        message,
-        data,
-      });
-    };
-    // First load, if windowMessages passed in, create events
-    if (initialLoad) {
-      setInitialLoad(false);
-      wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE, completeEvent);
-      wcs.addListener(WINDOW_MESSAGES.SEND_MESSAGE_FAILED, failEvent);
-    }
-  }, [initialLoad, wcs]);
 
   return (
     <ActionCard
@@ -97,9 +71,9 @@ export const SendMessage: React.FC = () => {
         value={message}
         label="Base64 Encoded Message"
         placeholder="Enter Base64 Encoded Message"
-        onChange={setMessage}
-        bottomGap
-        disabled={sendMessageLoading}
+          onChange={setMessage}
+          bottomGap
+          disabled={sendMessageLoading}
       />
       <Dropdown
         value={method}

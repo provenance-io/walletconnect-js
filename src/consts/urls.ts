@@ -1,15 +1,21 @@
 export const WALLETCONNECT_BRIDGE_URL =
   'wss://figure.tech/service-wallet-connect-bridge/ws/external';
 
-const FIREBASE_PROJECT_API_KEY = 'AIzaSyBNzgtDMBU_7Df1MjTGjHyj4_3pLYtdOY8';
-const FIREBASE_PROJECT_URL =
-  'https://firebasedynamiclinks.googleapis.com/v1/shortLinks';
-export const FIREBASE_FETCH_WALLET_URL = `${FIREBASE_PROJECT_URL}?key=${FIREBASE_PROJECT_API_KEY}`;
+// FIGURE MOBILE WALLET DYNAMIC URLS
+export const DYNAMIC_LINK_FIGURE_MOBILE_URL = 'https://figurewallet.page.link';
+export const FIGURE_MOBILE_WALLET_CONNECT_URL = 'https://figure.com/wallet-connect';
+export const FIGURE_MOBILE_WALLET_APP_ID = '6444263900';
+export const FIGURE_MOBILE_WALLET_APP_ID_TEST = '6444293331';
+export const FIGURE_MOBILE_WALLET_PACKAGE_NAME = 'com.figure.mobile.wallet';
+export const FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST = 'com.figure.mobile.wallet.dev';
 
-export const APP_STORE_GOOGLE_PLAY =
-  'https://play.google.com/store/apps/details?id=io.provenance.wallet';
-export const APP_STORE_APPLE =
-  'https://apps.apple.com/us/app/provenance-blockchain-wallet/id1606428494';
+// APP STORE ICONS
+export const APP_STORE_GOOGLE_PLAY_FIGURE =
+  'https://play.google.com/store/apps/details?id=com.figure.mobile.wallet';
+export const APP_STORE_APPLE_FIGURE =
+  'https://apps.apple.com/us/app/figure-wallet/id6444263900';
 
-export const FIGURE_WEB_WALLET_TEST_URL = 'https://test.figure.com/figure-wallet';
-export const FIGURE_WEB_WALLET_PROD_URL = 'https://www.figure.com/figure-wallet';
+// FIGURE WEB WALLET URLS
+const FIGURE_HOSTED_WALLET_URL = 'figure-wallet/connect/hosted?isPopup=true';
+export const FIGURE_HOSTED_WALLET_URL_TEST = `https://test.figure.com/${FIGURE_HOSTED_WALLET_URL}`;
+export const FIGURE_HOSTED_WALLET_URL_PROD = `https://www.figure.com/${FIGURE_HOSTED_WALLET_URL}`;

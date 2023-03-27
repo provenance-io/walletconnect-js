@@ -1,17 +1,14 @@
 import { ConnectionType } from '../types';
 
 export const CONNECTOR_EVENTS = {
-  session_request: 'session_request',
-  session_update: 'session_update',
-  exchange_key: 'exchange_key',
   connect: 'connect',
   disconnect: 'disconnect',
-  display_uri: 'display_uri',
-  modal_closed: 'modal_closed',
-  transport_open: 'transport_open',
-  transport_close: 'transport_close',
-  transport_error: 'transport_error',
-};
+  session_request: 'session_request',
+  session_update: 'session_update',
+  call_request: 'call_request',
+  wc_sessionRequest: 'wc_sessionRequest',
+  wc_sessionUpdate: 'wc_sessionUpdate',
+} as const;
 
 export const CONNECTION_TYPES: {
   existing_session: ConnectionType;
@@ -19,4 +16,4 @@ export const CONNECTION_TYPES: {
 } = {
   existing_session: 'existing session',
   new_session: 'new session',
-};
+} as const;

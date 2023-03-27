@@ -1,46 +1,109 @@
-import type WalletConnectClient from '@walletconnect/client';
+import WalletConnectClient from '@walletconnect/client';
 import type { IClientMeta } from './IClientMeta';
 import type { WalletId } from './WalletList';
-import type { MasterGroupPolicy, WalletInfo } from './ConnectData';
+import type { AccountObject, MasterGroupPolicy, WalletInfo } from './ConnectData';
+import type { ProvenanceMethod } from './Broadcast';
+import type { GasPrice } from './GasPriceType';
+import { WalletAction } from '../consts/walletActions';
 
 export type WalletConnectClientType = WalletConnectClient;
 
-type WCSLoadingValue = '' | 'sendMessage' | 'signJWT' | 'signMessage';
+type WCSPendingMethod =
+  | ''
+  | 'sendMessage'
+  | 'signJWT'
+  | 'signHexMessage'
+  | 'switchToGroup';
+
+export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
+
+export interface ModalData {
+  QRCodeImg: string;
+  QRCodeUrl: string;
+  showModal: boolean;
+  isMobile: boolean;
+  dynamicUrl: string;
+}
 
 export interface WCSState {
-  account: string;
   address: string;
   bridge: string;
-  connected: boolean;
+  status: WalletConnectServiceStatus;
   connectionEXP: number | null;
   connectionEST: number | null;
   connectionTimeout: number;
-  connector: WalletConnectClientType | null;
-  figureConnected: boolean;
-  isMobile: boolean;
-  loading: WCSLoadingValue;
-  newAccount: boolean;
+  pendingMethod: WCSPendingMethod;
   peer: IClientMeta | null;
   publicKey: string;
-  QRCode: string;
-  QRCodeUrl: string;
-  showQRCodeModal: boolean;
+  modal: ModalData;
   signedJWT: string;
-  walletApp?: WalletId | '';
+  walletAppId?: WalletId;
   walletInfo: WalletInfo;
   representedGroupPolicy: MasterGroupPolicy | null;
 }
 
-export type WCSSetState = (state: Partial<WCSState>) => void;
+export interface WCSSetStateParam extends WCSState {
+  connector?: WalletConnectClient;
+}
+
+export type WCSSetState = (
+  state: Partial<WCSSetStateParam>,
+  updateLocalStorage?: boolean
+) => void;
 export type WCSSetFullState = (state: WCSState) => void;
 
 export interface WCJSLocalState {
-  account: string;
   connectionEXP: number;
   connectionEST: number;
   connectionTimeout: number;
-  figureConnected: boolean;
-  newAccount: false;
   signedJWT: string;
-  walletApp?: WalletId | '';
+  walletAppId?: WalletId | '';
+}
+
+export interface WCLocalState {
+  connected: boolean;
+  accounts: AccountObject[];
+  chainId: number;
+  bridge: string;
+  key: string;
+  clientId: string;
+  clientMeta: IClientMeta | null;
+  peerId: string;
+  peerMeta: IClientMeta | null;
+  handshakeId: number;
+  handshakeTopic: string;
+}
+
+export type WCJSLocalStateKeys = keyof WCJSLocalState;
+export type WCLocalStateKeys = keyof WCLocalState;
+
+export interface ConnectMethod {
+  bridge?: string;
+  duration?: number;
+  noPopup?: boolean;
+  individualAddress?: string;
+  groupAddress?: string;
+  prohibitGroups?: boolean;
+  jwtExpiration?: number;
+  walletAppId?: WalletId;
+}
+
+export interface SendMessageMethod {
+  message: string | string[];
+  description?: string;
+  method?: ProvenanceMethod;
+  gasPrice?: GasPrice;
+  feeGranter?: string;
+  feePayer?: string;
+  memo?: string;
+  timeoutHeight?: number;
+  extensionOptions?: string[];
+  nonCriticalExtensionOptions?: string[];
+}
+
+export interface SendWalletActionMethod {
+  method?: ProvenanceMethod;
+  description?: string;
+  action: WalletAction;
+  payload?: Record<string, unknown>;
 }

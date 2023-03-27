@@ -1,12 +1,34 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import type { WCSState, BroadcastResult, MethodSendMessageData } from '../../types';
-import { WALLET_LIST, WALLET_APP_EVENTS, PROVENANCE_METHODS } from '../../consts';
+import type {
+  SendMessageMethod,
+  WalletConnectClientType,
+  WalletId,
+  SendMessageMethodResult,
+  BroadcastEventData,
+} from '../../types';
+import {
+  WALLET_LIST,
+  WALLET_APP_EVENTS,
+  PROVENANCE_METHODS,
+  WINDOW_MESSAGES,
+} from '../../consts';
 import { rngNum } from '../../utils';
 
-export const sendMessage = async (
-  state: WCSState,
-  data: MethodSendMessageData
-): Promise<BroadcastResult> => {
+interface SendMessage {
+  address: string;
+  connector?: WalletConnectClientType;
+  data: SendMessageMethod;
+  walletAppId?: WalletId;
+}
+
+export const sendMessage = async ({
+  address,
+  connector,
+  data,
+  walletAppId,
+}: SendMessage): Promise<
+  BroadcastEventData[typeof WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]
+> => {
   let valid = false;
   const {
     message: rawB64Message,
@@ -20,7 +42,6 @@ export const sendMessage = async (
     extensionOptions,
     nonCriticalExtensionOptions,
   } = data;
-  const { connector, address, walletApp } = state;
   const metadata = JSON.stringify({
     description,
     address,
@@ -40,9 +61,9 @@ export const sendMessage = async (
     method,
     params: [metadata],
   };
+  if (!connector) return { valid, request, error: 'No wallet connected' };
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletApp);
-  if (!connector) return { valid, data, request, error: 'No wallet connected' };
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
 
   // If message isn't an array, turn it into one
   const b64MessageArray = Array.isArray(rawB64Message)
@@ -58,13 +79,18 @@ export const sendMessage = async (
       knownWalletApp.eventAction(eventData);
     }
     // send message
-    const result = await connector.sendCustomRequest(request);
-    // TODO verify transaction ID
-    valid = !!result;
+    const result = (await connector.sendCustomRequest(
+      request
+    )) as SendMessageMethodResult;
+    // Check to see if we had an error in the txResponse
+    if (result && result.txResponse && result.txResponse.code) {
+      // Any code, other than 0, means there is a problem
+      valid = false;
+      return { valid, result, error: result.txResponse.rawLog, request };
+    }
 
-    // result is a hex encoded signature
-    return { valid, result, data, request };
+    return { valid: true, result, request };
   } catch (error) {
-    return { valid, error: `${error}`, data, request };
+    return { valid, error: `${error}`, request };
   }
 };

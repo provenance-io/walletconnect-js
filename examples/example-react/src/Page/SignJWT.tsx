@@ -1,9 +1,5 @@
-import { useState, useEffect } from 'react';
-import {
-  useWalletConnect,
-  WINDOW_MESSAGES,
-  BroadcastResult,
-} from '@provenanceio/walletconnect-js';
+import { useState } from 'react';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 import styled from 'styled-components';
@@ -22,46 +18,23 @@ export const SignJWT: React.FC = () => {
   const [results, setResults] = useState<{
     [key: string]: any;
   } | null>({});
-  const [initialLoad, setInitialLoad] = useState(true);
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { loading } = walletConnectState;
-  const signJWTLoading = loading === 'signJWT';
+  const { pendingMethod } = walletConnectState;
+  const signJWTLoading = pendingMethod === 'signJWT';
 
   const newExpirationDate = new Date(
     Date.now() + Number(value) * 1000
   ).toLocaleString('en-US');
 
-  const handleSubmit = () => {
-    wcs.signJWT(Number(value));
+  const handleSubmit = async () => {
+    const result = await wcs.signJWT(Number(value));
+    setResults({
+      action: 'signJWT',
+      status: result.error ? 'failed' : 'success',
+      message: result.error ? result.error : 'WalletConnectJS | Sign JWT Complete',
+      data: result,
+    });
   };
-
-  // Create all event listeners for this Action Card method
-  useEffect(() => {
-    const completeEvent = (data: BroadcastResult) => {
-      setResults({
-        action: 'signJWT',
-        status: 'success',
-        message: 'WalletConnectJS | Sign JWT Complete',
-        data,
-      });
-    };
-    const failEvent = (data: BroadcastResult) => {
-      const { error } = data;
-      const message = error || 'Unknown error';
-      setResults({
-        action: 'signJWT',
-        status: 'failed',
-        message,
-        data,
-      });
-    };
-    // First load, if windowMessages passed in, create events
-    if (initialLoad) {
-      setInitialLoad(false);
-      wcs.addListener(WINDOW_MESSAGES.SIGN_JWT_COMPLETE, completeEvent);
-      wcs.addListener(WINDOW_MESSAGES.SIGN_JWT_FAILED, failEvent);
-    }
-  }, [initialLoad, wcs]);
 
   return (
     <ActionCard
