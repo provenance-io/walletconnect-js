@@ -295,12 +295,9 @@ To see how to initiate and run the different examples, look through the [README.
 [release-latest]: https://github.com/provenance-io/walletconnect-js/releases/latest
 [loc-badge]: https://tokei.rs/b1/github/provenance-io/walletconnect-js
 [loc-report]: https://github.com/provenance-io/walletconnect-js
-[lint-badge]: https://github.com/provenance-io/walletconnect-js/workflows/Lint/badge.svg
 [provenance]: https://provenance.io/#overview
 
 This application is under heavy development. The upcoming public blockchain is the evolution of the private Provenance network blockchain started in 2018.
 Current development is being supported by [Figure Technologies](https://figure.com).
 
 [Back to top](#Provenance.io-WalletConnect-JS)
-
-
