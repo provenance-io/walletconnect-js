@@ -22,15 +22,6 @@ module.exports = {
     '@babel/preset-typescript',
     '@babel/preset-react',
   ]),
-  plugins: [
-    [
-      'babel-plugin-styled-components',
-      {
-        displayName: true,
-        pure: true,
-      },
-    ],
-  ],
   env: {
     cjs: {
       plugins: productionPlugins,

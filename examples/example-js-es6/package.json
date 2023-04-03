@@ -1,6 +1,6 @@
 {
   "name": "wcjs-example-es6",
-  "version": "2.1.8",
+  "version": "3.0.2",
   "description": "testing walletconnect-js with a non-react js app",
   "main": "index.js",
   "scripts": {

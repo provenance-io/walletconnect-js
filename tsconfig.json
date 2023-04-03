@@ -30,5 +30,6 @@
     "custom.d.ts",
     ".eslintrc.js",
     "scripts",
+    "babel.config.js",
   ],
 }

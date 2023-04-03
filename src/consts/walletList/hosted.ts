@@ -14,7 +14,7 @@ const FIGURE_HOSTED_IGNORED_EVENTS: WalletEventValue[] = [
 export const FIGURE_HOSTED = {
   id: WALLET_APP_IDS.FIGURE_HOSTED,
   type: ['hosted', 'mobile'],
-  title: 'Figure Hosted',
+  title: 'Figure Account',
   icon: 'figure',
   eventAction: ({ uri, address, event, redirectUrl }) => {
     // If we have an event, make sure it's not an "ignored" event
@@ -43,7 +43,7 @@ export const FIGURE_HOSTED_TEST = {
   dev: true,
   id: WALLET_APP_IDS.FIGURE_HOSTED_TEST,
   type: ['hosted', 'mobile'],
-  title: 'Figure Hosted (Test)',
+  title: 'Figure Account (Test)',
   icon: 'figure',
   eventAction: ({ uri, address, event, redirectUrl }) => {
     // If we have an event, make sure it's not an "ignored" event
