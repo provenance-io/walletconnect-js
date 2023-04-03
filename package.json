@@ -3,14 +3,17 @@
   "version": "3.0.2-develop.1",
   "private": false,
   "sideEffects": false,
-  "main": "lib/index.js",
+  "main": "esm/index.js",
   "license": "Apache-2.0",
-  "typings": "./lib/index.d.ts",
+  "typings": "./esm/index.d.ts",
   "files": [
     "lib",
     "esm",
     "umd"
   ],
+  "import": {
+    ".": "./esm/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/provenance-io/walletconnect-js.git"
