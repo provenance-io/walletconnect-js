@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer';
 import events from 'events';
 import type {
-  BroadcastEventName,
   BroadcastEventData,
   ConnectMethod,
   SendMessageMethod,
@@ -290,9 +289,9 @@ export class WalletConnectService {
   }
 
   // Remove listener w/specific eventName used with eventEmitter/broadcast results
-  removeListener(
-    targetEvent: BroadcastEventName | 'all',
-    callback?: (results: BroadcastEventData) => void
+  removeListener<Name extends keyof BroadcastEventData>(
+    targetEvent: Name | 'all',
+    callback?: (results: BroadcastEventData[Name]) => void
   ) {
     if (targetEvent === 'all') {
       this.#eventEmitter.eventNames().forEach((eventName) => {
