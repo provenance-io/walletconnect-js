@@ -1,16 +1,19 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "private": false,
   "sideEffects": false,
-  "main": "lib/index.js",
+  "main": "esm/index.js",
   "license": "Apache-2.0",
-  "typings": "./lib/index.d.ts",
+  "typings": "./esm/index.d.ts",
   "files": [
     "lib",
     "esm",
     "umd"
   ],
+  "import": {
+    ".": "./esm/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/provenance-io/walletconnect-js.git"
@@ -61,12 +64,10 @@
     "@types/react": "18.0.21",
     "@types/react-router-dom": "5.3.3",
     "@types/secp256k1": "4.0.3",
-    "@types/styled-components": "5.1.26",
     "@typescript-eslint/eslint-plugin": "5.38.1",
     "@typescript-eslint/parser": "5.38.1",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.5",
-    "babel-plugin-styled-components": "2.0.7",
     "concurrently": "7.4.0",
     "css-loader": "6.7.1",
     "enquirer": "2.3.6",
@@ -90,7 +91,6 @@
     "process": "0.11.10",
     "react": "^18.2.0",
     "style-loader": "3.3.1",
-    "styled-components": "^5.3.6",
     "ts-loader": "9.4.1",
     "typescript": "4.8.3",
     "webpack": "5.76.1",
@@ -108,7 +108,7 @@
     "start:example-react": "cd examples/example-react-vite && npm i && npm run start",
     "watch:example-react": "cd examples/example-react-vite && npm run start",
     "prebuild": "npm run test",
-    "start:watch": "nodemon -e js,ts,tsx --watch src --exec 'npm run build:pack && npm run watch:example-react'",
+    "start:watch": "nodemon -e js,ts,tsx,css --watch src --exec 'npm run build:pack && npm run watch:example-react'",
     "start": "npm run start:watch && npm run start:example-react",
     "test": "jest",
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
