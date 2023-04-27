@@ -114,7 +114,10 @@
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "versionUp": "node -e 'require(\"./scripts/versionUp.js\").versionUp()'",
-    "vup": "npm run versionUp"
+    "vup": "npm run versionUp",
+    "vup:major": "npm version major --no-git-tag-version && cd examples/example-react-vite && npm version major --no-git-tag-version",
+    "vup:minor": "npm version minor --no-git-tag-version && cd examples/example-react-vite && npm version minor --no-git-tag-version",
+    "vup:patch": "npm version patch --no-git-tag-version && cd examples/example-react-vite && npm version patch --no-git-tag-version"
   },
   "browserslist": [
     "defaults"
