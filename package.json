@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "private": false,
   "sideEffects": false,
   "main": "esm/index.js",
@@ -100,7 +100,7 @@
     "build:commonjs": "BABEL_ENV=cjs babel ./src --extensions \".js,.jsx,.ts,.tsx\" -d lib --copy-files",
     "build:esm": "BABEL_ENV=esm babel src -d esm --extensions \".js,.jsx,.ts,.tsx\" --copy-files",
     "build:umd": "webpack",
-    "build:pack": "npm run clean && npm run build:commonjs && npm run tsc:commonjs && npm pack --pack-destination './examples'",
+    "build:pack": "npm run clean && npm run build:commonjs && npm run build:esm && npm run tsc:commonjs && npm pack --pack-destination './examples'",
     "build": "npm run clean && npm run build:commonjs && npm run build:esm && npm run build:umd && npm run tsc:esm && npm run tsc:commonjs",
     "clean": "rm -rf ./lib ./esm ./umd ./examples/provenanceio-walletconnect-js-*.tgz",
     "commentSniff": "node -e 'require(\"./scripts/commentSniffer.js\").commentSniffer()'",

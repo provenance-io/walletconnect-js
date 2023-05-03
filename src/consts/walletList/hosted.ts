@@ -1,9 +1,10 @@
 import { Wallet, WalletEventValue } from '../../types';
-import { WALLET_APP_IDS } from '../walletAppIds';
 import {
-  FIGURE_HOSTED_WALLET_URL_TEST,
+  FIGURE_HOSTED_WALLET_URL,
   FIGURE_HOSTED_WALLET_URL_PROD,
+  FIGURE_HOSTED_WALLET_URL_TEST,
 } from '../urls';
+import { WALLET_APP_IDS } from '../walletAppIds';
 
 const FIGURE_HOSTED_IGNORED_EVENTS: WalletEventValue[] = [
   'walletconnect_connect',
@@ -55,9 +56,13 @@ export const FIGURE_HOSTED_TEST = {
       if (event) searchParams.append('event', event);
       if (redirectUrl) searchParams.append('redirectUrl', redirectUrl);
       const searchParamsString = searchParams.toString();
-      const url = `${FIGURE_HOSTED_WALLET_URL_TEST}${
-        searchParamsString ? `&${searchParamsString}` : ''
-      }`;
+      const overrideUrl = localStorage.getItem(
+        'FIGURE_HOSTED_WALLET_URL_TEST_OVERRIDE'
+      );
+      const baseUrl = overrideUrl
+        ? `${overrideUrl}/${FIGURE_HOSTED_WALLET_URL}`
+        : FIGURE_HOSTED_WALLET_URL_TEST;
+      const url = `${baseUrl}${searchParamsString ? `&${searchParamsString}` : ''}`;
       const width = 600;
       const height = window.outerHeight < 750 ? window.outerHeight : 550;
       const top = window.outerHeight / 2 + window.screenY - height / 2;
