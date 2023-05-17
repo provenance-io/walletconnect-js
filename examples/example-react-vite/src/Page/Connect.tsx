@@ -48,7 +48,7 @@ export const Connect: React.FC = () => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [groupsAllowed, setGroupsAllowed] = useState(true);
   const [jwtExpiration, setJwtExpiration] = useState('');
-  const [sessionDuration, setSessionDuration] = useState('3600');
+  const [sessionDuration, setSessionDuration] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [results, setResults] = useState<BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
@@ -139,7 +139,7 @@ export const Connect: React.FC = () => {
               onChange={setSessionDuration}
               value={sessionDuration}
               label="Custom session duration in seconds (optional)"
-              placeholder="Use default (3600 seconds/1 hour)"
+              placeholder="Use default (24 hours)"
               bottomGap
             />
             <Checkbox

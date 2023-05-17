@@ -14,6 +14,7 @@ interface Props {
     eventName: BroadcastEventName,
     eventData: BroadcastEventData[BroadcastEventName]
   ) => void;
+  duration: number;
   getState: () => WCSState;
   jwtExpiration?: number;
   noPopup?: boolean;
@@ -37,6 +38,7 @@ interface Props {
 export const connect = ({
   bridge,
   broadcast,
+  duration,
   getState,
   jwtExpiration,
   prohibitGroups,
@@ -53,6 +55,7 @@ export const connect = ({
   const newConnector = createConnector({
     bridge,
     broadcast,
+    duration,
     getState,
     jwtExpiration,
     prohibitGroups,
