@@ -447,14 +447,21 @@ export class WalletConnectService {
   }: ConnectMethod = {}) => {
     // Only create a new connector when we're not already connected
     if (this.state.status !== 'connected') {
+      // Calculate duration to use (use passed in or default durations)
+      const finalDurationMS = duration
+        ? duration * 1000
+        : this.state.connectionTimeout;
+      // Convert back to seconds for wallets to use since jwtExpiration is already in seconds
+      const finalDurationS = finalDurationMS / 1000;
       // Update the duration of this connection
       this.#setState({
-        connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
+        connectionTimeout: finalDurationMS,
         status: 'pending',
       });
       const newConnector = connectMethod({
         bridge: bridge || this.state.bridge,
         broadcast: this.#broadcastEvent,
+        duration: finalDurationS,
         getState: this.#getState,
         jwtExpiration,
         prohibitGroups,
