@@ -56,10 +56,11 @@
 }
 .wcjs-qr-copy {
   font-size: 10px;
-  margin: 0 28px 18px auto;
+  margin: 4px 28px 18px auto;
   border: 1px solid #666666;
   border-radius: 3px;
   cursor: pointer;
+  padding: 0 6px;
 }
 .wcjs-qr-icon {
   background: #ffffff;
@@ -71,10 +72,15 @@
 }
 .wcjs-qr-img {
   flex-basis: 100%;
+}
+.wcjs-qr-appicon-element {
+  display: inline;
+  height: 42px;
   margin-top: 10px;
 }
-.wcjs-image-element {
+.wcjs-qr-img-element {
   display: inline;
+  margin-top: 10px;
 }
 .wcjs-qr-reload {
   position: absolute;
@@ -174,6 +180,7 @@
   cursor: pointer;
   text-align: center;
   user-select: none;
+  line-height: 18.4px;
 }
 .wcjs-qr-notch-active {
   background: #FFFFFF;
