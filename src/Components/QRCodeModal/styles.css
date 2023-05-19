@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+
 #wcjs-qr-modal {
   top: 0;
   left: 0;
   position: fixed;
+  font-family: "Poppins",sans-serif;
   height: 100%;
   width: 100%;
   display: flex;
@@ -10,6 +13,8 @@
   background: rgba(0, 0, 0, 0.5);
   color: #444444;
   z-index: 1000;
+  font-weight: 400;
+  letter-spacing: 0.4px;
 }
 .wcjs-qr-appicongroup {
   display: flex;
@@ -52,6 +57,9 @@
 .wcjs-qr-copy {
   font-size: 10px;
   margin: 0 28px 18px auto;
+  border: 1px solid #666666;
+  border-radius: 3px;
+  cursor: pointer;
 }
 .wcjs-qr-icon {
   background: #ffffff;
@@ -64,6 +72,9 @@
 .wcjs-qr-img {
   flex-basis: 100%;
   margin-top: 10px;
+}
+.wcjs-image-element {
+  display: inline;
 }
 .wcjs-qr-reload {
   position: absolute;
@@ -128,8 +139,11 @@
   background: #ffffff;
 }
 .wcjs-qr-text {
-  font-size: 1.5rem;
+  font-size: 15px;
   margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+  width: 100%;
 }
 .wcjs-qr-text-link {
   color: #5588DD;
@@ -138,7 +152,7 @@
 .wcjs-qr-title {
   font-weight: 900;
   user-select: none;
-  font-size: 2rem;
+  font-size: 20px;
 }
 .wcjs-qr-toggle {
   padding: 4px;

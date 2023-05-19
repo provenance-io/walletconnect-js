@@ -65,7 +65,13 @@ export const QRCodeModal: React.FC<Props> = ({
     <>
       <p className="wcjs-qr-text">{title}</p>
       <div className="wcjs-qr-img">
-        <img src={QRCodeImg} alt="WalletConnect QR Code" />
+        <img
+          className="wcjs-img-element"
+          src={QRCodeImg}
+          alt="WalletConnect QR Code"
+          height="276px"
+          width="276px"
+        />
       </div>
       {copied ? (
         <button disabled className="wcjs-qr-copy">
@@ -85,7 +91,13 @@ export const QRCodeModal: React.FC<Props> = ({
           title="Get the Figure Wallet in the Apple App store."
           className="wcjs-qr-appicon"
         >
-          <img src={appleAppStoreImg} height="42px" alt="Apple App Store badge" />
+          <img
+            src={appleAppStoreImg}
+            alt="Apple App Store badge"
+            className="wcjs-img-element"
+            height="42px"
+            width="146px"
+          />
         </a>
         <a
           href={APP_STORE_GOOGLE_PLAY_FIGURE}
@@ -94,7 +106,13 @@ export const QRCodeModal: React.FC<Props> = ({
           title="Get the Figure Wallet in the Google Play store."
           className="wcjs-qr-appicon"
         >
-          <img src={googlePlayImg} height="42px" alt="Google Play Store badge" />
+          <img
+            src={googlePlayImg}
+            height="42px"
+            width="141px"
+            alt="Google Play Store badge"
+            className="wcjs-img-element"
+          />
         </a>
       </div>
     </>
