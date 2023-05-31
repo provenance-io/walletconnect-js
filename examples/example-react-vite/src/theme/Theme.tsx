@@ -1,11 +1,10 @@
+import { SpriteSheet } from 'Components';
 import { ReactNode } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-import { createGlobalStyle, DefaultTheme } from 'styled-components';
+import { createGlobalStyle, DefaultTheme, ThemeProvider } from 'styled-components';
 import { normalize } from 'styled-normalize';
-import { ThemeProvider } from 'styled-components';
-import { SpriteSheet } from 'Components';
-import { BaseTypographyLoader, FONTS } from './fonts';
 import { COLORS } from './colors';
+import { BaseTypographyLoader, FONTS } from './fonts';
 
 const baseTheme: DefaultTheme = {
   colors: { ...COLORS },
@@ -14,12 +13,6 @@ const baseTheme: DefaultTheme = {
 
 const GlobalStyles = createGlobalStyle`
   ${normalize}
-
-  // React local causes iframe when error process is not defined shows up.
-  // https://github.com/facebook/create-react-app/issues/11773
-  iframe:not(#figure-wallet-extension) {
-    pointer-events: none;
-  }
 
   html {
     font-size: 62.5%; // 1rem = 10px

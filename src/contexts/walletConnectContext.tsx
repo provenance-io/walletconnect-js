@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { HostedWalletIframe } from '../Components/HostedWalletIframe';
 import { WalletConnectService } from '../services';
 import type { WCSState } from '../types';
 
@@ -64,6 +65,7 @@ const WalletConnectContextProvider: React.FC<Props> = ({
 
   return (
     <StateContext.Provider value={{ walletConnectService, walletConnectState }}>
+      <HostedWalletIframe />
       {children}
     </StateContext.Provider>
   );
