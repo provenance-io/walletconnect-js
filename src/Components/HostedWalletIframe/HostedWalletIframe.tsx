@@ -45,14 +45,6 @@ const createIframe = (url: string) => {
   const iframe = document.createElement('iframe');
   iframe.src = url;
 
-  const closeButton = document.createElement('button');
-  closeButton.textContent = 'Close window';
-  closeButton.onclick = () => {
-    removeIframe();
-  };
-
-  container.appendChild(closeButton);
-
   // I don't think we need the allow, but may need it after testing some
   //iframe.allow = `clipboard-read ${EXTENSION_ORIGIN}/index.html#/notification;clipboard-write ${EXTENSION_ORIGIN}/index.html#/notification;`
 
