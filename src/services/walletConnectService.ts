@@ -61,6 +61,7 @@ const defaultState: WCSState = {
   publicKey: '',
   representedGroupPolicy: null,
   signedJWT: '',
+  version: '3.0.7',
   walletAppId: undefined,
   walletInfo: {},
 };
@@ -126,6 +127,7 @@ export class WalletConnectService {
       signedJWT:
         existingWCJSState.signedJWT || localStorageJWT || currentState.signedJWT,
       status: getNewStatus(),
+      version: currentState.version,
       walletAppId: existingWCJSState.walletAppId || currentState.walletAppId,
       walletInfo: localStorageWalletInfo || currentState.walletInfo,
       representedGroupPolicy:
@@ -486,7 +488,10 @@ export class WalletConnectService {
   disconnect = async (message?: string) => {
     // Clear out the existing connection timer
     this.#clearConnectionTimer();
-    if (this.#connector) await this.#connector.killSession({ message });
+    // Only do this if we have a connector and the connector is connected
+    // Note: If we don't check for connected can generate an "invalid topic" error
+    if (this.#connector && this.#connector.connected)
+      await this.#connector.killSession({ message });
     return message;
   };
 

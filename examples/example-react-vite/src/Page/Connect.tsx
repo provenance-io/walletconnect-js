@@ -61,7 +61,9 @@ export const Connect: React.FC = () => {
     if (initialLoad) {
       setInitialLoad(false);
       wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {setResults(eventResults)});
-      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, (eventResults) => {setResults(eventResults)});
+      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, (eventResults) => {
+        setResults(eventResults)
+      });
     }
   }, [wcs, navigate, initialLoad, walletConnectState]);
 

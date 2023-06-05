@@ -37,6 +37,7 @@ export interface WCSState {
   publicKey: string;
   modal: ModalData;
   signedJWT: string;
+  version: string;
   walletAppId?: WalletId;
   walletInfo: WalletInfo;
   representedGroupPolicy: MasterGroupPolicy | null;
