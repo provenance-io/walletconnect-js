@@ -26,6 +26,7 @@ interface Props {
     eventName: BroadcastEventName,
     eventData: BroadcastEventData[BroadcastEventName]
   ) => void;
+  duration: number;
   getState: () => WCSState;
   jwtExpiration?: number;
   noPopup?: boolean;
@@ -45,6 +46,7 @@ interface Props {
 export const createConnector = ({
   bridge,
   broadcast,
+  duration,
   getState,
   jwtExpiration,
   prohibitGroups,
@@ -70,7 +72,6 @@ export const createConnector = ({
           const eventData: EventData = {
             uri: uriData,
             event: 'walletconnect_init',
-            duration: state.connectionTimeout,
             redirectUrl: window.location.href,
           };
           // Trigger the event action based on the wallet
@@ -113,7 +114,10 @@ export const createConnector = ({
       const jwtExpirationParam = jwtExpiration
         ? `&jwtExpiration=${jwtExpiration}`
         : '';
-      const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}`;
+      const connectionDurationParam = duration
+        ? `&connectionDuration=${duration}`
+        : '';
+      const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}${connectionDurationParam}`;
       const qrcode = await QRCode.toDataURL(fullData);
       // Don't trigger a QRCodeModal popup if they say "noPopup" or pass a specific walletId
       updateModal({

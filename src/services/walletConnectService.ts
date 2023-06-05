@@ -61,6 +61,7 @@ const defaultState: WCSState = {
   publicKey: '',
   representedGroupPolicy: null,
   signedJWT: '',
+  version: '3.0.7',
   walletAppId: undefined,
   walletInfo: {},
 };
@@ -126,6 +127,7 @@ export class WalletConnectService {
       signedJWT:
         existingWCJSState.signedJWT || localStorageJWT || currentState.signedJWT,
       status: getNewStatus(),
+      version: currentState.version,
       walletAppId: existingWCJSState.walletAppId || currentState.walletAppId,
       walletInfo: localStorageWalletInfo || currentState.walletInfo,
       representedGroupPolicy:
@@ -447,14 +449,21 @@ export class WalletConnectService {
   }: ConnectMethod = {}) => {
     // Only create a new connector when we're not already connected
     if (this.state.status !== 'connected') {
+      // Calculate duration to use (use passed in or default durations)
+      const finalDurationMS = duration
+        ? duration * 1000
+        : this.state.connectionTimeout;
+      // Convert back to seconds for wallets to use since jwtExpiration is already in seconds
+      const finalDurationS = finalDurationMS / 1000;
       // Update the duration of this connection
       this.#setState({
-        connectionTimeout: duration ? duration * 1000 : this.state.connectionTimeout,
+        connectionTimeout: finalDurationMS,
         status: 'pending',
       });
       const newConnector = connectMethod({
         bridge: bridge || this.state.bridge,
         broadcast: this.#broadcastEvent,
+        duration: finalDurationS,
         getState: this.#getState,
         jwtExpiration,
         prohibitGroups,
@@ -479,7 +488,10 @@ export class WalletConnectService {
   disconnect = async (message?: string) => {
     // Clear out the existing connection timer
     this.#clearConnectionTimer();
-    if (this.#connector) await this.#connector.killSession({ message });
+    // Only do this if we have a connector and the connector is connected
+    // Note: If we don't check for connected can generate an "invalid topic" error
+    if (this.#connector && this.#connector.connected)
+      await this.#connector.killSession({ message });
     return message;
   };
 
