@@ -438,7 +438,7 @@ export class WalletConnectService {
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
    * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
    */
-  connect = ({
+  connect = async ({
     individualAddress,
     groupAddress,
     bridge,
@@ -460,7 +460,7 @@ export class WalletConnectService {
         connectionTimeout: finalDurationMS,
         status: 'pending',
       });
-      const newConnector = connectMethod({
+      const newConnectData = await connectMethod({
         bridge: bridge || this.state.bridge,
         broadcast: this.#broadcastEvent,
         duration: finalDurationS,
@@ -476,9 +476,10 @@ export class WalletConnectService {
         updateModal: this.updateModal,
         walletAppId,
       });
-
-      this.#connector = newConnector;
+      this.#connector = newConnectData.connector || undefined;
+      return newConnectData;
     }
+    return 'Already connected';
   };
 
   /**
