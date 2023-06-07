@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "3.0.8-develop.2",
+  "version": "3.0.8-develop.3",
   "private": false,
   "sideEffects": false,
   "main": "esm/index.js",
@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/provenance-io/walletconnect-js#readme",
   "dependencies": {
-    "@babel/runtime": "7.19.0",
     "@walletconnect/client": "1.8.0",
     "@walletconnect/utils": "1.8.0",
     "base64url": "3.0.1",

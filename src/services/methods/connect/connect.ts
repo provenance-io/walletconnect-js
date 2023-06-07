@@ -1,4 +1,4 @@
-import { createConnector } from './createConnector';
+import { createConnectorPromise } from './createConnector';
 import type {
   BroadcastEventName,
   BroadcastEventData,
@@ -35,7 +35,7 @@ interface Props {
 // Creating a new connector w/connector.on() events (connect, session_update, and disconnect)
 // Update the walletConnectService state with the newly created connector
 // If we're not already connected, start a new session (Triggers a connect modal popup)
-export const connect = ({
+export const connect = async ({
   bridge,
   broadcast,
   duration,
@@ -52,7 +52,7 @@ export const connect = ({
   walletAppId,
 }: Props) => {
   // Create a new walletconnect connector class and set up all walletconnect event listeners for it
-  const newConnector = createConnector({
+  const newConnectData = await createConnectorPromise({
     bridge,
     broadcast,
     duration,
@@ -69,10 +69,5 @@ export const connect = ({
     walletAppId,
   });
 
-  // If we're not connected, initiate a connection to this newConnector and dApp
-  if (!newConnector.connected) {
-    newConnector.createSession();
-  }
-
-  return newConnector;
+  return newConnectData;
 };
