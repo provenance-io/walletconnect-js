@@ -50,6 +50,7 @@ export const Connect: React.FC = () => {
   const [jwtExpiration, setJwtExpiration] = useState('');
   const [sessionDuration, setSessionDuration] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
   const [results, setResults] = useState<BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status, modal } = walletConnectState;
@@ -71,11 +72,13 @@ export const Connect: React.FC = () => {
     setShowAdvanced(!showAdvanced);
   };
 
-  const handleConnect = (walletAppId?: WalletId) => {
+  const handleConnect = async (walletAppId?: WalletId, mobileDirect?: boolean) => {
     // Clear out any existing results
     setResults(undefined);
+    // Hide any existing QRCodes
+    setShowQRCode(false);
     // Run connect method based on current state values
-    wcs.connect({
+    await wcs.connect({
       bridge: selectedBridge,
       duration: Number(sessionDuration),
       individualAddress,
@@ -84,6 +87,10 @@ export const Connect: React.FC = () => {
       jwtExpiration: Number(jwtExpiration),
       walletAppId,
     })
+    // If connection with mobile directly, just show the QRCode
+    if (mobileDirect) {
+      setShowQRCode(true);
+    }
   };
 
   if (status === 'connected')
@@ -151,8 +158,9 @@ export const Connect: React.FC = () => {
             />
           </AdvancedOptions>
         )}
+        {showQRCode && !!walletConnectState.modal.QRCodeImg && <div><img src={walletConnectState.modal.QRCodeImg} /></div>}
         <Button onClick={handleConnect}>
-          Connect with QRCodeModal
+          Connect with Prebuilt Modal
         </Button>
         <DirectConnectButton onClick={() => handleConnect('figure_extension')}>
           Connect directly with Figure Extension Wallet
@@ -160,7 +168,7 @@ export const Connect: React.FC = () => {
         <DirectConnectButton onClick={() => handleConnect('figure_hosted_test')}>
           Connect directly with Figure Hosted Wallet
         </DirectConnectButton>
-        <DirectConnectButton  onClick={() => handleConnect('figure_mobile_test')}>
+        <DirectConnectButton  onClick={() => handleConnect('figure_mobile_test', true)}>
           Connect directly with Figure Mobile
         </DirectConnectButton>
         {directQRCodeGenerate && QRCodeImg && <img src={QRCodeImg} />}

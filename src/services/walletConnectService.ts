@@ -460,7 +460,7 @@ export class WalletConnectService {
         connectionTimeout: finalDurationMS,
         status: 'pending',
       });
-      const newConnectData = await connectMethod({
+      const newConnector = await connectMethod({
         bridge: bridge || this.state.bridge,
         broadcast: this.#broadcastEvent,
         duration: finalDurationS,
@@ -476,10 +476,9 @@ export class WalletConnectService {
         updateModal: this.updateModal,
         walletAppId,
       });
-      this.#connector = newConnectData.connector || undefined;
-      return newConnectData;
+      this.#connector = newConnector;
     }
-    return 'Already connected';
+    return;
   };
 
   /**
