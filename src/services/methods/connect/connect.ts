@@ -58,16 +58,9 @@ export const connect = ({
   state,
   updateModal,
   walletAppId: connectionWalletAppId,
-}: Props): Promise<{
-  QRCodeImg: string;
-  QRCodeUrl: string;
-  showModal: boolean;
-  walletAppId: string;
-  connector: null | WalletConnectClient;
-  success: boolean;
-}> =>
+}: Props): Promise<undefined | WalletConnectClient> =>
   new Promise((resolve, reject) => {
-    let newConnector: null | WalletConnectClient = null;
+    let newConnector: undefined | WalletConnectClient = undefined;
     const openDirectWallet = (targetWalletId: WalletId, uriData: string) => {
       // Find the target wallet based on id
       const targetWallet = WALLET_LIST.find(
@@ -137,14 +130,7 @@ export const connect = ({
         });
         // If we need to open a wallet directly, we won't be opening the QRCodeModal and will instead trigger that wallet directly
         if (connectionWalletAppId) openDirectWallet(connectionWalletAppId, fullData);
-        resolve({
-          QRCodeImg: qrcode,
-          QRCodeUrl: fullData,
-          showModal: !connectionWalletAppId,
-          walletAppId: connectionWalletAppId ? connectionWalletAppId : '',
-          connector: newConnector,
-          success: true,
-        });
+        resolve(newConnector);
       };
 
       close = () => {
@@ -320,14 +306,7 @@ export const connect = ({
     }
 
     setTimeout(() => {
-      reject({
-        QRCodeImg: '',
-        QRCodeUrl: '',
-        showModal: false,
-        walletAppId: '',
-        connector: null,
-        success: false,
-      });
+      reject(null);
     }, 3000); // If this takes more than 3s just fail it
 
     // return newConnector;
