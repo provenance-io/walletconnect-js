@@ -7,7 +7,7 @@ import { ICON_NAMES } from 'consts';
 export const SwitchToGroup: React.FC = () => {
   const [groupPolicyAddress, setGroupPolicyAddress] = useState('');
   const [description, setDescription] = useState('');
-  const [results, setResults] = useState<BroadcastEventData | undefined>();
+  const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod, representedGroupPolicy } = walletConnectState;

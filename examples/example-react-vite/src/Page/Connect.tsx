@@ -3,7 +3,7 @@ import {
   QRCodeModal,
   WINDOW_MESSAGES,
 } from '@provenanceio/walletconnect-js';
-import type { BroadcastEventData, WalletId } from '@provenanceio/walletconnect-js';
+import type { WalletId, BroadcastEventData } from '@provenanceio/walletconnect-js';
 import { Button, Card, Dropdown, Input, Results, Checkbox } from 'Components';
 import { ICON_NAMES, BRIDGE_URLS } from 'consts';
 import { useEffect, useState } from 'react';
@@ -51,7 +51,7 @@ export const Connect: React.FC = () => {
   const [sessionDuration, setSessionDuration] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
-  const [results, setResults] = useState<BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined>();
+  const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status, modal } = walletConnectState;
   const { QRCodeImg, dynamicUrl } = modal;

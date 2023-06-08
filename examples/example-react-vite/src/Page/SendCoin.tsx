@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
-import type { BroadcastEventData, ProvenanceMethod } from '@provenanceio/walletconnect-js';
+import type { ProvenanceMethod, SendMessageMethodEventData, BroadcastEventData } from '@provenanceio/walletconnect-js';
 import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
 import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
@@ -18,7 +18,7 @@ export const SendCoin: React.FC = () => {
     'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6'
   );
   const [denom, setDenom] = useState('nhash');
-  const [results, setResults] = useState<BroadcastEventData | undefined>();
+  const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const [feeGranter, setFeeGranter] = useState('');
   const [b64MessageArray, setB64MessageArray] = useState<string[]>([]);
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });

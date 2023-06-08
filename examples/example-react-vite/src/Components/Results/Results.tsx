@@ -53,8 +53,8 @@ const FloatingButton = styled(Button)`
 `;
 
 interface Props {
-  results?: BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined;
-  setResults: (results?: BroadcastEventData[typeof WINDOW_MESSAGES.CONNECTED] | BroadcastEventData[typeof WINDOW_MESSAGES.DISCONNECT] | undefined) => void;
+  results?: BroadcastEventData[keyof BroadcastEventData];
+  setResults: (results?: BroadcastEventData[keyof BroadcastEventData]) => void;
 }
 
 export const Results: React.FC<Props> = ({ results, setResults }) => {
