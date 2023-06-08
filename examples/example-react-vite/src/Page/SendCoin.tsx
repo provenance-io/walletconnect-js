@@ -5,11 +5,32 @@ import type { ProvenanceMethod, SendMessageMethodEventData, BroadcastEventData }
 import { buildMessage, createAnyMessageBase64 } from '@provenanceio/wallet-utils';
 import { Button, Input, ActionCard, ActionGas, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
+import { COLORS } from 'theme';
 
 const TotalMessages = styled.div`
   width: 100%;
   margin-bottom: 10px;
   font-style: italic;
+`;
+
+const AdvancedOptionsToggle = styled.p<{ showAdvanced: boolean }>`
+  margin-bottom: 30px;
+  user-select: none;
+  cursor: pointer;
+  color: ${({ showAdvanced }) =>
+    showAdvanced ? COLORS.PRIMARY_300 : COLORS.PRIMARY_500};
+  font-weight: bold;
+  font-style: italic;
+  font-size: 1.2rem;
+  width: 100%;
+`;
+const AdvancedOptions = styled.div`
+  border: 1px solid ${COLORS.NEUTRAL_250};
+  background: ${COLORS.NEUTRAL_100};
+  padding: 20px 30px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  width: 100%;
 `;
 
 export const SendCoin: React.FC = () => {
@@ -20,6 +41,9 @@ export const SendCoin: React.FC = () => {
   const [denom, setDenom] = useState('nhash');
   const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const [feeGranter, setFeeGranter] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [blockTimeoutHeight, setBlockTimeoutHeight] = useState('');
+  const [redirectUrl, setRedirectUrl] = useState('');
   const [b64MessageArray, setB64MessageArray] = useState<string[]>([]);
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
@@ -47,6 +71,8 @@ export const SendCoin: React.FC = () => {
         description: `Send ${amount}${denom} to ${toAddress}`,
         message: msg,
         feeGranter,
+        ...(redirectUrl && { redirectUrl }),
+        ...(blockTimeoutHeight && { timeoutHeight: Number(blockTimeoutHeight) }),
       };
       return message;
     }
@@ -102,25 +128,51 @@ export const SendCoin: React.FC = () => {
         bottomGap
         disabled={sendMessageLoading}
       />
-      <Input
-        value={denom}
-        label="Denom"
-        placeholder="Enter denom"
-        onChange={setDenom}
-        bottomGap
-        disabled={sendMessageLoading}
-      />
-      <Input
-        value={feeGranter}
-        label="Fee Granter (Optional)"
-        placeholder="Enter fee granter"
-        onChange={setFeeGranter}
-        bottomGap
-        disabled={sendMessageLoading}
-      />
-      <ActionGas setGasData={setGasData} gasData={gasData} />
-      {!!b64MessageArray.length && (
-        <TotalMessages>({b64MessageArray.length} total messages)</TotalMessages>
+      <AdvancedOptionsToggle
+        showAdvanced={showAdvanced}
+        onClick={() => setShowAdvanced(!showAdvanced)}
+      >
+        {showAdvanced ? 'Hide' : 'Show'} Advanced Options
+      </AdvancedOptionsToggle>
+      {showAdvanced && (
+        <AdvancedOptions>
+          <Input
+            value={denom}
+            label="Denom"
+            placeholder="Enter denom"
+            onChange={setDenom}
+            bottomGap
+            disabled={sendMessageLoading}
+          />
+          <Input
+            value={feeGranter}
+            label="Fee Granter (Optional)"
+            placeholder="Enter fee granter"
+            onChange={setFeeGranter}
+            bottomGap
+            disabled={sendMessageLoading}
+          />
+          <Input
+            value={blockTimeoutHeight}
+            label="Block Timeout Height (Optional)"
+            placeholder="Enter Block Timeout Height"
+            onChange={setBlockTimeoutHeight}
+            bottomGap
+            disabled={sendMessageLoading}
+          />
+          <Input
+            value={redirectUrl}
+            label="Redirect URL (Optional)"
+            placeholder="Enter Redirect URL"
+            onChange={setRedirectUrl}
+            bottomGap
+            disabled={sendMessageLoading}
+          />
+          <ActionGas setGasData={setGasData} gasData={gasData} />
+          {!!b64MessageArray.length && (
+            <TotalMessages>({b64MessageArray.length} total messages)</TotalMessages>
+          )}
+        </AdvancedOptions>
       )}
       <Button
         loading={sendMessageLoading}
