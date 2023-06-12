@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "3.0.8-develop.4",
+  "version": "3.0.8-develop.5",
   "private": false,
   "sideEffects": false,
   "main": "esm/index.js",

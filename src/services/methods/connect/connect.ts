@@ -19,6 +19,7 @@ import {
   WINDOW_MESSAGES,
 } from '../../../consts';
 import { getAccountInfo, sendWalletEvent } from '../../../utils';
+import figureLogo from '../../../images/figure.svg';
 
 interface Props {
   bridge: string;
@@ -120,17 +121,46 @@ export const connect = ({
           ? `&connectionDuration=${duration}`
           : '';
         const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}${connectionDurationParam}`;
-        const qrcode = await QRCode.toDataURL(fullData);
-        // Don't trigger a QRCodeModal popup if they say "noPopup" or pass a specific walletId
-        updateModal({
-          QRCodeImg: qrcode,
-          QRCodeUrl: fullData,
-          showModal: !connectionWalletAppId,
-          walletAppId: connectionWalletAppId,
-        });
-        // If we need to open a wallet directly, we won't be opening the QRCodeModal and will instead trigger that wallet directly
-        if (connectionWalletAppId) openDirectWallet(connectionWalletAppId, fullData);
-        resolve(newConnector);
+        const qrCodeCanvas = await QRCode.toCanvas(fullData);
+        const QR_CODE_SIZE = 276; // Final size of image generated
+        // Draw "F" in center of QRCode
+        // Setting "as" since we know it will exist
+        const ctx = qrCodeCanvas.getContext('2d') as CanvasRenderingContext2D;
+        // Draw white square for "F" to sit in
+        ctx.fillStyle = 'white';
+        // Add a border to the square
+        const BG_SQUARE_SIZE = 60; // Rectangle (same width & height)
+        const BG_SQUARE_X = QR_CODE_SIZE / 2 - BG_SQUARE_SIZE / 2;
+        const BG_SQUARE_Y = QR_CODE_SIZE / 2 - BG_SQUARE_SIZE / 2;
+        ctx.fillRect(BG_SQUARE_X, BG_SQUARE_Y, BG_SQUARE_SIZE, BG_SQUARE_SIZE);
+        // Draw Figure "F" in the center
+        const centerLogo = new Image();
+        centerLogo.src = figureLogo;
+        centerLogo.onload = () => {
+          const LOGO_WIDTH = 24.5;
+          const LOGO_HEIGHT = 40;
+          // Combine qrcode img with logo image in center
+          ctx.drawImage(
+            centerLogo,
+            QR_CODE_SIZE / 2 - LOGO_WIDTH / 2,
+            QR_CODE_SIZE / 2 - LOGO_HEIGHT / 2,
+            LOGO_WIDTH,
+            LOGO_HEIGHT
+          );
+          // Convert the canvas to a dataUrl for dApps to use / display
+          const finalQRCodeImg = qrCodeCanvas.toDataURL();
+          // Don't trigger a QRCodeModal popup if they say "noPopup" or pass a specific walletId
+          updateModal({
+            QRCodeImg: finalQRCodeImg,
+            QRCodeUrl: fullData,
+            showModal: !connectionWalletAppId,
+            walletAppId: connectionWalletAppId,
+          });
+          // If we need to open a wallet directly, we won't be opening the QRCodeModal and will instead trigger that wallet directly
+          if (connectionWalletAppId)
+            openDirectWallet(connectionWalletAppId, fullData);
+          resolve(newConnector);
+        };
       };
 
       close = () => {
