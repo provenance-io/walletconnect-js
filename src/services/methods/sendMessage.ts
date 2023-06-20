@@ -79,9 +79,12 @@ export const sendMessage = async ({
       knownWalletApp.eventAction(eventData);
     }
     // send message
+    // Logging to help track down rare, rogue bug where dApp hangs waiting on response
+    console.log('wcjs | sendMessage | request sent to wallet: ', request);
     const result = (await connector.sendCustomRequest(
       request
     )) as SendMessageMethodResult;
+    console.log('wcjs | sendMessage | result returned from wallet: ', result);
     // Check to see if we had an error in the txResponse
     if (result && result.txResponse && result.txResponse.code) {
       // Any code, other than 0, means there is a problem
