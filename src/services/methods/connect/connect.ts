@@ -234,8 +234,10 @@ export const connect = ({
           });
           startConnectionTimer();
           const { walletAppId } = getState();
-          if (walletAppId)
+          if (walletAppId) {
             sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
+          }
+          resolve(newConnector);
         }
         // If we're already connected but the session is expired (or times are missing), kill it
         else if (connected && !connectionDateValue) {
@@ -308,6 +310,4 @@ export const connect = ({
     setTimeout(() => {
       reject(null);
     }, 3000); // If this takes more than 3s just fail it
-
-    // return newConnector;
   });
