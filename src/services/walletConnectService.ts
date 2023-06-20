@@ -136,7 +136,7 @@ export class WalletConnectService {
   };
 
   // Populate the initial state from init call.  Does not trigger "setState" function
-  #buildInitialState = () => {
+  #buildInitialState = async () => {
     // Get the latest state using defaultState values (initial = true)
     const newState = this.#getLocalStorageState(defaultState);
     this.state = newState;
@@ -146,7 +146,7 @@ export class WalletConnectService {
       const duration = newState.connectionTimeout
         ? newState.connectionTimeout / 1000
         : undefined;
-      this.connect({ duration, bridge: newState.bridge });
+      await this.connect({ duration, bridge: newState.bridge });
     }
   };
 
@@ -478,7 +478,7 @@ export class WalletConnectService {
       });
       this.#connector = newConnector;
     }
-    return;
+    return 'initialized';
   };
 
   /**
