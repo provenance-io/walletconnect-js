@@ -75,11 +75,17 @@ export class WalletConnectService {
 
   #setWalletConnectContext: WCSSetFullState | undefined = undefined;
 
+  #logsEnabled = false;
+
   state: WCSState = defaultState;
 
   constructor() {
     this.#buildInitialState();
   }
+
+  setLogging = (logsEnabled: boolean) => {
+    this.#logsEnabled = logsEnabled;
+  };
 
   #getLocalStorageState = (currentState: WCSState): WCSState => {
     // If this is the first load, we need to default values to the current state, not the default state since default state has already been initialized
@@ -538,6 +544,7 @@ export class WalletConnectService {
         nonCriticalExtensionOptions,
         memo,
       },
+      logsEnabled: this.#logsEnabled,
     });
     // No longer loading
     this.#setState({ pendingMethod: '' });
