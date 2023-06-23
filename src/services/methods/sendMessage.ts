@@ -12,13 +12,14 @@ import {
   PROVENANCE_METHODS,
   WINDOW_MESSAGES,
 } from '../../consts';
-import { rngNum } from '../../utils';
+import { rngNum, log } from '../../utils';
 
 interface SendMessage {
   address: string;
   connector?: WalletConnectClientType;
   data: SendMessageMethod;
   walletAppId?: WalletId;
+  logsEnabled: boolean;
 }
 
 export const sendMessage = async ({
@@ -26,6 +27,7 @@ export const sendMessage = async ({
   connector,
   data,
   walletAppId,
+  logsEnabled,
 }: SendMessage): Promise<
   BroadcastEventData[typeof WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]
 > => {
@@ -79,9 +81,12 @@ export const sendMessage = async ({
       knownWalletApp.eventAction(eventData);
     }
     // send message
+    // Logging to help track down rare, rogue bug where dApp hangs waiting on response
+    log(logsEnabled, `sendMessage | request sent to wallet: `, request);
     const result = (await connector.sendCustomRequest(
       request
     )) as SendMessageMethodResult;
+    log(logsEnabled, `sendMessage | result sent to wallet: `, result);
     // Check to see if we had an error in the txResponse
     if (result && result.txResponse && result.txResponse.code) {
       // Any code, other than 0, means there is a problem

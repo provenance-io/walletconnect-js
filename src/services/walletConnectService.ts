@@ -61,6 +61,7 @@ const defaultState: WCSState = {
   publicKey: '',
   representedGroupPolicy: null,
   signedJWT: '',
+  version: '3.0.8',
   walletAppId: undefined,
   walletInfo: {},
 };
@@ -74,11 +75,17 @@ export class WalletConnectService {
 
   #setWalletConnectContext: WCSSetFullState | undefined = undefined;
 
+  #logsEnabled = false;
+
   state: WCSState = defaultState;
 
   constructor() {
     this.#buildInitialState();
   }
+
+  setLogging = (logsEnabled: boolean) => {
+    this.#logsEnabled = logsEnabled;
+  };
 
   #getLocalStorageState = (currentState: WCSState): WCSState => {
     // If this is the first load, we need to default values to the current state, not the default state since default state has already been initialized
@@ -126,6 +133,7 @@ export class WalletConnectService {
       signedJWT:
         existingWCJSState.signedJWT || localStorageJWT || currentState.signedJWT,
       status: getNewStatus(),
+      version: currentState.version,
       walletAppId: existingWCJSState.walletAppId || currentState.walletAppId,
       walletInfo: localStorageWalletInfo || currentState.walletInfo,
       representedGroupPolicy:
@@ -134,7 +142,7 @@ export class WalletConnectService {
   };
 
   // Populate the initial state from init call.  Does not trigger "setState" function
-  #buildInitialState = () => {
+  #buildInitialState = async () => {
     // Get the latest state using defaultState values (initial = true)
     const newState = this.#getLocalStorageState(defaultState);
     this.state = newState;
@@ -144,7 +152,7 @@ export class WalletConnectService {
       const duration = newState.connectionTimeout
         ? newState.connectionTimeout / 1000
         : undefined;
-      this.connect({ duration, bridge: newState.bridge });
+      await this.connect({ duration, bridge: newState.bridge });
     }
   };
 
@@ -436,7 +444,7 @@ export class WalletConnectService {
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
    * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
    */
-  connect = ({
+  connect = async ({
     individualAddress,
     groupAddress,
     bridge,
@@ -458,7 +466,7 @@ export class WalletConnectService {
         connectionTimeout: finalDurationMS,
         status: 'pending',
       });
-      const newConnector = connectMethod({
+      const newConnector = await connectMethod({
         bridge: bridge || this.state.bridge,
         broadcast: this.#broadcastEvent,
         duration: finalDurationS,
@@ -474,9 +482,9 @@ export class WalletConnectService {
         updateModal: this.updateModal,
         walletAppId,
       });
-
       this.#connector = newConnector;
     }
+    return 'initialized';
   };
 
   /**
@@ -486,7 +494,10 @@ export class WalletConnectService {
   disconnect = async (message?: string) => {
     // Clear out the existing connection timer
     this.#clearConnectionTimer();
-    if (this.#connector) await this.#connector.killSession({ message });
+    // Only do this if we have a connector and the connector is connected
+    // Note: If we don't check for connected can generate an "invalid topic" error
+    if (this.#connector && this.#connector.connected)
+      await this.#connector.killSession({ message });
     return message;
   };
 
@@ -533,6 +544,7 @@ export class WalletConnectService {
         nonCriticalExtensionOptions,
         memo,
       },
+      logsEnabled: this.#logsEnabled,
     });
     // No longer loading
     this.#setState({ pendingMethod: '' });

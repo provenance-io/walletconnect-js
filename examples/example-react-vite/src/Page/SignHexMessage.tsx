@@ -6,7 +6,7 @@ import { ICON_NAMES } from 'consts';
 
 export const SignHexMessage: React.FC = () => {
   const [value, setValue] = useState('');
-  const [results, setResults] = useState<BroadcastEventData | undefined>();
+  const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
   const signMessageLoading = pendingMethod === 'signHexMessage';

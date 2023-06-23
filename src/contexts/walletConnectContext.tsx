@@ -14,15 +14,18 @@ interface Props {
   children: React.ReactNode;
   service?: WalletConnectService;
   connectionRedirect?: string;
+  logsEnabled?: boolean;
 }
 
 const WalletConnectContextProvider: React.FC<Props> = ({
   children,
   service: existingService,
   connectionRedirect,
+  logsEnabled = false,
 }) => {
   // Allow users to pass in an instance of the service themselves
   const walletConnectService = existingService || newService;
+  walletConnectService.setLogging(logsEnabled);
   const [walletConnectState, setWalletConnectState] = useState<WCSState>({
     ...walletConnectService.state,
   });

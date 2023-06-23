@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
-import type { BroadcastEventData, ProvenanceMethod } from '@provenanceio/walletconnect-js';
+import type { ProvenanceMethod, BroadcastEventData } from '@provenanceio/walletconnect-js';
 import { Button, Input, ActionCard, ActionGas, Results, Dropdown } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { COLORS } from 'theme';
@@ -17,7 +17,7 @@ const TestMessage = styled.span`
 export const SendMessage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [description, setDescription] = useState('');
-  const [results, setResults] = useState<BroadcastEventData | undefined>();
+  const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const [method, setMethod] = useState<ProvenanceMethod>(
     'provenance_sendTransaction'
   );

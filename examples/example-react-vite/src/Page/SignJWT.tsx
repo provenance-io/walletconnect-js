@@ -16,7 +16,7 @@ const NewExpirationDate = styled.div`
 
 export const SignJWT: React.FC = () => {
   const [value, setValue] = useState('');
-  const [results, setResults] = useState<BroadcastEventData | undefined>();
+  const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
   const signJWTLoading = pendingMethod === 'signJWT';

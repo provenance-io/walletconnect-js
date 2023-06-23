@@ -1,7 +1,7 @@
 {
   "name": "example-react-vite",
   "private": true,
-  "version": "3.0.7",
+  "version": "3.0.8",
   "homepage": "/walletconnect-demo",
   "type": "module",
   "scripts": {
@@ -16,7 +16,7 @@
   "dependencies": {
     "@microlink/react-json-view": "1.22.2",
     "@provenanceio/wallet-utils": "2.8.0",
-    "@provenanceio/walletconnect-js": "file:../provenanceio-walletconnect-js-3.0.6.tgz",
+    "@provenanceio/walletconnect-js": "file:../provenanceio-walletconnect-js-3.0.8.tgz",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet-async": "1.3.0",

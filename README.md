@@ -1,43 +1,6 @@
-# Provenance.io WalletConnect-JS
+# WalletConnect-JS
 
-Library to interface with Provenance Wallet using WalletConnect.
-
-[Provenance] is a distributed, proof of stake blockchain designed for the financial services industry.
-
-For more information about [Provenance Inc](https://provenance.io) visit https://provenance.io
-
-## Version 3.x.x breaking changes:
-- `walletConnectService`
-  - Renamed `signMessage` to `signHexMessage`
-  - Results of methods (other than `connect` can now all use `await`)
-    - eg: `const result = await walletConnectService.signHexMessage('test');` 
-  - Removed `generateAutoConnectUrl` method.  Will revisit at a later time
-  - Removed `setState`, `resetState`, `removeAllListeners` and `on` methods
-    - `addListener` should be use in place of `on`
-    - `removeListener('all')` should be used in place of `removeAllListeners`
-- `walletConnectState` shape changed
-  - `connected` is now `status` which can be `"connected"`, `"disconnected"`, or `"pending"`
-  - `walletApp` is now `walletAppId`
-  - `loading` is now `pendingMethod`
-  - QRCode values now moved into `modal` state object
-    - `QRCode` is now `QRCodeImg`
-  - Removed `account`, `figureConnected`, `newAccount`, and `connector` values
-- `QRCodeModal` wallet changes
-  - Removed support for all Provenance wallets
-  - Added Figure Mobile wallets as responsive mobile options w/dynamic links
-  - Package now transpiles optional chaining
-- WalletConnectContext
-  - Optional `connectionRedirect` string url value will auto-redirect users when disconnected
-  - Optional `service` lets dApps manually pass in their own instance of `walletConnectService`
-- WINDOW_MESSAGES
-  - Renamed `SIGN_MESSAGE` events to `SIGN_HEX_MESSAGE`
-- Variable names
-  - Removed all Provenance wallet support
-  - Changed `figure_web` to be `figure_hosted`
-- Types changes
-  - Removed `BroadcastResult` type.
-  - Added `BroadcastEventData` and all the current method/action types instead.
-  - Note: Ideally you won't need to import `BroadcastEventData` due to the improved typing for `#broadcastEvent` and `addListener`.
+Bridging the gap between dApps and Figure wallets using WalletConnect.
 
 ## Table of Contents
 
@@ -106,8 +69,9 @@ import {
 
 React context provider which provides all children components with state and hooks
 Optional Params:
-  - `service`: Manual instance of `walletConnectService` to use/reference
-  - `connectionRedirect`: Auto-redirect string url to redirect user when `status` is `disconnected`
+  - `service`: (class) Manual instance of `walletConnectService` to use/reference
+  - `logsEnabled`: (boolean) Enable/disable console log of various events (default false)
+  - `connectionRedirect`: (string) Auto-redirect to url when `status` is `disconnected`
 - React.js example:
   ```js
   // index.js
@@ -255,11 +219,10 @@ Optional React.js component which creates a popup connection interface.
   - `title`: Title displayed on top of the modal (Optional)
 
 - Usage: _(See example apps for in-code usage)_
-  - Import the component in the same page as you call `walletConnectService.connect()`
   
 - Note:
   - `src/consts/walletList.ts` contains a list of available `walletsAppID`s 
-  - This modal is built with React.js and will only work within a react project. If you are not using React.js look through the `examples` folder to see how to initiate the connection without this QRCodeModal.
+  - This modal is built with React.js and will only work within a React project. If you are not using React.js look through the `examples` folder to see how to initiate the connection without this QRCodeModal.
 
 ## Window Messages
 
@@ -268,8 +231,25 @@ Each method will return a window message indicating whether it failed or was com
 _Note A: You can use `await` for most `walletConnectService` methods instead._
 _Note B: All of these are based off Node.js Event Emitters, read more on them here: [Node.js Event Emitters](https://nodejs.org/api/events.html#event-newlistener)_
 
-Window Messages:
- `CONNECTED`, `DISCONNECT`, `SEND_MESSAGE_COMPLETE`, `SEND_MESSAGE_FAILED`, `SIGN_JWT_COMPLETE`, `SIGN_JWT_FAILED`, `SIGN_HEX_MESSAGE_COMPLETE`, `SIGN_HEX_MESSAGE_FAILED`
+### Window Messages:
+  #### WalletConnect Connected
+  `CONNECTED`
+  #### WalletConnect Disconnect
+  `DISCONNECT`
+  #### WalletConnect Session Update
+  `SESSION_UPDATED`
+  #### Send Message
+  `SEND_MESSAGE_COMPLETE`
+  `SEND_MESSAGE_FAILED`
+  #### Switch to Group Wallet Action
+  `SWITCH_TO_GROUP_COMPLETE`
+  `SWITCH_TO_GROUP_FAILED`
+  #### JWT
+  `SIGN_JWT_COMPLETE`
+  `SIGN_JWT_FAILED`
+  #### Sign
+  `SIGN_HEX_MESSAGE_COMPLETE`
+  `SIGN_HEX_MESSAGE_FAILED`
 
 _(See example apps for more detailed usage)_
 
@@ -295,9 +275,7 @@ To see how to initiate and run the different examples, look through the [README.
 [release-latest]: https://github.com/provenance-io/walletconnect-js/releases/latest
 [loc-badge]: https://tokei.rs/b1/github/provenance-io/walletconnect-js
 [loc-report]: https://github.com/provenance-io/walletconnect-js
-[provenance]: https://provenance.io/#overview
 
-This application is under heavy development. The upcoming public blockchain is the evolution of the private Provenance network blockchain started in 2018.
 Current development is being supported by [Figure Technologies](https://figure.com).
 
 [Back to top](#Provenance.io-WalletConnect-JS)
