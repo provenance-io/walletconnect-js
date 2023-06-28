@@ -502,35 +502,37 @@ export class WalletConnectService {
   };
 
   /**
-   *
-   * @param message Raw Base64 encoded msgAny string
+   * @param customId (optional) custom id to track this transaction message
    * @param description (optional) Additional information for wallet to display
-   * @param method (optional) What method is used to send this message
-   * @param gasPrice (optional) Gas price object to use
+   * @param extensionOptions (optional) Tx body extensionOptions
    * @param feeGranter (optional) Specify a fee granter address
    * @param feePayer (optional) Specify a fee payer address
+   * @param gasPrice (optional) Gas price object to use
    * @param memo (optional) Tx body memo
-   * @param timeoutHeight (optional) Tx body timeoutHeight
-   * @param extensionOptions (optional) Tx body extensionOptions
+   * @param message (required) Raw Base64 encoded msgAny string
+   * @param method (optional) What method is used to send this message
    * @param nonCriticalExtensionOptions (optional) Tx body nonCriticalExtensionOptions
+   * @param timeoutHeight (optional) Tx body timeoutHeight
    */
   sendMessage = async ({
-    message,
+    customId,
     description,
-    gasPrice,
-    method,
+    extensionOptions,
     feeGranter,
     feePayer,
-    timeoutHeight,
-    extensionOptions,
-    nonCriticalExtensionOptions,
+    gasPrice,
     memo,
+    message,
+    method,
+    nonCriticalExtensionOptions,
+    timeoutHeight,
   }: SendMessageMethod) => {
     // Loading while we wait for mobile to respond
     this.#setState({ pendingMethod: 'sendMessage' });
     const result = await sendMessageMethod({
       address: this.state.address,
       connector: this.#connector,
+      customId,
       walletAppId: this.state.walletAppId,
       data: {
         message,

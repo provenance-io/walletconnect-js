@@ -90,16 +90,17 @@ export interface ConnectMethod {
 }
 
 export interface SendMessageMethod {
-  message: string | string[];
+  customId?: string;
   description?: string;
-  method?: ProvenanceMethod;
-  gasPrice?: GasPrice;
+  extensionOptions?: string[];
   feeGranter?: string;
   feePayer?: string;
+  gasPrice?: GasPrice;
   memo?: string;
-  timeoutHeight?: number;
-  extensionOptions?: string[];
+  message: string | string[];
+  method?: ProvenanceMethod;
   nonCriticalExtensionOptions?: string[];
+  timeoutHeight?: number;
 }
 
 export interface SendWalletActionMethod {

@@ -94,7 +94,7 @@ export type ProvenanceMethod =
   | 'wallet_action';
 
 interface BroadcastRequest {
-  id: number;
+  id?: string;
   jsonrpc: string;
   method: ProvenanceMethod;
   params: string[]; // Note the first item in the params array is stringified metadata

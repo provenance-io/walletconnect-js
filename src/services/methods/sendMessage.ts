@@ -17,6 +17,7 @@ import { rngNum, log } from '../../utils';
 interface SendMessage {
   address: string;
   connector?: WalletConnectClientType;
+  customId?: string;
   data: SendMessageMethod;
   walletAppId?: WalletId;
   logsEnabled: boolean;
@@ -25,6 +26,7 @@ interface SendMessage {
 export const sendMessage = async ({
   address,
   connector,
+  customId,
   data,
   walletAppId,
   logsEnabled,
@@ -52,13 +54,13 @@ export const sendMessage = async ({
     feeGranter,
     feePayer,
     memo,
+    customId: customId || rngNum(),
     timeoutHeight,
     extensionOptions,
     nonCriticalExtensionOptions,
   });
   // Custom Request
   const request = {
-    id: rngNum(),
     jsonrpc: '2.0',
     method,
     params: [metadata],

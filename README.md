@@ -196,6 +196,7 @@ Used to call walletconnect-js methods
   | timeoutHeight    | number         | no       | - | `3` | Specify a tx timeoutHeight |
   | extensionOptions    | any[]         | no       | - | `['CiwvcHJvdmVuYW5jZS5tZX...']` | Specify tx extensionOptions |
   | nonCriticalExtensionOptions    | any[]         | no       | - | `['CiwvcHJvdmVuYW5jZS5tZX...']` | Specify tx nonCriticalExtensionOptions |
+  | customId    | string         | no       | - | `sendMsg_tx_01` | Custom id to track this transaction message |
 
 - #### signHexMessage
   Sign a custom hex string message (async)
