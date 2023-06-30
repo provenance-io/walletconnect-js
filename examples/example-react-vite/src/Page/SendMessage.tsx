@@ -17,6 +17,7 @@ const TestMessage = styled.span`
 export const SendMessage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [description, setDescription] = useState('');
+  const [customId, setCustomId] = useState('');
   const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const [method, setMethod] = useState<ProvenanceMethod>(
     'provenance_sendTransaction'
@@ -35,6 +36,7 @@ export const SendMessage: React.FC = () => {
       description,
       gasPrice: finalGasData,
       method,
+      customId,
     });
     setResults(result);
   };
@@ -84,6 +86,14 @@ export const SendMessage: React.FC = () => {
         bottomGap
         disabled={sendMessageLoading}
       />
+      <Input
+            value={customId}
+            label="Custom ID (Optional)"
+            placeholder="Enter Custom ID"
+            onChange={setCustomId}
+            bottomGap
+            disabled={sendMessageLoading}
+          />
       <ActionGas setGasData={setGasData} gasData={gasData} />
       <Button
         loading={sendMessageLoading}

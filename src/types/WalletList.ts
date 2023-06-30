@@ -11,11 +11,7 @@ export type WalletId =
   | 'figure_mobile_test';
 export type WalletIcons = 'provenance' | 'figure';
 
-export type WalletEventData =
-  | { [key: string]: Record<string, unknown> }
-  | string
-  | number
-  | [];
+export type WalletEventData = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export interface EventData {
   event?: WalletEventValue;

@@ -15,6 +15,7 @@ import type {
 interface SignHexMessage {
   address: string;
   connector?: WalletConnectClientType;
+  customId?: string;
   hexMessage: string;
   publicKey: string;
   walletAppId?: WalletId;
@@ -23,6 +24,7 @@ interface SignHexMessage {
 export const signHexMessage = async ({
   address,
   connector,
+  customId,
   hexMessage,
   publicKey: pubKeyB64,
   walletAppId,
@@ -36,6 +38,7 @@ export const signHexMessage = async ({
     description,
     address,
     date: Date.now(),
+    customId,
   });
   // Custom Request
   const request = {

@@ -5,6 +5,7 @@ import {
   SIGN_HEX_MESSAGE_URL,
   SEND_COIN_URL,
   SWITCH_TO_GROUP_URL,
+  REMOVE_PENDING_METHOD_URL,
 } from 'consts';
 import {
   ResetConnectionTimeout,
@@ -12,8 +13,14 @@ import {
   SignJWT,
   SignHexMessage,
   SendCoin,
+  RemovePendingMethod,
+  SwitchToGroup,
 } from 'Page';
-import {SwitchToGroup} from "../Page/SwitchToGroup";
+
+export const REMOVE_PENDING_METHOD = {
+  path: REMOVE_PENDING_METHOD_URL,
+  element: <RemovePendingMethod />,
+};
 
 export const RESET_CONNECTION = {
   path: RESET_CONNECTION_URL,

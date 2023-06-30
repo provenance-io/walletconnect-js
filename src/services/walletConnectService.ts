@@ -527,7 +527,7 @@ export class WalletConnectService {
     nonCriticalExtensionOptions,
     timeoutHeight,
   }: SendMessageMethod) => {
-    // Loading while we wait for mobile to respond
+    // Loading while we wait for response
     this.#setState({ pendingMethod: 'sendMessage' });
     const result = await sendMessageMethod({
       address: this.state.address,
@@ -569,7 +569,7 @@ export class WalletConnectService {
    *        switching to group policy address
    */
   switchToGroup = async (groupPolicyAddress?: string, description?: string) => {
-    // Loading while we wait for mobile to respond
+    // Loading while we wait for response
     this.#setState({ pendingMethod: 'switchToGroup' });
     const result = await sendWalletActionMethod({
       connector: this.#connector,
@@ -598,16 +598,17 @@ export class WalletConnectService {
    *
    * @param expires Time from now in seconds to expire new JWT
    */
-  signJWT = async (expires: number) => {
-    // Loading while we wait for mobile to respond
+  signJWT = async (expires: number, options?: { customId?: string }) => {
+    // Loading while we wait for response
     this.#setState({ pendingMethod: 'signJWT' });
     const result = await signJWTMethod({
       address: this.state.address,
       connector: this.#connector,
+      customId: options?.customId,
+      expires,
       publicKey: this.state.publicKey,
       setState: this.#setState,
       walletAppId: this.state.walletAppId,
-      expires,
     });
     // No longer loading
     this.#setState({ pendingMethod: '' });
@@ -625,13 +626,14 @@ export class WalletConnectService {
    *
    * @param customMessage Message you want the wallet to sign
    */
-  signHexMessage = async (hexMessage: string) => {
-    // Loading while we wait for mobile to respond
+  signHexMessage = async (hexMessage: string, options?: { customId?: string }) => {
+    // Loading while we wait for response
     this.#setState({ pendingMethod: 'signHexMessage' });
-    // Get result back from mobile actions and wc
+    // Wait to get the result back
     const result = await signHexMessageMethod({
       address: this.state.address,
       connector: this.#connector,
+      customId: options?.customId,
       hexMessage,
       publicKey: this.state.publicKey,
       walletAppId: this.state.walletAppId,
@@ -642,6 +644,35 @@ export class WalletConnectService {
     const windowMessage = result.error
       ? WINDOW_MESSAGES.SIGN_HEX_MESSAGE_FAILED
       : WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.resetConnectionTimeout();
+
+    return result;
+  };
+
+  /**
+   * @param customId string (required) string id value of pending action you want to target
+   */
+  removePendingMethod = async (customId: string) => {
+    // Loading while we wait for response
+    this.#setState({ pendingMethod: 'removePendingMethod' });
+    // Wait to get the result back
+    const result = await sendWalletActionMethod({
+      connector: this.#connector,
+      walletAppId: this.state.walletAppId,
+      data: {
+        action: 'removePendingMethod',
+        payload: { customId },
+        method: 'wallet_action',
+      },
+    });
+    // No longer loading
+    this.#setState({ pendingMethod: '' });
+    // Broadcast result of method
+    const windowMessage = result.error
+      ? WINDOW_MESSAGES.REMOVE_PENDING_METHOD_FAILED
+      : WINDOW_MESSAGES.REMOVE_PENDING_METHOD_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();

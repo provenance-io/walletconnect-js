@@ -10,6 +10,7 @@ import {
   SIGN_JWT,
   SIGN_HEX_MESSAGE,
   SWITCH_TO_GROUP_ACTION,
+  REMOVE_PENDING_METHOD,
 } from './actions';
 
 export const routes = [
@@ -26,6 +27,7 @@ export const routes = [
       SIGN_HEX_MESSAGE,
       SIGN_JWT,
       SWITCH_TO_GROUP_ACTION,
+      REMOVE_PENDING_METHOD,
     ],
   },
   // { path: FOUR_OH_FOUR_URL, element: <NotFound /> },

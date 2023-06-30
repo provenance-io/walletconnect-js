@@ -9,7 +9,7 @@ import { App } from './App';
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <Router>
       <WalletConnectContextProvider
-        // logsEnabled={true}
+        logsEnabled={true}
         connectionRedirect={
           !window.location.href.includes('dapp')
             ? `${window.location.origin}${CONNECT_URL}`

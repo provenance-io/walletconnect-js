@@ -34,7 +34,7 @@ const AdvancedOptions = styled.div`
 `;
 
 export const SendCoin: React.FC = () => {
-  const [amount, setAmount] = useState('1000000000');
+  const [amount, setAmount] = useState('10');
   const [toAddress, setToAddress] = useState(
     'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6'
   );
@@ -43,7 +43,9 @@ export const SendCoin: React.FC = () => {
   const [feeGranter, setFeeGranter] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [blockTimeoutHeight, setBlockTimeoutHeight] = useState('');
+  const [customId, setCustomId] = useState('');
   const [redirectUrl, setRedirectUrl] = useState('');
+  const [showRetry, setShowRetry] = useState(false);
   const [b64MessageArray, setB64MessageArray] = useState<string[]>([]);
   const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
@@ -72,6 +74,7 @@ export const SendCoin: React.FC = () => {
         message: msg,
         feeGranter,
         ...(redirectUrl && { redirectUrl }),
+        ...(customId && { customId }),
         ...(blockTimeoutHeight && { timeoutHeight: Number(blockTimeoutHeight) }),
       };
       return message;
@@ -88,6 +91,7 @@ export const SendCoin: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    setShowRetry(true);
     const message = buildSendMessage();
     if (message) {
       // Convert input string value to number for price
@@ -102,6 +106,14 @@ export const SendCoin: React.FC = () => {
   };
 
   const status = results ? results.error ? 'failure' : 'success' : undefined;
+
+  const closeRequest = async (reopen?: boolean) => {
+    setShowRetry(false);
+    const rejected = await wcs.removePendingMethod(customId);
+    if (!rejected.error && reopen) {
+      handleSubmit();
+    }
+  };
 
   return (
     <ActionCard
@@ -168,6 +180,14 @@ export const SendCoin: React.FC = () => {
             bottomGap
             disabled={sendMessageLoading}
           />
+          <Input
+            value={customId}
+            label="Custom ID (Optional)"
+            placeholder="Enter Custom ID"
+            onChange={setCustomId}
+            bottomGap
+            disabled={sendMessageLoading}
+          />
           <ActionGas setGasData={setGasData} gasData={gasData} />
           {!!b64MessageArray.length && (
             <TotalMessages>({b64MessageArray.length} total messages)</TotalMessages>
@@ -198,6 +218,11 @@ export const SendCoin: React.FC = () => {
       >
         Submit
       </Button>
+      {showRetry && <>
+      <div onClick={() => closeRequest()}>Still waiting on wallet, click here to cancel.</div>
+      <div onClick={() => closeRequest(true)}>Still waiting on wallet, click here to retry.</div>
+      </>
+      }
       <Results results={results} setResults={setResults} />
     </ActionCard>
   );

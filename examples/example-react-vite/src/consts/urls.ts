@@ -1,6 +1,7 @@
 export const HOMEPAGE_URL = '/walletconnect-demo';
 export const CONNECT_URL = `${HOMEPAGE_URL}/connect`;
 export const DAPP_URL = `${HOMEPAGE_URL}/dApp`;
+export const REMOVE_PENDING_METHOD_URL = `${HOMEPAGE_URL}/removePendingMethod`;
 export const RESET_CONNECTION_URL = `${HOMEPAGE_URL}/resetConnectionTimeout`;
 export const SEND_COIN_URL = `${HOMEPAGE_URL}/sendCoin`;
 export const SEND_MESSAGE_URL = `${HOMEPAGE_URL}/sendMessage`;

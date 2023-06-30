@@ -13,7 +13,8 @@ type WCSPendingMethod =
   | 'sendMessage'
   | 'signJWT'
   | 'signHexMessage'
-  | 'switchToGroup';
+  | 'switchToGroup'
+  | 'removePendingMethod';
 
 export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
 

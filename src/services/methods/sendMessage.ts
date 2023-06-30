@@ -54,13 +54,14 @@ export const sendMessage = async ({
     feeGranter,
     feePayer,
     memo,
-    customId: customId || rngNum(),
+    customId,
     timeoutHeight,
     extensionOptions,
     nonCriticalExtensionOptions,
   });
   // Custom Request
   const request = {
+    id: rngNum(),
     jsonrpc: '2.0',
     method,
     params: [metadata],

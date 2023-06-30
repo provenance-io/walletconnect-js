@@ -87,6 +87,10 @@ export interface SwitchToGroupMethodEventData extends BasicBroadcastEventData {
   result?: string;
 }
 
+export interface RemovePendingMethodEventData extends BasicBroadcastEventData {
+  result?: string;
+}
+
 // Request data passed into the walletconnect sendCustomRequest function
 export type ProvenanceMethod =
   | 'provenance_sign'
@@ -94,7 +98,7 @@ export type ProvenanceMethod =
   | 'wallet_action';
 
 interface BroadcastRequest {
-  id?: string;
+  id: number;
   jsonrpc: string;
   method: ProvenanceMethod;
   params: string[]; // Note the first item in the params array is stringified metadata
@@ -120,4 +124,6 @@ export interface BroadcastEventData {
   [WINDOW_MESSAGES.SIGN_JWT_FAILED]: SignJWTMethodEventData;
   [WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE]: SwitchToGroupMethodEventData;
   [WINDOW_MESSAGES.SWITCH_TO_GROUP_FAILED]: SwitchToGroupMethodEventData;
+  [WINDOW_MESSAGES.REMOVE_PENDING_METHOD_COMPLETE]: RemovePendingMethodEventData;
+  [WINDOW_MESSAGES.REMOVE_PENDING_METHOD_FAILED]: RemovePendingMethodEventData;
 }

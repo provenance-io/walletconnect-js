@@ -23,7 +23,9 @@ export const sendWalletAction = async ({
   walletAppId,
   data,
 }: SendWalletAction): Promise<
-  BroadcastEventData[typeof WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE]
+  BroadcastEventData[
+    | typeof WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE
+    | typeof WINDOW_MESSAGES.REMOVE_PENDING_METHOD_COMPLETE]
 > => {
   const {
     description = 'Send Wallet Action',
@@ -52,7 +54,7 @@ export const sendWalletAction = async ({
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT, data };
       knownWalletApp.eventAction(eventData);
     }
 
