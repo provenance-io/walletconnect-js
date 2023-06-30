@@ -218,9 +218,9 @@ export const SendCoin: React.FC = () => {
       >
         Submit
       </Button>
-      {showRetry && <>
-      <div onClick={() => closeRequest()}>Still waiting on wallet, click here to cancel.</div>
-      <div onClick={() => closeRequest(true)}>Still waiting on wallet, click here to retry.</div>
+      {showRetry && customId && <>
+      <Button onClick={() => closeRequest()}>Cancel SendCoin</Button>
+      <Button onClick={() => closeRequest(true)}>Retry SendCoin</Button>
       </>
       }
       <Results results={results} setResults={setResults} />
