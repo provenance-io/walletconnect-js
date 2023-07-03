@@ -15,6 +15,7 @@ import type {
   WCSSetFullState,
   WCSSetState,
   WCSState,
+  InitMethod,
 } from '../types';
 import {
   CONNECTION_TIMEOUT,
@@ -436,6 +437,59 @@ export class WalletConnectService {
   };
 
   /**
+   * @param bridge - (optional) URL string of bridge to connect into
+   * @param duration - (optional) Time before connection is timed out (seconds)
+   * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
+   * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
+   * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
+   * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
+   * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
+   */
+  init = async ({
+    individualAddress,
+    groupAddress,
+    bridge,
+    duration,
+    jwtExpiration,
+    prohibitGroups,
+    walletAppId,
+  }: InitMethod = {}) => {
+    // Only create a new connector when we're not already connected
+    if (this.state.status !== 'connected') {
+      // Calculate duration to use (use passed in or default durations)
+      const finalDurationMS = duration
+        ? duration * 1000
+        : this.state.connectionTimeout;
+      // Convert back to seconds for wallets to use since jwtExpiration is already in seconds
+      const finalDurationS = finalDurationMS / 1000;
+      // Update the duration of this connection
+      this.#setState({
+        connectionTimeout: finalDurationMS,
+        status: 'pending',
+      });
+      const newConnector = await connectMethod({
+        bridge: bridge || this.state.bridge,
+        broadcast: this.#broadcastEvent,
+        duration: finalDurationS,
+        getState: this.#getState,
+        jwtExpiration,
+        prohibitGroups,
+        requiredGroupAddress: groupAddress,
+        requiredIndividualAddress: individualAddress,
+        resetState: this.#resetState,
+        setState: this.#setState,
+        startConnectionTimer: this.#startConnectionTimer,
+        state: this.state,
+        updateModal: this.updateModal,
+        walletAppId,
+      });
+      this.#connector = newConnector;
+    }
+    return 'initialized';
+  };
+
+  /**
+   * @deprecated connect is being phased out and init will be used in its place (same functionality)
    * @param bridge - (optional) URL string of bridge to connect into
    * @param duration - (optional) Time before connection is timed out (seconds)
    * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist

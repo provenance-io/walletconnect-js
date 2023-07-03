@@ -89,6 +89,16 @@ export interface ConnectMethod {
   jwtExpiration?: number;
   walletAppId?: WalletId;
 }
+export interface InitMethod {
+  bridge?: string;
+  duration?: number;
+  noPopup?: boolean;
+  individualAddress?: string;
+  groupAddress?: string;
+  prohibitGroups?: boolean;
+  jwtExpiration?: number;
+  walletAppId?: WalletId;
+}
 
 export interface SendMessageMethod {
   customId?: string;

@@ -9,7 +9,7 @@ Bridging the gap between dApps and Figure wallets using WalletConnect.
 3. [useWalletConnect](#useWalletConnect)
 4. [walletConnectState](#walletConnectState)
 5. [walletConnectService](#walletConnectService)
-   - [connect](#connect)
+   - [connect / init](#connect-/-init)
    - [disconnect](#disconnect)
    - [resetConnectionTimeout](#resetConnectionTimeout)
    - [signJWT](#signJWT)
@@ -124,9 +124,10 @@ Holds current walletconnect-js state values
 
 Used to call walletconnect-js methods
 
-- #### connect
+- #### connect / init
+  _Note: `connect` is being deprecated and will be replaced with `init`_
 
-  Connect a supported wallet
+  Start the connection process to join a Figure wallet with the dApp.
 
   ```js
   walletConnectService.connect(options);
