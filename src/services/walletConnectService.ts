@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import events from 'events';
 import type {
-  AccountAttributes,
+  AccountAttribute,
   BroadcastEventData,
   ConnectMethod,
   InitMethod,
@@ -46,7 +46,7 @@ if (window.Buffer === undefined) window.Buffer = Buffer;
 
 const defaultState: WCSState = {
   address: '',
-  attributes: [] as AccountAttributes,
+  attributes: [] as AccountAttribute[],
   bridge: WALLETCONNECT_BRIDGE_URL,
   status: 'disconnected',
   connectionEST: null,

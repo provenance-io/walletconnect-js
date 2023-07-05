@@ -5,7 +5,7 @@ import type {
   AccountObject,
   MasterGroupPolicy,
   WalletInfo,
-  AccountAttributes,
+  AccountAttribute,
 } from './ConnectData';
 import type { ProvenanceMethod } from './Broadcast';
 import type { GasPrice } from './GasPriceType';
@@ -33,7 +33,7 @@ export interface ModalData {
 
 export interface WCSState {
   address: string;
-  attributes: AccountAttributes;
+  attributes: AccountAttribute[];
   bridge: string;
   status: WalletConnectServiceStatus;
   connectionEXP: number | null;
