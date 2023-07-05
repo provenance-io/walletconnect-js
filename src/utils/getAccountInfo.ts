@@ -1,12 +1,13 @@
-import { AccountInfo } from '../types';
+import type { AccountAttributes, AccountInfo } from '../types';
 
 export const getAccountInfo = (accounts: AccountInfo) => {
   const defaultAccountInfo = {
     address: '',
-    publicKey: '',
+    attributes: [] as AccountAttributes,
     jwt: '',
-    walletInfo: {},
+    publicKey: '',
     representedGroupPolicy: null,
+    walletInfo: {},
   };
 
   if (!accounts || !Array.isArray(accounts) || !accounts.length)
@@ -25,6 +26,7 @@ export const getAccountInfo = (accounts: AccountInfo) => {
     // No walletInfo will be available on the old accounts array
     return {
       address,
+      attributes: defaultAccountInfo.attributes,
       publicKey,
       jwt,
       walletInfo: defaultAccountInfo.walletInfo,
@@ -34,10 +36,11 @@ export const getAccountInfo = (accounts: AccountInfo) => {
   // Data is in an object, pull keys from first item
   const {
     address = defaultAccountInfo.address,
+    attributes = defaultAccountInfo.attributes,
     publicKey = defaultAccountInfo.publicKey,
     jwt = defaultAccountInfo.jwt,
     walletInfo = defaultAccountInfo.walletInfo,
     representedGroupPolicy = defaultAccountInfo.representedGroupPolicy,
   } = firstAccount;
-  return { address, publicKey, jwt, walletInfo, representedGroupPolicy };
+  return { address, attributes, publicKey, jwt, walletInfo, representedGroupPolicy };
 };

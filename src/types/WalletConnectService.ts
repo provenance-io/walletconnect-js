@@ -1,7 +1,12 @@
 import WalletConnectClient from '@walletconnect/client';
 import type { IClientMeta } from './IClientMeta';
 import type { WalletId } from './WalletList';
-import type { AccountObject, MasterGroupPolicy, WalletInfo } from './ConnectData';
+import type {
+  AccountObject,
+  MasterGroupPolicy,
+  WalletInfo,
+  AccountAttributes,
+} from './ConnectData';
 import type { ProvenanceMethod } from './Broadcast';
 import type { GasPrice } from './GasPriceType';
 import { WalletAction } from '../consts/walletActions';
@@ -28,6 +33,7 @@ export interface ModalData {
 
 export interface WCSState {
   address: string;
+  attributes: AccountAttributes;
   bridge: string;
   status: WalletConnectServiceStatus;
   connectionEXP: number | null;
