@@ -1,9 +1,9 @@
-import type { AccountAttributes, AccountInfo } from '../types';
+import type { AccountAttribute, AccountInfo } from '../types';
 
 export const getAccountInfo = (accounts: AccountInfo) => {
   const defaultAccountInfo = {
     address: '',
-    attributes: [] as AccountAttributes,
+    attributes: [] as AccountAttribute[],
     jwt: '',
     publicKey: '',
     representedGroupPolicy: null,
