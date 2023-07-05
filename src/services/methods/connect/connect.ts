@@ -156,6 +156,7 @@ export const connect = ({
       const { accounts, peerMeta: peer } = data;
       const {
         address,
+        attributes,
         jwt: signedJWT,
         publicKey,
         representedGroupPolicy,
@@ -163,6 +164,7 @@ export const connect = ({
       } = getAccountInfo(accounts);
       setState({
         address,
+        attributes,
         connectionEST,
         connectionEXP,
         status: 'connected',

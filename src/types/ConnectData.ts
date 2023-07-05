@@ -50,8 +50,15 @@ export type WalletInfo = {
   name?: string;
 };
 
+export interface AccountAttribute {
+  name: string;
+  value: number;
+  type: string;
+}
+
 export type AccountObject = {
   address: string;
+  attributes: AccountAttribute[];
   jwt: string;
   publicKey: string;
   walletInfo: WalletInfo;

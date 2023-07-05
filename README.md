@@ -95,6 +95,7 @@ Holds current walletconnect-js state values
   ```js
   initialState: {
     address: '', // Wallet address [string]
+    attributes: [{ name: string, value: number, type: string}], // Figure Account Attributes
     bridge: 'wss://figure.tech/service-wallet-connect-bridge/ws/external', // WalletConnect bridge used for connection [string]
     status: 'disconnected', // connection status connected ['connected', 'pending', 'disconnected]
     connectionEST: null, // WalletConnect expires at time [number]

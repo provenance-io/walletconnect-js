@@ -1,10 +1,12 @@
 import { Buffer } from 'buffer';
 import events from 'events';
 import type {
+  AccountAttributes,
   BroadcastEventData,
   ConnectMethod,
-  SendMessageMethod,
+  InitMethod,
   ModalData,
+  SendMessageMethod,
   WalletConnectClientType,
   WalletConnectServiceStatus,
   WalletId,
@@ -15,7 +17,6 @@ import type {
   WCSSetFullState,
   WCSSetState,
   WCSState,
-  InitMethod,
 } from '../types';
 import {
   CONNECTION_TIMEOUT,
@@ -45,6 +46,7 @@ if (window.Buffer === undefined) window.Buffer = Buffer;
 
 const defaultState: WCSState = {
   address: '',
+  attributes: [] as AccountAttributes,
   bridge: WALLETCONNECT_BRIDGE_URL,
   status: 'disconnected',
   connectionEST: null,
@@ -62,7 +64,7 @@ const defaultState: WCSState = {
   publicKey: '',
   representedGroupPolicy: null,
   signedJWT: '',
-  version: '3.0.8',
+  version: '3.2.0',
   walletAppId: undefined,
   walletInfo: {},
 };
@@ -96,6 +98,7 @@ export class WalletConnectService {
     // Pull out account info from the "accounts" array found in 'walletconnect'
     const {
       address: localStorageAddress,
+      attributes: localStorageAttributes,
       publicKey: localStoragePublicKey,
       jwt: localStorageJWT,
       walletInfo: localStorageWalletInfo,
@@ -121,6 +124,7 @@ export class WalletConnectService {
     };
     return {
       address: localStorageAddress || currentState.address,
+      attributes: localStorageAttributes || currentState.attributes,
       bridge: existingWCState.bridge || currentState.bridge,
       connectionEXP: existingWCJSState.connectionEXP || currentState.connectionEXP,
       connectionEST: existingWCJSState.connectionEST || currentState.connectionEST,
