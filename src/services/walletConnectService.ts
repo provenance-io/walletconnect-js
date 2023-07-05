@@ -15,6 +15,7 @@ import type {
   WCSSetFullState,
   WCSSetState,
   WCSState,
+  InitMethod,
 } from '../types';
 import {
   CONNECTION_TIMEOUT,
@@ -444,6 +445,59 @@ export class WalletConnectService {
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
    * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
    */
+  init = async ({
+    individualAddress,
+    groupAddress,
+    bridge,
+    duration,
+    jwtExpiration,
+    prohibitGroups,
+    walletAppId,
+  }: InitMethod = {}) => {
+    // Only create a new connector when we're not already connected
+    if (this.state.status !== 'connected') {
+      // Calculate duration to use (use passed in or default durations)
+      const finalDurationMS = duration
+        ? duration * 1000
+        : this.state.connectionTimeout;
+      // Convert back to seconds for wallets to use since jwtExpiration is already in seconds
+      const finalDurationS = finalDurationMS / 1000;
+      // Update the duration of this connection
+      this.#setState({
+        connectionTimeout: finalDurationMS,
+        status: 'pending',
+      });
+      const newConnector = await connectMethod({
+        bridge: bridge || this.state.bridge,
+        broadcast: this.#broadcastEvent,
+        duration: finalDurationS,
+        getState: this.#getState,
+        jwtExpiration,
+        prohibitGroups,
+        requiredGroupAddress: groupAddress,
+        requiredIndividualAddress: individualAddress,
+        resetState: this.#resetState,
+        setState: this.#setState,
+        startConnectionTimer: this.#startConnectionTimer,
+        state: this.state,
+        updateModal: this.updateModal,
+        walletAppId,
+      });
+      this.#connector = newConnector;
+    }
+    return 'initialized';
+  };
+
+  /**
+   * @deprecated connect is being phased out and init will be used in its place (same functionality)
+   * @param bridge - (optional) URL string of bridge to connect into
+   * @param duration - (optional) Time before connection is timed out (seconds)
+   * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
+   * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
+   * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
+   * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
+   * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
+   */
   connect = async ({
     individualAddress,
     groupAddress,
@@ -502,35 +556,37 @@ export class WalletConnectService {
   };
 
   /**
-   *
-   * @param message Raw Base64 encoded msgAny string
+   * @param customId (optional) custom id to track this transaction message
    * @param description (optional) Additional information for wallet to display
-   * @param method (optional) What method is used to send this message
-   * @param gasPrice (optional) Gas price object to use
+   * @param extensionOptions (optional) Tx body extensionOptions
    * @param feeGranter (optional) Specify a fee granter address
    * @param feePayer (optional) Specify a fee payer address
+   * @param gasPrice (optional) Gas price object to use
    * @param memo (optional) Tx body memo
-   * @param timeoutHeight (optional) Tx body timeoutHeight
-   * @param extensionOptions (optional) Tx body extensionOptions
+   * @param message (required) Raw Base64 encoded msgAny string
+   * @param method (optional) What method is used to send this message
    * @param nonCriticalExtensionOptions (optional) Tx body nonCriticalExtensionOptions
+   * @param timeoutHeight (optional) Tx body timeoutHeight
    */
   sendMessage = async ({
-    message,
+    customId,
     description,
-    gasPrice,
-    method,
+    extensionOptions,
     feeGranter,
     feePayer,
-    timeoutHeight,
-    extensionOptions,
-    nonCriticalExtensionOptions,
+    gasPrice,
     memo,
+    message,
+    method,
+    nonCriticalExtensionOptions,
+    timeoutHeight,
   }: SendMessageMethod) => {
-    // Loading while we wait for mobile to respond
+    // Loading while we wait for response
     this.#setState({ pendingMethod: 'sendMessage' });
     const result = await sendMessageMethod({
       address: this.state.address,
       connector: this.#connector,
+      customId,
       walletAppId: this.state.walletAppId,
       data: {
         message,
@@ -567,7 +623,7 @@ export class WalletConnectService {
    *        switching to group policy address
    */
   switchToGroup = async (groupPolicyAddress?: string, description?: string) => {
-    // Loading while we wait for mobile to respond
+    // Loading while we wait for response
     this.#setState({ pendingMethod: 'switchToGroup' });
     const result = await sendWalletActionMethod({
       connector: this.#connector,
@@ -596,16 +652,17 @@ export class WalletConnectService {
    *
    * @param expires Time from now in seconds to expire new JWT
    */
-  signJWT = async (expires: number) => {
-    // Loading while we wait for mobile to respond
+  signJWT = async (expires: number, options?: { customId?: string }) => {
+    // Loading while we wait for response
     this.#setState({ pendingMethod: 'signJWT' });
     const result = await signJWTMethod({
       address: this.state.address,
       connector: this.#connector,
+      customId: options?.customId,
+      expires,
       publicKey: this.state.publicKey,
       setState: this.#setState,
       walletAppId: this.state.walletAppId,
-      expires,
     });
     // No longer loading
     this.#setState({ pendingMethod: '' });
@@ -623,13 +680,14 @@ export class WalletConnectService {
    *
    * @param customMessage Message you want the wallet to sign
    */
-  signHexMessage = async (hexMessage: string) => {
-    // Loading while we wait for mobile to respond
+  signHexMessage = async (hexMessage: string, options?: { customId?: string }) => {
+    // Loading while we wait for response
     this.#setState({ pendingMethod: 'signHexMessage' });
-    // Get result back from mobile actions and wc
+    // Wait to get the result back
     const result = await signHexMessageMethod({
       address: this.state.address,
       connector: this.#connector,
+      customId: options?.customId,
       hexMessage,
       publicKey: this.state.publicKey,
       walletAppId: this.state.walletAppId,
@@ -640,6 +698,35 @@ export class WalletConnectService {
     const windowMessage = result.error
       ? WINDOW_MESSAGES.SIGN_HEX_MESSAGE_FAILED
       : WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE;
+    this.#broadcastEvent(windowMessage, result);
+    // Refresh auto-disconnect timer
+    this.resetConnectionTimeout();
+
+    return result;
+  };
+
+  /**
+   * @param customId string (required) string id value of pending action you want to target
+   */
+  removePendingMethod = async (customId: string) => {
+    // Loading while we wait for response
+    this.#setState({ pendingMethod: 'removePendingMethod' });
+    // Wait to get the result back
+    const result = await sendWalletActionMethod({
+      connector: this.#connector,
+      walletAppId: this.state.walletAppId,
+      data: {
+        action: 'removePendingMethod',
+        payload: { customId },
+        method: 'wallet_action',
+      },
+    });
+    // No longer loading
+    this.#setState({ pendingMethod: '' });
+    // Broadcast result of method
+    const windowMessage = result.error
+      ? WINDOW_MESSAGES.REMOVE_PENDING_METHOD_FAILED
+      : WINDOW_MESSAGES.REMOVE_PENDING_METHOD_COMPLETE;
     this.#broadcastEvent(windowMessage, result);
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();

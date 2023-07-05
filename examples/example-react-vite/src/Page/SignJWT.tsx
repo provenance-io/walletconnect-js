@@ -16,6 +16,7 @@ const NewExpirationDate = styled.div`
 
 export const SignJWT: React.FC = () => {
   const [value, setValue] = useState('');
+  const [customId, setCustomId] = useState('');
   const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
@@ -26,7 +27,7 @@ export const SignJWT: React.FC = () => {
   ).toLocaleString('en-US');
 
   const handleSubmit = async () => {
-    const result = await wcs.signJWT(Number(value));
+    const result = await wcs.signJWT(Number(value), {customId});
     setResults(result);
   };
 
@@ -48,6 +49,14 @@ export const SignJWT: React.FC = () => {
         bottomGap
         submit={handleSubmit}
       />
+      <Input
+            value={customId}
+            label="Custom ID (Optional)"
+            placeholder="Enter Custom ID"
+            onChange={setCustomId}
+            bottomGap
+            disabled={signJWTLoading}
+          />
       {value && <NewExpirationDate>{`${newExpirationDate}`}</NewExpirationDate>}
       <Button loading={signJWTLoading} onClick={handleSubmit} disabled={!value}>
         Submit

@@ -11,6 +11,7 @@ import {
   SIGN_JWT_URL,
   SIGN_HEX_MESSAGE_URL,
   SWITCH_TO_GROUP_URL,
+  REMOVE_PENDING_METHOD_URL,
 } from 'consts';
 import { COLORS } from 'theme';
 import { useNavigate } from 'react-router-dom';
@@ -58,6 +59,11 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
   const [activePage, setActivePage] = useState('connect');
   // List of links
   const navItems = [
+    {
+      name: 'Remove Pending Method',
+      icon: ICON_NAMES.TAG,
+      url: REMOVE_PENDING_METHOD_URL,
+    },
     {
       name: 'Reset Connection',
       icon: ICON_NAMES.RELOAD,

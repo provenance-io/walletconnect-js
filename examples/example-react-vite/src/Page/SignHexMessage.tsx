@@ -6,13 +6,14 @@ import { ICON_NAMES } from 'consts';
 
 export const SignHexMessage: React.FC = () => {
   const [value, setValue] = useState('');
+  const [customId, setCustomId] = useState('');
   const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState;
   const signMessageLoading = pendingMethod === 'signHexMessage';
 
   const handleSubmit = async () => {
-    const result = await wcs.signHexMessage(value);
+    const result = await wcs.signHexMessage(value, {customId});
     setResults(result);
   };
 
@@ -35,6 +36,14 @@ export const SignHexMessage: React.FC = () => {
         bottomGap
         disabled={signMessageLoading}
         submit={handleSubmit}
+      />
+      <Input
+          value={customId}
+          label="Custom ID (Optional)"
+          placeholder="Enter Custom ID"
+          onChange={setCustomId}
+          bottomGap
+          disabled={signMessageLoading}
       />
       <Button loading={signMessageLoading} onClick={handleSubmit} disabled={!value}>
         Submit

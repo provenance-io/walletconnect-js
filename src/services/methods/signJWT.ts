@@ -18,6 +18,7 @@ import type {
 interface SignJWT {
   address: string;
   connector?: WalletConnectClientType;
+  customId?: string;
   expires?: number;
   publicKey: string;
   setState: WCSSetState;
@@ -27,10 +28,11 @@ interface SignJWT {
 export const signJWT = async ({
   address,
   connector,
+  customId,
+  expires, // Custom expiration time in seconds from now
+  publicKey: pubKeyB64,
   setState,
   walletAppId,
-  publicKey: pubKeyB64,
-  expires, // Custom expiration time in seconds from now
 }: SignJWT): Promise<
   BroadcastEventData[typeof WINDOW_MESSAGES.SIGN_JWT_COMPLETE]
 > => {
@@ -44,9 +46,10 @@ export const signJWT = async ({
   const method = PROVENANCE_METHODS.sign;
   const description = 'Sign JWT Token';
   const metadata = JSON.stringify({
-    description,
     address,
+    customId,
     date: Date.now(),
+    description,
   });
   // Custom Request
   const request = {

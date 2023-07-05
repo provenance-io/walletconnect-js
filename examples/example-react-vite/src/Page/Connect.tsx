@@ -78,7 +78,7 @@ export const Connect: React.FC = () => {
     // Hide any existing QRCodes
     setShowQRCode(false);
     // Run connect method based on current state values
-    await wcs.connect({
+    await wcs.init({
       bridge: selectedBridge,
       duration: Number(sessionDuration),
       individualAddress,

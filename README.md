@@ -9,12 +9,13 @@ Bridging the gap between dApps and Figure wallets using WalletConnect.
 3. [useWalletConnect](#useWalletConnect)
 4. [walletConnectState](#walletConnectState)
 5. [walletConnectService](#walletConnectService)
-   - [connect](#connect)
+   - [connect / init](#connect-/-init)
    - [disconnect](#disconnect)
    - [resetConnectionTimeout](#resetConnectionTimeout)
    - [signJWT](#signJWT)
    - [sendMessage](#sendMessage)
    - [signHexMessage](#signHexMessage)
+   - [removePendingMethod](#removePendingMethod)
 6. [QRCodeModal](#QRCodeModal)
 7. [Window messages](#Window-Messages)
 8. [Examples](#Examples,-Setup-Configurations,-and-Alternate-imports)
@@ -123,9 +124,10 @@ Holds current walletconnect-js state values
 
 Used to call walletconnect-js methods
 
-- #### connect
+- #### connect / init
+  _Note: `connect` is being deprecated and will be replaced with `init`_
 
-  Connect a supported wallet
+  Start the connection process to join a Figure wallet with the dApp.
 
   ```js
   walletConnectService.connect(options);
@@ -167,13 +169,14 @@ Used to call walletconnect-js methods
   Prompt user to sign a generated JWT (async)
 
   ```js
-  walletConnectService.signJWT(expire);
+  walletConnectService.signJWT(expire, options);
   // WINDOW_MESSAGES: SIGN_JWT_COMPLETE, SIGN_JWT_FAILED
   ```
 
   | Param  | Type   | Required | Default                | Example      | Info                                    |
   | ------ | ------ | -------- | ---------------------- | ------------ | --------------------------------------- |
   | expire | number | no       | 24 hours (Date.now() + 86400) | `1647020269` | Custom expiration date (ms) of JWT |
+  | options | object | no      | -       | `{ customId: 'abc' }` | Additional Options (customId) |
 
 - #### sendMessage
 
@@ -196,16 +199,28 @@ Used to call walletconnect-js methods
   | timeoutHeight    | number         | no       | - | `3` | Specify a tx timeoutHeight |
   | extensionOptions    | any[]         | no       | - | `['CiwvcHJvdmVuYW5jZS5tZX...']` | Specify tx extensionOptions |
   | nonCriticalExtensionOptions    | any[]         | no       | - | `['CiwvcHJvdmVuYW5jZS5tZX...']` | Specify tx nonCriticalExtensionOptions |
+  | customId    | string         | no       | - | `sendMsg_tx_01` | Custom id to track this transaction message |
 
 - #### signHexMessage
   Sign a custom hex string message (async)
   ```js
-  walletConnectService.signHexMessage(message);
+  walletConnectService.signHexMessage(message, options);
   // WINDOW_MESSAGES: SIGN_HEX_MESSAGE_COMPLETE, SIGN_HEX_MESSAGE_FAILED
   ```
   | Param   | Type   | Required | Default | Example               | Info                   |
   | ------- | ------ | -------- | ------- | --------------------- | ---------------------- |
   | message | string | yes      | -       | `'My Custom Message'` | Hex string message to send |
+  | options | object | no      | -       | `{ customId: 'abc' }` | Additional Options (customId) |
+
+- #### removePendingMethod
+  Remove a pending method from the wallet
+  ```js
+  walletConnectService.removePendingMethod(customId);
+  // WINDOW_MESSAGES: REMOVE_PENDING_METHOD_COMPLETE, REMOVE_PENDING_METHOD_FAILED
+  ```
+  | Param   | Type   | Required | Default | Example               | Info                   |
+  | ------- | ------ | -------- | ------- | --------------------- | ---------------------- |
+  | customId    | string         | yes       | - | `my-id-01` | Remove a pending request from the wallet based on its customId |
 
 ## QRCodeModal
 
@@ -250,6 +265,9 @@ _Note B: All of these are based off Node.js Event Emitters, read more on them he
   #### Sign
   `SIGN_HEX_MESSAGE_COMPLETE`
   `SIGN_HEX_MESSAGE_FAILED`
+  #### Remove Pending Method
+  `REMOVE_PENDING_METHOD_COMPLETE`
+  `REMOVE_PENDING_METHOD_FAILED`
 
 _(See example apps for more detailed usage)_
 

@@ -13,7 +13,8 @@ type WCSPendingMethod =
   | 'sendMessage'
   | 'signJWT'
   | 'signHexMessage'
-  | 'switchToGroup';
+  | 'switchToGroup'
+  | 'removePendingMethod';
 
 export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
 
@@ -88,18 +89,29 @@ export interface ConnectMethod {
   jwtExpiration?: number;
   walletAppId?: WalletId;
 }
+export interface InitMethod {
+  bridge?: string;
+  duration?: number;
+  noPopup?: boolean;
+  individualAddress?: string;
+  groupAddress?: string;
+  prohibitGroups?: boolean;
+  jwtExpiration?: number;
+  walletAppId?: WalletId;
+}
 
 export interface SendMessageMethod {
-  message: string | string[];
+  customId?: string;
   description?: string;
-  method?: ProvenanceMethod;
-  gasPrice?: GasPrice;
+  extensionOptions?: string[];
   feeGranter?: string;
   feePayer?: string;
+  gasPrice?: GasPrice;
   memo?: string;
-  timeoutHeight?: number;
-  extensionOptions?: string[];
+  message: string | string[];
+  method?: ProvenanceMethod;
   nonCriticalExtensionOptions?: string[];
+  timeoutHeight?: number;
 }
 
 export interface SendWalletActionMethod {

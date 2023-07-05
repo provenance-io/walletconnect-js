@@ -38,5 +38,6 @@ yarn-error.log*
 ignored/
 .eslintcache
 /examples/@provenanceio-wcjs-local
+/examples/example-react-vite/provenanceio-walletconnect-js-*.tgz
 /figure-tech-walletconnect
 *.tgz
