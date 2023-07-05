@@ -50,7 +50,7 @@ export type WalletInfo = {
   name?: string;
 };
 
-export interface AccountAttributes {
+export interface AccountAttribute {
   name: string;
   value: number;
   type: string;
@@ -58,7 +58,7 @@ export interface AccountAttributes {
 
 export type AccountObject = {
   address: string;
-  attributes: AccountAttributes[];
+  attributes: AccountAttribute[];
   jwt: string;
   publicKey: string;
   walletInfo: WalletInfo;
