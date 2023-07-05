@@ -64,7 +64,7 @@ const defaultState: WCSState = {
   publicKey: '',
   representedGroupPolicy: null,
   signedJWT: '',
-  version: '3.2.0',
+  version: '3.2.1',
   walletAppId: undefined,
   walletInfo: {},
 };
