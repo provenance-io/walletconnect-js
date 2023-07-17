@@ -2,6 +2,7 @@ import {
   useWalletConnect,
   QRCodeModal,
   WINDOW_MESSAGES,
+  WALLET_LIST,
 } from '@provenanceio/walletconnect-js';
 import type { WalletId, BroadcastEventData } from '@provenanceio/walletconnect-js';
 import { Button, Card, Dropdown, Input, Results, Checkbox } from 'Components';
@@ -43,6 +44,7 @@ const QRCodeModalStyled = styled(QRCodeModal)`
 export const Connect: React.FC = () => {
   const [directQRCodeGenerate, setDirectQRCodeGenerate] = useState(false);
   const [selectedBridge, setSelectedBridge] = useState(BRIDGE_URLS[0]);
+  const [customBridge, setCustomBridge] = useState('');
   const [individualAddress, setIndividualAddress] = useState('');
   const [groupAddress, setGroupAddress] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
@@ -73,13 +75,28 @@ export const Connect: React.FC = () => {
   };
 
   const handleConnect = async (walletAppId?: WalletId, mobileDirect?: boolean) => {
+    // Check to see if the wallet exists
+    if (walletAppId) {
+      // If we find the target walletAppId in the walletList
+      const targetWallet = WALLET_LIST.find(({id}) => walletAppId === id);
+      if (targetWallet && targetWallet.walletCheck) {
+        // Check if the wallet exists for the user
+        const walletExists = targetWallet.walletCheck();
+        if (!walletExists) {
+          alert('Wallet does not exist, after downloading and installing, please reload this page.')
+        }
+      }
+    }
+    
     // Clear out any existing results
     setResults(undefined);
     // Hide any existing QRCodes
     setShowQRCode(false);
     // Run connect method based on current state values
+    const finalBridge = customBridge ? customBridge : selectedBridge !== 'custom' ? selectedBridge : BRIDGE_URLS[0];
     await wcs.init({
-      bridge: selectedBridge,
+      // Use custom if given, or if left blank but custom selected, use the first in the options array
+      bridge: finalBridge,
       duration: Number(sessionDuration),
       individualAddress,
       groupAddress,
@@ -123,6 +140,15 @@ export const Connect: React.FC = () => {
               label="Select Bridge"
               bottomGap
             />
+            {selectedBridge === 'custom' && (
+              <Input
+                onChange={setCustomBridge}
+                value={customBridge}
+                label="Enter custom bridge url"
+                placeholder="Custom bridge url"
+                bottomGap
+              />
+            )}
             <Input
               onChange={setIndividualAddress}
               value={individualAddress}

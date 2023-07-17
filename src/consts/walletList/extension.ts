@@ -14,6 +14,11 @@ export const FIGURE_EXTENSION = {
   },
   walletUrl:
     'https://chrome.google.com/webstore/detail/figure-wallet/mgbfflhghaohmaecmaggieniidindaoc',
+  walletUrls: {
+    chrome:
+      'https://chrome.google.com/webstore/detail/figure-wallet/mgbfflhghaohmaecmaggieniidindaoc',
+    firefox: 'https://addons.mozilla.org/en-US/firefox/addon/figure-wallet/',
+  },
   walletCheck: () =>
     !!(window?.figureWalletExtension && window?.figureWalletExtension?.isFigure),
 } as Wallet;
