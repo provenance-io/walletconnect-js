@@ -1,11 +1,30 @@
 import { useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import { EventData } from 'types';
-import { FIGURE_HOSTED_WALLET_URL_TEST } from '../../consts';
+import { FIGURE_HOSTED_WALLET_URL_TEST } from '../consts';
 
 const IFRAME_NOTIFICATION_HEIGHT = 600;
 const IFRAME_NOTIFICATION_WIDTH = 375;
 const IFRAME_ID = 'figure-wallet-hosted';
 const EVENT_WCJS_MESSAGE = '';
+
+// Create shared BroadcastChannel instance to prevent catching own
+// events on same page from multiple iframe creations
+const channel = new BroadcastChannel('figure-hosted-wallet');
+channel.onmessage = handleChannelMessage;
+
+export function useHostedWalletIframe() {
+  useEffect(() => {
+    document.addEventListener('figureWalletHostedSendMessage', (ev) => {
+      catchWCJSMessage(ev as any); // NOTE: types not picking up correctly?
+    });
+
+    return () => {
+      document.removeEventListener('figureWalletHostedSendMessage', (ev) => {
+        catchWCJSMessage(ev as any); // NOTE: types not picking up correctly?
+      });
+    };
+  }, []);
+}
 
 // Check if the iframe exists
 const iframeExists = () => !!document.getElementById(IFRAME_ID);
@@ -14,6 +33,7 @@ const iframeExists = () => !!document.getElementById(IFRAME_ID);
 const removeIframe = () => {
   const iframeElement = document.getElementById(IFRAME_ID);
   if (iframeElement && iframeExists()) {
+    console.log('Removing iframe');
     iframeElement.remove();
     document.removeEventListener('click', handleClickAway);
   }
@@ -28,6 +48,15 @@ function getOrigin() {
 function handleClickAway(e: MouseEvent) {
   console.log('document click called, closing iframe', e);
   removeIframe();
+}
+
+function handleChannelMessage(event: MessageEvent<any>) {
+  if (event.data.type === 'create_iframe') {
+    console.log(
+      'received event to create iframe from another instance wcjs instance, removing iframe'
+    );
+    removeIframe();
+  }
 }
 
 // Add ability for dApp/website to send a message to this extension
@@ -67,19 +96,32 @@ const createIframe = (url: string) => {
       iframe {
         width:${IFRAME_NOTIFICATION_WIDTH}px;
         height:${IFRAME_NOTIFICATION_HEIGHT}px;
-        right: 10px;
-        top: 10px;
-        position: fixed;
+        margin: 10px;
         border: none;
         box-shadow: 4px 4px 37px 3px rgb(0 0 0 / 40%), 0 0 1px 0 rgb(0 0 0 / 40%);
+      }
+
+      @media screen and (max-height: ${IFRAME_NOTIFICATION_HEIGHT}px) {
+        #${IFRAME_ID} {
+          height: auto;
+          bottom: 0px;
+          align-items: stretch;
+        }
+
+        iframe {
+          height: auto;
+        }
       }
     `;
 
   container.appendChild(style);
   container.appendChild(iframe);
 
+  console.log('adding iframe to DOM');
   // Add iframe and style to the shadow
   document.body.appendChild(container);
+
+  channel.postMessage({ type: 'create_iframe' });
 
   // Listen for the iframe to load, then focus it
   iframe.addEventListener('load', () => {
@@ -138,6 +180,8 @@ const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
         if (redirectUrl) windowUrl.searchParams.append('redirectUrl', redirectUrl);
         console.log('iframe url generated', windowUrl.toString());
         createIframe(windowUrl.toString());
+      } else {
+        console.log('iframe already exists, exiting');
       }
       break;
     }
@@ -154,19 +198,3 @@ const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
       break;
   }
 };
-
-export function HostedWalletIframe() {
-  useEffect(() => {
-    document.addEventListener('figureWalletHostedSendMessage', (ev) => {
-      catchWCJSMessage(ev as any); // NOTE: types not picking up correctly?
-    });
-
-    return () => {
-      document.removeEventListener('figureWalletHostedSendMessage', (ev) => {
-        catchWCJSMessage(ev as any); // NOTE: types not picking up correctly?
-      });
-    };
-  }, []);
-
-  return null;
-}
