@@ -15,12 +15,6 @@ const baseTheme: DefaultTheme = {
 const GlobalStyles = createGlobalStyle`
   ${normalize}
 
-  // React local causes iframe when error process is not defined shows up.
-  // https://github.com/facebook/create-react-app/issues/11773
-  iframe:not(#figure-wallet-extension) {
-    pointer-events: none;
-  }
-
   html {
     font-size: 62.5%; // 1rem = 10px
     box-sizing: border-box;

@@ -34,6 +34,7 @@ export interface Wallet {
   type: WalletType | WalletType[]; // Is this wallet mobile, web, or an extension
   walletCheck?: () => boolean; // Check if the wallet exists, runs background actions as needed, returns a boolean indicating existance
   walletUrl?: string; // Location of wallet download
+  walletUrls?: Record<string, string>; // Location of wallet download based on browser
 }
 
 export type WalletList = Wallet[];

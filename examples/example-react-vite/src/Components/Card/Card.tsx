@@ -35,7 +35,7 @@ const Content = styled.div`
   padding: 50px 32px;
   position: relative;
 `;
-const Title = styled.p`
+const Title = styled.h1`
   font-size: 2.3rem;
   font-family: ${FONTS.SECONDARY_FONT};
   font-weight: 700;
