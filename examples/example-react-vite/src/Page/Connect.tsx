@@ -1,12 +1,12 @@
+import type { BroadcastEventData, WalletId } from '@provenanceio/walletconnect-js';
 import {
-  useWalletConnect,
   QRCodeModal,
-  WINDOW_MESSAGES,
   WALLET_LIST,
+  WINDOW_MESSAGES,
+  useWalletConnect,
 } from '@provenanceio/walletconnect-js';
-import type { WalletId, BroadcastEventData } from '@provenanceio/walletconnect-js';
-import { Button, Card, Dropdown, Input, Results, Checkbox } from 'Components';
-import { ICON_NAMES, BRIDGE_URLS } from 'consts';
+import { Button, Card, Checkbox, Dropdown, Input, Results } from 'Components';
+import { BRIDGE_URLS, ICON_NAMES } from 'consts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -205,7 +205,7 @@ export const Connect: React.FC = () => {
         )}
         <QRCodeModalStyled
           walletConnectService={wcs}
-          devWallets={['figure_hosted_test', 'figure_mobile_test']}
+          devWallets={['figure_hosted_test', 'figure_mobile_test', 'figure_hosted_test_iframe']}
         />
       </Card>
     );
@@ -218,7 +218,7 @@ export const Connect: React.FC = () => {
       Connection is currently pending.
       <QRCodeModalStyled
         walletConnectService={wcs}
-        devWallets={['figure_hosted_test', 'figure_mobile_test']}
+        devWallets={['figure_hosted_test', 'figure_mobile_test', 'figure_hosted_test_iframe']}
       />
     </Card>
   );
