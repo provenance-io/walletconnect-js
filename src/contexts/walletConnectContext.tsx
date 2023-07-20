@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useHostedWalletIframe } from '../hooks/useHostedWalletIframe';
 import { WalletConnectService } from '../services';
 import type { WCSState } from '../types';
 
@@ -30,6 +31,7 @@ const WalletConnectContextProvider: React.FC<Props> = ({
     ...walletConnectService.state,
   });
   const [initialLoad, setInitialLoad] = useState(true);
+  useHostedWalletIframe();
   const { status } = walletConnectState;
 
   // Auto-redirect was passed in.  Act on disconnected status

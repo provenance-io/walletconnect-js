@@ -1,4 +1,5 @@
 export * from './connectionTimeouts';
+export * from './hostedMessages';
 export * from './provenance';
 export * from './storage';
 export * from './urls';

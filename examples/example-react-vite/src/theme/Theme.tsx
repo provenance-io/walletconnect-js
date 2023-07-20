@@ -1,11 +1,10 @@
+import { SpriteSheet } from 'Components';
 import { ReactNode } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-import { createGlobalStyle, DefaultTheme } from 'styled-components';
+import { createGlobalStyle, DefaultTheme, ThemeProvider } from 'styled-components';
 import { normalize } from 'styled-normalize';
-import { ThemeProvider } from 'styled-components';
-import { SpriteSheet } from 'Components';
-import { BaseTypographyLoader, FONTS } from './fonts';
 import { COLORS } from './colors';
+import { BaseTypographyLoader, FONTS } from './fonts';
 
 const baseTheme: DefaultTheme = {
   colors: { ...COLORS },
