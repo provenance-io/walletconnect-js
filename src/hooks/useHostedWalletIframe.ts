@@ -163,10 +163,6 @@ const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
       createIframe(windowUrl.toString());
       break;
     }
-    case 'walletconnect_disconnect': {
-      removeIframe();
-      break;
-    }
     default:
       break;
   }
