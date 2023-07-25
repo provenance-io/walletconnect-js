@@ -149,7 +149,8 @@ const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
   // Based on the event type handle what we do
   switch (event) {
     case 'walletconnect_event':
-    case 'walletconnect_init': {
+    case 'walletconnect_init':
+    case 'walletconnect_disconnect': {
       // Only create the iframe if one doesn't already exist (prevent accidental double clicking)
       if (iframeExists()) {
         return;
