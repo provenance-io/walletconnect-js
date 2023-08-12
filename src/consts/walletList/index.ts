@@ -1,9 +1,5 @@
 import { FIGURE_EXTENSION } from './extension';
-import {
-  FIGURE_HOSTED,
-  FIGURE_HOSTED_TEST,
-  FIGURE_HOSTED_TEST_IFRAME,
-} from './hosted';
+import { FIGURE_HOSTED, FIGURE_HOSTED_TEST } from './hosted';
 import { FIGURE_MOBILE, FIGURE_MOBILE_TEST } from './mobile';
 
 export const WALLET_LIST = [
@@ -12,5 +8,4 @@ export const WALLET_LIST = [
   FIGURE_MOBILE_TEST,
   FIGURE_HOSTED,
   FIGURE_HOSTED_TEST,
-  FIGURE_HOSTED_TEST_IFRAME,
 ];
