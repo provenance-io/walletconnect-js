@@ -205,7 +205,7 @@ export const Connect: React.FC = () => {
         )}
         <QRCodeModalStyled
           walletConnectService={wcs}
-          devWallets={['figure_hosted_test', 'figure_mobile_test', 'figure_hosted_test_iframe']}
+          devWallets={['figure_hosted_test', 'figure_mobile_test']}
         />
       </Card>
     );
@@ -218,7 +218,7 @@ export const Connect: React.FC = () => {
       Connection is currently pending.
       <QRCodeModalStyled
         walletConnectService={wcs}
-        devWallets={['figure_hosted_test', 'figure_mobile_test', 'figure_hosted_test_iframe']}
+        devWallets={['figure_hosted_test', 'figure_mobile_test']}
       />
     </Card>
   );

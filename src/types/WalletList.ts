@@ -7,7 +7,6 @@ export type WalletId =
   | 'figure_extension'
   | 'figure_hosted'
   | 'figure_hosted_test'
-  | 'figure_hosted_test_iframe'
   | 'figure_mobile'
   | 'figure_mobile_test';
 export type WalletIcons = 'provenance' | 'figure';
@@ -15,6 +14,7 @@ export type WalletIcons = 'provenance' | 'figure';
 export type WalletEventData = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export interface EventData {
+  walletId?: WalletId;
   event?: WalletEventValue;
   uri?: string;
   address?: string;

@@ -1,6 +1,11 @@
 import { useEffect } from 'react'; // eslint-disable-line no-unused-vars
 import { EventData } from 'types';
-import { FIGURE_HOSTED_WALLET_URL_TEST, HOSTED_IFRAME_EVENT_TYPE } from '../consts';
+import {
+  FIGURE_HOSTED_WALLET_URL_PROD,
+  FIGURE_HOSTED_WALLET_URL_TEST,
+  HOSTED_IFRAME_EVENT_TYPE,
+  WALLET_APP_IDS,
+} from '../consts';
 
 const IFRAME_NOTIFICATION_HEIGHT = 600;
 const IFRAME_NOTIFICATION_WIDTH = 600;
@@ -25,8 +30,18 @@ export function useHostedWalletIframe() {
   }, []);
 
   function handleIframeMessage(event: MessageEvent<any>) {
+    const acceptableOrigins = [
+      new URL(FIGURE_HOSTED_WALLET_URL_PROD).origin,
+      new URL(FIGURE_HOSTED_WALLET_URL_TEST).origin,
+    ];
+    const overrideUrl = localStorage.getItem(
+      'FIGURE_HOSTED_WALLET_URL_TEST_OVERRIDE'
+    );
+    if (overrideUrl) {
+      acceptableOrigins.push(new URL(overrideUrl).origin);
+    }
     // Only listen for events coming from the hosted wallet origin
-    if (event.origin !== new URL(getOrigin()).origin) return;
+    if (!acceptableOrigins.includes(event.origin)) return;
     if (event.data === 'window_close') {
       removeIframe();
     }
@@ -52,7 +67,11 @@ function removeIframe() {
   }
 }
 
-function getOrigin() {
+function getOrigin(isProd: boolean) {
+  if (isProd) {
+    return new URL(FIGURE_HOSTED_WALLET_URL_PROD);
+  }
+  // TEST
   const overrideUrl = localStorage.getItem('FIGURE_HOSTED_WALLET_URL_TEST_OVERRIDE');
   const windowUrl = new URL(overrideUrl ?? `${FIGURE_HOSTED_WALLET_URL_TEST}`);
   return windowUrl;
@@ -155,12 +174,11 @@ const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
       if (iframeExists()) {
         return;
       }
-      const windowUrl = getOrigin();
+      const windowUrl = getOrigin(detail.walletId === WALLET_APP_IDS.FIGURE_HOSTED);
       if (uri) windowUrl.searchParams.append('wc', uri);
       if (address) windowUrl.searchParams.append('address', address);
       if (event) windowUrl.searchParams.append('event', event);
       if (redirectUrl) windowUrl.searchParams.append('redirectUrl', redirectUrl);
-      console.log('iframe url generated', windowUrl.toString());
       createIframe(windowUrl.toString());
       break;
     }
