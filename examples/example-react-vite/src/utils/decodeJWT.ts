@@ -2,6 +2,7 @@ export const decodeJWT = (
   encodedJWT: string,
   validation: { [key: string]: string | number }
 ) => {
+  if (!encodedJWT) return { header: 'n/a', payload: 'n/a', valid: 'n/a'};
   // Our JWTs are made of three parts, separated by a '.' - [header].[payload].[signature]
   // To keep this function lean and simple, we won't validate the signature, we'll use an optional
   // validation object that will check for a specific value in the payload.

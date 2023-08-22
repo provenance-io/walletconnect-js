@@ -1,16 +1,16 @@
-import { verifySignature } from '../../helpers';
 import {
-  WALLET_LIST,
-  WALLET_APP_EVENTS,
   PROVENANCE_METHODS,
+  WALLET_APP_EVENTS_NEW,
+  WALLET_LIST,
   WINDOW_MESSAGES,
 } from '../../consts';
-import { rngNum } from '../../utils';
+import { verifySignature } from '../../helpers';
 import type {
+  BroadcastEventData,
   WalletConnectClientType,
   WalletId,
-  BroadcastEventData,
 } from '../../types';
+import { rngNum } from '../../utils';
 
 interface SignHexMessage {
   address: string;
@@ -47,22 +47,32 @@ export const signHexMessage = async ({
     method,
     params: [metadata],
   };
-  if (!connector) return { valid, request, error: 'No wallet connected' };
+  // if (!connector) return { valid, request, error: 'No wallet connected' };
   // Check for a known wallet app with special callback functions
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
   request.params.push(hexMessage);
   try {
+    let result = '';
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT };
-      knownWalletApp.eventAction(eventData);
+      const eventData = { event: WALLET_APP_EVENTS_NEW.EVENT, request };
+      if (knownWalletApp.id === 'figure_extension') {
+        console.log('wcjs | signHexMessage.ts | eventAction wait');
+        result = await knownWalletApp.eventAction(eventData);
+        console.log('wcjs | signHexMessage.ts | eventAction result: ', result);
+      } else {
+        knownWalletApp.eventAction(eventData);
+      }
     }
-    // send message
-    const result = (await connector.sendCustomRequest(request)) as string;
+    if (connector) {
+      // send message
+      result = (await connector.sendCustomRequest(request)) as string;
+    }
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature
     valid = await verifySignature(hexMessage, signature, pubKeyB64);
+
     return { valid, result: { signature: result }, request };
   } catch (error) {
     return { valid, error: `${error}`, request };

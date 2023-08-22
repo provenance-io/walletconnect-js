@@ -1,7 +1,13 @@
-import { WALLET_APP_EVENTS } from '../consts';
+import {
+  PROVENANCE_METHODS,
+  WALLET_APP_EVENTS,
+  WALLET_APP_EVENTS_NEW,
+} from '../consts';
 
 export type WalletEventKey = keyof typeof WALLET_APP_EVENTS;
 export type WalletEventValue = typeof WALLET_APP_EVENTS[WalletEventKey];
+export type WalletEventNewKey = keyof typeof WALLET_APP_EVENTS_NEW;
+export type WalletEventNewValue = typeof WALLET_APP_EVENTS_NEW[WalletEventNewKey];
 export type WalletType = 'mobile' | 'extension' | 'hosted';
 export type WalletId =
   | 'figure_extension'
@@ -13,21 +19,37 @@ export type WalletIcons = 'provenance' | 'figure';
 
 export type WalletEventData = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
+export interface EventRequest {
+  id?: number;
+  jsonrpc?: string;
+  method?: typeof PROVENANCE_METHODS[keyof typeof PROVENANCE_METHODS];
+  params?: string[];
+  individualAddress?: string;
+  groupAddress?: string;
+  duration?: number;
+  jwtExpiration?: number;
+  prohibitGroups?: boolean;
+  requestFavicon?: string[];
+  requestOrigin?: string;
+  requestName?: string;
+}
+
 export interface EventData {
   walletId?: WalletId;
-  event?: WalletEventValue;
+  event?: WalletEventValue | WalletEventNewValue;
   uri?: string;
   address?: string;
   duration?: number;
   data?: WalletEventData;
   referral?: string;
   redirectUrl?: string;
+  request?: EventRequest;
 }
 
 export interface Wallet {
   dev?: boolean; // Is this wallet still in development?  If true, QRCode modal won't render by default
   dynamicUrl?: string; // The result of generateUrl, the dyanmic url for mobile users.
-  eventAction?: (eventData: EventData) => void; // Callback function for every walletconnect-js method/action
+  eventAction?: (eventData: EventData) => Promise<any>; // Callback function for every walletconnect-js method/action
   generateUrl?: (QRCodeUrl: string) => string; // Function to generate a dynamic URL for mobile users
   icon?: WalletIcons; // Icon to display next to the wallet selection
   id: WalletId; // Id to reference this specific wallet

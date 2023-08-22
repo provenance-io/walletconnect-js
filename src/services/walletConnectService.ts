@@ -1,9 +1,17 @@
 import { Buffer } from 'buffer';
 import events from 'events';
+import {
+  CONNECTION_TIMEOUT,
+  CONNECTION_TYPES,
+  LOCAL_STORAGE_NAMES,
+  WALLET_APP_EVENTS,
+  WALLET_LIST,
+  WALLETCONNECT_BRIDGE_URL,
+  WINDOW_MESSAGES,
+} from '../consts';
 import type {
   AccountAttribute,
   BroadcastEventData,
-  ConnectMethod,
   InitMethod,
   ModalData,
   SendMessageMethod,
@@ -19,27 +27,21 @@ import type {
   WCSState,
 } from '../types';
 import {
-  CONNECTION_TIMEOUT,
-  WALLET_APP_EVENTS,
-  WALLETCONNECT_BRIDGE_URL,
-  WINDOW_MESSAGES,
-  LOCAL_STORAGE_NAMES,
-} from '../consts';
-import {
-  connect as connectMethod,
-  sendMessage as sendMessageMethod,
-  sendWalletAction as sendWalletActionMethod,
-  signJWT as signJWTMethod,
-  signHexMessage as signHexMessageMethod,
-} from './methods';
-import {
   addToLocalStorage,
   clearLocalStorage,
   getAccountInfo,
+  getFavicon,
   getLocalStorageValues,
   isMobile,
   sendWalletEvent,
 } from '../utils';
+import {
+  connect as connectMethod,
+  sendMessage as sendMessageMethod,
+  sendWalletAction as sendWalletActionMethod,
+  signHexMessage as signHexMessageMethod,
+  signJWT as signJWTMethod,
+} from './methods';
 
 // If we don't have a value for Buffer (node core module) create it/polyfill it
 if (window.Buffer === undefined) window.Buffer = Buffer;
@@ -107,18 +109,6 @@ export class WalletConnectService {
     // Calculate the current connection status based on localStorage and current values
     const getNewStatus = (): WalletConnectServiceStatus => {
       const currentStateStatus = currentState.status;
-      // If we're already connected and the storage connector is also connected, don't change status
-      if (existingWCState.connected && currentStateStatus === 'connected')
-        return 'connected';
-      // If we're not connected and the storage connector is connected, set status to pending (connection might exist)
-      if (existingWCState.connected && currentStateStatus === 'disconnected')
-        return 'pending';
-      // If we're not connected and the storage connector is not connected, keep status as disconnected
-      if (!existingWCState.connected && currentStateStatus === 'disconnected')
-        return 'disconnected';
-      // If localStorage doesn't exist/is not connected but the service state was still connected, return back disconnected (localStorage much exist to be connected)
-      if (!existingWCState.connected && currentStateStatus === 'connected')
-        return 'disconnected';
       // Default return back the current states status or default status if nothing is set/exists yet
       return currentStateStatus;
     };
@@ -157,7 +147,7 @@ export class WalletConnectService {
       const duration = newState.connectionTimeout
         ? newState.connectionTimeout / 1000
         : undefined;
-      await this.connect({ duration, bridge: newState.bridge });
+      await this.init({ duration, bridge: newState.bridge });
     }
   };
 
@@ -173,7 +163,7 @@ export class WalletConnectService {
       const duration = currentState.connectionTimeout
         ? currentState.connectionTimeout / 1000
         : undefined;
-      this.connect({ duration, bridge: currentState.bridge });
+      this.init({ duration, bridge: currentState.bridge });
     }
   };
 
@@ -255,28 +245,32 @@ export class WalletConnectService {
     // If the updatedState passes a connector value we want to use it but save it separatly from the public state
     const { connector, ...filteredUpdatedState } = updatedState;
     let finalUpdatedState = { ...filteredUpdatedState };
+    // Pull out/surface connector data for state
+    finalUpdatedState = {
+      ...updatedState,
+    };
     // If we get a new "connector" passed in, pull various data keys out
-    if (connector) {
-      // Update private connector value
-      this.#connector = connector;
-      // Pull out/surface connector data for state
-      const { bridge, peerMeta, accounts, connected } = connector;
-      const status = connected ? 'connected' : 'disconnected';
-      const { address, jwt, publicKey, representedGroupPolicy, walletInfo } =
-        getAccountInfo(accounts);
-      finalUpdatedState = {
-        ...updatedState,
-        address,
-        bridge,
-        status,
-        // We always want to use the jwt in the state over the connector since newer jwts won't show up in the connector
-        signedJWT: this.state.signedJWT || jwt,
-        publicKey,
-        representedGroupPolicy,
-        walletInfo,
-        peer: peerMeta,
-      };
-    }
+    // if (connector) {
+    //   // Update private connector value
+    //   this.#connector = connector;
+    //   // Pull out/surface connector data for state
+    //   const { bridge, peerMeta, accounts, connected } = connector;
+    //   const status = connected ? 'connected' : 'disconnected';
+    //   const { address, jwt, publicKey, representedGroupPolicy, walletInfo } =
+    //     getAccountInfo(accounts);
+    //   finalUpdatedState = {
+    //     ...updatedState,
+    //     address,
+    //     bridge,
+    //     status,
+    //     // We always want to use the jwt in the state over the connector since newer jwts won't show up in the connector
+    //     signedJWT: this.state.signedJWT || jwt,
+    //     publicKey,
+    //     representedGroupPolicy,
+    //     walletInfo,
+    //     peer: peerMeta,
+    //   };
+    // }
     // Loop through each to update
     this.state = { ...this.state, ...finalUpdatedState };
     this.#updateContext();
@@ -460,6 +454,79 @@ export class WalletConnectService {
   }: InitMethod = {}) => {
     // Only create a new connector when we're not already connected
     if (this.state.status !== 'connected') {
+      // If extension wallet, instantly connect if domain/origin is on allowed list
+      // TODO: Domain vs origin?
+      const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
+      if (
+        walletAppId === 'figure_extension' &&
+        knownWalletApp &&
+        knownWalletApp.eventAction
+      ) {
+        // TODO: Move this into an imported function to reduce clutter here
+        console.log('wcjs | init | eventAction wait');
+        const requestOrigin = window.location.origin;
+        const requestFavicon = getFavicon();
+        const requestName = window.document.title;
+        let result;
+        try {
+          result = await knownWalletApp.eventAction({
+            event: 'basic_event',
+            request: {
+              ...(individualAddress && { individualAddress }),
+              ...(groupAddress && { groupAddress }),
+              ...(duration && { duration }),
+              ...(jwtExpiration && { jwtExpiration }),
+              ...(prohibitGroups && { prohibitGroups }),
+              ...(requestOrigin && { requestOrigin }),
+              ...(requestName && { requestName }),
+              ...(requestFavicon.length && { requestFavicon }),
+              method: 'connect',
+            },
+          });
+        } catch (error) {
+          result = { error };
+        }
+        console.log('wcjs | init | eventAction result: ', result);
+        const { accounts, error } = result;
+        const {
+          address,
+          attributes,
+          jwt: signedJWT,
+          publicKey,
+          representedGroupPolicy,
+          walletInfo,
+        } = getAccountInfo(accounts);
+        // No error - Connected
+        if (!error) {
+          const connectionEST = Date.now();
+          const connectionEXP = this.state.connectionTimeout + connectionEST;
+          this.#setState({
+            connectionEST,
+            connectionEXP,
+            status: 'connected',
+            walletAppId,
+            address,
+            publicKey,
+            signedJWT,
+            walletInfo,
+            ...(attributes && { attributes }),
+            ...(representedGroupPolicy && { representedGroupPolicy }),
+          });
+          this.#broadcastEvent(WINDOW_MESSAGES.CONNECTED, {
+            result: {
+              connectionEST,
+              connectionEXP,
+              connectionType: CONNECTION_TYPES.new_session,
+            },
+          });
+        } else {
+          // Error - Not connected
+          // TODO: Maybe update broadcast events to show connection fails?
+          this.#resetState();
+        }
+
+        return 'initialized';
+      }
       // Calculate duration to use (use passed in or default durations)
       const finalDurationMS = duration
         ? duration * 1000
@@ -502,47 +569,9 @@ export class WalletConnectService {
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
    * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
    */
-  connect = async ({
-    individualAddress,
-    groupAddress,
-    bridge,
-    duration,
-    jwtExpiration,
-    prohibitGroups,
-    walletAppId,
-  }: ConnectMethod = {}) => {
-    // Only create a new connector when we're not already connected
-    if (this.state.status !== 'connected') {
-      // Calculate duration to use (use passed in or default durations)
-      const finalDurationMS = duration
-        ? duration * 1000
-        : this.state.connectionTimeout;
-      // Convert back to seconds for wallets to use since jwtExpiration is already in seconds
-      const finalDurationS = finalDurationMS / 1000;
-      // Update the duration of this connection
-      this.#setState({
-        connectionTimeout: finalDurationMS,
-        status: 'pending',
-      });
-      const newConnector = await connectMethod({
-        bridge: bridge || this.state.bridge,
-        broadcast: this.#broadcastEvent,
-        duration: finalDurationS,
-        getState: this.#getState,
-        jwtExpiration,
-        prohibitGroups,
-        requiredGroupAddress: groupAddress,
-        requiredIndividualAddress: individualAddress,
-        resetState: this.#resetState,
-        setState: this.#setState,
-        startConnectionTimer: this.#startConnectionTimer,
-        state: this.state,
-        updateModal: this.updateModal,
-        walletAppId,
-      });
-      this.#connector = newConnector;
-    }
-    return 'initialized';
+  connect = async () => {
+    console.warn('wcjs | connect method is deprecated, use init method instead');
+    this.init();
   };
 
   /**
@@ -550,12 +579,7 @@ export class WalletConnectService {
    * @param message (optional) Custom disconnect message to send back to dApp
    * */
   disconnect = async (message?: string) => {
-    // Clear out the existing connection timer
-    this.#clearConnectionTimer();
-    // Only do this if we have a connector and the connector is connected
-    // Note: If we don't check for connected can generate an "invalid topic" error
-    if (this.#connector && this.#connector.connected)
-      await this.#connector.killSession({ message });
+    this.#resetState();
     return message;
   };
 
@@ -696,6 +720,7 @@ export class WalletConnectService {
       publicKey: this.state.publicKey,
       walletAppId: this.state.walletAppId,
     });
+    console.log('walletConnectService | signHex result: ', result);
     // No longer loading
     this.#setState({ pendingMethod: '' });
     // Broadcast result of method

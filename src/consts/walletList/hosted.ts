@@ -16,7 +16,7 @@ export const FIGURE_HOSTED = {
   icon: 'figure',
   eventAction: ({ uri, address, event, redirectUrl }) => {
     // If we have an event, make sure it's not an "ignored" event
-    if (event && !FIGURE_HOSTED_IGNORED_EVENTS.includes(event)) {
+    if (event && !FIGURE_HOSTED_IGNORED_EVENTS.includes(event as WalletEventValue)) {
       // Build a full set of urlSearchParams to append to the url
       const searchParams = new URLSearchParams();
       if (uri) searchParams.append('wc', uri);
@@ -46,7 +46,7 @@ export const FIGURE_HOSTED_TEST = {
   eventAction: (eventData) => {
     const { event } = eventData;
     // If we have an event, make sure it's not an "ignored" event
-    if (event && !FIGURE_HOSTED_IGNORED_EVENTS.includes(event)) {
+    if (event && !FIGURE_HOSTED_IGNORED_EVENTS.includes(event as WalletEventValue)) {
       window.document.dispatchEvent(
         new CustomEvent(HOSTED_IFRAME_EVENT_TYPE, {
           detail: { ...eventData, walletId: WALLET_APP_IDS.FIGURE_HOSTED_TEST },

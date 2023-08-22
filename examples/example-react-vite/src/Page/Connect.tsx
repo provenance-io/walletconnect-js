@@ -30,10 +30,18 @@ const AdvancedOptions = styled.div`
   margin-bottom: 20px;
 `;
 const DirectConnectButton = styled(Button)`
-  background: ${COLORS.SECONDARY_450};
   margin-top: 20px;
   &:hover:not(:disabled) {
     background-color: ${COLORS.SECONDARY_350};
+  }
+  &:nth-of-type(2) {
+    background: ${COLORS.SECONDARY_450};
+  }
+  &:nth-of-type(3) {
+    background: ${COLORS.SECONDARY_650};
+  }
+  &:nth-of-type(4) {
+    background: ${COLORS.SECONDARY_750};
   }
 `;
 const QRCodeModalStyled = styled(QRCodeModal)`
@@ -63,9 +71,12 @@ export const Connect: React.FC = () => {
   useEffect(() => {
     if (initialLoad) {
       setInitialLoad(false);
-      wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {setResults(eventResults)});
+      wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {
+        setResults(eventResults);
+        console.log('dApp | CONNECTED event: ', eventResults);
+      });
       wcs.addListener(WINDOW_MESSAGES.DISCONNECT, (eventResults) => {
-        setResults(eventResults)
+        setResults(eventResults.result)
       });
     }
   }, [wcs, navigate, initialLoad, walletConnectState]);
