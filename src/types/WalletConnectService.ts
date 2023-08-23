@@ -1,15 +1,15 @@
 import WalletConnectClient from '@walletconnect/client';
-import type { IClientMeta } from './IClientMeta';
-import type { WalletId } from './WalletList';
+import { WalletAction } from '../consts/walletActions';
+import type { ProvenanceMethod } from './Broadcast';
 import type {
+  AccountAttribute,
   AccountObject,
   MasterGroupPolicy,
   WalletInfo,
-  AccountAttribute,
 } from './ConnectData';
-import type { ProvenanceMethod } from './Broadcast';
 import type { GasPrice } from './GasPriceType';
-import { WalletAction } from '../consts/walletActions';
+import type { IClientMeta } from './IClientMeta';
+import type { WalletId } from './WalletList';
 
 export type WalletConnectClientType = WalletConnectClient;
 
@@ -95,7 +95,7 @@ export interface ConnectMethod {
   jwtExpiration?: number;
   walletAppId?: WalletId;
 }
-export interface InitMethod {
+export interface WalletConnectInitMethod {
   bridge?: string;
   duration?: number;
   noPopup?: boolean;
@@ -104,6 +104,7 @@ export interface InitMethod {
   prohibitGroups?: boolean;
   jwtExpiration?: number;
   walletAppId?: WalletId;
+  state: WCSState;
 }
 
 export interface SendMessageMethod {
@@ -126,3 +127,5 @@ export interface SendWalletActionMethod {
   action: WalletAction;
   payload?: Record<string, unknown>;
 }
+
+export type UpdateModalData = Partial<ModalData> & { walletAppId?: WalletId };

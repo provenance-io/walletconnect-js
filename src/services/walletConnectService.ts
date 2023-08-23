@@ -13,8 +13,8 @@ import type {
   AccountAttribute,
   BroadcastEventData,
   InitMethod,
-  ModalData,
   SendMessageMethod,
+  UpdateModalData,
   WalletConnectClientType,
   WalletConnectServiceStatus,
   WalletId,
@@ -388,7 +388,7 @@ export class WalletConnectService {
   };
 
   // Update the modal values
-  updateModal = (newModalData: Partial<ModalData> & { walletAppId?: WalletId }) => {
+  updateModal = (newModalData: UpdateModalData) => {
     const newModal = { ...this.state.modal, ...newModalData };
     let status = this.state.status;
     // If we're closing the modal and #connector isn't connected, update the status from "pending" to "disconnected".  Note: walletAppId will prevent a popup and is different from "closing", so check for it.
@@ -463,12 +463,12 @@ export class WalletConnectService {
         knownWalletApp.eventAction
       ) {
         // TODO: Move this into an imported function to reduce clutter here
-        console.log('wcjs | init | eventAction wait');
         const requestOrigin = window.location.origin;
         const requestFavicon = getFavicon();
         const requestName = window.document.title;
         let result;
         try {
+          console.log('wcjs | init | eventAction wait');
           result = await knownWalletApp.eventAction({
             event: 'basic_event',
             request: {
