@@ -14,7 +14,6 @@ import type {
   SendMessageMethod,
   UpdateModalData,
   WalletConnectClientType,
-  WalletConnectServiceStatus,
   WalletId,
   WCJSLocalState,
   WCJSLocalStateKeys,
@@ -22,7 +21,7 @@ import type {
   WCLocalStateKeys,
   WCSSetFullState,
   WCSSetState,
-  WCSState,
+  WCSStateNew,
 } from '../types';
 import {
   addToLocalStorage,
@@ -43,14 +42,27 @@ import {
 // If we don't have a value for Buffer (node core module) create it/polyfill it
 if (window.Buffer === undefined) window.Buffer = Buffer;
 
-const defaultState: WCSState = {
-  address: '',
-  attributes: [] as AccountAttribute[],
-  bridge: WALLETCONNECT_BRIDGE_URL,
-  status: 'disconnected',
-  connectionEST: null,
-  connectionEXP: null,
-  connectionTimeout: CONNECTION_TIMEOUT,
+const defaultState: WCSStateNew = {
+  connection: {
+    bridge: WALLETCONNECT_BRIDGE_URL,
+    status: 'disconnected',
+    connectionEST: null,
+    connectionEXP: null,
+    connectionTimeout: CONNECTION_TIMEOUT,
+    onDisconnect: undefined,
+    peer: null,
+    walletAppId: undefined,
+  },
+  wallet: {
+    address: '',
+    attributes: [] as AccountAttribute[],
+    publicKey: '',
+    representedGroupPolicy: null,
+    signedJWT: '',
+    coin: undefined,
+    id: undefined,
+    name: undefined,
+  },
   modal: {
     showModal: false,
     isMobile: isMobile(),
@@ -58,39 +70,49 @@ const defaultState: WCSState = {
     QRCodeImg: '',
     QRCodeUrl: '',
   },
-  onDisconnect: undefined,
-  peer: null,
   pendingMethod: '',
-  publicKey: '',
-  representedGroupPolicy: null,
-  signedJWT: '',
-  version: '3.2.1',
-  walletAppId: undefined,
-  walletInfo: {},
 };
 
 export class WalletConnectService {
-  #connectionTimer = 0;
+  #connectionTimer = 0; // Timer tracking when the currenct wcjs connection should expire
 
-  #connector?: WalletConnectClientType;
+  #connector?: WalletConnectClientType; // walletconnect connector object
 
-  #eventEmitter = new events.EventEmitter();
+  #eventEmitter = new events.EventEmitter(); // A listener sending all the various broadcast events for wcjs
 
-  #setWalletConnectContext: WCSSetFullState | undefined = undefined;
+  #setWalletConnectContext: WCSSetFullState | undefined = undefined; // Connect context updates to state updates in this class
 
-  #logsEnabled = false;
-
-  state: WCSState = defaultState;
+  state: WCSStateNew = defaultState; // Main data held and used within this class object
 
   constructor() {
-    this.#buildInitialState();
+    // Pull 'walletconnect' and 'walletconnect-js' localStorage values
+    const { existingWCJSState, existingWCState } = getLocalStorageValues();
+    // TODO: Need to decide where we are going to save our data...
+    // Risk of pulling wc data into wcjs storage is desync.
+    // Safer to just pull from both locations, only one should have account info
+    // Using existingWCState account info, get wallet info (N)
+    const {
+      address: localStorageAddress,
+      attributes: localStorageAttributes,
+      publicKey: localStoragePublicKey,
+      jwt: localStorageJWT,
+      walletInfo: localStorageWalletInfo,
+      representedGroupPolicy: localStorageRepresentedGroupPolicy,
+    } = getAccountInfo(existingWCState.accounts);
+    // Get the latest state using defaultState values (initial = true)
+    const newState = this.#getLocalStorageState(defaultState);
+    this.state = newState;
+    // If the status is "pending" attempt to reconnect
+    if (newState.status === 'pending') {
+      // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
+      const duration = newState.connectionTimeout
+        ? newState.connectionTimeout / 1000
+        : undefined;
+      await this.connect({ duration, bridge: newState.bridge });
+    }
   }
 
-  setLogging = (logsEnabled: boolean) => {
-    this.#logsEnabled = logsEnabled;
-  };
-
-  #getLocalStorageState = (currentState: WCSState): WCSState => {
+  #getLocalStorageState = (currentState: WCSStateNew): WCSStateNew => {
     // If this is the first load, we need to default values to the current state, not the default state since default state has already been initialized
 
     // Pull 'walletconnect' and 'walletconnect-js' localStorage values to build the state if they exists
@@ -132,21 +154,6 @@ export class WalletConnectService {
       representedGroupPolicy:
         localStorageRepresentedGroupPolicy || currentState.representedGroupPolicy,
     };
-  };
-
-  // Populate the initial state from init call.  Does not trigger "setState" function
-  #buildInitialState = async () => {
-    // Get the latest state using defaultState values (initial = true)
-    const newState = this.#getLocalStorageState(defaultState);
-    this.state = newState;
-    // If the status is "pending" attempt to reconnect
-    if (newState.status === 'pending') {
-      // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
-      const duration = newState.connectionTimeout
-        ? newState.connectionTimeout / 1000
-        : undefined;
-      await this.connect({ duration, bridge: newState.bridge });
-    }
   };
 
   // Populate the state when localStorage updated.  Trigger "setState" function
@@ -198,7 +205,7 @@ export class WalletConnectService {
   // Pull latest state values on demand (prevent stale state in callback events)
   #getState = () => this.state;
 
-  #updateLocalStorage = (updatedState: Partial<WCSState>) => {
+  #updateLocalStorage = (updatedState: Partial<WCSStateNew>) => {
     // Special values to look for
     const {
       connectionEXP,

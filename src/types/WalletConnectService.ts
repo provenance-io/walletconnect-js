@@ -13,7 +13,7 @@ import type { WalletId } from './WalletList';
 
 export type WalletConnectClientType = WalletConnectClient;
 
-type WCSPendingMethod =
+type PendingMethod =
   | ''
   | 'sendMessage'
   | 'signJWT'
@@ -21,37 +21,65 @@ type WCSPendingMethod =
   | 'switchToGroup'
   | 'removePendingMethod';
 
-export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
+export type ConnectionStatus = 'connected' | 'disconnected' | 'pending';
 
-export interface ModalData {
+export interface ModalState {
+  dynamicUrl: string;
+  isMobile: boolean;
   QRCodeImg: string;
   QRCodeUrl: string;
   showModal: boolean;
-  isMobile: boolean;
-  dynamicUrl: string;
 }
 
-export interface WCSState {
+export interface WalletState {
   address: string;
   attributes: AccountAttribute[];
+  coin?: string;
+  id?: number;
+  name?: string;
+  publicKey: string;
+  representedGroupPolicy: MasterGroupPolicy | null;
+  signedJWT: string;
+}
+export interface ConnectionState {
   bridge: string;
   connectionEST: number | null;
   connectionEXP: number | null;
   connectionTimeout: number;
-  modal: ModalData;
   onDisconnect?: (message?: string) => void;
   peer: IClientMeta | null;
-  pendingMethod: WCSPendingMethod;
-  publicKey: string;
-  representedGroupPolicy: MasterGroupPolicy | null;
-  signedJWT: string;
-  status: WalletConnectServiceStatus;
-  version: string;
+  status: ConnectionStatus;
   walletAppId?: WalletId;
-  walletInfo: WalletInfo;
 }
 
-export interface WCSSetStateParam extends WCSState {
+export interface WCSStateNew {
+  connection: ConnectionState;
+  modal: ModalState;
+  pendingMethod: PendingMethod;
+  wallet: WalletState;
+}
+
+export interface WCSState {
+  address: string; // Done
+  attributes: AccountAttribute[]; // Done
+  bridge: string; // Done
+  connectionEST: number | null; // Done
+  connectionEXP: number | null; // Done
+  connectionTimeout: number; // Done
+  modal: ModalState; // Done
+  onDisconnect?: (message?: string) => void; // Done
+  peer: IClientMeta | null; // Done
+  pendingMethod: PendingMethod; // Done
+  publicKey: string; // Done
+  representedGroupPolicy: MasterGroupPolicy | null; // Done
+  signedJWT: string; // Done
+  status: ConnectionStatus; // Done
+  version: string; // Won't Do
+  walletAppId?: WalletId; // Done
+  walletInfo: WalletInfo; // Done
+}
+
+export interface WCSSetStateParam extends WCSStateNew {
   connector?: WalletConnectClient;
 }
 
@@ -59,7 +87,7 @@ export type WCSSetState = (
   state: Partial<WCSSetStateParam>,
   updateLocalStorage?: boolean
 ) => void;
-export type WCSSetFullState = (state: WCSState) => void;
+export type WCSSetFullState = (state: WCSStateNew) => void;
 
 export interface WCJSLocalState {
   connectionEXP: number;
@@ -99,7 +127,7 @@ export interface ConnectMethod {
 }
 
 export interface ConnectMethodResults {
-  state?: Partial<WCSState>;
+  state?: Partial<WCSStateNew>;
   error?: string;
   resetState?: boolean;
 }
@@ -113,7 +141,7 @@ export interface WalletConnectInitMethod {
   prohibitGroups?: boolean;
   jwtExpiration?: number;
   walletAppId?: WalletId;
-  state: WCSState;
+  state: WCSStateNew;
 }
 
 export interface SendMessageMethod {
@@ -137,4 +165,4 @@ export interface SendWalletActionMethod {
   payload?: Record<string, unknown>;
 }
 
-export type UpdateModalData = Partial<ModalData> & { walletAppId?: WalletId };
+export type UpdateModalData = Partial<ModalState> & { walletAppId?: WalletId };
