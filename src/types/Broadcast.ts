@@ -5,8 +5,8 @@ export interface WalletConnectEventDisconnect {
   params: { message?: string }[];
 }
 
-type BroadcastEventNameKeys = keyof typeof WINDOW_MESSAGES;
-export type BroadcastEventName = typeof WINDOW_MESSAGES[BroadcastEventNameKeys];
+type BroadcastEventNameKey = keyof typeof WINDOW_MESSAGES;
+export type BroadcastEventName = typeof WINDOW_MESSAGES[BroadcastEventNameKey];
 
 // All the different walletConnectService method results
 export type ConnectionType = 'existing session' | 'new session';

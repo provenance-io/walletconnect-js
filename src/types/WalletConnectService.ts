@@ -35,19 +35,20 @@ export interface WCSState {
   address: string;
   attributes: AccountAttribute[];
   bridge: string;
-  status: WalletConnectServiceStatus;
-  connectionEXP: number | null;
   connectionEST: number | null;
+  connectionEXP: number | null;
   connectionTimeout: number;
-  pendingMethod: WCSPendingMethod;
-  peer: IClientMeta | null;
-  publicKey: string;
   modal: ModalData;
+  onDisconnect?: (message?: string) => void;
+  peer: IClientMeta | null;
+  pendingMethod: WCSPendingMethod;
+  publicKey: string;
+  representedGroupPolicy: MasterGroupPolicy | null;
   signedJWT: string;
+  status: WalletConnectServiceStatus;
   version: string;
   walletAppId?: WalletId;
   walletInfo: WalletInfo;
-  representedGroupPolicy: MasterGroupPolicy | null;
 }
 
 export interface WCSSetStateParam extends WCSState {
@@ -94,7 +95,15 @@ export interface ConnectMethod {
   prohibitGroups?: boolean;
   jwtExpiration?: number;
   walletAppId?: WalletId;
+  onDisconnect?: (message?: string) => void;
 }
+
+export interface ConnectMethodResults {
+  state?: Partial<WCSState>;
+  error?: string;
+  resetState?: boolean;
+}
+
 export interface WalletConnectInitMethod {
   bridge?: string;
   duration?: number;

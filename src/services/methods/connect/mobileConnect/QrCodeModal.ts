@@ -1,4 +1,4 @@
-import { WalletId } from '../../../types';
+import { WalletId } from '../../../../types';
 
 interface QRCodeModalState {
   connectionWalletAppId?: WalletId;
@@ -29,7 +29,6 @@ export class QRCodeModal {
       prohibitGroups,
       jwtExpiration,
       duration,
-      connectionWalletAppId,
       onOpenCallback,
     } = this.state;
     // Check for address and prohibit groups values to append to the wc value for the wallet to read when connecting

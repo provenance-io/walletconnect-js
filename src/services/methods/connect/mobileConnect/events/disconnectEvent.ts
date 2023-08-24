@@ -7,7 +7,7 @@ import {
 } from '../../../../../types';
 import { sendWalletEvent } from '../../../../../utils';
 
-interface DisconnectArgs {
+interface DisconnectParams {
   payload: WalletConnectEventDisconnect;
   resetState: () => void;
   getState: () => WCSState;
@@ -28,7 +28,7 @@ export const disconnectEvent = ({
   resetState,
   broadcast,
   getState,
-}: DisconnectArgs) => {
+}: DisconnectParams) => {
   const { walletAppId } = getState();
   if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.DISCONNECT);
   resetState();

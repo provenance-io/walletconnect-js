@@ -1,5 +1,5 @@
-import { WALLET_APP_EVENTS, WALLET_LIST } from '../../../consts';
-import { UpdateModalData, WalletId } from '../../../types';
+import { WALLET_APP_EVENTS, WALLET_LIST } from '../consts';
+import { UpdateModalData, WalletId } from '../types';
 
 export const openDirectWallet = (
   targetWalletId: WalletId,

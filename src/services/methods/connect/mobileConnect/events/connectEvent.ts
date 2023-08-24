@@ -12,7 +12,7 @@ import type {
 } from '../../../../../types';
 import { getAccountInfo, sendWalletEvent } from '../../../../../utils';
 
-interface ConnectEventArgs {
+interface ConnectEventParams {
   payload: ConnectData;
   broadcast: (
     eventName: BroadcastEventName,
@@ -39,7 +39,7 @@ export const connectEvent = ({
   startConnectionTimer,
   getState,
   connectionTimeout,
-}: ConnectEventArgs) => {
+}: ConnectEventParams) => {
   const connectionEST = Date.now();
   const connectionEXP = connectionTimeout + connectionEST;
   const data = payload.params[0];

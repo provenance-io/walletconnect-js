@@ -1,3 +1,15 @@
+import {
+  CONNECTION_TYPES,
+  WALLET_APP_EVENTS,
+  WINDOW_MESSAGES,
+} from '../../../../../consts';
+import {
+  BroadcastEventData,
+  BroadcastEventName,
+  WCSSetState,
+  WCSState,
+} from '../../../../../types';
+import { sendWalletEvent } from '../../../../../utils';
 // ------------------------
 // SESSION RESUME EVENT
 // ------------------------
@@ -8,18 +20,36 @@
 // - Broadcast "session_update" event (let the dApp know)
 // - Start the "connection timer" to auto-disconnect wcjs when session is expired
 // - Trigger wallet event for "session_update" (let the wallet know)
-export const resumeResumeEvent = () => {
-  if (newConnector) {
-    const connectionEST = state.connectionEST;
-    const connectionEXP = state.connectionEXP;
+
+interface SessionResumeEventParams {
+  broadcast: (
+    eventName: BroadcastEventName,
+    eventData: BroadcastEventData[BroadcastEventName]
+  ) => void;
+  setState: WCSSetState;
+  getState: () => WCSState;
+  startConnectionTimer: () => void;
+  connectionTimeout: number;
+}
+
+export const sessionResumeEvent = ({
+  connector,
+  connectionEST,
+  connectionEXP,
+  setState,
+  startConnectionTimer,
+  getState,
+  broadcast,
+}: SessionResumeEventParams) => {
+  if (connector) {
     const connectionDateValue =
       !!connectionEST && !!connectionEXP && connectionEST < connectionEXP;
-    const connected = newConnector.connected;
+    const connected = connector.connected;
     const connectionValid = connectionDateValue && connected;
     // Connection already exists and is not expired
     if (connectionValid) {
       setState({
-        connector: newConnector,
+        connector,
       });
       broadcast(WINDOW_MESSAGES.CONNECTED, {
         result: {
@@ -37,7 +67,7 @@ export const resumeResumeEvent = () => {
     }
     // If we're already connected but the session is expired (or times are missing), kill it
     else if (connected && !connectionDateValue) {
-      newConnector.killSession();
+      connector.killSession();
     }
   }
 };

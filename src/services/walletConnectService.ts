@@ -2,17 +2,15 @@ import { Buffer } from 'buffer';
 import events from 'events';
 import {
   CONNECTION_TIMEOUT,
-  CONNECTION_TYPES,
   LOCAL_STORAGE_NAMES,
   WALLET_APP_EVENTS,
-  WALLET_LIST,
   WALLETCONNECT_BRIDGE_URL,
   WINDOW_MESSAGES,
 } from '../consts';
 import type {
   AccountAttribute,
   BroadcastEventData,
-  InitMethod,
+  ConnectMethod,
   SendMessageMethod,
   UpdateModalData,
   WalletConnectClientType,
@@ -30,7 +28,6 @@ import {
   addToLocalStorage,
   clearLocalStorage,
   getAccountInfo,
-  getFavicon,
   getLocalStorageValues,
   isMobile,
   sendWalletEvent,
@@ -61,6 +58,7 @@ const defaultState: WCSState = {
     QRCodeImg: '',
     QRCodeUrl: '',
   },
+  onDisconnect: undefined,
   peer: null,
   pendingMethod: '',
   publicKey: '',
@@ -147,7 +145,7 @@ export class WalletConnectService {
       const duration = newState.connectionTimeout
         ? newState.connectionTimeout / 1000
         : undefined;
-      await this.init({ duration, bridge: newState.bridge });
+      await this.connect({ duration, bridge: newState.bridge });
     }
   };
 
@@ -163,18 +161,8 @@ export class WalletConnectService {
       const duration = currentState.connectionTimeout
         ? currentState.connectionTimeout / 1000
         : undefined;
-      this.init({ duration, bridge: currentState.bridge });
+      this.connect({ duration, bridge: currentState.bridge });
     }
-  };
-
-  // *** Event Listener *** (https://nodejs.org/api/events.html)
-  // Instead of having to use walletConnectService.eventEmitter.addListener()
-  // We want to be able to use walletConnectService.addListener() to pass the arguments directly into eventEmitter
-  #broadcastEvent = <Name extends keyof BroadcastEventData>(
-    eventName: Name,
-    eventData: BroadcastEventData[Name]
-  ) => {
-    this.#eventEmitter.emit(eventName, eventData);
   };
 
   // Control auto-disconnect / timeout
@@ -442,8 +430,9 @@ export class WalletConnectService {
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
    * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
+   * @param onDisconnect - (optional) Action to take if a disconnect call comes in (to handle wallet disconnecting from dApp)
    */
-  init = async ({
+  connect = async ({
     individualAddress,
     groupAddress,
     bridge,
@@ -451,127 +440,25 @@ export class WalletConnectService {
     jwtExpiration,
     prohibitGroups,
     walletAppId,
-  }: InitMethod = {}) => {
-    // Only create a new connector when we're not already connected
-    if (this.state.status !== 'connected') {
-      // If extension wallet, instantly connect if domain/origin is on allowed list
-      // TODO: Domain vs origin?
-      const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
-      if (
-        walletAppId === 'figure_extension' &&
-        knownWalletApp &&
-        knownWalletApp.eventAction
-      ) {
-        // TODO: Move this into an imported function to reduce clutter here
-        const requestOrigin = window.location.origin;
-        const requestFavicon = getFavicon();
-        const requestName = window.document.title;
-        let result;
-        try {
-          console.log('wcjs | init | eventAction wait');
-          result = await knownWalletApp.eventAction({
-            event: 'basic_event',
-            request: {
-              ...(individualAddress && { individualAddress }),
-              ...(groupAddress && { groupAddress }),
-              ...(duration && { duration }),
-              ...(jwtExpiration && { jwtExpiration }),
-              ...(prohibitGroups && { prohibitGroups }),
-              ...(requestOrigin && { requestOrigin }),
-              ...(requestName && { requestName }),
-              ...(requestFavicon.length && { requestFavicon }),
-              method: 'connect',
-            },
-          });
-        } catch (error) {
-          result = { error };
-        }
-        console.log('wcjs | init | eventAction result: ', result);
-        const { accounts, error } = result;
-        const {
-          address,
-          attributes,
-          jwt: signedJWT,
-          publicKey,
-          representedGroupPolicy,
-          walletInfo,
-        } = getAccountInfo(accounts);
-        // No error - Connected
-        if (!error) {
-          const connectionEST = Date.now();
-          const connectionEXP = this.state.connectionTimeout + connectionEST;
-          this.#setState({
-            connectionEST,
-            connectionEXP,
-            status: 'connected',
-            walletAppId,
-            address,
-            publicKey,
-            signedJWT,
-            walletInfo,
-            ...(attributes && { attributes }),
-            ...(representedGroupPolicy && { representedGroupPolicy }),
-          });
-          this.#broadcastEvent(WINDOW_MESSAGES.CONNECTED, {
-            result: {
-              connectionEST,
-              connectionEXP,
-              connectionType: CONNECTION_TYPES.new_session,
-            },
-          });
-        } else {
-          // Error - Not connected
-          // TODO: Maybe update broadcast events to show connection fails?
-          this.#resetState();
-        }
-
-        return 'initialized';
-      }
-      // Calculate duration to use (use passed in or default durations)
-      const finalDurationMS = duration
-        ? duration * 1000
-        : this.state.connectionTimeout;
-      // Convert back to seconds for wallets to use since jwtExpiration is already in seconds
-      const finalDurationS = finalDurationMS / 1000;
-      // Update the duration of this connection
-      this.#setState({
-        connectionTimeout: finalDurationMS,
-        status: 'pending',
-      });
-      const newConnector = await connectMethod({
-        bridge: bridge || this.state.bridge,
-        broadcast: this.#broadcastEvent,
-        duration: finalDurationS,
-        getState: this.#getState,
-        jwtExpiration,
-        prohibitGroups,
-        requiredGroupAddress: groupAddress,
-        requiredIndividualAddress: individualAddress,
-        resetState: this.#resetState,
-        setState: this.#setState,
-        startConnectionTimer: this.#startConnectionTimer,
-        state: this.state,
-        updateModal: this.updateModal,
-        walletAppId,
-      });
-      this.#connector = newConnector;
-    }
-    return 'initialized';
-  };
-
-  /**
-   * @deprecated connect is being phased out and init will be used in its place (same functionality)
-   * @param bridge - (optional) URL string of bridge to connect into
-   * @param duration - (optional) Time before connection is timed out (seconds)
-   * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
-   * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
-   * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
-   * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
-   * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
-   */
-  connect = async () => {
-    console.warn('wcjs | connect method is deprecated, use init method instead');
-    this.init();
+    onDisconnect,
+  }: ConnectMethod = {}) => {
+    const results = await connectMethod({
+      individualAddress,
+      groupAddress,
+      bridge,
+      duration,
+      jwtExpiration,
+      prohibitGroups,
+      walletAppId,
+    });
+    // Based on the results perform service actions
+    if (results.error) return { error: results.error };
+    // No error means we've connected, add the disconnect event if passed in
+    else if (onDisconnect) this.#setState({ onDisconnect });
+    if (results.state) this.#setState(results.state);
+    if (results.resetState) this.#resetState();
+    // TODO: What should we return to the user?
+    return 'something...';
   };
 
   /**
@@ -579,6 +466,8 @@ export class WalletConnectService {
    * @param message (optional) Custom disconnect message to send back to dApp
    * */
   disconnect = async (message?: string) => {
+    // Run disconnect callback function if provided/exists
+    if (this.state.onDisconnect) this.state.onDisconnect(message);
     this.#resetState();
     return message;
   };
