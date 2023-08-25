@@ -1,11 +1,9 @@
-import WalletConnectClient from '@walletconnect/client';
-import { WalletAction } from '../consts/walletActions';
+import type WalletConnectClient from '@walletconnect/client';
 import type { ProvenanceMethod } from './Broadcast';
 import type {
   AccountAttribute,
   AccountObject,
   MasterGroupPolicy,
-  WalletInfo,
 } from './ConnectData';
 import type { GasPrice } from './GasPriceType';
 import type { IClientMeta } from './IClientMeta';
@@ -52,50 +50,22 @@ export interface ConnectionState {
   walletAppId?: WalletId;
 }
 
-export interface WCSStateNew {
+export interface WCSState {
   connection: ConnectionState;
   modal: ModalState;
   pendingMethod: PendingMethod;
   wallet: WalletState;
 }
 
-export interface WCSState {
-  address: string; // Done
-  attributes: AccountAttribute[]; // Done
-  bridge: string; // Done
-  connectionEST: number | null; // Done
-  connectionEXP: number | null; // Done
-  connectionTimeout: number; // Done
-  modal: ModalState; // Done
-  onDisconnect?: (message?: string) => void; // Done
-  peer: IClientMeta | null; // Done
-  pendingMethod: PendingMethod; // Done
-  publicKey: string; // Done
-  representedGroupPolicy: MasterGroupPolicy | null; // Done
-  signedJWT: string; // Done
-  status: ConnectionStatus; // Done
-  version: string; // Won't Do
-  walletAppId?: WalletId; // Done
-  walletInfo: WalletInfo; // Done
-}
-
-export interface WCSSetStateParam extends WCSStateNew {
+export interface WCSSetStateParam extends WCSState {
   connector?: WalletConnectClient;
 }
 
 export type WCSSetState = (
-  state: Partial<WCSSetStateParam>,
+  state: Partial<WCSState>,
   updateLocalStorage?: boolean
 ) => void;
-export type WCSSetFullState = (state: WCSStateNew) => void;
-
-export interface WCJSLocalState {
-  connectionEXP: number;
-  connectionEST: number;
-  connectionTimeout: number;
-  signedJWT: string;
-  walletAppId?: WalletId | '';
-}
+export type WCSSetFullState = (state: WCSState) => void;
 
 export interface WCLocalState {
   connected: boolean;
@@ -110,8 +80,6 @@ export interface WCLocalState {
   handshakeId: number;
   handshakeTopic: string;
 }
-
-export type WCJSLocalStateKeys = keyof WCJSLocalState;
 export type WCLocalStateKeys = keyof WCLocalState;
 
 export interface ConnectMethod {
@@ -127,7 +95,7 @@ export interface ConnectMethod {
 }
 
 export interface ConnectMethodResults {
-  state?: Partial<WCSStateNew>;
+  state?: Partial<WCSState>;
   error?: string;
   resetState?: boolean;
 }
@@ -141,7 +109,7 @@ export interface WalletConnectInitMethod {
   prohibitGroups?: boolean;
   jwtExpiration?: number;
   walletAppId?: WalletId;
-  state: WCSStateNew;
+  state: WCSState;
 }
 
 export interface SendMessageMethod {
@@ -166,3 +134,5 @@ export interface SendWalletActionMethod {
 }
 
 export type UpdateModalData = Partial<ModalState> & { walletAppId?: WalletId };
+
+export type WalletAction = 'switchToGroup' | 'removePendingMethod';

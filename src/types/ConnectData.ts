@@ -65,12 +65,12 @@ export type AccountObject = {
   representedGroupPolicy: MasterGroupPolicy | null;
 };
 
-export type AccountInfo = string[] | AccountObject[] | undefined;
+export type WalletConnectAccountInfo = string[] | AccountObject[] | undefined;
 
 export type ConnectData = {
   params: [
     {
-      accounts: AccountInfo;
+      accounts: WalletConnectAccountInfo;
       peerMeta: {
         description: string;
         url: string;

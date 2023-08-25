@@ -1,5 +1,4 @@
 export * from './generateDynamicUrl';
-export * from './getAccountInfo';
 export * from './getFavicon';
 export * from './getPageData';
 export * from './isMobile';
@@ -8,3 +7,4 @@ export * from './log';
 export * from './openDirectWallet';
 export * from './rngNum';
 export * from './sendWalletEvent';
+export * from './walletConnectAccountInfo';

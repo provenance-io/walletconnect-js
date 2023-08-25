@@ -1,14 +1,18 @@
-import type { AccountAttribute, AccountInfo } from '../types';
+import type {
+  AccountAttribute,
+  WalletConnectAccountInfo,
+  WalletInfo,
+} from '../types';
 
-export const getAccountInfo = (accounts: AccountInfo) => {
+export const walletConnectAccountInfo = (accounts: WalletConnectAccountInfo) => {
   const defaultAccountInfo = {
     address: '',
     attributes: [] as AccountAttribute[],
     jwt: '',
     publicKey: '',
     representedGroupPolicy: null,
-    walletInfo: {},
-  };
+    walletInfo: {} as WalletInfo,
+  } as const;
 
   if (!accounts || !Array.isArray(accounts) || !accounts.length)
     return defaultAccountInfo;
@@ -30,7 +34,7 @@ export const getAccountInfo = (accounts: AccountInfo) => {
       publicKey,
       jwt,
       walletInfo: defaultAccountInfo.walletInfo,
-      representedGroupPolicy: defaultAccountInfo.walletInfo,
+      representedGroupPolicy: defaultAccountInfo.representedGroupPolicy,
     };
   }
   // Data is in an object, pull keys from first item

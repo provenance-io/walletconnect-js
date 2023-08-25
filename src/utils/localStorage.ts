@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_NAMES } from '../consts';
-import { WalletConnectClientType, WCJSLocalState } from '../types';
+import { WalletConnectClientType, WCSState } from '../types';
 
 type StorageKeys = keyof typeof LOCAL_STORAGE_NAMES;
 type StorageName = typeof LOCAL_STORAGE_NAMES[StorageKeys];
@@ -19,7 +19,7 @@ export const getLocalStorageValues = () => {
   const existingWCState: WalletConnectClientType = getFromLocalStorage(
     LOCAL_STORAGE_NAMES.WALLETCONNECT
   );
-  const existingWCJSState: WCJSLocalState = getFromLocalStorage(
+  const existingWCJSState: WCSState = getFromLocalStorage(
     LOCAL_STORAGE_NAMES.WALLETCONNECTJS
   );
   return { existingWCState, existingWCJSState };

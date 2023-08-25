@@ -10,7 +10,7 @@ import type {
   WCSSetState,
   WCSState,
 } from '../../../../../types';
-import { getAccountInfo, sendWalletEvent } from '../../../../../utils';
+import { sendWalletEvent, walletConnectAccountInfo } from '../../../../../utils';
 
 interface ConnectEventParams {
   payload: ConnectData;
@@ -51,7 +51,7 @@ export const connectEvent = ({
     publicKey,
     representedGroupPolicy,
     walletInfo,
-  } = getAccountInfo(accounts);
+  } = walletConnectAccountInfo(accounts);
   setState({
     address,
     attributes,

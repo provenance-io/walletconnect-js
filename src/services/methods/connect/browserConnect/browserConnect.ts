@@ -6,7 +6,7 @@ import {
   WCSSetState,
   WalletId,
 } from '../../../../types';
-import { getAccountInfo, getPageData } from '../../../../utils';
+import { getPageData, walletConnectAccountInfo } from '../../../../utils';
 
 interface BrowserConnectParams {
   broadcast: (
@@ -86,7 +86,7 @@ export const browserConnect = async ({
       publicKey,
       representedGroupPolicy,
       walletInfo,
-    } = getAccountInfo(accounts);
+    } = walletConnectAccountInfo(accounts);
     // We are now connected, update the walletConnectService state and broadcast the connection event to listening dApps
     if (!error) {
       const connectionEST = Date.now();

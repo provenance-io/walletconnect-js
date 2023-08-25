@@ -6,5 +6,6 @@ export * from './urls';
 export * from './walletAppEvents';
 export * from './walletAppIds';
 export * from './walletConnect';
+export * from './walletConnectService';
 export * from './walletList';
 export * from './windowMessages';

@@ -1,35 +1,26 @@
+import WalletConnectClient from '@walletconnect/client';
 import { Buffer } from 'buffer';
-import events from 'events';
 import {
-  CONNECTION_TIMEOUT,
   LOCAL_STORAGE_NAMES,
   WALLET_APP_EVENTS,
-  WALLETCONNECT_BRIDGE_URL,
+  WCS_DEFAULT_STATE,
   WINDOW_MESSAGES,
 } from '../consts';
 import type {
-  AccountAttribute,
-  BroadcastEventData,
   ConnectMethod,
   SendMessageMethod,
   UpdateModalData,
-  WalletConnectClientType,
-  WalletId,
-  WCJSLocalState,
-  WCJSLocalStateKeys,
   WCLocalState,
   WCLocalStateKeys,
-  WCSSetFullState,
-  WCSSetState,
-  WCSStateNew,
+  WCSState,
+  WalletConnectClientType,
 } from '../types';
 import {
   addToLocalStorage,
   clearLocalStorage,
-  getAccountInfo,
   getLocalStorageValues,
-  isMobile,
   sendWalletEvent,
+  walletConnectAccountInfo,
 } from '../utils';
 import {
   connect as connectMethod,
@@ -42,65 +33,105 @@ import {
 // If we don't have a value for Buffer (node core module) create it/polyfill it
 if (window.Buffer === undefined) window.Buffer = Buffer;
 
-const defaultState: WCSStateNew = {
-  connection: {
-    bridge: WALLETCONNECT_BRIDGE_URL,
-    status: 'disconnected',
-    connectionEST: null,
-    connectionEXP: null,
-    connectionTimeout: CONNECTION_TIMEOUT,
-    onDisconnect: undefined,
-    peer: null,
-    walletAppId: undefined,
-  },
-  wallet: {
-    address: '',
-    attributes: [] as AccountAttribute[],
-    publicKey: '',
-    representedGroupPolicy: null,
-    signedJWT: '',
-    coin: undefined,
-    id: undefined,
-    name: undefined,
-  },
-  modal: {
-    showModal: false,
-    isMobile: isMobile(),
-    dynamicUrl: '',
-    QRCodeImg: '',
-    QRCodeUrl: '',
-  },
-  pendingMethod: '',
-};
-
 export class WalletConnectService {
   #connectionTimer = 0; // Timer tracking when the currenct wcjs connection should expire
 
   #connector?: WalletConnectClientType; // walletconnect connector object
 
-  #eventEmitter = new events.EventEmitter(); // A listener sending all the various broadcast events for wcjs
+  #updateContext: ((state: WCSState) => void) | undefined = undefined; // Connect class state updates to context wrapper
 
-  #setWalletConnectContext: WCSSetFullState | undefined = undefined; // Connect context updates to state updates in this class
+  state: WCSState = WCS_DEFAULT_STATE; // Main data held and used within this class object
 
-  state: WCSStateNew = defaultState; // Main data held and used within this class object
+  // Keep all state updates tidy in a single method (prevent random setting in methods)
+  #setState = (
+    updatedState: Partial<WCSState> | 'reset',
+    updateLocalStorage = true
+  ) => {
+    const isReset = updatedState === 'reset';
+    // We want to reset the state back to the default values
+    if (isReset) this.state = WCS_DEFAULT_STATE;
+    // We are updating the state with some/all new values
+    else {
+      // Since state is not a flat object, we need to loop through each level to add/combine data vs overwriting all of it
+      // Eg: Only change the state.wallet.address/publicKey (leave all other state.wallet values the same)
+      const updatedStateKeys = Object.keys(updatedState) as Array<
+        keyof typeof updatedState
+      >;
+      updatedStateKeys.forEach((updateKey) => {
+        if (updateKey === 'connection')
+          this.state[updateKey] = { ...this.state[updateKey] };
+        const newNestedState = updatedState[updateKey];
+        const existingNestedState = this.state[updateKey];
+        const test = newNestedState
+          ? Object.assign(existingNestedState, newNestedState)
+          : existingNestedState;
+        const test1 = Object.assign({}, existingNestedState);
+        const test2 = Object.assign(existingNestedState, newNestedState);
+        const test3 = { ...existingNestedState };
+        // this.state[updateKey] = {...existingNestedState, ...newNestedState};
+        this.state[updateKey] = test;
+      });
+    }
+    // Let the context provider know we've updated our state
+    if (this.#updateContext) this.#updateContext(this.state);
+    // If needed, write state changes into wcjs localStorage
+    if (updateLocalStorage) {
+      if (isReset) clearLocalStorage('walletconnect-js');
+      else addToLocalStorage('walletconnect-js', this.state);
+    }
+  };
+
+  // Keep the WalletConnect connector saved, but inaccessable/out of the class state
+  #setConnector(connector?: WalletConnectClientType) {
+    this.#connector = connector;
+  }
 
   constructor() {
-    // Pull 'walletconnect' and 'walletconnect-js' localStorage values
+    // Pull 'walletconnect' and 'walletconnect-js' localStorage values to see if we might already be connected
     const { existingWCJSState, existingWCState } = getLocalStorageValues();
-    // TODO: Need to decide where we are going to save our data...
-    // Risk of pulling wc data into wcjs storage is desync.
-    // Safer to just pull from both locations, only one should have account info
-    // Using existingWCState account info, get wallet info (N)
-    const {
-      address: localStorageAddress,
-      attributes: localStorageAttributes,
-      publicKey: localStoragePublicKey,
-      jwt: localStorageJWT,
-      walletInfo: localStorageWalletInfo,
-      representedGroupPolicy: localStorageRepresentedGroupPolicy,
-    } = getAccountInfo(existingWCState.accounts);
-    // Get the latest state using defaultState values (initial = true)
-    const newState = this.#getLocalStorageState(defaultState);
+    // Are we already connected with walletconnect?
+    if (
+      existingWCState &&
+      existingWCState.connected &&
+      existingWCState.accounts.length
+    ) {
+      // Rebuild the connector from existing session data
+      const newConnector = new WalletConnectClient({
+        session: existingWCState.session,
+      });
+      this.#setConnector(newConnector);
+      // Look through the wc accounts to pull connected wallet data
+      const {
+        address,
+        attributes,
+        publicKey,
+        jwt: signedJWT,
+        walletInfo,
+        representedGroupPolicy,
+      } = walletConnectAccountInfo(existingWCState.accounts);
+      const { coin, id, name } = walletInfo;
+      this.#setState({
+        wallet: {
+          address,
+          attributes,
+          publicKey,
+          signedJWT,
+          representedGroupPolicy,
+          coin,
+          id,
+          name,
+        },
+      });
+    }
+    // Are we already connected with a browser wallet?
+    else if (
+      existingWCJSState &&
+      existingWCJSState?.connection?.status === 'connected'
+    ) {
+      // Look through the saved data to get connected wallet/account data
+      // Note: wcjs localStorage should be the exact shape as the service state
+    }
+
     this.state = newState;
     // If the status is "pending" attempt to reconnect
     if (newState.status === 'pending') {
@@ -110,6 +141,11 @@ export class WalletConnectService {
         : undefined;
       await this.connect({ duration, bridge: newState.bridge });
     }
+  }
+
+  // Allow this class to notify/update the context about state changes
+  setContextUpdater(updateFunction: (state: WCSState) => void): void {
+    this.#updateContext = updateFunction;
   }
 
   #getLocalStorageState = (currentState: WCSStateNew): WCSStateNew => {
@@ -157,7 +193,7 @@ export class WalletConnectService {
   };
 
   // Populate the state when localStorage updated.  Trigger "setState" function
-  // Note: We want to skip updating localStorage with the setState
+  // Note: We want to skip updating localStorage with the setState (infinite loop)
   #updateState = () => {
     // Get latest state based on current state values
     const currentState = this.#getLocalStorageState(defaultState);
@@ -204,106 +240,6 @@ export class WalletConnectService {
 
   // Pull latest state values on demand (prevent stale state in callback events)
   #getState = () => this.state;
-
-  #updateLocalStorage = (updatedState: Partial<WCSStateNew>) => {
-    // Special values to look for
-    const {
-      connectionEXP,
-      connectionEST,
-      connectionTimeout,
-      signedJWT,
-      walletAppId,
-    } = updatedState;
-    // If the value was changed, add it to the localStorage updates
-    const storageUpdates = {
-      ...(connectionEXP !== undefined && { connectionEXP }),
-      ...(connectionEST !== undefined && { connectionEST }),
-      ...(connectionTimeout !== undefined && { connectionTimeout }),
-      ...(signedJWT !== undefined && { signedJWT }),
-      ...(walletAppId !== undefined && { walletAppId }),
-    };
-    // If we have updated 1 or more special values, update localStorage
-    if (Object.keys(storageUpdates).length) {
-      addToLocalStorage('walletconnect-js', storageUpdates);
-    }
-  };
-
-  // Reset walletConnectService state back to the original default state
-  #resetState = () => {
-    this.state = { ...defaultState };
-    this.#updateContext();
-    clearLocalStorage('walletconnect-js');
-  };
-
-  // Change the class state
-  #setState: WCSSetState = (updatedState, updateLocalStorage = true) => {
-    // If the updatedState passes a connector value we want to use it but save it separatly from the public state
-    const { connector, ...filteredUpdatedState } = updatedState;
-    let finalUpdatedState = { ...filteredUpdatedState };
-    // Pull out/surface connector data for state
-    finalUpdatedState = {
-      ...updatedState,
-    };
-    // If we get a new "connector" passed in, pull various data keys out
-    // if (connector) {
-    //   // Update private connector value
-    //   this.#connector = connector;
-    //   // Pull out/surface connector data for state
-    //   const { bridge, peerMeta, accounts, connected } = connector;
-    //   const status = connected ? 'connected' : 'disconnected';
-    //   const { address, jwt, publicKey, representedGroupPolicy, walletInfo } =
-    //     getAccountInfo(accounts);
-    //   finalUpdatedState = {
-    //     ...updatedState,
-    //     address,
-    //     bridge,
-    //     status,
-    //     // We always want to use the jwt in the state over the connector since newer jwts won't show up in the connector
-    //     signedJWT: this.state.signedJWT || jwt,
-    //     publicKey,
-    //     representedGroupPolicy,
-    //     walletInfo,
-    //     peer: peerMeta,
-    //   };
-    // }
-    // Loop through each to update
-    this.state = { ...this.state, ...finalUpdatedState };
-    this.#updateContext();
-    // Write state changes into localStorage as needed
-    if (updateLocalStorage) this.#updateLocalStorage(finalUpdatedState);
-  };
-
-  // Update the class object to reflect the latest state changes
-  #updateContext = (): void => {
-    if (this.#setWalletConnectContext) {
-      this.#setWalletConnectContext({
-        ...this.state,
-      });
-    }
-  };
-
-  // Create listeners used with eventEmitter/broadcast results
-  addListener<Name extends keyof BroadcastEventData>(
-    eventName: Name,
-    callback: (results: BroadcastEventData[Name]) => void
-  ) {
-    this.#eventEmitter.addListener(eventName, callback);
-  }
-
-  // Remove listener w/specific eventName used with eventEmitter/broadcast results
-  removeListener<Name extends keyof BroadcastEventData>(
-    targetEvent: Name | 'all',
-    callback?: (results: BroadcastEventData[Name]) => void
-  ) {
-    if (targetEvent === 'all') {
-      this.#eventEmitter.eventNames().forEach((eventName) => {
-        this.#eventEmitter.removeAllListeners(eventName);
-      });
-    } else if (callback) {
-      // Callback must be provided to remove specific event action
-      this.#eventEmitter.removeListener(targetEvent, callback);
-    }
-  }
 
   // One or more values within localStorage have changed, see if we care about any of the values and update the state as needed
   handleLocalStorageChange = (storageEvent: StorageEvent) => {
@@ -370,16 +306,6 @@ export class WalletConnectService {
         this.#updateState();
       }
     }
-  };
-
-  // Create a stateUpdater, used for context to be able to auto change this class state
-  setContextUpdater(updateFunction: WCSSetFullState): void {
-    this.#setWalletConnectContext = updateFunction;
-  }
-
-  // Set a new walletAppId
-  setWalletAppId = (id: WalletId) => {
-    this.#setState({ walletAppId: id });
   };
 
   // Update the modal values

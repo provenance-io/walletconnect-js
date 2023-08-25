@@ -10,7 +10,7 @@ import {
   WCSSetState,
   WCSState,
 } from '../../../../../types';
-import { getAccountInfo, sendWalletEvent } from '../../../../../utils';
+import { sendWalletEvent, walletConnectAccountInfo } from '../../../../../utils';
 
 // ------------------------
 // UPDATE SESSION EVENT
@@ -57,7 +57,7 @@ export const sessionUpdateEvent = ({
     publicKey,
     representedGroupPolicy,
     walletInfo,
-  } = getAccountInfo(accounts);
+  } = walletConnectAccountInfo(accounts);
   // Save pulled information into wcjs state
   setState({
     address,
