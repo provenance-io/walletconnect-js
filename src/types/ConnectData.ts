@@ -62,7 +62,7 @@ export type AccountObject = {
   jwt: string;
   publicKey: string;
   walletInfo: WalletInfo;
-  representedGroupPolicy: MasterGroupPolicy | null;
+  representedGroupPolicy?: MasterGroupPolicy;
 };
 
 export type WalletConnectAccountInfo = string[] | AccountObject[] | undefined;

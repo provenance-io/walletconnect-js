@@ -8,6 +8,7 @@ import {
 } from '../consts';
 import type {
   ConnectMethod,
+  PartialState,
   SendMessageMethod,
   UpdateModalData,
   WCLocalState,
@@ -20,7 +21,6 @@ import {
   clearLocalStorage,
   getLocalStorageValues,
   sendWalletEvent,
-  walletConnectAccountInfo,
 } from '../utils';
 import {
   connect as connectMethod,
@@ -44,40 +44,53 @@ export class WalletConnectService {
 
   // Keep all state updates tidy in a single method (prevent random setting in methods)
   #setState = (
-    updatedState: Partial<WCSState> | 'reset',
+    updatedState: PartialState<WCSState> | 'reset',
     updateLocalStorage = true
   ) => {
     const isReset = updatedState === 'reset';
-    // We want to reset the state back to the default values
-    if (isReset) this.state = WCS_DEFAULT_STATE;
-    // We are updating the state with some/all new values
-    else {
+    // Either clone the default state (due to reset) or use existing state
+    const newState = Object.assign({}, isReset ? WCS_DEFAULT_STATE : this.state);
+    // Resets don't need to update any values
+    if (!isReset) {
       // Since state is not a flat object, we need to loop through each level to add/combine data vs overwriting all of it
-      // Eg: Only change the state.wallet.address/publicKey (leave all other state.wallet values the same)
+      // Eg: Only change the state.wallet.address (leave all other state.wallet values the same)
       const updatedStateKeys = Object.keys(updatedState) as Array<
         keyof typeof updatedState
       >;
       updatedStateKeys.forEach((updateKey) => {
-        if (updateKey === 'connection')
-          this.state[updateKey] = { ...this.state[updateKey] };
         const newNestedState = updatedState[updateKey];
-        const existingNestedState = this.state[updateKey];
-        const test = newNestedState
-          ? Object.assign(existingNestedState, newNestedState)
-          : existingNestedState;
-        const test1 = Object.assign({}, existingNestedState);
-        const test2 = Object.assign(existingNestedState, newNestedState);
-        const test3 = { ...existingNestedState };
-        // this.state[updateKey] = {...existingNestedState, ...newNestedState};
-        this.state[updateKey] = test;
+        const existingNestedState = newState[updateKey];
+        // Note: Due to TS limitations, we can't infer the key here and have to manually build out state
+        switch (updateKey) {
+          case 'connection':
+            newState.connection = {
+              ...existingNestedState,
+              ...newNestedState,
+            } as WCSState['connection'];
+            break;
+          case 'modal':
+            newState.modal = {
+              ...existingNestedState,
+              ...newNestedState,
+            } as WCSState['modal'];
+            break;
+          case 'wallet':
+            newState.wallet = {
+              ...existingNestedState,
+              ...newNestedState,
+            } as WCSState['wallet'];
+            break;
+        }
       });
     }
+    // Update the state based on the newState
+    this.state = newState;
     // Let the context provider know we've updated our state
-    if (this.#updateContext) this.#updateContext(this.state);
+    if (this.#updateContext) this.#updateContext(newState);
     // If needed, write state changes into wcjs localStorage
     if (updateLocalStorage) {
       if (isReset) clearLocalStorage('walletconnect-js');
-      else addToLocalStorage('walletconnect-js', this.state);
+      else addToLocalStorage('walletconnect-js', newState);
     }
   };
 
@@ -89,6 +102,8 @@ export class WalletConnectService {
   constructor() {
     // Pull 'walletconnect' and 'walletconnect-js' localStorage values to see if we might already be connected
     const { existingWCJSState, existingWCState } = getLocalStorageValues();
+    // Add all the existing wcjs values from localStorage into state
+    this.#setState(existingWCJSState);
     // Are we already connected with walletconnect?
     if (
       existingWCState &&
@@ -100,46 +115,6 @@ export class WalletConnectService {
         session: existingWCState.session,
       });
       this.#setConnector(newConnector);
-      // Look through the wc accounts to pull connected wallet data
-      const {
-        address,
-        attributes,
-        publicKey,
-        jwt: signedJWT,
-        walletInfo,
-        representedGroupPolicy,
-      } = walletConnectAccountInfo(existingWCState.accounts);
-      const { coin, id, name } = walletInfo;
-      this.#setState({
-        wallet: {
-          address,
-          attributes,
-          publicKey,
-          signedJWT,
-          representedGroupPolicy,
-          coin,
-          id,
-          name,
-        },
-      });
-    }
-    // Are we already connected with a browser wallet?
-    else if (
-      existingWCJSState &&
-      existingWCJSState?.connection?.status === 'connected'
-    ) {
-      // Look through the saved data to get connected wallet/account data
-      // Note: wcjs localStorage should be the exact shape as the service state
-    }
-
-    this.state = newState;
-    // If the status is "pending" attempt to reconnect
-    if (newState.status === 'pending') {
-      // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
-      const duration = newState.connectionTimeout
-        ? newState.connectionTimeout / 1000
-        : undefined;
-      await this.connect({ duration, bridge: newState.bridge });
     }
   }
 
@@ -148,76 +123,16 @@ export class WalletConnectService {
     this.#updateContext = updateFunction;
   }
 
-  #getLocalStorageState = (currentState: WCSStateNew): WCSStateNew => {
-    // If this is the first load, we need to default values to the current state, not the default state since default state has already been initialized
-
-    // Pull 'walletconnect' and 'walletconnect-js' localStorage values to build the state if they exists
-    const { existingWCJSState, existingWCState } = getLocalStorageValues();
-    // Pull out account info from the "accounts" array found in 'walletconnect'
-    const {
-      address: localStorageAddress,
-      attributes: localStorageAttributes,
-      publicKey: localStoragePublicKey,
-      jwt: localStorageJWT,
-      walletInfo: localStorageWalletInfo,
-      representedGroupPolicy: localStorageRepresentedGroupPolicy,
-    } = getAccountInfo(existingWCState.accounts);
-    // Calculate the current connection status based on localStorage and current values
-    const getNewStatus = (): WalletConnectServiceStatus => {
-      const currentStateStatus = currentState.status;
-      // Default return back the current states status or default status if nothing is set/exists yet
-      return currentStateStatus;
-    };
-    return {
-      address: localStorageAddress || currentState.address,
-      attributes: localStorageAttributes || currentState.attributes,
-      bridge: existingWCState.bridge || currentState.bridge,
-      connectionEXP: existingWCJSState.connectionEXP || currentState.connectionEXP,
-      connectionEST: existingWCJSState.connectionEST || currentState.connectionEST,
-      connectionTimeout:
-        existingWCJSState.connectionTimeout || currentState.connectionTimeout,
-      modal: currentState.modal,
-      peer: currentState.peer,
-      pendingMethod: currentState.pendingMethod,
-      publicKey: localStoragePublicKey || currentState.publicKey,
-      // Note: we are pulling from wcjs storage first incase the user generated a newer JWT since connecting
-      signedJWT:
-        existingWCJSState.signedJWT || localStorageJWT || currentState.signedJWT,
-      status: getNewStatus(),
-      version: currentState.version,
-      walletAppId: existingWCJSState.walletAppId || currentState.walletAppId,
-      walletInfo: localStorageWalletInfo || currentState.walletInfo,
-      representedGroupPolicy:
-        localStorageRepresentedGroupPolicy || currentState.representedGroupPolicy,
-    };
-  };
-
-  // Populate the state when localStorage updated.  Trigger "setState" function
-  // Note: We want to skip updating localStorage with the setState (infinite loop)
-  #updateState = () => {
-    // Get latest state based on current state values
-    const currentState = this.#getLocalStorageState(defaultState);
-    this.#setState(currentState, false);
-    // If the status is "pending" attempt to reconnect
-    if (currentState.status === 'pending') {
-      // ConnectionTimeout is saved in ms, the connect function takes it as seconds, so we need to convert
-      const duration = currentState.connectionTimeout
-        ? currentState.connectionTimeout / 1000
-        : undefined;
-      this.connect({ duration, bridge: currentState.bridge });
-    }
-  };
-
   // Control auto-disconnect / timeout
   #startConnectionTimer = () => {
     // Can't start a timer if one is already running (make sure we have EXP and EST too)
     if (
       !this.#connectionTimer &&
-      this.state.connectionEXP &&
-      this.state.connectionEST
+      this.state.connection.connectionEXP &&
+      this.state.connection.connectionEST
     ) {
       // Get the time until expiration (typically this.state.connectionTimeout, but might not be if session restored from refresh)
-      const connectionTimeout = this.state.connectionEXP - Date.now();
+      const connectionTimeout = this.state.connection.connectionEXP - Date.now();
       // Create a new timer
       const newConnectionTimer = window.setTimeout(() => {
         // When this timer expires, kill the session

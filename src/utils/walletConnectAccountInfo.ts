@@ -10,7 +10,7 @@ export const walletConnectAccountInfo = (accounts: WalletConnectAccountInfo) => 
     attributes: [] as AccountAttribute[],
     jwt: '',
     publicKey: '',
-    representedGroupPolicy: null,
+    representedGroupPolicy: undefined,
     walletInfo: {} as WalletInfo,
   } as const;
 

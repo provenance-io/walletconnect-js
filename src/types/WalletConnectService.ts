@@ -20,32 +20,35 @@ type PendingMethod =
   | 'removePendingMethod';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'pending';
+export type ConnectionType = 'mobile' | 'browser';
 
 export interface ModalState {
-  dynamicUrl: string;
+  dynamicUrl?: string;
   isMobile: boolean;
-  QRCodeImg: string;
-  QRCodeUrl: string;
+  QRCodeImg?: string;
+  QRCodeUrl?: string;
   showModal: boolean;
 }
 
 export interface WalletState {
-  address: string;
+  address?: string;
   attributes: AccountAttribute[];
   coin?: string;
   id?: number;
   name?: string;
-  publicKey: string;
-  representedGroupPolicy: MasterGroupPolicy | null;
-  signedJWT: string;
+  publicKey?: string;
+  representedGroupPolicy?: MasterGroupPolicy;
+  signedJWT?: string;
 }
 export interface ConnectionState {
   bridge: string;
-  connectionEST: number | null;
-  connectionEXP: number | null;
+  connectionEST?: number;
+  connectionEXP?: number;
   connectionTimeout: number;
+  connectionType?: ConnectionType;
   onDisconnect?: (message?: string) => void;
-  peer: IClientMeta | null;
+  peer?: IClientMeta;
+  pendingMethod?: PendingMethod;
   status: ConnectionStatus;
   walletAppId?: WalletId;
 }
@@ -53,13 +56,16 @@ export interface ConnectionState {
 export interface WCSState {
   connection: ConnectionState;
   modal: ModalState;
-  pendingMethod: PendingMethod;
   wallet: WalletState;
 }
 
 export interface WCSSetStateParam extends WCSState {
   connector?: WalletConnectClient;
 }
+
+export type PartialState<T> = {
+  [P in keyof T]?: Partial<T[P]>;
+};
 
 export type WCSSetState = (
   state: Partial<WCSState>,
