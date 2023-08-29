@@ -6,10 +6,10 @@ import { WALLETCONNECT_BRIDGE_URL } from './urls';
 export const WCS_DEFAULT_STATE: WCSState = {
   connection: {
     bridge: WALLETCONNECT_BRIDGE_URL,
-    connectionEST: undefined,
-    connectionEXP: undefined,
-    connectionTimeout: CONNECTION_TIMEOUT,
-    connectionType: undefined,
+    est: undefined,
+    exp: undefined,
+    timeout: CONNECTION_TIMEOUT,
+    type: undefined,
     onDisconnect: undefined,
     peer: undefined,
     pendingMethod: undefined,
@@ -21,7 +21,7 @@ export const WCS_DEFAULT_STATE: WCSState = {
     isMobile: isMobile(),
     QRCodeImg: undefined,
     QRCodeUrl: undefined,
-    showModal: false,
+    show: false,
   },
   wallet: {
     address: undefined,

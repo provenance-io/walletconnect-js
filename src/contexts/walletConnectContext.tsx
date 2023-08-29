@@ -15,24 +15,22 @@ interface Props {
   children: React.ReactNode;
   service?: WalletConnectService;
   connectionRedirect?: string;
-  logsEnabled?: boolean;
 }
 
 const WalletConnectContextProvider: React.FC<Props> = ({
   children,
   service: existingService,
   connectionRedirect,
-  logsEnabled = false,
 }) => {
   // Allow users to pass in an instance of the service themselves
   const walletConnectService = existingService || newService;
-  walletConnectService.setLogging(logsEnabled);
   const [walletConnectState, setWalletConnectState] = useState<WCSState>({
     ...walletConnectService.state,
   });
   const [initialLoad, setInitialLoad] = useState(true);
+  const { status } = walletConnectState.connection;
+
   useHostedWalletIframe();
-  const { status } = walletConnectState;
 
   // Auto-redirect was passed in.  Act on disconnected status
   useEffect(() => {
@@ -57,11 +55,6 @@ const WalletConnectContextProvider: React.FC<Props> = ({
   useEffect(() => {
     if (initialLoad) {
       setInitialLoad(false);
-      // Create event listener for localStorage changes
-      window.addEventListener(
-        'storage',
-        walletConnectService.handleLocalStorageChange
-      );
       // Whenever we change the react state, update the class state
       walletConnectService.setContextUpdater(setWalletConnectState);
     }

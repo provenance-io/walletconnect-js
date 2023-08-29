@@ -27,7 +27,7 @@ export interface ModalState {
   isMobile: boolean;
   QRCodeImg?: string;
   QRCodeUrl?: string;
-  showModal: boolean;
+  show: boolean;
 }
 
 export interface WalletState {
@@ -42,10 +42,10 @@ export interface WalletState {
 }
 export interface ConnectionState {
   bridge: string;
-  connectionEST?: number;
-  connectionEXP?: number;
-  connectionTimeout: number;
-  connectionType?: ConnectionType;
+  est?: number;
+  exp?: number;
+  timeout: number;
+  type?: ConnectionType;
   onDisconnect?: (message?: string) => void;
   peer?: IClientMeta;
   pendingMethod?: PendingMethod;

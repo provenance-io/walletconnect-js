@@ -12,13 +12,13 @@ import type {
   SendMessageMethod,
   UpdateModalData,
   WCLocalState,
-  WCLocalStateKeys,
   WCSState,
   WalletConnectClientType,
 } from '../types';
 import {
   addToLocalStorage,
   clearLocalStorage,
+  getChangedFields,
   getLocalStorageValues,
   sendWalletEvent,
 } from '../utils';
@@ -116,6 +116,8 @@ export class WalletConnectService {
       });
       this.#setConnector(newConnector);
     }
+    // Setup a listener for localStorage changes
+    window.addEventListener('storage', this.#handleLocalStorageChange);
   }
 
   // Allow this class to notify/update the context about state changes
@@ -128,11 +130,11 @@ export class WalletConnectService {
     // Can't start a timer if one is already running (make sure we have EXP and EST too)
     if (
       !this.#connectionTimer &&
-      this.state.connection.connectionEXP &&
-      this.state.connection.connectionEST
+      this.state.connection.exp &&
+      this.state.connection.est
     ) {
       // Get the time until expiration (typically this.state.connectionTimeout, but might not be if session restored from refresh)
-      const connectionTimeout = this.state.connection.connectionEXP - Date.now();
+      const connectionTimeout = this.state.connection.exp - Date.now();
       // Create a new timer
       const newConnectionTimer = window.setTimeout(() => {
         // When this timer expires, kill the session
@@ -143,85 +145,62 @@ export class WalletConnectService {
     }
   };
 
-  // Stop the current running connection timer
-  #clearConnectionTimer = () => {
-    if (this.#connectionTimer) {
-      // Stop timer
-      window.clearTimeout(this.#connectionTimer);
-      // Reset timer value to 0
-      this.#connectionTimer = 0;
-    }
-  };
-
   // Pull latest state values on demand (prevent stale state in callback events)
   #getState = () => this.state;
 
+  // WalletConnect localStorage values changed
+  #localStorageChangeWalletConnectJS(
+    newValue: string | null,
+    oldValue: string | null
+  ) {
+    // Convert each string json into a workable object
+    const newLocalStorageObj = JSON.parse(newValue || '{}') as Partial<WCSState>;
+    const oldLocalStorageObj = JSON.parse(oldValue || '{}') as Partial<WCSState>;
+    // We only care about specific storage values in walletconnect
+    const targetValues = [
+      'connectionEXP',
+      'connectionEST',
+      'connectionTimeout',
+      'signedJWT',
+      'walletAppId',
+    ];
+    // Which of these target values changed in the new storage object?
+    const changedObj = getChangedFields(
+      newLocalStorageObj,
+      oldLocalStorageObj,
+      targetValues
+    );
+  }
+
+  // WalletConnect localStorage values changed
+  #localStorageChangeWalletConnect(
+    newValue: string | null,
+    oldValue: string | null
+  ) {
+    // Convert each string json into a workable object
+    const newLocalStorageObj = JSON.parse(newValue || '{}') as Partial<WCLocalState>;
+    const oldLocalStorageObj = JSON.parse(oldValue || '{}') as Partial<WCLocalState>;
+    // We only care about specific storage values in walletconnect
+    const targetValues = ['accounts', 'bridge', 'connected'];
+    // Which of these target values changed in the new storage object?
+    const changedObj = getChangedFields(
+      newLocalStorageObj,
+      oldLocalStorageObj,
+      targetValues
+    );
+  }
+
   // One or more values within localStorage have changed, see if we care about any of the values and update the state as needed
-  handleLocalStorageChange = (storageEvent: StorageEvent) => {
+  #handleLocalStorageChange(storageEvent: StorageEvent) {
     const { key: storageEventKey, newValue, oldValue } = storageEvent;
-    const validStorageEventKey =
-      storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECT ||
-      storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECTJS;
-    if (validStorageEventKey) {
-      const newValueObj = JSON.parse(newValue || '{}') as Partial<
-        WCJSLocalState & WCLocalState
-      >;
-      const oldValueObj = JSON.parse(oldValue || '{}') as Partial<
-        WCJSLocalState & WCLocalState
-      >;
-      // Keys to look for within 'walletconnect' storage object
-      const targetWCValues: Partial<WCLocalStateKeys>[] = [
-        'accounts',
-        'bridge',
-        'connected',
-      ];
-
-      // Keys to look for within 'walletconnect-js' storage object
-      const targetWCJSValues: WCJSLocalStateKeys[] = [
-        'connectionEXP',
-        'connectionEST',
-        'connectionTimeout',
-        'signedJWT',
-        'walletAppId',
-      ];
-      // Look for specific changed key values in the objects and return a final object with all the changes
-      const findChangedValues = (
-        targetValues: typeof targetWCValues | typeof targetWCJSValues
-      ) => {
-        const foundChangedValues = {} as Record<
-          WCLocalStateKeys[number] | WCJSLocalStateKeys[number],
-          unknown
-        >;
-        targetValues.forEach((targetKey) => {
-          // Accounts array holds an object with data, but we only want to look at the address value
-          // Idea here is that if the account changed we should reload the connection to get the full new data
-          if (targetKey === 'accounts') {
-            if (
-              newValueObj?.accounts?.[0].address !==
-              oldValueObj.accounts?.[0].address
-            ) {
-              foundChangedValues.address = newValueObj?.accounts?.[0].address;
-            }
-          } else if (newValueObj[targetKey] !== oldValueObj[targetKey]) {
-            foundChangedValues[targetKey] = newValueObj[targetKey];
-          }
-        });
-        return foundChangedValues;
-      };
-      let changedValuesWC, changedValuesWCJS;
-      // Make sure the key is changing a value we care about, must be walletconnect or walletconnect-js
-      if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECT)
-        changedValuesWC = findChangedValues(targetWCValues);
-      if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECTJS)
-        changedValuesWCJS = findChangedValues(targetWCJSValues);
-
-      const changedValues = { ...changedValuesWC, ...changedValuesWCJS };
-      const totalChangedValues = Object.keys(changedValues).length;
-      if (totalChangedValues) {
-        this.#updateState();
-      }
-    }
-  };
+    // WalletConnect-JS localStorage values changed
+    // Info: Another tab triggered a disconnect, or "switch account", connectionTimeout reset, etc
+    if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECTJS)
+      this.#localStorageChangeWalletConnectJS(newValue, oldValue);
+    // WalletConnect localStorage values changed
+    else if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECT)
+      this.#localStorageChangeWalletConnect(newValue, oldValue);
+  }
 
   // Update the modal values
   updateModal = (newModalData: UpdateModalData) => {
@@ -253,7 +232,12 @@ export class WalletConnectService {
       ? connectionTimeout * 1000
       : this.state.connectionTimeout;
     // Kill the last timer (if it exists)
-    this.#clearConnectionTimer();
+    if (this.#connectionTimer) {
+      // Stop timer
+      window.clearTimeout(this.#connectionTimer);
+      // Reset timer value to 0
+      this.#connectionTimer = 0;
+    }
     // Build a new connectionEXP (Iat + connectionTimeout)
     const connectionEXP = newConnectionTimeout + Date.now();
     // Save these new values (needed for session restore functionality/page refresh)
