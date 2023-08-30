@@ -127,7 +127,7 @@
   },
   "jest": {
     "testMatch": [
-      "**/__tests__/unit/*.test.ts"
+      "**/src/__tests__/unit/*.test.ts"
     ]
   }
 }

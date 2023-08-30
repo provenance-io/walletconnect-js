@@ -27,6 +27,7 @@ module.exports = {
     'no-var': 'warn',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/await-thenable': 'error',
     'object-shorthand': 'warn',
     'prefer-arrow-callback': 'warn',
     'prefer-const': 'warn',
@@ -79,6 +80,6 @@ module.exports = {
     },
   },
   parserOptions: {
-    project: ["tsconfig.json","examples/example-react-vite/tsconfig.json"]
-  }
+    project: ['tsconfig.json', 'examples/example-react-vite/tsconfig.json'],
+  },
 };

@@ -14,19 +14,25 @@ export const getChangedFields = (
       // targetKeys will be in "dot" notation, eg: wallet.address, check for them and look for those keys accordingly (nested)
       // Note: We won't go deeper than 3 keys
       const [key0, key1, key2] = key.split('.');
-      const valueChanged = newObj[key0][key1][key2] !== oldObj[key0][key1][key2];
-      if (valueChanged) {
-        // Pre-populate objects as needed based on keys
-        if (key0 && !changedValues[key0]) changedValues[key0] = {};
-        if (key1 && !changedValues[key0][key1]) changedValues[key0][key1] = {};
-        if (key2 && !changedValues[key0][key1][key2])
-          changedValues[key0][key1][key2] = {};
-        // Add in the latest values
-        // Examples:
-        // wallet
-        // wallet.address
-        // wallet.data.name  // not a real one but needs to handle 3 keys in
-        changedValues[key0] = newObj[key];
+      // Check the furthest out value first to build the changed shape
+      if (key2) {
+        const valueChanged = newObj[key0][key1][key2] !== oldObj[key0][key1][key2];
+        if (valueChanged) {
+          if (!changedValues[key0]) changedValues[key0] = {};
+          if (!changedValues[key0][key1]) changedValues[key0][key1] = {};
+          changedValues[key0][key1][key2] = newObj[key0][key1][key2];
+        }
+      } else if (key1) {
+        const valueChanged = newObj[key0][key1] !== oldObj[key0][key1];
+        if (valueChanged) {
+          if (!changedValues[key0]) changedValues[key0] = {};
+          changedValues[key0][key1] = newObj[key0][key1];
+        }
+      } else if (key0) {
+        const valueChanged = newObj[key0] !== oldObj[key0];
+        if (valueChanged) {
+          changedValues[key0] = newObj[key0];
+        }
       }
     });
   }
@@ -54,4 +60,5 @@ export const getChangedFields = (
   Concerns:
     - Now that we don't broadcast anything, can non-react dApps catch these context state value changes correctly?
       - They should since the state is shared in the context class, but needs testing in a non-react app
+      - Not specific to this util function, more of a consideration of just removing broadcast functionality maybe
 */
