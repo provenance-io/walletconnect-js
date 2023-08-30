@@ -68,10 +68,6 @@ export const connect = async ({
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
   if (walletAppId && BROWSER_MESSAGE_WALLETS.includes(walletAppId)) {
     connectResults = await browserConnect({
-      broadcast,
-      connectionTimeout,
-      resetState,
-      setState,
       walletAppId,
       duration,
       groupAddress,

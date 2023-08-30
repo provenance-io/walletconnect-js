@@ -1,18 +1,18 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import type {
-  SendMessageMethod,
-  WalletConnectClientType,
-  WalletId,
-  SendMessageMethodResult,
-  BroadcastEventData,
-} from '../../types';
 import {
-  WALLET_LIST,
-  WALLET_APP_EVENTS,
   PROVENANCE_METHODS,
+  WALLET_APP_EVENTS,
+  WALLET_LIST,
   WINDOW_MESSAGES,
 } from '../../consts';
-import { rngNum, log } from '../../utils';
+import type {
+  BroadcastEventData,
+  SendMessageMethod,
+  SendMessageMethodResult,
+  WalletConnectClientType,
+  WalletId,
+} from '../../types';
+import { log, rngNum } from '../../utils';
 
 interface SendMessage {
   address: string;
@@ -20,7 +20,6 @@ interface SendMessage {
   customId?: string;
   data: SendMessageMethod;
   walletAppId?: WalletId;
-  logsEnabled: boolean;
 }
 
 export const sendMessage = async ({
@@ -29,7 +28,6 @@ export const sendMessage = async ({
   customId,
   data,
   walletAppId,
-  logsEnabled,
 }: SendMessage): Promise<
   BroadcastEventData[typeof WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]
 > => {

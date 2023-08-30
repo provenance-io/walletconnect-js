@@ -4,13 +4,11 @@ import {
   LOCAL_STORAGE_NAMES,
   WALLET_APP_EVENTS,
   WCS_DEFAULT_STATE,
-  WINDOW_MESSAGES,
 } from '../consts';
 import type {
   ConnectMethod,
   PartialState,
   SendMessageMethod,
-  UpdateModalData,
   WCLocalState,
   WCSState,
   WalletConnectClientType,
@@ -18,9 +16,9 @@ import type {
 import {
   addToLocalStorage,
   clearLocalStorage,
-  getChangedFields,
   getLocalStorageValues,
   sendWalletEvent,
+  walletConnectAccountInfo,
 } from '../utils';
 import {
   connect as connectMethod,
@@ -47,6 +45,8 @@ export class WalletConnectService {
     updatedState: PartialState<WCSState> | 'reset',
     updateLocalStorage = true
   ) => {
+    // NOTE: Should we protect this function by only ever setting expected state values to expected types?
+    // Reason: Users can change localStorage state and force the internal wcjs state to reflect those keys/values
     const isReset = updatedState === 'reset';
     // Either clone the default state (due to reset) or use existing state
     const newState = Object.assign({}, isReset ? WCS_DEFAULT_STATE : this.state);
@@ -102,7 +102,7 @@ export class WalletConnectService {
   constructor() {
     // Pull 'walletconnect' and 'walletconnect-js' localStorage values to see if we might already be connected
     const { existingWCJSState, existingWCState } = getLocalStorageValues();
-    // Add all the existing wcjs values from localStorage into state
+    // Merge all the existing wcjs values from localStorage into state
     this.#setState(existingWCJSState);
     // Are we already connected with walletconnect?
     if (
@@ -145,82 +145,79 @@ export class WalletConnectService {
     }
   };
 
-  // Pull latest state values on demand (prevent stale state in callback events)
-  #getState = () => this.state;
-
   // WalletConnect localStorage values changed
-  #localStorageChangeWalletConnectJS(
-    newValue: string | null,
-    oldValue: string | null
-  ) {
-    // Convert each string json into a workable object
-    const newLocalStorageObj = JSON.parse(newValue || '{}') as Partial<WCSState>;
-    const oldLocalStorageObj = JSON.parse(oldValue || '{}') as Partial<WCSState>;
-    // We only care about specific storage values in walletconnect
-    const targetValues = [
-      'connectionEXP',
-      'connectionEST',
-      'connectionTimeout',
-      'signedJWT',
-      'walletAppId',
-    ];
-    // Which of these target values changed in the new storage object?
-    const changedObj = getChangedFields(
-      newLocalStorageObj,
-      oldLocalStorageObj,
-      targetValues
-    );
-  }
-
-  // WalletConnect localStorage values changed
-  #localStorageChangeWalletConnect(
-    newValue: string | null,
-    oldValue: string | null
-  ) {
-    // Convert each string json into a workable object
-    const newLocalStorageObj = JSON.parse(newValue || '{}') as Partial<WCLocalState>;
-    const oldLocalStorageObj = JSON.parse(oldValue || '{}') as Partial<WCLocalState>;
-    // We only care about specific storage values in walletconnect
-    const targetValues = ['accounts', 'bridge', 'connected'];
-    // Which of these target values changed in the new storage object?
-    const changedObj = getChangedFields(
-      newLocalStorageObj,
-      oldLocalStorageObj,
-      targetValues
-    );
+  #localStorageChangeWalletConnect(newValue: string | null) {
+    // Convert string json into a workable object
+    const { accounts, bridge, connected } = JSON.parse(
+      newValue || '{}'
+    ) as Partial<WCLocalState>;
+    // Gather all new state information to update
+    const newState: PartialState<WCSState> = { connection: {}, wallet: {} };
+    // Did account information change? Pull it out and set it to state
+    if (accounts) {
+      const {
+        address,
+        attributes,
+        jwt,
+        publicKey,
+        representedGroupPolicy,
+        walletInfo,
+      } = walletConnectAccountInfo(accounts);
+      const { coin, id, name } = walletInfo || {};
+      // Update wallet info
+      newState.wallet = {
+        address,
+        signedJWT: jwt,
+        publicKey,
+        attributes,
+        representedGroupPolicy,
+        name,
+        id,
+        coin,
+      };
+    }
+    // Update connection info
+    newState.connection = {
+      bridge,
+      status: connected ? 'connected' : 'disconnected',
+    };
+    // Update state with new localStorage pulled values
+    this.#setState(newState);
   }
 
   // One or more values within localStorage have changed, see if we care about any of the values and update the state as needed
   #handleLocalStorageChange(storageEvent: StorageEvent) {
-    const { key: storageEventKey, newValue, oldValue } = storageEvent;
-    // WalletConnect-JS localStorage values changed
+    const { key: storageEventKey, newValue } = storageEvent;
     // Info: Another tab triggered a disconnect, or "switch account", connectionTimeout reset, etc
     if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECTJS)
-      this.#localStorageChangeWalletConnectJS(newValue, oldValue);
+      // WalletConnect-JS localStorage values changed, just merge it into state since we will store everything now
+      this.#setState(JSON.parse(newValue || '{}') as PartialState<WCSState>);
     // WalletConnect localStorage values changed
     else if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECT)
-      this.#localStorageChangeWalletConnect(newValue, oldValue);
+      this.#localStorageChangeWalletConnect(newValue);
   }
 
-  // Update the modal values
-  updateModal = (newModalData: UpdateModalData) => {
-    const newModal = { ...this.state.modal, ...newModalData };
-    let status = this.state.status;
-    // If we're closing the modal and #connector isn't connected, update the status from "pending" to "disconnected".  Note: walletAppId will prevent a popup and is different from "closing", so check for it.
-    if (
-      !newModalData.showModal &&
-      status === 'pending' &&
-      !this.#connector?.connected &&
-      !newModalData.walletAppId
-    ) {
-      status = 'disconnected';
-    }
-    this.#setState({
-      modal: newModal,
-      status,
-      ...(newModalData.walletAppId && { walletAppId: newModalData.walletAppId }),
-    });
-  };
+  // // Update the modal values
+  // updateModal = (newModalData: UpdateModalData) => {
+  //   const newModal = { ...this.state.modal, ...newModalData };
+  //   let status = this.state.connection.status;
+  //   // If we're closing the modal and #connector isn't connected, update the status from "pending" to "disconnected".  Note: walletAppId will prevent a popup and is different from "closing", so check for it.
+  //   if (
+  //     !newModalData.show &&
+  //     status === 'pending' &&
+  //     !this.#connector?.connected &&
+  //     !newModalData.walletAppId
+  //   ) {
+  //     status = 'disconnected';
+  //   }
+  //   this.#setState({
+  //     modal: newModal,
+  //     connection: {
+  //       status,
+  //       ...(newModalData.walletAppId && { walletAppId: newModalData.walletAppId }),
+  //     },
+  //   });
+  // };
 
   /**
    *
@@ -230,7 +227,7 @@ export class WalletConnectService {
     // Use the new (convert to ms) or existing connection timeout
     const newConnectionTimeout = connectionTimeout
       ? connectionTimeout * 1000
-      : this.state.connectionTimeout;
+      : this.state.connection.timeout;
     // Kill the last timer (if it exists)
     if (this.#connectionTimer) {
       // Stop timer
@@ -241,13 +238,15 @@ export class WalletConnectService {
     // Build a new connectionEXP (Iat + connectionTimeout)
     const connectionEXP = newConnectionTimeout + Date.now();
     // Save these new values (needed for session restore functionality/page refresh)
-    this.#setState({ connectionTimeout: newConnectionTimeout, connectionEXP });
+    this.#setState({
+      connection: { timeout: newConnectionTimeout, exp: connectionEXP },
+    });
     // Start a new timer
     this.#startConnectionTimer();
     // Send connected wallet custom event with the new connection details
-    if (this.state.walletAppId) {
+    if (this.state.connection.walletAppId) {
       sendWalletEvent(
-        this.state.walletAppId,
+        this.state.connection.walletAppId,
         WALLET_APP_EVENTS.RESET_TIMEOUT,
         newConnectionTimeout
       );
@@ -286,9 +285,9 @@ export class WalletConnectService {
     // Based on the results perform service actions
     if (results.error) return { error: results.error };
     // No error means we've connected, add the disconnect event if passed in
-    else if (onDisconnect) this.#setState({ onDisconnect });
+    else if (onDisconnect) this.#setState({ connection: { onDisconnect } });
     if (results.state) this.#setState(results.state);
-    if (results.resetState) this.#resetState();
+    if (results.resetState) this.#setState('reset');
     // TODO: What should we return to the user?
     return 'something...';
   };
@@ -299,8 +298,9 @@ export class WalletConnectService {
    * */
   disconnect = async (message?: string) => {
     // Run disconnect callback function if provided/exists
-    if (this.state.onDisconnect) this.state.onDisconnect(message);
-    this.#resetState();
+    if (this.state.connection.onDisconnect)
+      this.state.connection.onDisconnect(message);
+    this.#setState('reset');
     return message;
   };
 
@@ -331,12 +331,12 @@ export class WalletConnectService {
     timeoutHeight,
   }: SendMessageMethod) => {
     // Loading while we wait for response
-    this.#setState({ pendingMethod: 'sendMessage' });
+    this.#setState({ connection: { pendingMethod: 'sendMessage' } });
     const result = await sendMessageMethod({
-      address: this.state.address,
+      address: this.state.wallet.address || '',
       connector: this.#connector,
       customId,
-      walletAppId: this.state.walletAppId,
+      walletAppId: this.state.connection.walletAppId,
       data: {
         message,
         description,
@@ -349,15 +349,9 @@ export class WalletConnectService {
         nonCriticalExtensionOptions,
         memo,
       },
-      logsEnabled: this.#logsEnabled,
     });
     // No longer loading
-    this.#setState({ pendingMethod: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.SEND_MESSAGE_FAILED
-      : WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
+    this.#setState({ connection: { pendingMethod: '' } });
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
 
@@ -373,10 +367,10 @@ export class WalletConnectService {
    */
   switchToGroup = async (groupPolicyAddress?: string, description?: string) => {
     // Loading while we wait for response
-    this.#setState({ pendingMethod: 'switchToGroup' });
+    this.#setState({ connection: { pendingMethod: 'switchToGroup' } });
     const result = await sendWalletActionMethod({
       connector: this.#connector,
-      walletAppId: this.state.walletAppId,
+      walletAppId: this.state.connection.walletAppId,
       data: {
         action: 'switchToGroup',
         payload: groupPolicyAddress ? { address: groupPolicyAddress } : undefined,
@@ -385,12 +379,7 @@ export class WalletConnectService {
       },
     });
     // No longer loading
-    this.#setState({ pendingMethod: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.SWITCH_TO_GROUP_FAILED
-      : WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
+    this.#setState({ connection: { pendingMethod: '' } });
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
 
@@ -403,23 +392,18 @@ export class WalletConnectService {
    */
   signJWT = async (expires: number, options?: { customId?: string }) => {
     // Loading while we wait for response
-    this.#setState({ pendingMethod: 'signJWT' });
+    this.#setState({ connection: { pendingMethod: 'signJWT' } });
     const result = await signJWTMethod({
-      address: this.state.address,
+      address: this.state.wallet.address || '',
       connector: this.#connector,
       customId: options?.customId,
       expires,
-      publicKey: this.state.publicKey,
+      publicKey: this.state.wallet.publicKey || '',
       setState: this.#setState,
-      walletAppId: this.state.walletAppId,
+      walletAppId: this.state.connection.walletAppId,
     });
     // No longer loading
-    this.#setState({ pendingMethod: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.SIGN_JWT_FAILED
-      : WINDOW_MESSAGES.SIGN_JWT_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
+    this.#setState({ connection: { pendingMethod: '' } });
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
     return result;
@@ -431,24 +415,19 @@ export class WalletConnectService {
    */
   signHexMessage = async (hexMessage: string, options?: { customId?: string }) => {
     // Loading while we wait for response
-    this.#setState({ pendingMethod: 'signHexMessage' });
+    this.#setState({ connection: { pendingMethod: 'signHexMessage' } });
     // Wait to get the result back
     const result = await signHexMessageMethod({
-      address: this.state.address,
+      address: this.state.wallet.address || '',
       connector: this.#connector,
       customId: options?.customId,
       hexMessage,
-      publicKey: this.state.publicKey,
-      walletAppId: this.state.walletAppId,
+      publicKey: this.state.wallet.publicKey || '',
+      walletAppId: this.state.connection.walletAppId,
     });
     console.log('walletConnectService | signHex result: ', result);
     // No longer loading
-    this.#setState({ pendingMethod: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.SIGN_HEX_MESSAGE_FAILED
-      : WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
+    this.#setState({ connection: { pendingMethod: '' } });
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
 
@@ -460,11 +439,11 @@ export class WalletConnectService {
    */
   removePendingMethod = async (customId: string) => {
     // Loading while we wait for response
-    this.#setState({ pendingMethod: 'removePendingMethod' });
+    this.#setState({ connection: { pendingMethod: 'removePendingMethod' } });
     // Wait to get the result back
     const result = await sendWalletActionMethod({
       connector: this.#connector,
-      walletAppId: this.state.walletAppId,
+      walletAppId: this.state.connection.walletAppId,
       data: {
         action: 'removePendingMethod',
         payload: { customId },
@@ -472,12 +451,7 @@ export class WalletConnectService {
       },
     });
     // No longer loading
-    this.#setState({ pendingMethod: '' });
-    // Broadcast result of method
-    const windowMessage = result.error
-      ? WINDOW_MESSAGES.REMOVE_PENDING_METHOD_FAILED
-      : WINDOW_MESSAGES.REMOVE_PENDING_METHOD_COMPLETE;
-    this.#broadcastEvent(windowMessage, result);
+    this.#setState({ connection: { pendingMethod: '' } });
     // Refresh auto-disconnect timer
     this.resetConnectionTimeout();
 

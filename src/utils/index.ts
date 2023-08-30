@@ -1,5 +1,4 @@
 export * from './generateDynamicUrl';
-export * from './getChangedFields';
 export * from './getFavicon';
 export * from './getPageData';
 export * from './isMobile';

@@ -1,26 +1,14 @@
-import { CONNECTION_TYPES, WALLET_LIST, WINDOW_MESSAGES } from '../../../../consts';
-import {
-  BroadcastEventData,
-  BroadcastEventName,
-  ConnectMethodResults,
-  WCSSetState,
-  WalletId,
-} from '../../../../types';
+import { WALLET_LIST } from '../../../../consts';
+import { ConnectMethodResults, WalletId } from '../../../../types';
 import { getPageData, walletConnectAccountInfo } from '../../../../utils';
 
+// TODO: Move this to /types
 interface BrowserConnectParams {
-  broadcast: (
-    eventName: BroadcastEventName,
-    eventData: BroadcastEventData[BroadcastEventName]
-  ) => void;
-  connectionTimeout: number;
   duration?: number;
   groupAddress?: string;
   individualAddress?: string;
   jwtExpiration?: number;
   prohibitGroups?: boolean;
-  resetState: () => void;
-  setState: WCSSetState;
   walletAppId: WalletId;
 }
 
@@ -28,15 +16,11 @@ interface BrowserConnectParams {
 const BROWSER_MESSAGE_WALLETS = 'figure_extension';
 
 export const browserConnect = async ({
-  broadcast: broadcastEvent,
-  connectionTimeout,
   duration,
   groupAddress,
   individualAddress,
   jwtExpiration,
   prohibitGroups,
-  resetState,
-  setState,
   walletAppId,
 }: BrowserConnectParams) => {
   const results: ConnectMethodResults = {};
@@ -89,35 +73,25 @@ export const browserConnect = async ({
     } = walletConnectAccountInfo(accounts);
     // We are now connected, update the walletConnectService state and broadcast the connection event to listening dApps
     if (!error) {
-      const connectionEST = Date.now();
-      const connectionEXP = connectionTimeout + connectionEST;
-      setState({
-        connectionEST,
-        connectionEXP,
-        status: 'connected',
-        walletAppId,
-        address,
-        publicKey,
-        signedJWT,
-        walletInfo,
-        ...(attributes && { attributes }),
-        ...(representedGroupPolicy && { representedGroupPolicy }),
-      });
-      broadcastEvent(WINDOW_MESSAGES.CONNECTED, {
-        result: {
-          connectionEST,
-          connectionEXP,
-          connectionType: CONNECTION_TYPES.new_session,
+      const { coin, id, name } = walletInfo;
+      results.state = {
+        connection: { status: 'connected', walletAppId },
+        wallet: {
+          address,
+          publicKey,
+          signedJWT,
+          coin,
+          id,
+          name,
+          ...(attributes && { attributes }),
+          ...(representedGroupPolicy && { representedGroupPolicy }),
         },
-      });
+      };
     }
     // We don't have a valid wallet for a browser connection
     else {
       // Reset the walletConnectService state
-      resetState();
-      broadcastEvent(WINDOW_MESSAGES.DISCONNECT, {
-        result: 'Wallet does not exist',
-      });
+      results.state = 'resetState';
     }
   }
   return results;
