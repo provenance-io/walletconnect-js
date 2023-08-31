@@ -1,3 +1,4 @@
+import { BROWSER_MESSAGE_WALLETS } from '../../../consts';
 import { ConnectMethod, ConnectMethodResults } from '../../../types';
 import { browserConnect } from './browserConnect';
 import { mobileConnect } from './mobileConnect';
@@ -56,20 +57,14 @@ export const connect = async ({
   groupAddress,
   individualAddress,
   jwtExpiration,
-  noPopup,
   prohibitGroups,
   walletAppId,
 }: ConnectMethod): Promise<ConnectMethodResults> => {
-  // TODO: Move this into /consts
-  const BROWSER_MESSAGE_WALLETS = 'figure_extension';
-  let connectResults: ConnectMethodResults = {
-    error: 'Connection failed, unknown error',
-  };
+  let connectResults: ConnectMethodResults = {};
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
   if (walletAppId && BROWSER_MESSAGE_WALLETS.includes(walletAppId)) {
     connectResults = await browserConnect({
       walletAppId,
-      duration,
       groupAddress,
       individualAddress,
       jwtExpiration,
@@ -79,24 +74,25 @@ export const connect = async ({
   // We either don't have a requested wallet or we're not using the browser wallet messaging
   else {
     connectResults = await mobileConnect({
-      state,
       bridge,
-      duration,
+      timeout: duration,
       groupAddress,
       individualAddress,
       jwtExpiration,
-      noPopup,
       prohibitGroups,
       walletAppId,
     });
   }
-  // TODO: What should we be returning?
-  // Mobile connect needs to return a connector
-  // Browser connect doesn't need to return anything
-  // Should we be returning state values to update?
+  // If we are connected, calculate the new connection est/exp times
+  if (connectResults.state?.connection?.status === 'connected') {
+    // TODO: Check to see if it's valid, if it's already expired (session resume), kill the connection
+    // Calculate and set the new exp, est times
+    const est = Date.now();
+    const exp = duration + est;
+    connectResults.state.connection.timeout = duration;
+    connectResults.state.connection.est = est;
+    connectResults.state.connection.exp = exp;
+  }
 
-  // Ideas:
-  // - Return state values to update, broadcast to send, and if we need to reset the state
-  // - connectResults: { state, reset, error }
   return connectResults;
 };

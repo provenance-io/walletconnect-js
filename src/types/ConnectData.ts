@@ -1,3 +1,5 @@
+import { WalletId } from './WalletList';
+
 interface TimePeriod {
   seconds: number;
   nanos: number;
@@ -80,3 +82,16 @@ export type ConnectData = {
     }
   ];
 };
+
+export interface BrowserConnectParams {
+  groupAddress?: string;
+  individualAddress?: string;
+  jwtExpiration?: number;
+  prohibitGroups?: boolean;
+  walletAppId: WalletId;
+}
+
+export interface WalletConnectResponse {
+  accounts?: WalletConnectAccountInfo;
+  error?: string;
+}

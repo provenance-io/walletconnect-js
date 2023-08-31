@@ -60,7 +60,7 @@ export interface WCSState {
 }
 
 export interface WCSSetStateParam extends WCSState {
-  connector?: WalletConnectClient;
+  connector?: WalletConnectClientType;
 }
 
 export type PartialState<T> = {
@@ -68,7 +68,7 @@ export type PartialState<T> = {
 };
 
 export type WCSSetState = (
-  state: Partial<WCSState>,
+  state: PartialState<WCSState>,
   updateLocalStorage?: boolean
 ) => void;
 export type WCSSetFullState = (state: WCSState) => void;
@@ -89,33 +89,32 @@ export interface WCLocalState {
 export type WCLocalStateKeys = keyof WCLocalState;
 
 export interface ConnectMethod {
-  bridge?: string;
-  duration?: number;
+  bridge: string;
+  duration: number;
   noPopup?: boolean;
   individualAddress?: string;
   groupAddress?: string;
   prohibitGroups?: boolean;
   jwtExpiration?: number;
-  walletAppId?: WalletId;
+  walletAppId: WalletId;
   onDisconnect?: (message?: string) => void;
 }
 
 export interface ConnectMethodResults {
-  state?: Partial<WCSState>;
+  state?: PartialState<WCSState>;
   error?: string;
   resetState?: boolean;
+  connector?: WalletConnectClientType;
 }
 
 export interface WalletConnectInitMethod {
   bridge?: string;
-  duration?: number;
-  noPopup?: boolean;
+  timeout?: number;
   individualAddress?: string;
   groupAddress?: string;
   prohibitGroups?: boolean;
   jwtExpiration?: number;
   walletAppId?: WalletId;
-  state: WCSState;
 }
 
 export interface SendMessageMethod {

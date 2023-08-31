@@ -1,4 +1,4 @@
-import { ConnectionType } from '../types';
+// import { ConnectionType } from '../types';
 
 export const CONNECTOR_EVENTS = {
   connect: 'connect',
@@ -10,10 +10,10 @@ export const CONNECTOR_EVENTS = {
   wc_sessionUpdate: 'wc_sessionUpdate',
 } as const;
 
-export const CONNECTION_TYPES: {
-  existing_session: ConnectionType;
-  new_session: ConnectionType;
-} = {
-  existing_session: 'existing session',
-  new_session: 'new session',
-} as const;
+// export const CONNECTION_TYPES: {
+//   existing_session: ConnectionType;
+//   new_session: ConnectionType;
+// } = {
+//   existing_session: 'existing session',
+//   new_session: 'new session',
+// } as const;

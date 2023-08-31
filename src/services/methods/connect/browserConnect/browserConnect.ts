@@ -1,22 +1,12 @@
 import { WALLET_LIST } from '../../../../consts';
-import { ConnectMethodResults, WalletId } from '../../../../types';
+import {
+  BrowserConnectParams,
+  ConnectMethodResults,
+  WalletConnectResponse,
+} from '../../../../types';
 import { getPageData, walletConnectAccountInfo } from '../../../../utils';
 
-// TODO: Move this to /types
-interface BrowserConnectParams {
-  duration?: number;
-  groupAddress?: string;
-  individualAddress?: string;
-  jwtExpiration?: number;
-  prohibitGroups?: boolean;
-  walletAppId: WalletId;
-}
-
-// TODO: Move this into /consts
-const BROWSER_MESSAGE_WALLETS = 'figure_extension';
-
 export const browserConnect = async ({
-  duration,
   groupAddress,
   individualAddress,
   jwtExpiration,
@@ -27,28 +17,23 @@ export const browserConnect = async ({
   // Find the target wallet based on the app id
   const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
   // Must have a wallet with an eventAction to continue
-  if (
-    BROWSER_MESSAGE_WALLETS.includes(walletAppId) &&
-    knownWalletApp &&
-    knownWalletApp.eventAction
-  ) {
+  if (knownWalletApp && knownWalletApp.eventAction) {
     // Pull page specific information out of the dApp to share with the wallet
     const {
       origin: requestOrigin,
       favicon: requestFavicon,
       title: requestName,
     } = getPageData();
-    // Result will either have data or an error
-    let result;
-    // Wrapping event action with a try/catch to catch upstream rejects
+    // walletResponse will either have data or an error
+    let walletResponse: WalletConnectResponse;
+    // Wrapping event action with a try/catch for upstream rejects
     try {
       console.log('wcjs | browserConnect | eventAction wait');
-      result = await knownWalletApp.eventAction({
+      walletResponse = await knownWalletApp.eventAction({
         event: 'basic_event',
         request: {
           ...(individualAddress && { individualAddress }),
           ...(groupAddress && { groupAddress }),
-          ...(duration && { duration }),
           ...(jwtExpiration && { jwtExpiration }),
           ...(prohibitGroups && { prohibitGroups }),
           ...(requestOrigin && { requestOrigin }),
@@ -58,11 +43,14 @@ export const browserConnect = async ({
         },
       });
     } catch (error) {
-      result = { error };
+      walletResponse = { error: `${error}` };
     }
-    console.log('wcjs | browserConnect | eventAction result: ', result);
+    console.log(
+      'wcjs | browserConnect | eventAction walletResponse: ',
+      walletResponse
+    );
     // At this point, result will either have account data or an error
-    const { accounts, error } = result;
+    const { accounts, error } = walletResponse;
     const {
       address,
       attributes,
@@ -71,7 +59,7 @@ export const browserConnect = async ({
       representedGroupPolicy,
       walletInfo,
     } = walletConnectAccountInfo(accounts);
-    // We are now connected, update the walletConnectService state and broadcast the connection event to listening dApps
+    // We are now connected: update wcs state
     if (!error) {
       const { coin, id, name } = walletInfo;
       results.state = {
@@ -88,11 +76,12 @@ export const browserConnect = async ({
         },
       };
     }
-    // We don't have a valid wallet for a browser connection
-    else {
-      // Reset the walletConnectService state
-      results.state = 'resetState';
-    }
   }
+  // We don't have a valid wallet for a browser connection
+  else {
+    // Reset the walletConnectService state
+    results.resetState = true;
+  }
+
   return results;
 };

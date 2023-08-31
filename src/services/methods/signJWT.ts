@@ -1,19 +1,19 @@
-import base64url from 'base64url';
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import { verifySignature } from '../../helpers';
+import base64url from 'base64url';
 import {
-  WALLET_LIST,
-  WALLET_APP_EVENTS,
   PROVENANCE_METHODS,
+  WALLET_APP_EVENTS,
+  WALLET_LIST,
   WINDOW_MESSAGES,
 } from '../../consts';
-import { rngNum } from '../../utils';
+import { verifySignature } from '../../helpers';
 import type {
   BroadcastEventData,
   WCSSetState,
   WalletConnectClientType,
   WalletId,
 } from '../../types';
+import { rngNum } from '../../utils';
 
 interface SignJWT {
   address: string;
@@ -98,7 +98,7 @@ export const signJWT = async ({
     const signedPayloadEncoded = base64url(signature);
     const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
     // Update JWT within the wcjs state
-    setState({ signedJWT });
+    setState({ wallet: { signedJWT } });
     return {
       valid,
       result: { signature: result, signedJWT, expires: finalExpiresSec },

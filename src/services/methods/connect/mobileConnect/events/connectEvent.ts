@@ -1,27 +1,8 @@
-import {
-  CONNECTION_TYPES,
-  WALLET_APP_EVENTS,
-  WINDOW_MESSAGES,
-} from '../../../../../consts';
-import type {
-  BroadcastEventData,
-  BroadcastEventName,
-  ConnectData,
-  WCSSetState,
-  WCSState,
-} from '../../../../../types';
-import { sendWalletEvent, walletConnectAccountInfo } from '../../../../../utils';
+import type { ConnectData, ConnectMethodResults } from '../../../../../types';
+import { walletConnectAccountInfo } from '../../../../../utils';
 
 interface ConnectEventParams {
   payload: ConnectData;
-  broadcast: (
-    eventName: BroadcastEventName,
-    eventData: BroadcastEventData[BroadcastEventName]
-  ) => void;
-  setState: WCSSetState;
-  getState: () => WCSState;
-  startConnectionTimer: () => void;
-  connectionTimeout: number;
 }
 
 // ------------------------
@@ -32,16 +13,9 @@ interface ConnectEventParams {
 // - Broadcast "connect" event (let the dApp know)
 // - Start the "connection timer" to auto-disconnect wcjs when session is expired
 // - Trigger wallet event for "connect" (let the wallet know)
-export const connectEvent = ({
-  payload,
-  broadcast,
-  setState,
-  startConnectionTimer,
-  getState,
-  connectionTimeout,
-}: ConnectEventParams) => {
-  const connectionEST = Date.now();
-  const connectionEXP = connectionTimeout + connectionEST;
+export const connectEvent = ({ payload }: ConnectEventParams) => {
+  const results: ConnectMethodResults = {};
+
   const data = payload.params[0];
   const { accounts, peerMeta: peer } = data;
   const {
@@ -52,26 +26,23 @@ export const connectEvent = ({
     representedGroupPolicy,
     walletInfo,
   } = walletConnectAccountInfo(accounts);
-  setState({
-    address,
-    attributes,
-    connectionEST,
-    connectionEXP,
-    status: 'connected',
-    peer,
-    publicKey,
-    representedGroupPolicy,
-    signedJWT,
-    walletInfo,
-  });
-  broadcast(WINDOW_MESSAGES.CONNECTED, {
-    result: {
-      connectionEST,
-      connectionEXP,
-      connectionType: CONNECTION_TYPES.new_session,
+  const { coin, id, name } = walletInfo;
+  results.state = {
+    wallet: {
+      address,
+      attributes,
+      publicKey,
+      representedGroupPolicy,
+      signedJWT,
+      coin,
+      id,
+      name,
     },
-  });
-  startConnectionTimer();
-  const { walletAppId } = getState();
-  if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.CONNECT);
+    connection: {
+      status: 'connected',
+      peer,
+    },
+  };
+
+  return results;
 };

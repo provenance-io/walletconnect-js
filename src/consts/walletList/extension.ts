@@ -12,7 +12,7 @@ export const FIGURE_EXTENSION = {
       const sendMessageEvent = new CustomEvent(EVENT_WCJS_MESSAGE, {
         detail: eventData,
       });
-      console.log('wcjs | eventAction | dispatchEvent: ', eventData);
+      console.log('wcjs | eventAction | sendMessageEvent: ', sendMessageEvent);
       dispatchEvent(sendMessageEvent);
       // We will resolve this once we get a response back from content-script.js
       // Only listen once

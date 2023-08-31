@@ -1,5 +1,5 @@
 import QRCode from 'qrcode';
-import figureLogo from '../../../images/figure.svg';
+import figureLogo from '../../../../images/figure.svg';
 
 export const createQRImage = (qrData: string): Promise<string> =>
   new Promise((resolve) => {

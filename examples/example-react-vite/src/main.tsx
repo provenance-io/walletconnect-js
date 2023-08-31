@@ -1,15 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
 import { WalletConnectContextProvider } from '@provenanceio/walletconnect-js';
+import { CONNECT_URL } from 'consts';
+import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Theme } from 'theme';
-import { CONNECT_URL } from 'consts';
 import { App } from './App';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <Router>
       <WalletConnectContextProvider
-        logsEnabled={true}
         connectionRedirect={
           !window.location.href.includes('dapp')
             ? `${window.location.origin}${CONNECT_URL}`

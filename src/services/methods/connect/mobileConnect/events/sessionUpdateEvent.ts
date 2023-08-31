@@ -1,16 +1,5 @@
-import {
-  CONNECTION_TYPES,
-  WALLET_APP_EVENTS,
-  WINDOW_MESSAGES,
-} from '../../../../../consts';
-import {
-  BroadcastEventData,
-  BroadcastEventName,
-  ConnectData,
-  WCSSetState,
-  WCSState,
-} from '../../../../../types';
-import { sendWalletEvent, walletConnectAccountInfo } from '../../../../../utils';
+import { ConnectData, ConnectMethodResults } from '../../../../../types';
+import { walletConnectAccountInfo } from '../../../../../utils';
 
 // ------------------------
 // UPDATE SESSION EVENT
@@ -22,33 +11,18 @@ import { sendWalletEvent, walletConnectAccountInfo } from '../../../../../utils'
 
 interface SessionUpdateEventParams {
   payload: ConnectData;
-  broadcast: (
-    eventName: BroadcastEventName,
-    eventData: BroadcastEventData[BroadcastEventName]
-  ) => void;
-  setState: WCSSetState;
-  getState: () => WCSState;
-  startConnectionTimer: () => void;
-  connectionTimeout: number;
 }
 
-export const sessionUpdateEvent = ({
-  payload,
-  connectionTimeout,
-  setState,
-  broadcast,
-  startConnectionTimer,
-  getState,
-}: SessionUpdateEventParams) => {
+export const sessionUpdateEvent = ({ payload }: SessionUpdateEventParams) => {
+  const connectResults: ConnectMethodResults = {
+    error: 'Connection failed, unknown error',
+  };
   const data = payload.params[0];
   const { accounts, peerMeta: peer } = data;
   if (!accounts) {
     //if no accounts, likely a post disconnect update - bail
     return;
   }
-  // Update connection expiration times
-  const connectionEST = Date.now();
-  const connectionEXP = connectionTimeout + connectionEST;
   // Pull out all known information about the current account
   const {
     address,
@@ -58,30 +32,22 @@ export const sessionUpdateEvent = ({
     representedGroupPolicy,
     walletInfo,
   } = walletConnectAccountInfo(accounts);
+  const { coin, id, name } = walletInfo;
   // Save pulled information into wcjs state
-  setState({
-    address,
-    attributes,
-    connectionEST,
-    connectionEXP,
-    status: 'connected',
-    peer,
-    publicKey,
-    representedGroupPolicy,
-    signedJWT,
-    walletInfo,
-  });
-  // Let all listening dApps know that we've updated our session
-  broadcast(WINDOW_MESSAGES.SESSION_UPDATED, {
-    result: {
-      connectionEST,
-      connectionEXP,
-      connectionType: CONNECTION_TYPES.existing_session,
+  connectResults.state = {
+    wallet: {
+      address,
+      attributes,
+      publicKey,
+      representedGroupPolicy,
+      signedJWT,
+      coin,
+      id,
+      name,
     },
-  });
-  // Start a new connection expiration timer
-  startConnectionTimer();
-  // If we know the type of currently connected wallet, send a session updated event to it
-  const { walletAppId } = getState();
-  if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
+    connection: {
+      status: 'connected',
+      peer,
+    },
+  };
 };

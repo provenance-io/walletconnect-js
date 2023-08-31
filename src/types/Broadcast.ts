@@ -9,15 +9,15 @@ type BroadcastEventNameKey = keyof typeof WINDOW_MESSAGES;
 export type BroadcastEventName = typeof WINDOW_MESSAGES[BroadcastEventNameKey];
 
 // All the different walletConnectService method results
-export type ConnectionType = 'existing session' | 'new session';
-export interface ConnectMethodResult {
-  connectionEST: number;
-  connectionEXP: number;
-  connectionType: ConnectionType;
-}
-export interface ConnectMethodEventData extends BasicBroadcastEventData {
-  result?: ConnectMethodResult;
-}
+// export type ConnectionType = 'existing session' | 'new session';
+// export interface ConnectMethodResult {
+//   connectionEST: number;
+//   connectionEXP: number;
+//   connectionType: ConnectionType;
+// }
+// export interface ConnectMethodEventData extends BasicBroadcastEventData {
+//   result?: ConnectMethodResult;
+// }
 
 export interface DisconnectMethodResult extends BasicBroadcastEventData {
   message?: string;
@@ -113,8 +113,8 @@ interface BasicBroadcastEventData {
 
 // All the possible BroadcastResults mapped
 export interface BroadcastEventData {
-  [WINDOW_MESSAGES.CONNECTED]: ConnectMethodEventData;
-  [WINDOW_MESSAGES.SESSION_UPDATED]: ConnectMethodEventData;
+  // [WINDOW_MESSAGES.CONNECTED]: ConnectMethodEventData;
+  // [WINDOW_MESSAGES.SESSION_UPDATED]: ConnectMethodEventData;
   [WINDOW_MESSAGES.DISCONNECT]: DisconnectMethodEventData;
   [WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]: SendMessageMethodEventData;
   [WINDOW_MESSAGES.SEND_MESSAGE_FAILED]: SendMessageMethodEventData;

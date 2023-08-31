@@ -2,6 +2,7 @@ import WalletConnectClient from '@walletconnect/client';
 import { Buffer } from 'buffer';
 import {
   LOCAL_STORAGE_NAMES,
+  WALLETCONNECT_BRIDGE_URL,
   WALLET_APP_EVENTS,
   WCS_DEFAULT_STATE,
 } from '../consts';
@@ -103,6 +104,10 @@ export class WalletConnectService {
     // Pull 'walletconnect' and 'walletconnect-js' localStorage values to see if we might already be connected
     const { existingWCJSState, existingWCState } = getLocalStorageValues();
     // Merge all the existing wcjs values from localStorage into state
+    // TODO: We need to think this through, certain values don't need to be saved (eg: status: 'pending')
+    // If we were previously "pending" we will no longer be "pending"
+    if (existingWCJSState?.connection?.status === 'pending')
+      existingWCJSState.connection.status = 'disconnected';
     this.#setState(existingWCJSState);
     // Are we already connected with walletconnect?
     if (
@@ -185,13 +190,20 @@ export class WalletConnectService {
     this.#setState(newState);
   }
 
+  // WalletConnect-JS localStorage values changed, just merge it into state since we will store everything now
+  #localStorageChangeBrowserWallet(newValue: string | null) {
+    // TODO: We don't want to do this, doing this will mean if one page is loading the other page should be loading too
+    // Need to pick out certain things we care about and ignore the others (state wise)
+    const newValueObj = JSON.parse(newValue || '{}') as PartialState<WCSState>;
+    this.#setState(newValueObj);
+  }
+
   // One or more values within localStorage have changed, see if we care about any of the values and update the state as needed
   #handleLocalStorageChange(storageEvent: StorageEvent) {
     const { key: storageEventKey, newValue } = storageEvent;
     // Info: Another tab triggered a disconnect, or "switch account", connectionTimeout reset, etc
     if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECTJS)
-      // WalletConnect-JS localStorage values changed, just merge it into state since we will store everything now
-      this.#setState(JSON.parse(newValue || '{}') as PartialState<WCSState>);
+      this.#localStorageChangeBrowserWallet(newValue);
     // WalletConnect localStorage values changed
     else if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECT)
       this.#localStorageChangeWalletConnect(newValue);
@@ -260,36 +272,49 @@ export class WalletConnectService {
    * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
-   * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
+   * @param walletAppId - (required) Open a specific wallet directly (bypassing the QRCode modal)
    * @param onDisconnect - (optional) Action to take if a disconnect call comes in (to handle wallet disconnecting from dApp)
    */
   connect = async ({
     individualAddress,
     groupAddress,
-    bridge,
-    duration,
+    bridge = WALLETCONNECT_BRIDGE_URL,
+    duration = this.state.connection.timeout,
     jwtExpiration,
     prohibitGroups,
     walletAppId,
     onDisconnect,
-  }: ConnectMethod = {}) => {
-    const results = await connectMethod({
-      individualAddress,
-      groupAddress,
-      bridge,
-      duration,
-      jwtExpiration,
-      prohibitGroups,
-      walletAppId,
-    });
-    // Based on the results perform service actions
-    if (results.error) return { error: results.error };
-    // No error means we've connected, add the disconnect event if passed in
-    else if (onDisconnect) this.#setState({ connection: { onDisconnect } });
-    if (results.state) this.#setState(results.state);
-    if (results.resetState) this.#setState('reset');
-    // TODO: What should we return to the user?
-    return 'something...';
+  }: ConnectMethod) => {
+    // If we're already connected, ignore this event
+    if (this.state.connection.status !== 'connected') {
+      this.#setState({ connection: { status: 'pending' } });
+      const results = await connectMethod({
+        individualAddress,
+        groupAddress,
+        bridge,
+        duration,
+        jwtExpiration,
+        prohibitGroups,
+        walletAppId,
+      });
+      // Based on the results perform service actions
+      if (results.error) return { error: results.error };
+      // No error means we've connected, add the disconnect event if passed in
+      else {
+        if (onDisconnect) this.#setState({ connection: { onDisconnect } });
+        if (results.connector) this.#connector = results.connector;
+        if (results.resetState) this.#setState('reset');
+        if (results.state) {
+          this.#setState(results.state);
+        }
+        // Start the connection timer
+        this.#startConnectionTimer();
+        // TODO: What should we return to the user?
+        return 'something...';
+      }
+    } else {
+      return { error: 'Already connected' };
+    }
   };
 
   /**

@@ -2,12 +2,11 @@ import type { BroadcastEventData, WalletId } from '@provenanceio/walletconnect-j
 import {
   QRCodeModal,
   WALLET_LIST,
-  WINDOW_MESSAGES,
-  useWalletConnect,
+  useWalletConnect
 } from '@provenanceio/walletconnect-js';
 import { Button, Card, Checkbox, Dropdown, Input, Results } from 'Components';
 import { BRIDGE_URLS, ICON_NAMES } from 'consts';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { COLORS, FONTS } from 'theme';
@@ -63,29 +62,15 @@ export const Connect: React.FC = () => {
   const [showQRCode, setShowQRCode] = useState(false);
   const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { status, modal } = walletConnectState;
-  const { QRCodeImg, dynamicUrl } = modal;
+  const { status } = walletConnectState.connection;
+  const { QRCodeImg, dynamicUrl } = walletConnectState.modal;
   const navigate = useNavigate();
-
-  // Listen for a connection, then redirect to action page
-  useEffect(() => {
-    if (initialLoad) {
-      setInitialLoad(false);
-      wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {
-        setResults(eventResults);
-        console.log('dApp | CONNECTED event: ', eventResults);
-      });
-      wcs.addListener(WINDOW_MESSAGES.DISCONNECT, (eventResults) => {
-        setResults(eventResults.result)
-      });
-    }
-  }, [wcs, navigate, initialLoad, walletConnectState]);
 
   const toggleAdvancedOptions = () => {
     setShowAdvanced(!showAdvanced);
   };
 
-  const handleConnect = async (walletAppId?: WalletId, mobileDirect?: boolean) => {
+  const handleConnect = async (walletAppId: WalletId, mobileDirect?: boolean) => {
     // Check to see if the wallet exists
     if (walletAppId) {
       // If we find the target walletAppId in the walletList
@@ -105,7 +90,7 @@ export const Connect: React.FC = () => {
     setShowQRCode(false);
     // Run connect method based on current state values
     const finalBridge = customBridge ? customBridge : selectedBridge !== 'custom' ? selectedBridge : BRIDGE_URLS[0];
-    await wcs.init({
+    await wcs.connect({
       // Use custom if given, or if left blank but custom selected, use the first in the options array
       bridge: finalBridge,
       duration: Number(sessionDuration),
@@ -196,9 +181,6 @@ export const Connect: React.FC = () => {
           </AdvancedOptions>
         )}
         {showQRCode && !!walletConnectState.modal.QRCodeImg && <div><img src={walletConnectState.modal.QRCodeImg} /></div>}
-        <Button onClick={handleConnect}>
-          Connect with Prebuilt Modal
-        </Button>
         <DirectConnectButton onClick={() => handleConnect('figure_extension')}>
           Connect directly with Figure Extension Wallet
         </DirectConnectButton>

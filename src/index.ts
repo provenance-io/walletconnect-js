@@ -1,27 +1,23 @@
 export * from './Components';
-export * from './hooks';
-export * from './contexts';
-export * from './services';
-export * from './consts/windowMessages';
-export * from './consts/walletList';
 export * from './consts/walletConnect';
+export * from './consts/walletList';
+export * from './consts/windowMessages';
+export * from './contexts';
+export * from './hooks';
+export * from './services';
 
 export type {
-  ProvenanceMethod,
-  WalletConnectServiceStatus,
-  ConnectMethod,
-  // Broadcast events for methods
   BroadcastEventData,
-  SignHexMessageMethodResult,
-  SignHexMessageMethodEventData,
-  SignJWTMethodResult,
-  SignJWTMethodEventData,
-  SendMessageMethodResult,
-  SendMessageMethodEventData,
-  DisconnectMethodResult,
+  ConnectMethod,
   DisconnectMethodEventData,
-  ConnectMethodResult,
-  ConnectMethodEventData,
+  DisconnectMethodResult,
+  ProvenanceMethod,
+  SendMessageMethodEventData,
+  SendMessageMethodResult,
+  SignHexMessageMethodEventData,
+  SignHexMessageMethodResult,
+  SignJWTMethodEventData,
+  SignJWTMethodResult,
   SwitchToGroupMethodEventData,
   // Wallet info
   WalletId,

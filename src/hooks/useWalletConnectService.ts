@@ -9,8 +9,6 @@ export const useWalletConnectService = () => {
 
   useEffect(() => {
     walletConnectService.setContextUpdater(setWalletConnectState); // Whenever we change the react state, update the class state
-
-    return () => walletConnectService.removeListener('all');
   }, [walletConnectService]);
 
   return { walletConnectState, walletConnectService };
