@@ -1,12 +1,12 @@
-import styled from 'styled-components';
-import { useCallback, useEffect, useState } from 'react';
-import { Navigation, Sprite, Checkbox } from 'Components';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import { Checkbox, Navigation, Sprite } from 'Components';
 import { CONNECT_URL, ICON_NAMES } from 'consts';
+import { useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { COLORS } from 'theme';
 import { handleLocalStorageChange } from 'utils';
-import { Countdowns } from './Countdowns';
 import { AccountInfo } from './AccountInfo';
+import { Countdowns } from './Countdowns';
 
 const FullSidebar = styled.div<{ mobileShow: boolean }>`
   width: 200px;
@@ -93,7 +93,7 @@ export const Sidebar: React.FC = () => {
   const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const [loggingActive, setLoggingActive] = useState(false);
   const [nightmode, setNightmode] = useState(false);
-  const { status } = walletConnectState;
+  const { status } = walletConnectState.connection;
   const version = `v${APP_VERSION || 'v?.?.?'}`;
 
   // Hack: At some later point should implement a real thememing system, for now, the white background just needs a way to be disabled

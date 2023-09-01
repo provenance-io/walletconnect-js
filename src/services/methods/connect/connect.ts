@@ -1,5 +1,5 @@
 import { BROWSER_MESSAGE_WALLETS } from '../../../consts';
-import { ConnectMethod, ConnectMethodResults } from '../../../types';
+import { ConnectMethodFunction, ConnectMethodResults } from '../../../types';
 import { browserConnect } from './browserConnect';
 import { mobileConnect } from './mobileConnect';
 
@@ -59,7 +59,7 @@ export const connect = async ({
   jwtExpiration,
   prohibitGroups,
   walletAppId,
-}: ConnectMethod): Promise<ConnectMethodResults> => {
+}: ConnectMethodFunction): Promise<ConnectMethodResults> => {
   let connectResults: ConnectMethodResults = {};
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
   if (walletAppId && BROWSER_MESSAGE_WALLETS.includes(walletAppId)) {

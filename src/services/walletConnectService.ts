@@ -297,21 +297,22 @@ export class WalletConnectService {
         prohibitGroups,
         walletAppId,
       });
+      console.log('wcjs | walletConnectService.ts | connect results: ', results);
       // Based on the results perform service actions
-      if (results.error) return { error: results.error };
+      // if (results.error) return { error: results.error };
       // No error means we've connected, add the disconnect event if passed in
-      else {
-        if (onDisconnect) this.#setState({ connection: { onDisconnect } });
-        if (results.connector) this.#connector = results.connector;
-        if (results.resetState) this.#setState('reset');
-        if (results.state) {
-          this.#setState(results.state);
-        }
+      // else {
+      if (onDisconnect) this.#setState({ connection: { onDisconnect } });
+      if (results.connector) this.#connector = results.connector;
+      if (results.resetState) this.#setState('reset');
+      if (results.state) {
+        this.#setState(results.state);
         // Start the connection timer
         this.#startConnectionTimer();
-        // TODO: What should we return to the user?
-        return 'something...';
       }
+      // TODO: What should we return to the user? Right now returning everything...
+      return results;
+      // }
     } else {
       return { error: 'Already connected' };
     }

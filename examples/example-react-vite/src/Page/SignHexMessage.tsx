@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import type { BroadcastEventData } from '@provenanceio/walletconnect-js';
-import { Button, Input, ActionCard, Results } from 'Components';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import { ActionCard, Button, Input, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
+import { useState } from 'react';
 
 export const SignHexMessage: React.FC = () => {
   const [value, setValue] = useState('');
   const [customId, setCustomId] = useState('');
   const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
-  const { pendingMethod } = walletConnectState;
+  const { pendingMethod } = walletConnectState.connection;
   const signMessageLoading = pendingMethod === 'signHexMessage';
 
   const handleSubmit = async () => {

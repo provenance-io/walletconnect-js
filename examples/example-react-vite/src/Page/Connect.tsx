@@ -90,16 +90,17 @@ export const Connect: React.FC = () => {
     setShowQRCode(false);
     // Run connect method based on current state values
     const finalBridge = customBridge ? customBridge : selectedBridge !== 'custom' ? selectedBridge : BRIDGE_URLS[0];
-    await wcs.connect({
+    const results = await wcs.connect({
       // Use custom if given, or if left blank but custom selected, use the first in the options array
       bridge: finalBridge,
-      duration: Number(sessionDuration),
-      individualAddress,
-      groupAddress,
-      prohibitGroups: !groupsAllowed,
-      jwtExpiration: Number(jwtExpiration),
+      ...(sessionDuration && {duration: Number(sessionDuration)}),
+      ...(individualAddress && {individualAddress}),
+      ...(groupAddress && {groupAddress}),
+      ...(!groupsAllowed && {prohibitGroups: !groupsAllowed}),
+      ...(jwtExpiration && {jwtExpiration: Number(jwtExpiration)}),
       walletAppId,
     })
+    setResults(results);
     // If connection with mobile directly, just show the QRCode
     if (mobileDirect) {
       setShowQRCode(true);
@@ -200,6 +201,7 @@ export const Connect: React.FC = () => {
           walletConnectService={wcs}
           devWallets={['figure_hosted_test', 'figure_mobile_test']}
         />
+        <Results results={results} setResults={setResults} />
       </Card>
     );
   return (

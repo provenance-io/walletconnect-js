@@ -89,8 +89,8 @@ export interface WCLocalState {
 export type WCLocalStateKeys = keyof WCLocalState;
 
 export interface ConnectMethod {
-  bridge: string;
-  duration: number;
+  bridge?: string;
+  duration?: number;
   noPopup?: boolean;
   individualAddress?: string;
   groupAddress?: string;
@@ -99,6 +99,10 @@ export interface ConnectMethod {
   walletAppId: WalletId;
   onDisconnect?: (message?: string) => void;
 }
+export type ConnectMethodFunction = ConnectMethod & {
+  bridge: string;
+  duration: number;
+};
 
 export interface ConnectMethodResults {
   state?: PartialState<WCSState>;

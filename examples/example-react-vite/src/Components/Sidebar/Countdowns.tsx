@@ -1,9 +1,9 @@
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
+import { Button, CountdownTimer, Modal } from 'Components';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { COLORS } from 'theme';
-import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { decodeJWT } from 'utils';
-import { CountdownTimer, Modal, Button } from 'Components';
 
 const RowInfo = styled.div`
   padding: 0 20px 0 40px;
@@ -69,11 +69,12 @@ export const Countdowns: React.FC = () => {
   const [showPopupModal, setShowPopupModal] = useState(false); // Popup modal will warn the user befor the JWT or Connection expire
   const [popupModalMsg, setPopupModalMsg] = useState(''); // What message should the popup modal display?
   const { walletConnectState } = useWalletConnect();
-  const { address, status, connectionEXP, signedJWT } = walletConnectState;
+  const { status, exp: connectionEXP } = walletConnectState.connection;
+  const { address, signedJWT } = walletConnectState.wallet;
   const connected = status === 'connected';
   // Need to decode signedJWT and note the expiration time
   const { payload: JWTPayload, valid: JWTValid } = decodeJWT(signedJWT, {
-    addr: address,
+    addr: address || 'n/a',
   });
   // Pull out expiration date for jwt (in seconds)
   const { exp: JWTExpSec } = JWTPayload;

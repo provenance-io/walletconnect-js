@@ -1,7 +1,7 @@
-import styled from 'styled-components';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
-import { COLORS } from 'theme';
 import { CopyValue } from 'Components';
+import styled from 'styled-components';
+import { COLORS } from 'theme';
 
 const RowInfo = styled.div`
   padding: 0 20px 0 40px;
@@ -39,13 +39,8 @@ const RowInfoValue = styled.div`
 
 export const AccountInfo: React.FC = () => {
   const { walletConnectState } = useWalletConnect();
-  const {
-    address,
-    walletInfo = {},
-    bridge,
-    representedGroupPolicy,
-  } = walletConnectState;
-  const { name: walletName } = walletInfo;
+  const { bridge } = walletConnectState.connection;
+  const { address, representedGroupPolicy, name: walletName } = walletConnectState.wallet;
   const groupAddress = representedGroupPolicy?.address;
 
   const logCurrentState = () => {

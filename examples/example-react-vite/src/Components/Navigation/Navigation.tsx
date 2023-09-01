@@ -1,20 +1,20 @@
-import styled from 'styled-components';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
 import { Sprite } from 'Components';
-import { useState } from 'react';
 import {
   CONNECT_URL,
   ICON_NAMES,
+  REMOVE_PENDING_METHOD_URL,
   RESET_CONNECTION_URL,
   SEND_COIN_URL,
   SEND_MESSAGE_URL,
-  SIGN_JWT_URL,
   SIGN_HEX_MESSAGE_URL,
+  SIGN_JWT_URL,
   SWITCH_TO_GROUP_URL,
-  REMOVE_PENDING_METHOD_URL,
 } from 'consts';
-import { COLORS } from 'theme';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { COLORS } from 'theme';
 
 const NavContainer = styled.div`
   position: relative;
@@ -100,7 +100,7 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
   const navigate = useNavigate();
   // eslint-disable-line react/prop-types
   const { walletConnectService, walletConnectState } = useWalletConnect();
-  const { status } = walletConnectState;
+  const { status } = walletConnectState.connection;
   const connected = status === 'connected';
 
   const handleDisconnect = () => {

@@ -76,6 +76,11 @@ export const browserConnect = async ({
         },
       };
     }
+    // We have an error (likely just rejected connection by user) - set status to disconnected
+    else {
+      results.resetState = true;
+      results.error = error;
+    }
   }
   // We don't have a valid wallet for a browser connection
   else {
