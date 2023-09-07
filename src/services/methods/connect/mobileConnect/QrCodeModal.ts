@@ -2,8 +2,8 @@ import { WalletId } from '../../../../types';
 
 interface QRCodeModalState {
   connectionWalletAppId?: WalletId;
-  timeout?: number;
-  jwtExpiration?: number;
+  connectionDuration?: number;
+  jwtDuration?: number;
   prohibitGroups?: boolean;
   requiredGroupAddress?: string;
   requiredIndividualAddress?: string;
@@ -27,8 +27,8 @@ export class QRCodeModal {
       requiredIndividualAddress,
       requiredGroupAddress,
       prohibitGroups,
-      jwtExpiration,
-      timeout,
+      jwtDuration,
+      connectionDuration,
       onOpenCallback,
     } = this.state;
     // Check for address and prohibit groups values to append to the wc value for the wallet to read when connecting
@@ -39,11 +39,11 @@ export class QRCodeModal {
       ? `&groupAddress=${requiredGroupAddress}`
       : '';
     const prohibitGroupsParam = prohibitGroups ? `&prohibitGroups=true` : '';
-    const jwtExpirationParam = jwtExpiration
-      ? `&jwtExpiration=${jwtExpiration}`
+    const jwtDurationParam = jwtDuration ? `&jwtExpiration=${jwtDuration}` : '';
+    const connectionDurationParam = connectionDuration
+      ? `&connectionDuration=${connectionDuration}`
       : '';
-    const connectionDurationParam = timeout ? `&connectionDuration=${timeout}` : '';
-    const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}${connectionDurationParam}`;
+    const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtDurationParam}${connectionDurationParam}`;
     // If we need to open a wallet directly, we won't be opening the QRCodeModal and will instead trigger that wallet directly
     // if (connectionWalletAppId) openDirectWallet(connectionWalletAppId, fullData);
     // Run callback now that we're opened

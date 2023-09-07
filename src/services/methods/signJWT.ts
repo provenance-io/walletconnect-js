@@ -1,6 +1,7 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import base64url from 'base64url';
 import {
+  DEFAULT_CONNECTION_DURATION,
   PROVENANCE_METHODS,
   WALLET_APP_EVENTS,
   WALLET_LIST,
@@ -39,7 +40,7 @@ export const signJWT = async ({
   let valid = false;
   const nowSec = Math.round(Date.now() / 1000); // Current time seconds
   const customExpiresGiven = expires !== undefined;
-  const defaultExpireSec = 1440; // (24hours as seconds)
+  const defaultExpireSec = DEFAULT_CONNECTION_DURATION; // (24hours as seconds)
   const customExpiresSec = customExpiresGiven && expires;
   const finalExpiresSec =
     nowSec + (customExpiresGiven ? (customExpiresSec as number) : defaultExpireSec);

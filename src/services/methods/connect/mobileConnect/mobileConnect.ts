@@ -11,11 +11,11 @@ import { createQRImage } from './createQRImage';
 import { connectEvent, sessionUpdateEvent } from './events';
 
 export const mobileConnect = async ({
-  individualAddress,
-  timeout,
-  groupAddress,
   bridge,
-  jwtExpiration,
+  connectionDuration,
+  groupAddress,
+  individualAddress,
+  jwtDuration,
   prohibitGroups,
   walletAppId,
 }: WalletConnectInitMethod): Promise<ConnectMethodResults> =>
@@ -25,8 +25,8 @@ export const mobileConnect = async ({
     // Send the URI data directly to a specific wallet (instead of opening the qrCodeModal popup)
     // Create a new QRCodeModal class instance for the WalletConnectClient with requested connection params
     const WcQrCodeModal = new QRCodeModal({
-      timeout,
-      jwtExpiration,
+      connectionDuration,
+      jwtDuration,
       prohibitGroups,
       requiredGroupAddress: groupAddress,
       requiredIndividualAddress: individualAddress,

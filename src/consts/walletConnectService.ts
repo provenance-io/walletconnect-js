@@ -1,6 +1,9 @@
 import { AccountAttribute, WCSState } from '../types';
 import { isMobile } from '../utils';
-import { CONNECTION_TIMEOUT } from './connectionTimeouts';
+import {
+  DEFAULT_CONNECTION_DURATION,
+  DEFAULT_JWT_DURATION,
+} from './connectionTimeouts';
 import { WALLETCONNECT_BRIDGE_URL } from './urls';
 
 export const WCS_DEFAULT_STATE: WCSState = {
@@ -8,7 +11,8 @@ export const WCS_DEFAULT_STATE: WCSState = {
     bridge: WALLETCONNECT_BRIDGE_URL,
     est: undefined,
     exp: undefined,
-    timeout: CONNECTION_TIMEOUT,
+    jwtDuration: DEFAULT_JWT_DURATION,
+    connectionDuration: DEFAULT_CONNECTION_DURATION,
     type: undefined,
     onDisconnect: undefined,
     peer: undefined,
@@ -34,3 +38,5 @@ export const WCS_DEFAULT_STATE: WCSState = {
     signedJWT: undefined,
   },
 } as const;
+
+export const WCS_BACKUP_TIMER_INTERVAL = 3000; // 3s interval to check connection status

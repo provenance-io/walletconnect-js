@@ -53,10 +53,10 @@ import { mobileConnect } from './mobileConnect';
 */
 export const connect = async ({
   bridge,
-  duration,
+  connectionDuration,
+  jwtDuration,
   groupAddress,
   individualAddress,
-  jwtExpiration,
   prohibitGroups,
   walletAppId,
 }: ConnectMethodFunction): Promise<ConnectMethodResults> => {
@@ -64,21 +64,22 @@ export const connect = async ({
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
   if (walletAppId && BROWSER_MESSAGE_WALLETS.includes(walletAppId)) {
     connectResults = await browserConnect({
-      walletAppId,
+      connectionDuration,
       groupAddress,
       individualAddress,
-      jwtExpiration,
+      jwtDuration,
       prohibitGroups,
+      walletAppId,
     });
   }
   // We either don't have a requested wallet or we're not using the browser wallet messaging
   else {
     connectResults = await mobileConnect({
       bridge,
-      timeout: duration,
+      connectionDuration,
       groupAddress,
       individualAddress,
-      jwtExpiration,
+      jwtDuration,
       prohibitGroups,
       walletAppId,
     });
@@ -88,11 +89,14 @@ export const connect = async ({
     // TODO: Check to see if it's valid, if it's already expired (session resume), kill the connection
     // Calculate and set the new exp, est times
     const est = Date.now();
-    const exp = duration + est;
-    connectResults.state.connection.timeout = duration;
+    const exp = connectionDuration + est;
+    connectResults.state.connection.connectionDuration = connectionDuration;
+    connectResults.state.connection.jwtDuration = jwtDuration;
     connectResults.state.connection.est = est;
     connectResults.state.connection.exp = exp;
   }
+
+  console.log('wcjs | connect.ts | connectResults: ', connectResults);
 
   return connectResults;
 };

@@ -44,7 +44,8 @@ export interface ConnectionState {
   bridge: string;
   est?: number;
   exp?: number;
-  timeout: number;
+  connectionDuration: number;
+  jwtDuration: number;
   type?: ConnectionType;
   onDisconnect?: (message?: string) => void;
   peer?: IClientMeta;
@@ -90,18 +91,21 @@ export type WCLocalStateKeys = keyof WCLocalState;
 
 export interface ConnectMethod {
   bridge?: string;
-  duration?: number;
+  connectionDuration?: number;
+  jwtDuration?: number;
   noPopup?: boolean;
   individualAddress?: string;
   groupAddress?: string;
   prohibitGroups?: boolean;
-  jwtExpiration?: number;
   walletAppId: WalletId;
   onDisconnect?: (message?: string) => void;
 }
 export type ConnectMethodFunction = ConnectMethod & {
+  // These will always exist since they will show up with defaults
   bridge: string;
-  duration: number;
+  connectionDuration: number;
+  jwtDuration: number;
+  prohibitGroups: boolean;
 };
 
 export interface ConnectMethodResults {
@@ -112,13 +116,13 @@ export interface ConnectMethodResults {
 }
 
 export interface WalletConnectInitMethod {
-  bridge?: string;
-  timeout?: number;
-  individualAddress?: string;
+  bridge: string;
+  connectionDuration: number;
   groupAddress?: string;
-  prohibitGroups?: boolean;
-  jwtExpiration?: number;
-  walletAppId?: WalletId;
+  individualAddress?: string;
+  jwtDuration: number;
+  prohibitGroups: boolean;
+  walletAppId: WalletId;
 }
 
 export interface SendMessageMethod {

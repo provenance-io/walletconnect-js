@@ -104,7 +104,7 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
   const connected = status === 'connected';
 
   const handleDisconnect = () => {
-    walletConnectService.disconnect();
+    walletConnectService.disconnect('Disconnected by user');
   };
 
   const handleActionClick = (name: string, url: string) => {

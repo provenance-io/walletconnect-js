@@ -9,9 +9,10 @@ import { getPageData, walletConnectAccountInfo } from '../../../../utils';
 export const browserConnect = async ({
   groupAddress,
   individualAddress,
-  jwtExpiration,
   prohibitGroups,
   walletAppId,
+  connectionDuration,
+  jwtDuration,
 }: BrowserConnectParams) => {
   const results: ConnectMethodResults = {};
   // Find the target wallet based on the app id
@@ -32,14 +33,15 @@ export const browserConnect = async ({
       walletResponse = await knownWalletApp.eventAction({
         event: 'basic_event',
         request: {
-          ...(individualAddress && { individualAddress }),
-          ...(groupAddress && { groupAddress }),
-          ...(jwtExpiration && { jwtExpiration }),
-          ...(prohibitGroups && { prohibitGroups }),
-          ...(requestOrigin && { requestOrigin }),
-          ...(requestName && { requestName }),
-          ...(requestFavicon.length && { requestFavicon }),
+          jwtDuration,
+          connectionDuration,
+          requestOrigin,
+          requestName,
+          requestFavicon,
+          prohibitGroups,
+          individualAddress,
           method: 'connect',
+          ...(groupAddress && { groupAddress }),
         },
       });
     } catch (error) {

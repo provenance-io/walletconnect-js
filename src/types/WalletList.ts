@@ -17,6 +17,7 @@ export type WalletId =
   | 'figure_mobile_test';
 export type WalletIcons = 'provenance' | 'figure';
 
+// TODO: Type this out, remove any
 export type WalletEventData = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export interface EventRequest {
@@ -26,8 +27,8 @@ export interface EventRequest {
   params?: string[];
   individualAddress?: string;
   groupAddress?: string;
-  duration?: number;
-  jwtExpiration?: number;
+  connectionDuration?: number;
+  jwtDuration?: number;
   prohibitGroups?: boolean;
   requestFavicon?: string[];
   requestOrigin?: string;

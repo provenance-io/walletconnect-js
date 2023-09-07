@@ -56,8 +56,8 @@ export const Connect: React.FC = () => {
   const [groupAddress, setGroupAddress] = useState('');
   const [initialLoad, setInitialLoad] = useState(true);
   const [groupsAllowed, setGroupsAllowed] = useState(true);
-  const [jwtExpiration, setJwtExpiration] = useState('');
-  const [sessionDuration, setSessionDuration] = useState('');
+  const [jwtDuration, setJwtDuration] = useState('');
+  const [connectionDuration, setConnectionDuration] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
@@ -93,12 +93,13 @@ export const Connect: React.FC = () => {
     const results = await wcs.connect({
       // Use custom if given, or if left blank but custom selected, use the first in the options array
       bridge: finalBridge,
-      ...(sessionDuration && {duration: Number(sessionDuration)}),
+      ...(connectionDuration && {connectionDuration: Number(connectionDuration)}),
       ...(individualAddress && {individualAddress}),
       ...(groupAddress && {groupAddress}),
       ...(!groupsAllowed && {prohibitGroups: !groupsAllowed}),
-      ...(jwtExpiration && {jwtExpiration: Number(jwtExpiration)}),
+      ...(jwtDuration && {jwtDuration: Number(jwtDuration)}),
       walletAppId,
+      onDisconnect: (disconnectMessage) => { setResults({result: disconnectMessage}) },
     })
     setResults(results);
     // If connection with mobile directly, just show the QRCode
@@ -161,16 +162,16 @@ export const Connect: React.FC = () => {
               bottomGap
             />
             <Input
-              onChange={setJwtExpiration}
-              value={jwtExpiration}
-              label="Custom JWT Expiration in seconds (optional)"
+              onChange={setJwtDuration}
+              value={jwtDuration}
+              label="Custom JWT Duration in seconds (optional)"
               placeholder="Use default (24 hours)"
               bottomGap
             />
             <Input
-              onChange={setSessionDuration}
-              value={sessionDuration}
-              label="Custom session duration in seconds (optional)"
+              onChange={setConnectionDuration}
+              value={connectionDuration}
+              label="Custom connection duration in seconds (optional)"
               placeholder="Use default (24 hours)"
               bottomGap
             />

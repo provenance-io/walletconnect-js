@@ -1,9 +1,11 @@
 import WalletConnectClient from '@walletconnect/client';
 import { Buffer } from 'buffer';
 import {
+  DEFAULT_JWT_DURATION,
   LOCAL_STORAGE_NAMES,
   WALLETCONNECT_BRIDGE_URL,
   WALLET_APP_EVENTS,
+  WCS_BACKUP_TIMER_INTERVAL,
   WCS_DEFAULT_STATE,
 } from '../consts';
 import type {
@@ -34,6 +36,8 @@ if (window.Buffer === undefined) window.Buffer = Buffer;
 
 export class WalletConnectService {
   #connectionTimer = 0; // Timer tracking when the currenct wcjs connection should expire
+
+  #backupConnectionTimer = 0; // Interval timer running every x seconds checking connection status
 
   #connector?: WalletConnectClientType; // walletconnect connector object
 
@@ -95,6 +99,34 @@ export class WalletConnectService {
     }
   };
 
+  #checkConnectionExpired() {
+    const now = Date.now();
+    if (!this.state.connection.exp || now > this.state.connection.exp) {
+      // Disconnect
+      this.disconnect('Connection Expired');
+    }
+  }
+
+  // Interval timer which will check
+  #backupTimer(status: 'start' | 'clear') {
+    if (status === 'start') {
+      // If we're connected and there is not already a backup timer running, start one
+      if (
+        this.state.connection.status === 'connected' &&
+        !this.#backupConnectionTimer
+      ) {
+        this.#backupConnectionTimer = window.setInterval(
+          () => this.#checkConnectionExpired(),
+          WCS_BACKUP_TIMER_INTERVAL
+        );
+      }
+    }
+    if (status === 'clear' && this.#backupConnectionTimer) {
+      window.clearInterval(this.#backupConnectionTimer);
+      this.#backupConnectionTimer = 0;
+    }
+  }
+
   // Keep the WalletConnect connector saved, but inaccessable/out of the class state
   #setConnector(connector?: WalletConnectClientType) {
     this.#connector = connector;
@@ -123,6 +155,8 @@ export class WalletConnectService {
     }
     // Setup a listener for localStorage changes
     window.addEventListener('storage', this.#handleLocalStorageChange);
+    // If we're connected, start the backup timer
+    if (this.state.connection.status === 'connected') this.#backupTimer('start');
   }
 
   // Allow this class to notify/update the context about state changes
@@ -143,7 +177,7 @@ export class WalletConnectService {
       // Create a new timer
       const newConnectionTimer = window.setTimeout(() => {
         // When this timer expires, kill the session
-        this.disconnect();
+        this.disconnect('Connection Expired');
       }, connectionTimeout);
       // Save this timer (so it can be deleted on a reset)
       this.#connectionTimer = newConnectionTimer;
@@ -235,11 +269,11 @@ export class WalletConnectService {
    *
    * @param connectionTimeout (optional) Seconds to bump the connection timeout by
    */
-  resetConnectionTimeout = (connectionTimeout?: number) => {
+  resetConnectionTimeout = (connectionTimeoutS?: number) => {
     // Use the new (convert to ms) or existing connection timeout
-    const newConnectionTimeout = connectionTimeout
-      ? connectionTimeout * 1000
-      : this.state.connection.timeout;
+    const newConnectionDuration = connectionTimeoutS
+      ? connectionTimeoutS * 1000
+      : this.state.connection.connectionDuration;
     // Kill the last timer (if it exists)
     if (this.#connectionTimer) {
       // Stop timer
@@ -248,10 +282,10 @@ export class WalletConnectService {
       this.#connectionTimer = 0;
     }
     // Build a new connectionEXP (Iat + connectionTimeout)
-    const connectionEXP = newConnectionTimeout + Date.now();
+    const connectionEXP = newConnectionDuration + Date.now();
     // Save these new values (needed for session restore functionality/page refresh)
     this.#setState({
-      connection: { timeout: newConnectionTimeout, exp: connectionEXP },
+      connection: { connectionDuration: newConnectionDuration, exp: connectionEXP },
     });
     // Start a new timer
     this.#startConnectionTimer();
@@ -260,14 +294,15 @@ export class WalletConnectService {
       sendWalletEvent(
         this.state.connection.walletAppId,
         WALLET_APP_EVENTS.RESET_TIMEOUT,
-        newConnectionTimeout
+        newConnectionDuration
       );
     }
   };
 
   /**
    * @param bridge - (optional) URL string of bridge to connect into
-   * @param duration - (optional) Time before connection is timed out (seconds)
+   * @param connectionDuration - (optional) Time before connection is timed out (seconds)
+   * @param jwtDuration - (optional) Time before signed jwt is timed out (seconds)
    * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
    * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
@@ -279,9 +314,9 @@ export class WalletConnectService {
     individualAddress,
     groupAddress,
     bridge = WALLETCONNECT_BRIDGE_URL,
-    duration = this.state.connection.timeout,
-    jwtExpiration,
-    prohibitGroups,
+    connectionDuration,
+    jwtDuration,
+    prohibitGroups = false,
     walletAppId,
     onDisconnect,
   }: ConnectMethod) => {
@@ -292,8 +327,11 @@ export class WalletConnectService {
         individualAddress,
         groupAddress,
         bridge,
-        duration,
-        jwtExpiration,
+        // Duration/jwtExpiration should be in ms, but is passed into connect as s
+        connectionDuration: connectionDuration
+          ? connectionDuration * 1000
+          : this.state.connection.connectionDuration,
+        jwtDuration: jwtDuration ? jwtDuration * 1000 : DEFAULT_JWT_DURATION,
         prohibitGroups,
         walletAppId,
       });
@@ -322,7 +360,9 @@ export class WalletConnectService {
    *
    * @param message (optional) Custom disconnect message to send back to dApp
    * */
-  disconnect = async (message?: string) => {
+  disconnect = async (message = 'Disconnected') => {
+    // Clear backup connection timer
+    this.#backupTimer('clear');
     // Run disconnect callback function if provided/exists
     if (this.state.connection.onDisconnect)
       this.state.connection.onDisconnect(message);

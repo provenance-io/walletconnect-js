@@ -77,9 +77,7 @@ export const Countdowns: React.FC = () => {
     addr: address || 'n/a',
   });
   // Pull out expiration date for jwt (in seconds)
-  const { exp: JWTExpSec } = JWTPayload;
-  // Convert JWT Expiration to ms for countdown
-  const JWTExpMs = JWTExpSec * 1000;
+  const { exp: JWTExpMs } = JWTPayload;
 
   const handleCountdownExpires = (type: 'jwt' | 'connection') => {
     setPopupModalMsg(`${type} Expired`);

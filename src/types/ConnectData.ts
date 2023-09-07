@@ -86,8 +86,9 @@ export type ConnectData = {
 export interface BrowserConnectParams {
   groupAddress?: string;
   individualAddress?: string;
-  jwtExpiration?: number;
-  prohibitGroups?: boolean;
+  connectionDuration: number;
+  jwtDuration: number;
+  prohibitGroups: boolean;
   walletAppId: WalletId;
 }
 
