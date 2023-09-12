@@ -1,7 +1,7 @@
 import {
-  WalletConnectService,
-  WINDOW_MESSAGES,
   WALLET_LIST,
+  WINDOW_MESSAGES,
+  WalletConnectService,
 } from '@provenanceio/walletconnect-js/lib/service';
 import { Element, ListElement } from './helpers';
 
@@ -35,7 +35,7 @@ const walletConnectedUpdates = (data) => {
   // Remove the QR image and desktop wallet section
   document.getElementById('options').classList.add('hidden');
   // Pull data from connected state
-  const { address, publicKey, connectionEXP, bridge, walletInfo, walletAppId } =
+  const { address, publicKey, connectionEXP, bridge, walletInfo, walletId } =
     walletConnectService.state;
   // Update status element
   StatusElement.innerHTML = `${
@@ -47,7 +47,7 @@ const walletConnectedUpdates = (data) => {
     publicKey,
     'Connection Expires': new Date(connectionEXP * 1000),
     bridge,
-    'Wallet App': walletAppId || 'N/A',
+    'Wallet App': walletId || 'N/A',
     'Active Wallet Name': walletInfo?.name,
   };
   // Add list section to container

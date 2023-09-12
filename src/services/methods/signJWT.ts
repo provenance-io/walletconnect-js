@@ -23,7 +23,7 @@ interface SignJWT {
   expires?: number;
   publicKey: string;
   setState: WCSSetState;
-  walletAppId?: WalletId;
+  walletId?: WalletId;
 }
 
 export const signJWT = async ({
@@ -33,7 +33,7 @@ export const signJWT = async ({
   expires, // Custom expiration time in seconds from now
   publicKey: pubKeyB64,
   setState,
-  walletAppId,
+  walletId,
 }: SignJWT): Promise<
   BroadcastEventData[typeof WINDOW_MESSAGES.SIGN_JWT_COMPLETE]
 > => {
@@ -66,7 +66,7 @@ export const signJWT = async ({
       error: 'No wallet connected',
     };
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletId);
   // Build JWT
   const header = JSON.stringify({ alg: 'ES256K', typ: 'JWT' });
   const headerEncoded = base64url(header);

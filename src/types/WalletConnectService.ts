@@ -1,13 +1,12 @@
 import type WalletConnectClient from '@walletconnect/client';
-import type { ProvenanceMethod } from './Broadcast';
 import type {
   AccountAttribute,
   AccountObject,
   MasterGroupPolicy,
 } from './ConnectData';
-import type { GasPrice } from './GasPriceType';
-import type { IClientMeta } from './IClientMeta';
-import type { WalletId } from './WalletList';
+import type { GasPrice } from './Cosmos';
+import type { WalletId } from './Wallet';
+import type { ProvenanceMethod } from './WalletMessaging';
 
 export type WalletConnectClientType = WalletConnectClient;
 
@@ -21,6 +20,13 @@ type PendingMethod =
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'pending';
 export type ConnectionType = 'mobile' | 'browser';
+
+export type IClientMeta = {
+  description: string;
+  url: string;
+  icons: string[];
+  name: string;
+};
 
 export interface ModalState {
   dynamicUrl?: string;
@@ -51,7 +57,7 @@ export interface ConnectionState {
   peer?: IClientMeta;
   pendingMethod?: PendingMethod;
   status: ConnectionStatus;
-  walletAppId?: WalletId;
+  walletId?: WalletId;
 }
 
 export interface WCSState {
@@ -97,7 +103,7 @@ export interface ConnectMethod {
   individualAddress?: string;
   groupAddress?: string;
   prohibitGroups?: boolean;
-  walletAppId: WalletId;
+  walletId: WalletId;
   onDisconnect?: (message?: string) => void;
 }
 export type ConnectMethodFunction = ConnectMethod & {
@@ -122,7 +128,7 @@ export interface WalletConnectInitMethod {
   individualAddress?: string;
   jwtDuration: number;
   prohibitGroups: boolean;
-  walletAppId: WalletId;
+  walletId: WalletId;
 }
 
 export interface SendMessageMethod {
@@ -146,6 +152,6 @@ export interface SendWalletActionMethod {
   payload?: Record<string, unknown>;
 }
 
-export type UpdateModalData = Partial<ModalState> & { walletAppId?: WalletId };
+export type UpdateModalData = Partial<ModalState> & { walletId?: WalletId };
 
 export type WalletAction = 'switchToGroup' | 'removePendingMethod';

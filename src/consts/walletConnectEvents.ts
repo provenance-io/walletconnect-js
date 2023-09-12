@@ -1,6 +1,6 @@
 // import { ConnectionType } from '../types';
 
-export const CONNECTOR_EVENTS = {
+export const WALLET_CONNECT_CONNECTOR_EVENTS = {
   connect: 'connect',
   disconnect: 'disconnect',
   session_request: 'session_request',

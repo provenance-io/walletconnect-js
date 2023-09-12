@@ -1,23 +1,24 @@
-import { Wallet } from '../../types';
-import { WALLET_APP_IDS } from '../walletAppIds';
+import { BrowserWallet } from '../../types';
+import { CUSTOM_EVENT_EXTENSION } from '../browserEvents';
+import { WALLET_IDS } from '../walletIds';
 
-const EVENT_WCJS_MESSAGE = 'figureWalletExtensionSendMessage';
 export const FIGURE_EXTENSION = {
-  id: WALLET_APP_IDS.FIGURE_EXTENSION,
+  id: WALLET_IDS.FIGURE_EXTENSION,
   type: 'extension',
   title: 'Figure Extension',
   icon: 'figure',
-  eventAction: (eventData) =>
+  messaging: 'browser',
+  browserEventAction: (browserEventData) =>
     new Promise((resolve, reject) => {
-      const sendMessageEvent = new CustomEvent(EVENT_WCJS_MESSAGE, {
-        detail: eventData,
+      const sendMessageEvent = new CustomEvent(CUSTOM_EVENT_EXTENSION, {
+        detail: browserEventData,
       });
       console.log('wcjs | eventAction | sendMessageEvent: ', sendMessageEvent);
       dispatchEvent(sendMessageEvent);
       // We will resolve this once we get a response back from content-script.js
       // Only listen once
       addEventListener(
-        EVENT_WCJS_MESSAGE,
+        CUSTOM_EVENT_EXTENSION,
         (message) => {
           const { sender, result } = (message as CustomEvent).detail;
           // Only listen to messages sent by the content-script
@@ -45,4 +46,4 @@ export const FIGURE_EXTENSION = {
   },
   walletCheck: () =>
     !!(window?.figureWalletExtension && window?.figureWalletExtension?.isFigure),
-} as Wallet;
+} as BrowserWallet;

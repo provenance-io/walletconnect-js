@@ -18,7 +18,7 @@ export const WCS_DEFAULT_STATE: WCSState = {
     peer: undefined,
     pendingMethod: undefined,
     status: 'disconnected',
-    walletAppId: undefined,
+    walletId: undefined,
   },
   modal: {
     dynamicUrl: undefined,

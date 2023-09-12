@@ -1,10 +1,5 @@
-import {
-  PROVENANCE_METHODS,
-  WALLET_APP_EVENTS_NEW,
-  WALLET_LIST,
-  WINDOW_MESSAGES,
-} from '../../consts';
-import { verifySignature } from '../../helpers';
+import { PROVENANCE_METHODS, WALLET_LIST, WINDOW_MESSAGES } from '../../consts';
+import { sendWalletMessage, verifySignature } from '../../helpers';
 import type {
   BroadcastEventData,
   WalletConnectClientType,
@@ -18,7 +13,7 @@ interface SignHexMessage {
   customId?: string;
   hexMessage: string;
   publicKey: string;
-  walletAppId?: WalletId;
+  walletId?: WalletId;
 }
 
 export const signHexMessage = async ({
@@ -27,7 +22,7 @@ export const signHexMessage = async ({
   customId,
   hexMessage,
   publicKey: pubKeyB64,
-  walletAppId,
+  walletId,
 }: SignHexMessage): Promise<
   BroadcastEventData[typeof WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE]
 > => {
@@ -49,21 +44,12 @@ export const signHexMessage = async ({
   };
   // if (!connector) return { valid, request, error: 'No wallet connected' };
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletId);
   request.params.push(hexMessage);
   try {
     let result = '';
     // If the wallet app has an eventAction (web/extension) trigger it
-    if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS_NEW.EVENT, request };
-      if (knownWalletApp.id === 'figure_extension') {
-        console.log('wcjs | signHexMessage.ts | eventAction wait');
-        result = await knownWalletApp.eventAction(eventData);
-        console.log('wcjs | signHexMessage.ts | eventAction result: ', result);
-      } else {
-        knownWalletApp.eventAction(eventData);
-      }
-    }
+    result = await sendWalletMessage({ request, walletId });
     if (connector) {
       // send message
       result = (await connector.sendCustomRequest(request)) as string;

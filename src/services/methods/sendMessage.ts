@@ -19,7 +19,7 @@ interface SendMessage {
   connector?: WalletConnectClientType;
   customId?: string;
   data: SendMessageMethod;
-  walletAppId?: WalletId;
+  walletId?: WalletId;
 }
 
 export const sendMessage = async ({
@@ -27,7 +27,7 @@ export const sendMessage = async ({
   connector,
   customId,
   data,
-  walletAppId,
+  walletId,
 }: SendMessage): Promise<
   BroadcastEventData[typeof WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]
 > => {
@@ -66,7 +66,7 @@ export const sendMessage = async ({
   };
   if (!connector) return { valid, request, error: 'No wallet connected' };
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletId);
 
   // If message isn't an array, turn it into one
   const b64MessageArray = Array.isArray(rawB64Message)

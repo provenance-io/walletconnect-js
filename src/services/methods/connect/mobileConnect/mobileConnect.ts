@@ -17,7 +17,7 @@ export const mobileConnect = async ({
   individualAddress,
   jwtDuration,
   prohibitGroups,
-  walletAppId,
+  walletId,
 }: WalletConnectInitMethod): Promise<ConnectMethodResults> =>
   new Promise((resolve, reject) => {
     // New connector we will be resolving this promise with

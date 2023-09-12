@@ -1,26 +1,26 @@
 import {
-  WALLET_LIST,
-  WALLET_APP_EVENTS,
   PROVENANCE_METHODS,
+  WALLET_APP_EVENTS,
+  WALLET_LIST,
   WINDOW_MESSAGES,
 } from '../../consts';
-import { rngNum } from '../../utils';
 import type {
   BroadcastEventData,
+  SendWalletActionMethod,
   WalletConnectClientType,
   WalletId,
-  SendWalletActionMethod,
 } from '../../types';
+import { rngNum } from '../../utils';
 
 interface SendWalletAction {
   connector?: WalletConnectClientType;
   data: SendWalletActionMethod;
-  walletAppId?: WalletId;
+  walletId?: WalletId;
 }
 
 export const sendWalletAction = async ({
   connector,
-  walletAppId,
+  walletId,
   data,
 }: SendWalletAction): Promise<
   BroadcastEventData[
@@ -49,7 +49,7 @@ export const sendWalletAction = async ({
   if (!connector) return { valid: false, request, error: 'No wallet connected' };
 
   // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletAppId);
+  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletId);
 
   try {
     // If the wallet app has an eventAction (web/extension) trigger it

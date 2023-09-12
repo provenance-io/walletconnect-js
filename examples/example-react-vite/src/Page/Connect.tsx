@@ -70,11 +70,11 @@ export const Connect: React.FC = () => {
     setShowAdvanced(!showAdvanced);
   };
 
-  const handleConnect = async (walletAppId: WalletId, mobileDirect?: boolean) => {
+  const handleConnect = async (walletId: WalletId, mobileDirect?: boolean) => {
     // Check to see if the wallet exists
-    if (walletAppId) {
-      // If we find the target walletAppId in the walletList
-      const targetWallet = WALLET_LIST.find(({id}) => walletAppId === id);
+    if (walletId) {
+      // If we find the target walletId in the walletList
+      const targetWallet = WALLET_LIST.find(({id}) => walletId === id);
       if (targetWallet && targetWallet.walletCheck) {
         // Check if the wallet exists for the user
         const walletExists = targetWallet.walletCheck();
@@ -98,7 +98,7 @@ export const Connect: React.FC = () => {
       ...(groupAddress && {groupAddress}),
       ...(!groupsAllowed && {prohibitGroups: !groupsAllowed}),
       ...(jwtDuration && {jwtDuration: Number(jwtDuration)}),
-      walletAppId,
+      walletId,
       onDisconnect: (disconnectMessage) => { setResults({result: disconnectMessage}) },
     })
     setResults(results);

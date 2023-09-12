@@ -58,18 +58,18 @@ export const connect = async ({
   groupAddress,
   individualAddress,
   prohibitGroups,
-  walletAppId,
+  walletId,
 }: ConnectMethodFunction): Promise<ConnectMethodResults> => {
   let connectResults: ConnectMethodResults = {};
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
-  if (walletAppId && BROWSER_MESSAGE_WALLETS.includes(walletAppId)) {
+  if (walletId && BROWSER_MESSAGE_WALLETS.includes(walletId)) {
     connectResults = await browserConnect({
       connectionDuration,
       groupAddress,
       individualAddress,
       jwtDuration,
       prohibitGroups,
-      walletAppId,
+      walletId,
     });
   }
   // We either don't have a requested wallet or we're not using the browser wallet messaging
@@ -81,7 +81,7 @@ export const connect = async ({
       individualAddress,
       jwtDuration,
       prohibitGroups,
-      walletAppId,
+      walletId,
     });
   }
   // If we are connected, calculate the new connection est/exp times

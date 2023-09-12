@@ -3,8 +3,8 @@ import { Buffer } from 'buffer';
 import {
   DEFAULT_JWT_DURATION,
   LOCAL_STORAGE_NAMES,
+  MOBILE_WALLET_APP_EVENTS,
   WALLETCONNECT_BRIDGE_URL,
-  WALLET_APP_EVENTS,
   WCS_BACKUP_TIMER_INTERVAL,
   WCS_DEFAULT_STATE,
 } from '../consts';
@@ -232,6 +232,16 @@ export class WalletConnectService {
     this.#setState(newValueObj);
   }
 
+  // Stop the current running connection timer
+  #clearConnectionTimer = () => {
+    if (this.#connectionTimer) {
+      // Stop timer
+      window.clearTimeout(this.#connectionTimer);
+      // Reset timer value to 0
+      this.#connectionTimer = 0;
+    }
+  };
+
   // One or more values within localStorage have changed, see if we care about any of the values and update the state as needed
   #handleLocalStorageChange(storageEvent: StorageEvent) {
     const { key: storageEventKey, newValue } = storageEvent;
@@ -290,10 +300,10 @@ export class WalletConnectService {
     // Start a new timer
     this.#startConnectionTimer();
     // Send connected wallet custom event with the new connection details
-    if (this.state.connection.walletAppId) {
+    if (this.state.connection.walletId) {
       sendWalletEvent(
-        this.state.connection.walletAppId,
-        WALLET_APP_EVENTS.RESET_TIMEOUT,
+        this.state.connection.walletId,
+        MOBILE_WALLET_APP_EVENTS.RESET_TIMEOUT,
         newConnectionDuration
       );
     }
@@ -307,7 +317,7 @@ export class WalletConnectService {
    * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
-   * @param walletAppId - (required) Open a specific wallet directly (bypassing the QRCode modal)
+   * @param walletId - (required) Open a specific wallet directly (bypassing the QRCode modal)
    * @param onDisconnect - (optional) Action to take if a disconnect call comes in (to handle wallet disconnecting from dApp)
    */
   connect = async ({
@@ -317,7 +327,7 @@ export class WalletConnectService {
     connectionDuration,
     jwtDuration,
     prohibitGroups = false,
-    walletAppId,
+    walletId,
     onDisconnect,
   }: ConnectMethod) => {
     // If we're already connected, ignore this event
@@ -333,7 +343,7 @@ export class WalletConnectService {
           : this.state.connection.connectionDuration,
         jwtDuration: jwtDuration ? jwtDuration * 1000 : DEFAULT_JWT_DURATION,
         prohibitGroups,
-        walletAppId,
+        walletId,
       });
       console.log('wcjs | walletConnectService.ts | connect results: ', results);
       // Based on the results perform service actions
@@ -361,11 +371,14 @@ export class WalletConnectService {
    * @param message (optional) Custom disconnect message to send back to dApp
    * */
   disconnect = async (message = 'Disconnected') => {
-    // Clear backup connection timer
+    // Clear connection timers
     this.#backupTimer('clear');
+    this.#clearConnectionTimer();
     // Run disconnect callback function if provided/exists
     if (this.state.connection.onDisconnect)
       this.state.connection.onDisconnect(message);
+    if (this.#connector && this.#connector.connected)
+      await this.#connector.killSession({ message });
     this.#setState('reset');
     return message;
   };
@@ -402,7 +415,7 @@ export class WalletConnectService {
       address: this.state.wallet.address || '',
       connector: this.#connector,
       customId,
-      walletAppId: this.state.connection.walletAppId,
+      walletId: this.state.connection.walletId,
       data: {
         message,
         description,
@@ -436,7 +449,7 @@ export class WalletConnectService {
     this.#setState({ connection: { pendingMethod: 'switchToGroup' } });
     const result = await sendWalletActionMethod({
       connector: this.#connector,
-      walletAppId: this.state.connection.walletAppId,
+      walletId: this.state.connection.walletId,
       data: {
         action: 'switchToGroup',
         payload: groupPolicyAddress ? { address: groupPolicyAddress } : undefined,
@@ -466,7 +479,7 @@ export class WalletConnectService {
       expires,
       publicKey: this.state.wallet.publicKey || '',
       setState: this.#setState,
-      walletAppId: this.state.connection.walletAppId,
+      walletId: this.state.connection.walletId,
     });
     // No longer loading
     this.#setState({ connection: { pendingMethod: '' } });
@@ -489,7 +502,7 @@ export class WalletConnectService {
       customId: options?.customId,
       hexMessage,
       publicKey: this.state.wallet.publicKey || '',
-      walletAppId: this.state.connection.walletAppId,
+      walletId: this.state.connection.walletId,
     });
     console.log('walletConnectService | signHex result: ', result);
     // No longer loading
@@ -509,7 +522,7 @@ export class WalletConnectService {
     // Wait to get the result back
     const result = await sendWalletActionMethod({
       connector: this.#connector,
-      walletAppId: this.state.connection.walletAppId,
+      walletId: this.state.connection.walletId,
       data: {
         action: 'removePendingMethod',
         payload: { customId },
