@@ -4,11 +4,10 @@ import {
   DEFAULT_CONNECTION_DURATION,
   DEFAULT_JWT_DURATION,
 } from './connectionTimeouts';
-import { WALLETCONNECT_BRIDGE_URL } from './urls';
 
 export const WCS_DEFAULT_STATE: WCSState = {
   connection: {
-    bridge: WALLETCONNECT_BRIDGE_URL,
+    bridge: undefined,
     est: undefined,
     exp: undefined,
     jwtDuration: DEFAULT_JWT_DURATION,

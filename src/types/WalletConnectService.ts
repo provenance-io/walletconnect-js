@@ -47,7 +47,7 @@ export interface WalletState {
   signedJWT?: string;
 }
 export interface ConnectionState {
-  bridge: string;
+  bridge?: string;
   est?: number;
   exp?: number;
   connectionDuration: number;

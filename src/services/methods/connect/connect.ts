@@ -1,7 +1,6 @@
-import { BROWSER_EVENTS, PROVENANCE_METHODS, WALLET_LIST } from '../../../consts';
-import { sendWalletMessage } from '../../../helpers';
+import { WALLET_LIST } from '../../../consts';
 import { ConnectMethodFunction, ConnectMethodResults } from '../../../types';
-import { getPageData } from '../../../utils';
+import { browserConnect } from './browserConnect';
 import { mobileConnect } from './mobileConnect';
 
 // Init will determine if we want to send a walletconnect event or a browser message event based on the connected/intended wallet type/id
@@ -65,27 +64,14 @@ export const connect = async ({
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
   const wallet = WALLET_LIST.find(({ id }) => id === walletId);
   if (wallet?.messaging === 'browser') {
-    const {
-      favicon: requestFavicon,
-      origin: requestOrigin,
-      title: requestName,
-    } = getPageData();
-    const response = await sendWalletMessage({
-      request: {
-        method: PROVENANCE_METHODS.CONNECT,
-        browserEvent: BROWSER_EVENTS.BASIC,
-        connectionDuration,
-        groupAddress,
-        individualAddress,
-        jwtDuration,
-        prohibitGroups,
-        requestFavicon,
-        requestOrigin,
-        requestName,
-      },
+    result = await browserConnect({
+      connectionDuration,
+      jwtDuration,
+      groupAddress,
+      individualAddress,
+      prohibitGroups,
       walletId,
     });
-    result = response.result;
   }
   // We either don't have a requested wallet or we're not using the browser wallet messaging
   else if (wallet?.messaging === 'walletconnect') {
