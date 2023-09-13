@@ -25,19 +25,7 @@ export const sendWalletMessage = async ({
     try {
       // Browser wallet message
       if (wallet.messaging === 'browser') {
-        /*
-        eventData:
-          walletId?: WalletId;
-          browserEvent?: BrowserEventValue;
-          uri?: string;
-          address?: string;
-          duration?: number;
-          data?: WalletEventData;
-          referral?: string;
-          redirectUrl?: string;
-          request?: WalletMessageRequest;
-        */
-        return await (wallet as BrowserWallet).browserEventAction(eventData);
+        return await (wallet as BrowserWallet).browserEventAction(request);
       }
       // WalletConnect message
       else if (wallet.messaging === 'walletconnect' && connector) {
@@ -46,8 +34,8 @@ export const sendWalletMessage = async ({
       // Unknown wallet error
       return { error: 'Unknown wallet messaging value' };
     } catch (error) {
-      return { error: `${error}` };
+      return { error: `${error}`, request };
     }
   }
-  return { error: 'Invalid walletId' };
+  return { error: 'Invalid walletId', request };
 };

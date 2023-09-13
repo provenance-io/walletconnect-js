@@ -1,4 +1,4 @@
-import { BrowserEventData, WalletMessageResponse } from './WalletMessaging';
+import { WalletMessageRequest, WalletMessageResponse } from './WalletMessaging';
 
 export type WalletType = 'mobile' | 'extension' | 'hosted';
 
@@ -24,7 +24,7 @@ export interface Wallet {
 }
 export type BrowserWallet = Wallet & {
   browserEventAction: (
-    eventData: BrowserEventData
+    eventData: WalletMessageRequest
   ) => Promise<WalletMessageResponse>; // Callback function for every walletconnect-js method/action
   walletCheck?: () => boolean; // Check if the wallet exists, runs background actions as needed, returns a boolean indicating existance
   walletUrl?: string; // Location of wallet download

@@ -1,6 +1,5 @@
 import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../consts';
 import { TxResponse } from './Cosmos';
-import { WalletId } from './Wallet';
 
 export type BrowserEventKey = keyof typeof BROWSER_EVENTS;
 export type BrowserEventValue = typeof BROWSER_EVENTS[BrowserEventKey];
@@ -13,6 +12,7 @@ export type WalletEventData = any; // eslint-disable-line @typescript-eslint/no-
 // Request data sent to all wallet types when a wcjs method is called
 export interface WalletMessageRequest {
   id?: number;
+  browserEvent?: BrowserEventValue;
   jsonrpc?: string;
   method?: ProvenanceMethod;
   params?: string[];
@@ -26,19 +26,6 @@ export interface WalletMessageRequest {
   requestName?: string;
 }
 
-// Data sent to Browser wallets through a window message
-export interface BrowserEventData {
-  walletId?: WalletId;
-  browserEvent?: BrowserEventValue;
-  uri?: string;
-  address?: string;
-  duration?: number;
-  data?: WalletEventData;
-  referral?: string;
-  redirectUrl?: string;
-  request?: WalletMessageRequest;
-}
-
 interface WalletMessageBasicResponse {
   error?: string;
   valid?: boolean;
@@ -46,7 +33,7 @@ interface WalletMessageBasicResponse {
 }
 
 // CONNECT METHOD
-interface ConnectResponse extends WalletMessageBasicResponse {
+export interface ConnectResponse extends WalletMessageBasicResponse {
   result?: {
     connectionEST: number;
     connectionEXP: number;
@@ -54,27 +41,27 @@ interface ConnectResponse extends WalletMessageBasicResponse {
   };
 }
 // DISCONNECT METHOD
-interface DisconnectResponse extends WalletMessageBasicResponse {
+export interface DisconnectResponse extends WalletMessageBasicResponse {
   result?: { message: string };
 }
 // SEND MESSAGE METHOD
-interface SendMessageResponse extends WalletMessageBasicResponse {
+export interface SendMessageResponse extends WalletMessageBasicResponse {
   result?: TxResponse;
 }
 // SIGN MESSAGE METHOD
-interface SignMessageResponse extends WalletMessageBasicResponse {
+export interface SignMessageResponse extends WalletMessageBasicResponse {
   result?: { signature: string };
 }
 // SIGN JWT METHOD
-interface SignJWTResponse extends WalletMessageBasicResponse {
+export interface SignJWTResponse extends WalletMessageBasicResponse {
   result?: { signature: string; signedJWT: string; expires: number };
 }
 // SWITCH TO GROUP METHOD
-interface SwitchGroupResponse extends WalletMessageBasicResponse {
+export interface SwitchGroupResponse extends WalletMessageBasicResponse {
   result?: string;
 }
 // REMOVE PENDING METHOD
-interface RemovePendingMethodResponse extends WalletMessageBasicResponse {
+export interface RemovePendingMethodResponse extends WalletMessageBasicResponse {
   result?: string;
 }
 

@@ -1,6 +1,7 @@
-import { BROWSER_MESSAGE_WALLETS } from '../../../consts';
+import { WALLET_LIST } from '../../../consts';
+import { sendWalletMessage } from '../../../helpers';
 import { ConnectMethodFunction, ConnectMethodResults } from '../../../types';
-import { browserConnect } from './browserConnect';
+import { getPageData } from '../../../utils';
 import { mobileConnect } from './mobileConnect';
 
 // Init will determine if we want to send a walletconnect event or a browser message event based on the connected/intended wallet type/id
@@ -62,18 +63,24 @@ export const connect = async ({
 }: ConnectMethodFunction): Promise<ConnectMethodResults> => {
   let connectResults: ConnectMethodResults = {};
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
-  if (walletId && BROWSER_MESSAGE_WALLETS.includes(walletId)) {
-    connectResults = await browserConnect({
-      connectionDuration,
-      groupAddress,
-      individualAddress,
-      jwtDuration,
-      prohibitGroups,
+  const wallet = WALLET_LIST.find(({ id }) => id === walletId);
+  if (wallet?.messaging === 'browser') {
+    const requestPageData = getPageData();
+    connectResults = await sendWalletMessage({
+      request: {
+        browserEvent: 'connect',
+        connectionDuration,
+        groupAddress,
+        individualAddress,
+        jwtDuration,
+        prohibitGroups,
+        ...requestPageData,
+      },
       walletId,
     });
   }
   // We either don't have a requested wallet or we're not using the browser wallet messaging
-  else {
+  else if (wallet?.messaging === 'walletconnect') {
     connectResults = await mobileConnect({
       bridge,
       connectionDuration,
@@ -81,8 +88,9 @@ export const connect = async ({
       individualAddress,
       jwtDuration,
       prohibitGroups,
-      walletId,
     });
+  } else {
+    connectResults.error = 'Wallet not found, or is missing messaging type';
   }
   // If we are connected, calculate the new connection est/exp times
   if (connectResults.state?.connection?.status === 'connected') {

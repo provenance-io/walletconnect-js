@@ -128,7 +128,7 @@ export interface WalletConnectInitMethod {
   individualAddress?: string;
   jwtDuration: number;
   prohibitGroups: boolean;
-  walletId: WalletId;
+  // walletId: WalletId;
 }
 
 export interface SendMessageMethod {

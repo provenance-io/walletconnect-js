@@ -1,9 +1,8 @@
 import WalletConnectClient from '@walletconnect/client';
-import { CONNECTOR_EVENTS } from '../../../../consts';
+import { WALLET_CONNECT_CONNECTOR_EVENTS } from '../../../../consts';
 import {
   ConnectData,
   ConnectMethodResults,
-  WalletConnectEventDisconnect,
   WalletConnectInitMethod,
 } from '../../../../types';
 import { QRCodeModal } from './QrCodeModal';
@@ -17,7 +16,6 @@ export const mobileConnect = async ({
   individualAddress,
   jwtDuration,
   prohibitGroups,
-  walletId,
 }: WalletConnectInitMethod): Promise<ConnectMethodResults> =>
   new Promise((resolve, reject) => {
     // New connector we will be resolving this promise with
@@ -54,21 +52,21 @@ export const mobileConnect = async ({
     });
 
     // Create all of the newConnector events
-    newConnector.on(CONNECTOR_EVENTS.connect, (error, payload: ConnectData) => {
-      if (error) throw error;
-      connectEvent({
-        payload,
-      });
-    });
     newConnector.on(
-      CONNECTOR_EVENTS.disconnect,
-      (error, payload: WalletConnectEventDisconnect) => {
+      WALLET_CONNECT_CONNECTOR_EVENTS.connect,
+      (error, payload: ConnectData) => {
         if (error) throw error;
-        // Resolve with state.resetState = true
+        connectEvent({
+          payload,
+        });
       }
     );
+    newConnector.on(WALLET_CONNECT_CONNECTOR_EVENTS.disconnect, (error) => {
+      if (error) throw error;
+      // Resolve with state.resetState = true
+    });
     newConnector.on(
-      CONNECTOR_EVENTS.wc_sessionUpdate,
+      WALLET_CONNECT_CONNECTOR_EVENTS.wc_sessionUpdate,
       (error, payload: ConnectData) => {
         if (error) throw error;
         sessionUpdateEvent({

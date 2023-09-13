@@ -1,6 +1,6 @@
 export const PROVENANCE_METHODS = {
-  sign: 'provenance_sign',
-  send: 'provenance_sendTransaction',
-  action: 'wallet_action',
-  connect: 'connect',
+  SIGN: 'provenance_sign',
+  SEND: 'provenance_sendTransaction',
+  ACTION: 'wallet_action',
+  CONNECT: 'connect',
 } as const;

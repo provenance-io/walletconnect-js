@@ -1,4 +1,4 @@
-import { WalletId } from './Wallet';
+import { BrowserWallet } from './Wallet';
 
 interface TimePeriod {
   seconds: number;
@@ -89,7 +89,7 @@ export interface BrowserConnectParams {
   connectionDuration: number;
   jwtDuration: number;
   prohibitGroups: boolean;
-  walletId: WalletId;
+  wallet: BrowserWallet;
 }
 
 export interface WalletConnectResponse {

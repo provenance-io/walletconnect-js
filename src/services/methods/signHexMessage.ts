@@ -1,34 +1,35 @@
-import { PROVENANCE_METHODS, WALLET_LIST, WINDOW_MESSAGES } from '../../consts';
+import { convertUtf8ToHex } from '@walletconnect/utils';
+import { PROVENANCE_METHODS } from '../../consts';
 import { sendWalletMessage, verifySignature } from '../../helpers';
 import type {
-  BroadcastEventData,
+  SignMessageResponse,
   WalletConnectClientType,
   WalletId,
 } from '../../types';
 import { rngNum } from '../../utils';
 
-interface SignHexMessage {
+interface SignMessage {
   address: string;
+  description?: string;
   connector?: WalletConnectClientType;
   customId?: string;
-  hexMessage: string;
+  message: string;
+  isHex: boolean;
   publicKey: string;
-  walletId?: WalletId;
+  walletId: WalletId;
 }
 
-export const signHexMessage = async ({
+export const signMessage = async ({
   address,
   connector,
+  description = 'Sign Message',
   customId,
-  hexMessage,
+  message,
+  isHex,
   publicKey: pubKeyB64,
   walletId,
-}: SignHexMessage): Promise<
-  BroadcastEventData[typeof WINDOW_MESSAGES.SIGN_HEX_MESSAGE_COMPLETE]
-> => {
-  let valid = false;
-  const method = PROVENANCE_METHODS.sign;
-  const description = 'Sign Message';
+}: SignMessage): Promise<SignMessageResponse> => {
+  const method = PROVENANCE_METHODS.SIGN;
   const metadata = JSON.stringify({
     description,
     address,
@@ -42,25 +43,15 @@ export const signHexMessage = async ({
     method,
     params: [metadata],
   };
-  // if (!connector) return { valid, request, error: 'No wallet connected' };
-  // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletId);
+  // If needed, convert the message to hex before adding to request params
+  const hexMessage = isHex ? message : convertUtf8ToHex(message);
   request.params.push(hexMessage);
-  try {
-    let result = '';
-    // If the wallet app has an eventAction (web/extension) trigger it
-    result = await sendWalletMessage({ request, walletId });
-    if (connector) {
-      // send message
-      result = (await connector.sendCustomRequest(request)) as string;
-    }
-    // result is a hex encoded signature
-    const signature = Uint8Array.from(Buffer.from(result, 'hex'));
-    // verify signature
-    valid = await verifySignature(hexMessage, signature, pubKeyB64);
+  // Send a message to the wallet containing the request and wait for a response
+  const result = await sendWalletMessage({ request, walletId, connector });
+  // result is a hex encoded signature
+  const signature = Uint8Array.from(Buffer.from(result, 'hex'));
+  // verify signature
+  const valid = await verifySignature(hexMessage, signature, pubKeyB64);
 
-    return { valid, result: { signature: result }, request };
-  } catch (error) {
-    return { valid, error: `${error}`, request };
-  }
+  return { ...result, valid };
 };
