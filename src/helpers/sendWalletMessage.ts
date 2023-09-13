@@ -25,11 +25,13 @@ export const sendWalletMessage = async ({
     try {
       // Browser wallet message
       if (wallet.messaging === 'browser') {
-        return await (wallet as BrowserWallet).browserEventAction(request);
+        const result = await (wallet as BrowserWallet).browserEventAction(request);
+        return { result, request };
       }
       // WalletConnect message
       else if (wallet.messaging === 'walletconnect' && connector) {
-        return await connector.sendCustomRequest(request);
+        const result = await connector.sendCustomRequest(request);
+        return { result, request };
       }
       // Unknown wallet error
       return { error: 'Unknown wallet messaging value' };

@@ -1,16 +1,9 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import base64url from 'base64url';
-import {
-  DEFAULT_CONNECTION_DURATION,
-  PROVENANCE_METHODS,
-  WALLET_APP_EVENTS,
-  WALLET_LIST,
-  WINDOW_MESSAGES,
-} from '../../consts';
-import { verifySignature } from '../../helpers';
+import { DEFAULT_CONNECTION_DURATION, PROVENANCE_METHODS } from '../../consts';
+import { sendWalletMessage, verifySignature } from '../../helpers';
 import type {
-  BroadcastEventData,
-  WCSSetState,
+  SignJWTResponse,
   WalletConnectClientType,
   WalletId,
 } from '../../types';
@@ -22,30 +15,26 @@ interface SignJWT {
   customId?: string;
   expires?: number;
   publicKey: string;
-  setState: WCSSetState;
-  walletId?: WalletId;
+  walletId: WalletId;
+  description?: string;
 }
 
 export const signJWT = async ({
   address,
   connector,
+  description = 'Sign JWT Token',
   customId,
   expires, // Custom expiration time in seconds from now
   publicKey: pubKeyB64,
-  setState,
   walletId,
-}: SignJWT): Promise<
-  BroadcastEventData[typeof WINDOW_MESSAGES.SIGN_JWT_COMPLETE]
-> => {
-  let valid = false;
+}: SignJWT): Promise<SignJWTResponse> => {
   const nowSec = Math.round(Date.now() / 1000); // Current time seconds
   const customExpiresGiven = expires !== undefined;
   const defaultExpireSec = DEFAULT_CONNECTION_DURATION; // (24hours as seconds)
   const customExpiresSec = customExpiresGiven && expires;
   const finalExpiresSec =
     nowSec + (customExpiresGiven ? (customExpiresSec as number) : defaultExpireSec);
-  const method = PROVENANCE_METHODS.sign;
-  const description = 'Sign JWT Token';
+  const method = PROVENANCE_METHODS.SIGN;
   const metadata = JSON.stringify({
     address,
     customId,
@@ -59,14 +48,6 @@ export const signJWT = async ({
     method,
     params: [metadata],
   };
-  if (!connector)
-    return {
-      valid,
-      request,
-      error: 'No wallet connected',
-    };
-  // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletId);
   // Build JWT
   const header = JSON.stringify({ alg: 'ES256K', typ: 'JWT' });
   const headerEncoded = base64url(header);
@@ -83,29 +64,11 @@ export const signJWT = async ({
   const hexJWT = convertUtf8ToHex(JWT, true);
   request.params.push(hexJWT);
 
-  try {
-    // If the wallet app has an eventAction (web/extension) trigger it
-    if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT };
-      knownWalletApp.eventAction(eventData);
-    }
-    // send message
-    const result = (await connector.sendCustomRequest(request)) as string;
-    // result is a hex encoded signature
-    // const signature = Uint8Array.from(Buffer.from(result, 'hex'));
-    const signature = Buffer.from(result, 'hex');
-    // verify signature
-    valid = await verifySignature(hexJWT, signature, pubKeyB64);
-    const signedPayloadEncoded = base64url(signature);
-    const signedJWT = `${headerEncoded}.${payloadEncoded}.${signedPayloadEncoded}`;
-    // Update JWT within the wcjs state
-    setState({ wallet: { signedJWT } });
-    return {
-      valid,
-      result: { signature: result, signedJWT, expires: finalExpiresSec },
-      request,
-    };
-  } catch (error) {
-    return { valid, error: `${error}`, request };
-  }
+  // Send a message to the wallet containing the request and wait for a response
+  const response = await sendWalletMessage({ request, walletId, connector });
+  const signature = Buffer.from(response.result, 'hex');
+  // verify signature
+  const valid = await verifySignature(hexJWT, signature, pubKeyB64);
+
+  return { ...response, valid };
 };

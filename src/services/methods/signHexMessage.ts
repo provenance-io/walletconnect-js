@@ -47,11 +47,11 @@ export const signMessage = async ({
   const hexMessage = isHex ? message : convertUtf8ToHex(message);
   request.params.push(hexMessage);
   // Send a message to the wallet containing the request and wait for a response
-  const result = await sendWalletMessage({ request, walletId, connector });
+  const response = await sendWalletMessage({ request, walletId, connector });
   // result is a hex encoded signature
-  const signature = Uint8Array.from(Buffer.from(result, 'hex'));
+  const signature = Uint8Array.from(Buffer.from(response.result, 'hex'));
   // verify signature
   const valid = await verifySignature(hexMessage, signature, pubKeyB64);
 
-  return { ...result, valid };
+  return { ...response, valid };
 };

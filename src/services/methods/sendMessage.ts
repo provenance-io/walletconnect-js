@@ -1,14 +1,9 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import {
-  PROVENANCE_METHODS,
-  WALLET_APP_EVENTS,
-  WALLET_LIST,
-  WINDOW_MESSAGES,
-} from '../../consts';
+import { PROVENANCE_METHODS } from '../../consts';
+import { sendWalletMessage } from '../../helpers';
 import type {
-  BroadcastEventData,
   SendMessageMethod,
-  SendMessageMethodResult,
+  SignMessageResponse,
   WalletConnectClientType,
   WalletId,
 } from '../../types';
@@ -19,7 +14,7 @@ interface SendMessage {
   connector?: WalletConnectClientType;
   customId?: string;
   data: SendMessageMethod;
-  walletId?: WalletId;
+  walletId: WalletId;
 }
 
 export const sendMessage = async ({
@@ -28,14 +23,11 @@ export const sendMessage = async ({
   customId,
   data,
   walletId,
-}: SendMessage): Promise<
-  BroadcastEventData[typeof WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]
-> => {
-  let valid = false;
+}: SendMessage): Promise<SignMessageResponse> => {
   const {
     message: rawB64Message,
     description = 'Send Message',
-    method = PROVENANCE_METHODS.send,
+    method = PROVENANCE_METHODS.SEND,
     gasPrice,
     feeGranter,
     feePayer,
@@ -64,36 +56,20 @@ export const sendMessage = async ({
     method,
     params: [metadata],
   };
-  if (!connector) return { valid, request, error: 'No wallet connected' };
-  // Check for a known wallet app with special callback functions
-  const knownWalletApp = WALLET_LIST.find((wallet) => wallet.id === walletId);
 
   // If message isn't an array, turn it into one
   const b64MessageArray = Array.isArray(rawB64Message)
     ? rawB64Message
     : [rawB64Message];
-  // Convert to hex
+
+  // Convert to hex and add to request
   const hexMsgArray = b64MessageArray.map((msg) => convertUtf8ToHex(msg));
   request.params.push(...hexMsgArray);
-  try {
-    // If the wallet app has an eventAction (web/extension) trigger it
-    if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT };
-      knownWalletApp.eventAction(eventData);
-    }
-    // send message
-    const result = (await connector.sendCustomRequest(
-      request
-    )) as SendMessageMethodResult;
-    // Check to see if we had an error in the txResponse
-    if (result && result.txResponse && result.txResponse.code) {
-      // Any code, other than 0, means there is a problem
-      valid = false;
-      return { valid, result, error: result.txResponse.rawLog, request };
-    }
 
-    return { valid: true, result, request };
-  } catch (error) {
-    return { valid, error: `${error}`, request };
-  }
+  // Send a message to the wallet containing the request and wait for a response
+  const response = await sendWalletMessage({ request, walletId, connector });
+  // No result, or result error, or response code is 0
+  const hasError = !response || response.error || !response.result.txResponse.code;
+
+  return { valid: !hasError, ...response };
 };

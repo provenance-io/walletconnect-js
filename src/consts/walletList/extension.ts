@@ -11,7 +11,7 @@ export const FIGURE_EXTENSION = {
   browserEventAction: (browserEventData) =>
     new Promise((resolve, reject) => {
       const sendMessageEvent = new CustomEvent(CUSTOM_EVENT_EXTENSION, {
-        detail: browserEventData,
+        detail: { request: browserEventData },
       });
       console.log('wcjs | eventAction | sendMessageEvent: ', sendMessageEvent);
       dispatchEvent(sendMessageEvent);

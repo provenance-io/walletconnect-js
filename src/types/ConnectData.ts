@@ -68,6 +68,10 @@ export type AccountObject = {
 };
 
 export type WalletConnectAccountInfo = string[] | AccountObject[] | undefined;
+export interface WalletConnectEventDisconnect {
+  event: string;
+  params: { message?: string }[];
+}
 
 export type ConnectData = {
   params: [

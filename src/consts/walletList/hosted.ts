@@ -3,11 +3,7 @@ import { BrowserEventValue, BrowserWallet } from '../../types';
 import { FIGURE_HOSTED_WALLET_URL_PROD } from '../urls';
 import { WALLET_IDS } from '../walletIds';
 
-const FIGURE_HOSTED_IGNORED_EVENTS: BrowserEventValue[] = [
-  'connect',
-  'update',
-  'resetConnectionTimeout',
-];
+const FIGURE_HOSTED_IGNORED_EVENTS: BrowserEventValue[] = ['resetConnectionTimeout'];
 
 export const FIGURE_HOSTED = {
   id: WALLET_IDS.FIGURE_HOSTED,

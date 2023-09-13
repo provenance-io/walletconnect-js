@@ -1,71 +1,36 @@
-import { useEffect } from 'react'; // eslint-disable-line no-unused-vars
-import { EventData } from 'types';
+import { useEffect } from 'react';
 import {
+  CUSTOM_EVENT_HOSTED,
   FIGURE_HOSTED_WALLET_URL_PROD,
   FIGURE_HOSTED_WALLET_URL_TEST,
-  HOSTED_IFRAME_EVENT_TYPE,
-  WALLET_APP_IDS,
+  WALLET_IDS,
 } from '../consts';
 
 const IFRAME_NOTIFICATION_HEIGHT = 600;
 const IFRAME_NOTIFICATION_WIDTH = 600;
 const IFRAME_ID = 'figure-wallet-hosted';
 
+// If the iframe element exists, remove it from the DOM
+function removeIframe() {
+  const iframeElement = document.getElementById(IFRAME_ID);
+  if (iframeElement) {
+    iframeElement.remove();
+  }
+}
+
+function handleChannelMessage(event: MessageEvent<any>) {
+  if (event.data.type === 'create_iframe') {
+    removeIframe();
+  }
+}
+
 // Create shared BroadcastChannel instance to prevent catching own
 // events on same page from multiple iframe creations
 const channel = new BroadcastChannel('figure-hosted-wallet');
 channel.onmessage = handleChannelMessage;
 
-export function useHostedWalletIframe() {
-  useEffect(() => {
-    document.addEventListener(HOSTED_IFRAME_EVENT_TYPE, (ev) => {
-      catchWCJSMessage(ev as any); // NOTE: types not picking up correctly?
-    });
-
-    return () => {
-      document.removeEventListener(HOSTED_IFRAME_EVENT_TYPE, (ev) => {
-        catchWCJSMessage(ev as any); // NOTE: types not picking up correctly?
-      });
-    };
-  }, []);
-
-  function handleIframeMessage(event: MessageEvent<any>) {
-    const acceptableOrigins = [
-      new URL(FIGURE_HOSTED_WALLET_URL_PROD).origin,
-      new URL(FIGURE_HOSTED_WALLET_URL_TEST).origin,
-    ];
-    const overrideUrl = localStorage.getItem(
-      'FIGURE_HOSTED_WALLET_URL_TEST_OVERRIDE'
-    );
-    if (overrideUrl) {
-      acceptableOrigins.push(new URL(overrideUrl).origin);
-    }
-    // Only listen for events coming from the hosted wallet origin
-    if (!acceptableOrigins.includes(event.origin)) return;
-    if (event.data === 'window_close') {
-      removeIframe();
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('message', handleIframeMessage);
-
-    return () => {
-      window.removeEventListener('message', handleIframeMessage);
-    };
-  }, []);
-}
-
 // Check if the iframe exists
 const iframeExists = () => !!document.getElementById(IFRAME_ID);
-
-// If the iframe element exists, remove it from the DOM
-function removeIframe() {
-  const iframeElement = document.getElementById(IFRAME_ID);
-  if (!!iframeElement) {
-    iframeElement.remove();
-  }
-}
 
 function getOrigin(isProd: boolean) {
   if (isProd) {
@@ -75,12 +40,6 @@ function getOrigin(isProd: boolean) {
   const overrideUrl = localStorage.getItem('FIGURE_HOSTED_WALLET_URL_TEST_OVERRIDE');
   const windowUrl = new URL(overrideUrl ?? `${FIGURE_HOSTED_WALLET_URL_TEST}`);
   return windowUrl;
-}
-
-function handleChannelMessage(event: MessageEvent<any>) {
-  if (event.data.type === 'create_iframe') {
-    removeIframe();
-  }
 }
 
 // Add ability for dApp/website to send a message to this extension
@@ -163,7 +122,7 @@ const createIframe = (url: string) => {
 };
 
 // Handle each specific notification event type
-const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
+const catchWCJSMessage = ({ detail }: CustomEvent<any>) => {
   const { event, uri, duration, data, referral, address, redirectUrl } = detail;
   // Based on the event type handle what we do
   switch (event) {
@@ -174,7 +133,7 @@ const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
       if (iframeExists()) {
         return;
       }
-      const windowUrl = getOrigin(detail.walletId === WALLET_APP_IDS.FIGURE_HOSTED);
+      const windowUrl = getOrigin(detail.walletId === WALLET_IDS.FIGURE_HOSTED);
       if (uri) windowUrl.searchParams.append('wc', uri);
       if (address) windowUrl.searchParams.append('address', address);
       if (event) windowUrl.searchParams.append('event', event);
@@ -186,3 +145,43 @@ const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
       break;
   }
 };
+
+export function useHostedWalletIframe() {
+  useEffect(() => {
+    document.addEventListener(CUSTOM_EVENT_HOSTED, (ev) => {
+      catchWCJSMessage(ev as any); // NOTE: types not picking up correctly?
+    });
+
+    return () => {
+      document.removeEventListener(CUSTOM_EVENT_HOSTED, (ev) => {
+        catchWCJSMessage(ev as any); // NOTE: types not picking up correctly?
+      });
+    };
+  }, []);
+
+  function handleIframeMessage(event: MessageEvent<any>) {
+    const acceptableOrigins = [
+      new URL(FIGURE_HOSTED_WALLET_URL_PROD).origin,
+      new URL(FIGURE_HOSTED_WALLET_URL_TEST).origin,
+    ];
+    const overrideUrl = localStorage.getItem(
+      'FIGURE_HOSTED_WALLET_URL_TEST_OVERRIDE'
+    );
+    if (overrideUrl) {
+      acceptableOrigins.push(new URL(overrideUrl).origin);
+    }
+    // Only listen for events coming from the hosted wallet origin
+    if (!acceptableOrigins.includes(event.origin)) return;
+    if (event.data === 'window_close') {
+      removeIframe();
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('message', handleIframeMessage);
+
+    return () => {
+      window.removeEventListener('message', handleIframeMessage);
+    };
+  }, []);
+}

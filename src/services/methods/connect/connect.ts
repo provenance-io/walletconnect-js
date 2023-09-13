@@ -1,4 +1,4 @@
-import { WALLET_LIST } from '../../../consts';
+import { BROWSER_EVENTS, PROVENANCE_METHODS, WALLET_LIST } from '../../../consts';
 import { sendWalletMessage } from '../../../helpers';
 import { ConnectMethodFunction, ConnectMethodResults } from '../../../types';
 import { getPageData } from '../../../utils';
@@ -61,27 +61,35 @@ export const connect = async ({
   prohibitGroups,
   walletId,
 }: ConnectMethodFunction): Promise<ConnectMethodResults> => {
-  let connectResults: ConnectMethodResults = {};
+  let result: ConnectMethodResults = {};
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
   const wallet = WALLET_LIST.find(({ id }) => id === walletId);
   if (wallet?.messaging === 'browser') {
-    const requestPageData = getPageData();
-    connectResults = await sendWalletMessage({
+    const {
+      favicon: requestFavicon,
+      origin: requestOrigin,
+      title: requestName,
+    } = getPageData();
+    const response = await sendWalletMessage({
       request: {
-        browserEvent: 'connect',
+        method: PROVENANCE_METHODS.CONNECT,
+        browserEvent: BROWSER_EVENTS.BASIC,
         connectionDuration,
         groupAddress,
         individualAddress,
         jwtDuration,
         prohibitGroups,
-        ...requestPageData,
+        requestFavicon,
+        requestOrigin,
+        requestName,
       },
       walletId,
     });
+    result = response.result;
   }
   // We either don't have a requested wallet or we're not using the browser wallet messaging
   else if (wallet?.messaging === 'walletconnect') {
-    connectResults = await mobileConnect({
+    result = await mobileConnect({
       bridge,
       connectionDuration,
       groupAddress,
@@ -90,21 +98,21 @@ export const connect = async ({
       prohibitGroups,
     });
   } else {
-    connectResults.error = 'Wallet not found, or is missing messaging type';
+    result.error = 'Wallet not found, or is missing messaging type';
   }
   // If we are connected, calculate the new connection est/exp times
-  if (connectResults.state?.connection?.status === 'connected') {
+  if (result.state?.connection?.status === 'connected') {
     // TODO: Check to see if it's valid, if it's already expired (session resume), kill the connection
     // Calculate and set the new exp, est times
     const est = Date.now();
     const exp = connectionDuration + est;
-    connectResults.state.connection.connectionDuration = connectionDuration;
-    connectResults.state.connection.jwtDuration = jwtDuration;
-    connectResults.state.connection.est = est;
-    connectResults.state.connection.exp = exp;
+    result.state.connection.connectionDuration = connectionDuration;
+    result.state.connection.jwtDuration = jwtDuration;
+    result.state.connection.est = est;
+    result.state.connection.exp = exp;
   }
 
-  console.log('wcjs | connect.ts | connectResults: ', connectResults);
+  console.log('wcjs | connect.ts | connectResults: ', result);
 
-  return connectResults;
+  return result;
 };

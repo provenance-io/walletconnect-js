@@ -408,32 +408,36 @@ export class WalletConnectService {
     nonCriticalExtensionOptions,
     timeoutHeight,
   }: SendMessageMethod) => {
-    // Loading while we wait for response
-    this.#setState({ connection: { pendingMethod: 'sendMessage' } });
-    const result = await sendMessageMethod({
-      address: this.state.wallet.address || '',
-      connector: this.#connector,
-      customId,
-      walletId: this.state.connection.walletId,
-      data: {
-        message,
-        description,
-        gasPrice,
-        method,
-        feeGranter,
-        feePayer,
-        timeoutHeight,
-        extensionOptions,
-        nonCriticalExtensionOptions,
-        memo,
-      },
-    });
-    // No longer loading
-    this.#setState({ connection: { pendingMethod: '' } });
-    // Refresh auto-disconnect timer
-    this.resetConnectionTimeout();
+    // Only run this if we have a wallet id
+    if (this.state.connection.walletId) {
+      // Loading while we wait for response
+      this.#setState({ connection: { pendingMethod: 'sendMessage' } });
+      const result = await sendMessageMethod({
+        address: this.state.wallet.address || '',
+        connector: this.#connector,
+        customId,
+        walletId: this.state.connection.walletId,
+        data: {
+          message,
+          description,
+          gasPrice,
+          method,
+          feeGranter,
+          feePayer,
+          timeoutHeight,
+          extensionOptions,
+          nonCriticalExtensionOptions,
+          memo,
+        },
+      });
+      // No longer loading
+      this.#setState({ connection: { pendingMethod: '' } });
+      // Refresh auto-disconnect timer
+      this.resetConnectionTimeout();
 
-    return result;
+      return result;
+    }
+    return { error: 'missing wallet id' };
   };
 
   /**
@@ -444,52 +448,64 @@ export class WalletConnectService {
    *        switching to group policy address
    */
   switchToGroup = async (groupPolicyAddress?: string, description?: string) => {
-    // Loading while we wait for response
-    this.#setState({ connection: { pendingMethod: 'switchToGroup' } });
-    const result = await sendWalletActionMethod({
-      connector: this.#connector,
-      walletId: this.state.connection.walletId,
-      data: {
-        action: 'switchToGroup',
-        payload: groupPolicyAddress ? { address: groupPolicyAddress } : undefined,
-        description,
-        method: 'wallet_action',
-      },
-    });
-    // No longer loading
-    this.#setState({ connection: { pendingMethod: '' } });
-    // Refresh auto-disconnect timer
-    this.resetConnectionTimeout();
+    // Only run this if we have a wallet id
+    if (this.state.connection.walletId) {
+      // Loading while we wait for response
+      this.#setState({ connection: { pendingMethod: 'switchToGroup' } });
+      const result = await sendWalletActionMethod({
+        connector: this.#connector,
+        walletId: this.state.connection.walletId,
+        data: {
+          action: 'switchToGroup',
+          payload: groupPolicyAddress ? { address: groupPolicyAddress } : undefined,
+          description,
+          method: 'wallet_action',
+        },
+      });
+      // No longer loading
+      this.#setState({ connection: { pendingMethod: '' } });
+      // Refresh auto-disconnect timer
+      this.resetConnectionTimeout();
 
-    return result;
+      return result;
+    }
+    return { error: 'missing wallet id' };
   };
 
   /**
    *
    * @param expires Time from now in seconds to expire new JWT
+   * @param description (optional) Additional information for wallet to display
    */
-  signJWT = async (expires: number, options?: { customId?: string }) => {
-    // Loading while we wait for response
-    this.#setState({ connection: { pendingMethod: 'signJWT' } });
-    const result = await signJWTMethod({
-      address: this.state.wallet.address || '',
-      connector: this.#connector,
-      customId: options?.customId,
-      expires,
-      publicKey: this.state.wallet.publicKey || '',
-      setState: this.#setState,
-      walletId: this.state.connection.walletId,
-    });
-    // No longer loading
-    this.#setState({ connection: { pendingMethod: '' } });
-    // Refresh auto-disconnect timer
-    this.resetConnectionTimeout();
-    return result;
+  signJWT = async (
+    expires: number,
+    options?: { customId?: string; description?: string }
+  ) => {
+    // Only run this if we have a wallet id
+    if (this.state.connection.walletId) {
+      // Loading while we wait for response
+      this.#setState({ connection: { pendingMethod: 'signJWT' } });
+      const result = await signJWTMethod({
+        address: this.state.wallet.address || '',
+        connector: this.#connector,
+        customId: options?.customId,
+        expires,
+        publicKey: this.state.wallet.publicKey || '',
+        walletId: this.state.connection.walletId,
+      });
+      // No longer loading
+      this.#setState({ connection: { pendingMethod: '' } });
+      // Refresh auto-disconnect timer
+      this.resetConnectionTimeout();
+      return result;
+    }
+    return { error: 'missing wallet id' };
   };
 
   /**
    *
    * @param customMessage Message you want the wallet to sign
+   * @param description (optional) Additional information for wallet to display
    */
   signMessage = async (
     message: string,
@@ -529,23 +545,27 @@ export class WalletConnectService {
    * @param customId string (required) string id value of pending action you want to target
    */
   removePendingMethod = async (customId: string) => {
-    // Loading while we wait for response
-    this.#setState({ connection: { pendingMethod: 'removePendingMethod' } });
-    // Wait to get the result back
-    const result = await sendWalletActionMethod({
-      connector: this.#connector,
-      walletId: this.state.connection.walletId,
-      data: {
-        action: 'removePendingMethod',
-        payload: { customId },
-        method: 'wallet_action',
-      },
-    });
-    // No longer loading
-    this.#setState({ connection: { pendingMethod: '' } });
-    // Refresh auto-disconnect timer
-    this.resetConnectionTimeout();
+    // Only run this if we have a wallet id
+    if (this.state.connection.walletId) {
+      // Loading while we wait for response
+      this.#setState({ connection: { pendingMethod: 'removePendingMethod' } });
+      // Wait to get the result back
+      const result = await sendWalletActionMethod({
+        connector: this.#connector,
+        walletId: this.state.connection.walletId,
+        data: {
+          action: 'removePendingMethod',
+          payload: { customId },
+          method: 'wallet_action',
+        },
+      });
+      // No longer loading
+      this.#setState({ connection: { pendingMethod: '' } });
+      // Refresh auto-disconnect timer
+      this.resetConnectionTimeout();
 
-    return result;
+      return result;
+    }
+    return { error: 'missing wallet id' };
   };
 }
