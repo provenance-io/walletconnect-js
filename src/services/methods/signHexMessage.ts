@@ -14,7 +14,7 @@ interface SignMessage {
   connector?: WalletConnectClientType;
   customId?: string;
   message: string;
-  isHex: boolean;
+  isHex?: boolean;
   publicKey: string;
   walletId: WalletId;
 }
@@ -25,7 +25,7 @@ export const signMessage = async ({
   description = 'Sign Message',
   customId,
   message,
-  isHex,
+  isHex = true,
   publicKey: pubKeyB64,
   walletId,
 }: SignMessage): Promise<SignMessageResponse> => {

@@ -3,7 +3,6 @@ import { Buffer } from 'buffer';
 import {
   DEFAULT_JWT_DURATION,
   LOCAL_STORAGE_NAMES,
-  MOBILE_WALLET_APP_EVENTS,
   WALLETCONNECT_BRIDGE_URL,
   WCS_BACKUP_TIMER_INTERVAL,
   WCS_DEFAULT_STATE,
@@ -20,15 +19,14 @@ import {
   addToLocalStorage,
   clearLocalStorage,
   getLocalStorageValues,
-  sendWalletEvent,
   walletConnectAccountInfo,
 } from '../utils';
 import {
   connect as connectMethod,
   sendMessage as sendMessageMethod,
   sendWalletAction as sendWalletActionMethod,
-  signHexMessage as signHexMessageMethod,
   signJWT as signJWTMethod,
+  signMessage as signMessageMethod,
 } from './methods';
 
 // If we don't have a value for Buffer (node core module) create it/polyfill it
@@ -301,11 +299,12 @@ export class WalletConnectService {
     this.#startConnectionTimer();
     // Send connected wallet custom event with the new connection details
     if (this.state.connection.walletId) {
-      sendWalletEvent(
-        this.state.connection.walletId,
-        MOBILE_WALLET_APP_EVENTS.RESET_TIMEOUT,
-        newConnectionDuration
-      );
+      // TODO: Send event a different way than below
+      // sendWalletEvent(
+      //   this.state.connection.walletId,
+      //   MOBILE_WALLET_APP_EVENTS.RESET_TIMEOUT,
+      //   newConnectionDuration
+      // );
     }
   };
 
@@ -492,25 +491,38 @@ export class WalletConnectService {
    *
    * @param customMessage Message you want the wallet to sign
    */
-  signHexMessage = async (hexMessage: string, options?: { customId?: string }) => {
-    // Loading while we wait for response
-    this.#setState({ connection: { pendingMethod: 'signHexMessage' } });
-    // Wait to get the result back
-    const result = await signHexMessageMethod({
-      address: this.state.wallet.address || '',
-      connector: this.#connector,
-      customId: options?.customId,
-      hexMessage,
-      publicKey: this.state.wallet.publicKey || '',
-      walletId: this.state.connection.walletId,
-    });
-    console.log('walletConnectService | signHex result: ', result);
-    // No longer loading
-    this.#setState({ connection: { pendingMethod: '' } });
-    // Refresh auto-disconnect timer
-    this.resetConnectionTimeout();
+  signMessage = async (
+    message: string,
+    options?: {
+      customId?: string;
+      isHex?: boolean;
+      description?: string;
+    }
+  ) => {
+    // Only run this if we have a wallet id
+    if (this.state.connection.walletId) {
+      // Loading while we wait for response
+      this.#setState({ connection: { pendingMethod: 'signHexMessage' } });
+      // Wait to get the result back
+      const result = await signMessageMethod({
+        address: this.state.wallet.address || '',
+        connector: this.#connector,
+        customId: options?.customId,
+        message,
+        isHex: options?.isHex,
+        description: options?.description,
+        publicKey: this.state.wallet.publicKey || '',
+        walletId: this.state.connection.walletId,
+      });
+      console.log('walletConnectService | signHex result: ', result);
+      // No longer loading
+      this.#setState({ connection: { pendingMethod: '' } });
+      // Refresh auto-disconnect timer
+      this.resetConnectionTimeout();
 
-    return result;
+      return result;
+    }
+    return { error: 'missing wallet id' };
   };
 
   /**

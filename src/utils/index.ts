@@ -6,5 +6,4 @@ export * from './localStorage';
 export * from './log';
 export * from './openDirectWallet';
 export * from './rngNum';
-export * from './sendWalletEvent';
 export * from './walletConnectAccountInfo';

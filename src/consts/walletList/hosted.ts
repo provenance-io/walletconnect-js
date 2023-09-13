@@ -17,15 +17,14 @@ export const FIGURE_HOSTED = {
   messaging: 'browser',
   browserEventAction: (browserEventData) =>
     new Promise((resolve, reject) => {
-      const { uri, address, browserEvent, redirectUrl } = browserEventData;
+      const { individualAddress, browserEvent } = browserEventData;
       // If we have an event, make sure it's not an "ignored" event
       if (browserEvent && !FIGURE_HOSTED_IGNORED_EVENTS.includes(browserEvent)) {
         // Build a full set of urlSearchParams to append to the url
         const searchParams = new URLSearchParams();
-        if (uri) searchParams.append('wc', uri);
-        if (address) searchParams.append('address', address);
+        if (individualAddress) searchParams.append('address', individualAddress);
         if (browserEvent) searchParams.append('event', browserEvent);
-        if (redirectUrl) searchParams.append('redirectUrl', redirectUrl);
+        // if (redirectUrl) searchParams.append('redirectUrl', redirectUrl);
         const searchParamsString = searchParams.toString();
         const url = `${FIGURE_HOSTED_WALLET_URL_PROD}${
           searchParamsString ? `&${searchParamsString}` : ''
@@ -36,7 +35,7 @@ export const FIGURE_HOSTED = {
         const left = window.outerWidth / 2 + window.screenX - width / 2;
         const windowOptions = `popup=1 height=${height} width=${width} top=${top} left=${left} resizable=1, scrollbars=1, fullscreen=0, toolbar=0, menubar=0, status=1`;
         window.open(url, 'figure-wallet-hosted', windowOptions);
-        resolve('');
+        resolve({});
       }
     }),
 } as BrowserWallet;
@@ -62,6 +61,6 @@ export const FIGURE_HOSTED_TEST = {
           })
         );
       }
-      resolve('');
+      resolve({});
     }),
 } as BrowserWallet;
