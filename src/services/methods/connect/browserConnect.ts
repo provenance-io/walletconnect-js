@@ -31,7 +31,7 @@ export const browserConnect = async ({
     },
     walletId,
   });
-
+  console.log('wcjs | browserConnect | response: ', response);
   // TODO: This should NOT be an any...result should be typed
   // const {} = response.result;
 

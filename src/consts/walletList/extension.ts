@@ -1,13 +1,12 @@
-import { BrowserWallet } from '../../types';
+import { Wallet } from '../../types';
 import { CUSTOM_EVENT_EXTENSION } from '../browserEvents';
 import { WALLET_IDS } from '../walletIds';
 
 export const FIGURE_EXTENSION = {
   id: WALLET_IDS.FIGURE_EXTENSION,
-  type: 'extension',
+  type: 'browser',
   title: 'Figure Extension',
   icon: 'figure',
-  messaging: 'browser',
   browserEventAction: (browserEventData) =>
     new Promise((resolve, reject) => {
       const sendMessageEvent = new CustomEvent(CUSTOM_EVENT_EXTENSION, {
@@ -46,4 +45,4 @@ export const FIGURE_EXTENSION = {
   },
   walletCheck: () =>
     !!(window?.figureWalletExtension && window?.figureWalletExtension?.isFigure),
-} as BrowserWallet;
+} as Wallet;

@@ -1,3 +1,5 @@
+import { PROVENANCE_METHODS } from 'consts';
+
 interface Attribute {
   key: string;
   value: string;
@@ -45,3 +47,6 @@ export type GasPrice = {
   gasPrice: number;
   gasPriceDenom: string;
 };
+
+export type ProvenanceMethod =
+  typeof PROVENANCE_METHODS[keyof typeof PROVENANCE_METHODS];

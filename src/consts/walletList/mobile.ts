@@ -1,4 +1,4 @@
-import { WalletConnectWallet } from '../../types';
+import { Wallet } from '../../types';
 import { generateDynamicUrl } from '../../utils';
 import {
   DYNAMIC_LINK_FIGURE_MOBILE_URL,
@@ -8,14 +8,13 @@ import {
   FIGURE_MOBILE_WALLET_PACKAGE_NAME,
   FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST,
 } from '../urls';
-import { WALLET_IDS } from '../walletIds';
+import { WALLET_IDS } from '../wallet';
 
 export const FIGURE_MOBILE = {
   id: WALLET_IDS.FIGURE_MOBILE,
-  type: 'mobile',
+  type: 'walletconnect',
   title: 'Figure Mobile',
   icon: 'figure',
-  messaging: 'walletconnect',
   generateUrl: (qRCodeUrl) =>
     generateDynamicUrl({
       qRCodeUrl,
@@ -24,14 +23,13 @@ export const FIGURE_MOBILE = {
       packageName: FIGURE_MOBILE_WALLET_PACKAGE_NAME,
       walletConnectUrl: FIGURE_MOBILE_WALLET_CONNECT_URL,
     }),
-} as WalletConnectWallet;
+} as Wallet;
 
 export const FIGURE_MOBILE_TEST = {
   id: WALLET_IDS.FIGURE_MOBILE_TEST,
-  type: 'mobile',
+  type: 'walletconnect',
   title: 'Figure Mobile (Test)',
   icon: 'figure',
-  messaging: 'walletconnect',
   generateUrl: (qRCodeUrl) =>
     generateDynamicUrl({
       qRCodeUrl,
@@ -40,4 +38,4 @@ export const FIGURE_MOBILE_TEST = {
       packageName: FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST,
       walletConnectUrl: FIGURE_MOBILE_WALLET_CONNECT_URL,
     }),
-} as WalletConnectWallet;
+} as Wallet;

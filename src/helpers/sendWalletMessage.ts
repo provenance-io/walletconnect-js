@@ -1,10 +1,5 @@
 import { WALLET_LIST } from '../consts';
-import {
-  BrowserWallet,
-  WalletConnectClientType,
-  WalletId,
-  WalletMessageRequest,
-} from '../types';
+import { WalletConnectClientType, WalletId, WalletMessageRequest } from '../types';
 
 interface SendWalletMessage {
   walletId: WalletId;
@@ -24,12 +19,12 @@ export const sendWalletMessage = async ({
     // Use a try/catch since walletconnect might die halfway through the request
     try {
       // Browser wallet message
-      if (wallet.messaging === 'browser') {
-        const result = await (wallet as BrowserWallet).browserEventAction(request);
+      if (wallet.browserEventAction) {
+        const result = await wallet.browserEventAction(request);
         return { result, request };
       }
       // WalletConnect message
-      else if (wallet.messaging === 'walletconnect' && connector) {
+      else if (wallet.type === 'walletconnect' && connector) {
         const result = await connector.sendCustomRequest(request);
         return { result, request };
       }

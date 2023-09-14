@@ -1,5 +1,5 @@
 import { CUSTOM_EVENT_HOSTED } from '../../consts';
-import { BrowserEventValue, BrowserWallet } from '../../types';
+import { BrowserEventValue, Wallet } from '../../types';
 import { FIGURE_HOSTED_WALLET_URL_PROD } from '../urls';
 import { WALLET_IDS } from '../walletIds';
 
@@ -7,10 +7,9 @@ const FIGURE_HOSTED_IGNORED_EVENTS: BrowserEventValue[] = ['resetConnectionTimeo
 
 export const FIGURE_HOSTED = {
   id: WALLET_IDS.FIGURE_HOSTED,
-  type: ['hosted', 'mobile'],
+  type: 'browser',
   title: 'Figure Account',
   icon: 'figure',
-  messaging: 'browser',
   browserEventAction: (browserEventData) =>
     new Promise((resolve, reject) => {
       const { individualAddress, browserEvent } = browserEventData;
@@ -34,15 +33,14 @@ export const FIGURE_HOSTED = {
         resolve({});
       }
     }),
-} as BrowserWallet;
+} as Wallet;
 
 export const FIGURE_HOSTED_TEST = {
   dev: true,
   id: WALLET_IDS.FIGURE_HOSTED_TEST,
-  type: ['hosted', 'mobile'],
+  type: 'browser',
   title: 'Figure Account (Test)',
   icon: 'figure',
-  messaging: 'browser',
   browserEventAction: (browserEventData) =>
     new Promise((resolve, reject) => {
       const { browserEvent } = browserEventData;
@@ -59,4 +57,4 @@ export const FIGURE_HOSTED_TEST = {
       }
       resolve({});
     }),
-} as BrowserWallet;
+} as Wallet;

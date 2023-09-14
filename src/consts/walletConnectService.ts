@@ -39,3 +39,8 @@ export const WCS_DEFAULT_STATE: WCSState = {
 } as const;
 
 export const WCS_BACKUP_TIMER_INTERVAL = 3000; // 3s interval to check connection status
+
+export const WALLET_ACTIONS = {
+  SWITCH_TO_GROUP: 'switchToGroup',
+  REMOVE_PENDING_METHOD: 'removePendingMethod',
+} as const;

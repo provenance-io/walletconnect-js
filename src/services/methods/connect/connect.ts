@@ -63,7 +63,7 @@ export const connect = async ({
   let result: ConnectMethodResults = {};
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
   const wallet = WALLET_LIST.find(({ id }) => id === walletId);
-  if (wallet?.messaging === 'browser') {
+  if (wallet?.type === 'browser') {
     result = await browserConnect({
       connectionDuration,
       jwtDuration,
@@ -74,7 +74,7 @@ export const connect = async ({
     });
   }
   // We either don't have a requested wallet or we're not using the browser wallet messaging
-  else if (wallet?.messaging === 'walletconnect') {
+  else if (wallet?.type === 'walletconnect') {
     result = await mobileConnect({
       bridge,
       connectionDuration,

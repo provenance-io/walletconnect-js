@@ -133,8 +133,13 @@ export class WalletConnectService {
   constructor() {
     // Pull 'walletconnect' and 'walletconnect-js' localStorage values to see if we might already be connected
     const { existingWCJSState, existingWCState } = getLocalStorageValues();
+    console.log('wcjs | constructor | localStorageValues: ', {
+      existingWCJSState,
+      existingWCState,
+    });
     // Merge all the existing wcjs values from localStorage into state
     // TODO: We need to think this through, certain values don't need to be saved (eg: status: 'pending')
+
     // If we were previously "pending" we will no longer be "pending"
     if (existingWCJSState?.connection?.status === 'pending')
       existingWCJSState.connection.status = 'disconnected';
@@ -329,6 +334,7 @@ export class WalletConnectService {
     walletId,
     onDisconnect,
   }: ConnectMethod) => {
+    console.log('wcjs | walletConnectService.ts | connect()');
     // If we're already connected, ignore this event
     if (this.state.connection.status !== 'connected') {
       this.#setState({ connection: { status: 'pending' } });

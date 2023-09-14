@@ -3,7 +3,7 @@ export * from './connectionTimeouts';
 export * from './provenance';
 export * from './storage';
 export * from './urls';
+export * from './wallet';
 export * from './walletConnectEvents';
 export * from './walletConnectService';
-export * from './walletIds';
 export * from './walletList';

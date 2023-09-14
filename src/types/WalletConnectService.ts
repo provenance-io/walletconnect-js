@@ -1,14 +1,6 @@
-import type WalletConnectClient from '@walletconnect/client';
-import type {
-  AccountAttribute,
-  AccountObject,
-  MasterGroupPolicy,
-} from './ConnectData';
-import type { GasPrice } from './Cosmos';
-import type { WalletId } from './Wallet';
-import type { ProvenanceMethod } from './WalletMessaging';
-
-export type WalletConnectClientType = WalletConnectClient;
+import { MasterGroupPolicy } from './MasterGroupPolicy';
+import type { AccountAttribute, AccountObject, WalletId } from './Wallet';
+import { WalletConnectClientType } from './WalletConnect';
 
 type PendingMethod =
   | ''
@@ -93,65 +85,5 @@ export interface WCLocalState {
   handshakeId: number;
   handshakeTopic: string;
 }
-export type WCLocalStateKeys = keyof WCLocalState;
-
-export interface ConnectMethod {
-  bridge?: string;
-  connectionDuration?: number;
-  jwtDuration?: number;
-  noPopup?: boolean;
-  individualAddress?: string;
-  groupAddress?: string;
-  prohibitGroups?: boolean;
-  walletId: WalletId;
-  onDisconnect?: (message?: string) => void;
-}
-export type ConnectMethodFunction = ConnectMethod & {
-  // These will always exist since they will show up with defaults
-  bridge: string;
-  connectionDuration: number;
-  jwtDuration: number;
-  prohibitGroups: boolean;
-};
-
-export interface ConnectMethodResults {
-  state?: PartialState<WCSState>;
-  error?: string;
-  resetState?: boolean;
-  connector?: WalletConnectClientType;
-}
-
-export interface WalletConnectInitMethod {
-  bridge: string;
-  connectionDuration: number;
-  groupAddress?: string;
-  individualAddress?: string;
-  jwtDuration: number;
-  prohibitGroups: boolean;
-  // walletId: WalletId;
-}
-
-export interface SendMessageMethod {
-  customId?: string;
-  description?: string;
-  extensionOptions?: string[];
-  feeGranter?: string;
-  feePayer?: string;
-  gasPrice?: GasPrice;
-  memo?: string;
-  message: string | string[];
-  method?: ProvenanceMethod;
-  nonCriticalExtensionOptions?: string[];
-  timeoutHeight?: number;
-}
-
-export interface SendWalletActionMethod {
-  method?: ProvenanceMethod;
-  description?: string;
-  action: WalletAction;
-  payload?: Record<string, unknown>;
-}
 
 export type UpdateModalData = Partial<ModalState> & { walletId?: WalletId };
-
-export type WalletAction = 'switchToGroup' | 'removePendingMethod';

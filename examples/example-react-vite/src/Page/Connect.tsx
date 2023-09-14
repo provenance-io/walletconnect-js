@@ -1,4 +1,4 @@
-import type { BroadcastEventData, WalletId } from '@provenanceio/walletconnect-js';
+import type { WalletId } from '@provenanceio/walletconnect-js';
 import {
   QRCodeModal,
   WALLET_LIST,
@@ -60,7 +60,9 @@ export const Connect: React.FC = () => {
   const [connectionDuration, setConnectionDuration] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
-  const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
+  // TODO: What is this type?  How will dApps know these types?
+  // WCJS needs to export results for each method...
+  const [results, setResults] = useState<any>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status } = walletConnectState.connection;
   const { QRCodeImg, dynamicUrl } = walletConnectState.modal;
@@ -75,7 +77,7 @@ export const Connect: React.FC = () => {
     if (walletId) {
       // If we find the target walletId in the walletList
       const targetWallet = WALLET_LIST.find(({id}) => walletId === id);
-      if (targetWallet && targetWallet.walletCheck) {
+      if (targetWallet && targetWallet?.walletCheck) {
         // Check if the wallet exists for the user
         const walletExists = targetWallet.walletCheck();
         if (!walletExists) {
