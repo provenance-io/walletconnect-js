@@ -60,7 +60,7 @@ export const connect = async ({
   prohibitGroups,
   walletId,
 }: ConnectMethodFunction): Promise<ConnectMethodResults> => {
-  let result: ConnectMethodResults = {};
+  let result: ConnectMethodResults;
   // We are given a specific wallet we want to open, determine if it's going to use walletconnect or not
   const wallet = WALLET_LIST.find(({ id }) => id === walletId);
   if (wallet?.type === 'browser') {

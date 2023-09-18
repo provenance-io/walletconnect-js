@@ -10,10 +10,9 @@ import {
 import type {
   ConnectMethod,
   PartialState,
-  SendMessageMethod,
+  // SendMessageMethod,
   WCLocalState,
   WCSState,
-  WalletConnectClientType,
 } from '../types';
 import {
   addToLocalStorage,
@@ -37,7 +36,7 @@ export class WalletConnectService {
 
   #backupConnectionTimer = 0; // Interval timer running every x seconds checking connection status
 
-  #connector?: WalletConnectClientType; // walletconnect connector object
+  #connector?: WalletConnectClient; // walletconnect connector object
 
   #updateContext: ((state: WCSState) => void) | undefined = undefined; // Connect class state updates to context wrapper
 
@@ -126,7 +125,7 @@ export class WalletConnectService {
   }
 
   // Keep the WalletConnect connector saved, but inaccessable/out of the class state
-  #setConnector(connector?: WalletConnectClientType) {
+  #setConnector(connector?: WalletConnectClient) {
     this.#connector = connector;
   }
 
@@ -413,7 +412,8 @@ export class WalletConnectService {
     method,
     nonCriticalExtensionOptions,
     timeoutHeight,
-  }: SendMessageMethod) => {
+  }: any) => {
+    // TODO: Remove any
     // Only run this if we have a wallet id
     if (this.state.connection.walletId) {
       // Loading while we wait for response

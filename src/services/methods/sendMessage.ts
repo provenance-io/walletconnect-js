@@ -3,7 +3,7 @@ import { PROVENANCE_METHODS } from '../../consts';
 import { sendWalletMessage } from '../../helpers';
 import type {
   SendMessageMethod,
-  SignMessageResponse,
+  // SignMessageResponse,
   WalletConnectClientType,
   WalletId,
 } from '../../types';
@@ -23,7 +23,7 @@ export const sendMessage = async ({
   customId,
   data,
   walletId,
-}: SendMessage): Promise<SignMessageResponse> => {
+}: SendMessage): Promise<any> => {
   const {
     message: rawB64Message,
     description = 'Send Message',

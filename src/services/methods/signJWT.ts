@@ -3,7 +3,7 @@ import base64url from 'base64url';
 import { DEFAULT_CONNECTION_DURATION, PROVENANCE_METHODS } from '../../consts';
 import { sendWalletMessage, verifySignature } from '../../helpers';
 import type {
-  SignJWTResponse,
+  // SignJWTResponse,
   WalletConnectClientType,
   WalletId,
 } from '../../types';
@@ -27,7 +27,7 @@ export const signJWT = async ({
   expires, // Custom expiration time in seconds from now
   publicKey: pubKeyB64,
   walletId,
-}: SignJWT): Promise<SignJWTResponse> => {
+}: SignJWT): Promise<any> => {
   const nowSec = Math.round(Date.now() / 1000); // Current time seconds
   const customExpiresGiven = expires !== undefined;
   const defaultExpireSec = DEFAULT_CONNECTION_DURATION; // (24hours as seconds)

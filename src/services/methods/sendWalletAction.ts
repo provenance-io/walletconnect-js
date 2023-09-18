@@ -1,9 +1,9 @@
 import { PROVENANCE_METHODS } from '../../consts';
 import { sendWalletMessage } from '../../helpers';
 import type {
-  RemovePendingMethodResponse,
-  SendWalletActionMethod,
-  SwitchGroupResponse,
+  // RemovePendingMethodResponse,
+  // SendWalletActionMethod,
+  // SwitchGroupResponse,
   WalletConnectClientType,
   WalletId,
 } from '../../types';
@@ -11,7 +11,7 @@ import { rngNum } from '../../utils';
 
 interface SendWalletAction {
   connector?: WalletConnectClientType;
-  data: SendWalletActionMethod;
+  data: any;
   walletId: WalletId;
 }
 
@@ -19,7 +19,7 @@ export const sendWalletAction = async ({
   connector,
   walletId,
   data,
-}: SendWalletAction): Promise<SwitchGroupResponse | RemovePendingMethodResponse> => {
+}: SendWalletAction): Promise<any> => {
   const {
     description = 'Send Wallet Action',
     method = PROVENANCE_METHODS.ACTION,

@@ -2,7 +2,7 @@ import { convertUtf8ToHex } from '@walletconnect/utils';
 import { PROVENANCE_METHODS } from '../../consts';
 import { sendWalletMessage, verifySignature } from '../../helpers';
 import type {
-  SignMessageResponse,
+  // SignMessageResponse,
   WalletConnectClientType,
   WalletId,
 } from '../../types';
@@ -28,7 +28,7 @@ export const signMessage = async ({
   isHex = true,
   publicKey: pubKeyB64,
   walletId,
-}: SignMessage): Promise<SignMessageResponse> => {
+}: SignMessage): Promise<any> => {
   const method = PROVENANCE_METHODS.SIGN;
   const metadata = JSON.stringify({
     description,

@@ -1,6 +1,6 @@
+import type WalletConnectClient from '@walletconnect/client';
 import { MasterGroupPolicy } from './MasterGroupPolicy';
 import type { AccountAttribute, AccountObject, WalletId } from './Wallet';
-import { WalletConnectClientType } from './WalletConnect';
 
 type PendingMethod =
   | ''
@@ -59,7 +59,7 @@ export interface WCSState {
 }
 
 export interface WCSSetStateParam extends WCSState {
-  connector?: WalletConnectClientType;
+  connector?: WalletConnectClient;
 }
 
 export type PartialState<T> = {

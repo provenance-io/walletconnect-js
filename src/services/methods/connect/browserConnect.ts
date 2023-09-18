@@ -1,8 +1,13 @@
 import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../../../consts';
 import { sendWalletMessage } from '../../../helpers';
-import { ConnectMethod, ConnectMethodResults } from '../../../types';
+import {
+  ConnectMethod,
+  ConnectMethodResults,
+  ConnectWalletResponseBrowser,
+} from '../../../types';
 import { getPageData } from '../../../utils';
 
+// TODO: Not sure if using ConnectMethod to type browserConnect is right...
 export const browserConnect = async ({
   connectionDuration,
   jwtDuration,
@@ -10,13 +15,14 @@ export const browserConnect = async ({
   individualAddress,
   prohibitGroups,
   walletId,
-}: ConnectMethod): Promise<ConnectMethodResults> => {
+}: ConnectMethod): Promise<ConnectWalletResponseBrowser> => {
   const {
     favicon: requestFavicon,
     origin: requestOrigin,
     title: requestName,
   } = getPageData();
-  const response = await sendWalletMessage({
+  // TODO: Need sendWalletMessage result to be based on... method
+  const response: ConnectWalletResponseBrowser = await sendWalletMessage({
     request: {
       method: PROVENANCE_METHODS.CONNECT,
       browserEvent: BROWSER_EVENTS.BASIC,
@@ -32,14 +38,26 @@ export const browserConnect = async ({
     walletId,
   });
   console.log('wcjs | browserConnect | response: ', response);
-  // TODO: This should NOT be an any...result should be typed
-  // const {} = response.result;
+
+  const { accounts } = response.result;
+  const { address, attributes, jwt, publicKey, walletInfo, representedGroupPolicy } =
+    accounts;
+  const { coin, id, name } = walletInfo;
 
   const result: ConnectMethodResults = {
-    error: response.error,
+    ...(response.error && { error: response.error }),
     state: {
       connection: { status: 'connected', type: 'browser', walletId },
-      wallet: { address: response.result },
+      wallet: {
+        address,
+        attributes,
+        signedJWT: jwt,
+        publicKey,
+        representedGroupPolicy,
+        coin,
+        id,
+        name,
+      },
     },
   };
   return result;

@@ -1,6 +1,7 @@
 import { WALLET_ICONS, WALLET_IDS, WALLET_TYPES } from '../consts';
 import { MasterGroupPolicy } from './MasterGroupPolicy';
-import { WalletMessageRequest, WalletMessageResponse } from './WalletMessaging';
+import { BrowserWalletRequest, BrowserWalletResponse } from './Methods/Generic';
+// import { WalletMessageRequest, WalletMessageResponse } from './WalletMessaging';
 
 export type WalletType = typeof WALLET_TYPES[keyof typeof WALLET_TYPES];
 export type WalletId = typeof WALLET_IDS[keyof typeof WALLET_IDS];
@@ -13,17 +14,16 @@ export interface Wallet {
   dev?: boolean; // Is this wallet still in development?  If true, QRCode modal won't render by default
   icon?: WalletIcons; // Icon to display next to the wallet selection
   id: WalletId; // Id to reference this specific wallet
-  title: string; // Title to display when selecting wallets
-  type: WalletType; // Is this wallet mobile, web, or an extension
+  title: string; // Title to display when rendering UI of wallets
+  type: WalletType; // How does wcjs communicate w/wallet (wc vs browser messaging)
   // -----------------------------
   // Browser wallet functions/keys
   // -----------------------------
   browserEventAction?: (
-    eventData: WalletMessageRequest
-  ) => Promise<WalletMessageResponse>; // Callback function for every walletconnect-js method/action
+    eventData: BrowserWalletRequest
+  ) => Promise<BrowserWalletResponse>;
   walletCheck?: () => boolean; // Check if the wallet exists, runs background actions as needed, returns a boolean indicating existance
-  walletUrl?: string; // Location of wallet download
-  walletUrls?: Record<string, string>; // Location of wallet download based on browser
+  walletUrls?: Record<string, string>; // Url to download wallet based on browser
   // -----------------------------
   // walletconnect functions/keys
   // -----------------------------
@@ -54,3 +54,5 @@ export type AccountObject = {
   representedGroupPolicy?: MasterGroupPolicy;
   walletInfo: WalletInfo;
 };
+
+export type WalletConnectAccountInfo = string[] | AccountObject[] | undefined;

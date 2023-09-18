@@ -1,11 +1,18 @@
 import { WALLET_LIST } from '../consts';
-import { WalletConnectClientType, WalletId, WalletMessageRequest } from '../types';
+import { SendWalletMessage } from '../types';
 
-interface SendWalletMessage {
-  walletId: WalletId;
-  request: WalletMessageRequest;
-  connector?: WalletConnectClientType;
-}
+/* TODO:
+Based on the request, we need to know the shape of the response we will be getting back from the wallet
+
+- This is complicated as browser wallets will return a different shape from walletconnect wallets
+
+- Result is known based on walletType (browser vs walletconnect) and request method. (what about "wallet_action"?)
+
+- Need a fancy function type variable that will look at walletType and request method
+
+- Could also only type "sendCustomRequest" and "browserEventAction", then "sendWalletMessage" would be an OR of those? I want clearer typing based on the wallet type though
+
+*/
 
 // Send the wallet a message, this can be a message to a browser wallet or walletconnect wallet
 export const sendWalletMessage = async ({
