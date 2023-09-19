@@ -26,8 +26,9 @@ export const sendWalletMessage = async ({
     // Use a try/catch since walletconnect might die halfway through the request
     try {
       // Browser wallet message
-      if (wallet.browserEventAction) {
-        const result = await wallet.browserEventAction(request);
+      if (wallet.type === 'browser' && wallet.browserEventAction) {
+        const { method } = request; // TODO: request is currently an any...
+        const result = await wallet.browserEventAction(request, request);
         return { result, request };
       }
       // WalletConnect message

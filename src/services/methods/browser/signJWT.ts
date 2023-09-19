@@ -1,32 +1,26 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import base64url from 'base64url';
-import { DEFAULT_CONNECTION_DURATION, PROVENANCE_METHODS } from '../../consts';
-import { sendWalletMessage, verifySignature } from '../../helpers';
-import type {
-  // SignJWTResponse,
-  WalletConnectClientType,
-  WalletId,
-} from '../../types';
-import { rngNum } from '../../utils';
+import { DEFAULT_CONNECTION_DURATION, PROVENANCE_METHODS } from '../../../consts';
+import { verifySignature } from '../../../helpers';
+import type { BrowserWallet } from '../../../types';
+import { rngNum } from '../../../utils';
 
 interface SignJWT {
   address: string;
-  connector?: WalletConnectClientType;
   customId?: string;
   expires?: number;
   publicKey: string;
-  walletId: WalletId;
   description?: string;
+  wallet: BrowserWallet;
 }
 
 export const signJWT = async ({
   address,
-  connector,
   description = 'Sign JWT Token',
   customId,
   expires, // Custom expiration time in seconds from now
   publicKey: pubKeyB64,
-  walletId,
+  wallet,
 }: SignJWT): Promise<any> => {
   const nowSec = Math.round(Date.now() / 1000); // Current time seconds
   const customExpiresGiven = expires !== undefined;
@@ -65,7 +59,7 @@ export const signJWT = async ({
   request.params.push(hexJWT);
 
   // Send a message to the wallet containing the request and wait for a response
-  const response = await sendWalletMessage({ request, walletId, connector });
+  const response = await wallet.browserEventAction(request, request);
   const signature = Buffer.from(response.result, 'hex');
   // verify signature
   const valid = await verifySignature(hexJWT, signature, pubKeyB64);

@@ -1,28 +1,20 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import { PROVENANCE_METHODS } from '../../consts';
-import { sendWalletMessage } from '../../helpers';
-import type {
-  SendMessageMethod,
-  // SignMessageResponse,
-  WalletConnectClientType,
-  WalletId,
-} from '../../types';
-import { rngNum } from '../../utils';
+import { PROVENANCE_METHODS } from '../../../consts';
+import type { BrowserWallet, SendMessageMethod } from '../../../types';
+import { rngNum } from '../../../utils';
 
 interface SendMessage {
   address: string;
-  connector?: WalletConnectClientType;
   customId?: string;
   data: SendMessageMethod;
-  walletId: WalletId;
+  wallet: BrowserWallet;
 }
 
 export const sendMessage = async ({
   address,
-  connector,
   customId,
   data,
-  walletId,
+  wallet,
 }: SendMessage): Promise<any> => {
   const {
     message: rawB64Message,
@@ -67,7 +59,7 @@ export const sendMessage = async ({
   request.params.push(...hexMsgArray);
 
   // Send a message to the wallet containing the request and wait for a response
-  const response = await sendWalletMessage({ request, walletId, connector });
+  const response = await wallet.browserEventAction(request, request);
   // No result, or result error, or response code is 0
   const hasError = !response || response.error || !response.result.txResponse.code;
 

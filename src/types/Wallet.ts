@@ -1,6 +1,10 @@
 import { WALLET_ICONS, WALLET_IDS, WALLET_TYPES } from '../consts';
+import {
+  BrowserWalletEventActionRequests,
+  BrowserWalletEventActionResponses,
+} from './BrowserWallet/Methods/Generic';
+import { ProvenanceMethod } from './Cosmos';
 import { MasterGroupPolicy } from './MasterGroupPolicy';
-import { BrowserWalletRequest, BrowserWalletResponse } from './Methods/Generic';
 // import { WalletMessageRequest, WalletMessageResponse } from './WalletMessaging';
 
 export type WalletType = typeof WALLET_TYPES[keyof typeof WALLET_TYPES];
@@ -16,20 +20,21 @@ export interface Wallet {
   id: WalletId; // Id to reference this specific wallet
   title: string; // Title to display when rendering UI of wallets
   type: WalletType; // How does wcjs communicate w/wallet (wc vs browser messaging)
-  // -----------------------------
-  // Browser wallet functions/keys
-  // -----------------------------
-  browserEventAction?: (
-    eventData: BrowserWalletRequest
-  ) => Promise<BrowserWalletResponse>;
+}
+
+export type BrowserWallet = Wallet & {
+  browserEventAction: <M extends ProvenanceMethod>(
+    request: BrowserWalletEventActionRequests[M],
+    method: M
+  ) => Promise<BrowserWalletEventActionResponses[M]>;
   walletCheck?: () => boolean; // Check if the wallet exists, runs background actions as needed, returns a boolean indicating existance
   walletUrls?: Record<string, string>; // Url to download wallet based on browser
-  // -----------------------------
-  // walletconnect functions/keys
-  // -----------------------------
+};
+
+export type WCWallet = Wallet & {
   dynamicUrl?: string; // The result of generateUrl, the dyanmic url for mobile users.
   generateUrl?: (QRCodeUrl: string) => string; // Function to generate a dynamic URL for mobile users
-}
+};
 
 export type WalletList = Wallet[];
 

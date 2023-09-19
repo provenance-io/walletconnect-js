@@ -4,11 +4,13 @@ import {
   DEFAULT_JWT_DURATION,
   LOCAL_STORAGE_NAMES,
   WALLETCONNECT_BRIDGE_URL,
+  WALLET_LIST,
   WCS_BACKUP_TIMER_INTERVAL,
   WCS_DEFAULT_STATE,
 } from '../consts';
 import type {
-  ConnectMethod,
+  BrowserWallet,
+  ConnectMethodService,
   PartialState,
   // SendMessageMethod,
   WCLocalState,
@@ -20,13 +22,8 @@ import {
   getLocalStorageValues,
   walletConnectAccountInfo,
 } from '../utils';
-import {
-  connect as connectMethod,
-  sendMessage as sendMessageMethod,
-  sendWalletAction as sendWalletActionMethod,
-  signJWT as signJWTMethod,
-  signMessage as signMessageMethod,
-} from './methods';
+// browser methods
+import { connect as browserConnect } from './methods/browser';
 
 // If we don't have a value for Buffer (node core module) create it/polyfill it
 if (window.Buffer === undefined) window.Buffer = Buffer;
@@ -313,7 +310,7 @@ export class WalletConnectService {
   };
 
   /**
-   * @param bridge - (optional) URL string of bridge to connect into
+   * @param bridge - (optional) URL string of bridge to connect into (walletconnect only)
    * @param connectionDuration - (optional) Time before connection is timed out (seconds)
    * @param jwtDuration - (optional) Time before signed jwt is timed out (seconds)
    * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
@@ -332,42 +329,73 @@ export class WalletConnectService {
     prohibitGroups = false,
     walletId,
     onDisconnect,
-  }: ConnectMethod) => {
+  }: ConnectMethodService) => {
     console.log('wcjs | walletConnectService.ts | connect()');
+    // Pull wallet based on id entered
+    const wallet = WALLET_LIST.find(({ id }) => id === walletId);
+    // ----------------
+    // Check for errors
+    // ----------------
     // If we're already connected, ignore this event
-    if (this.state.connection.status !== 'connected') {
-      this.#setState({ connection: { status: 'pending' } });
-      const results = await connectMethod({
-        individualAddress,
-        groupAddress,
-        bridge,
-        // Duration/jwtExpiration should be in ms, but is passed into connect as s
-        connectionDuration: connectionDuration
-          ? connectionDuration * 1000
-          : this.state.connection.connectionDuration,
-        jwtDuration: jwtDuration ? jwtDuration * 1000 : DEFAULT_JWT_DURATION,
-        prohibitGroups,
-        walletId,
+    if (this.state.connection.status === 'connected')
+      return { error: { message: 'Already connected', code: 0 } };
+    // If we can't find a wallet based on the id, kick back an error
+    if (!wallet) return { error: { message: 'Invalid wallet ID', code: 0 } };
+    // --------------------------------------------
+    // No errors, send message based on wallet type
+    // --------------------------------------------
+    this.#setState({ connection: { status: 'pending' } });
+    // Object to be passed into each type of connectMethod (defaults filled in)
+    const requestParams = {
+      individualAddress,
+      groupAddress,
+      // Duration/jwtExpiration should be in ms, but is passed into connect as s
+      connectionDuration: connectionDuration
+        ? connectionDuration * 1000
+        : this.state.connection.connectionDuration,
+      jwtDuration: jwtDuration ? jwtDuration * 1000 : DEFAULT_JWT_DURATION,
+      prohibitGroups,
+      wallet,
+    };
+    let results;
+    // TODO: Refactor walletconnect connect method
+    // if (wallet.type === 'walletconnect')
+    //   results = await wcConnect({
+    //     individualAddress,
+    //     groupAddress,
+    //     bridge,
+    //     // Duration/jwtExpiration should be in ms, but is passed into connect as s
+    //     connectionDuration: connectionDuration
+    //       ? connectionDuration * 1000
+    //       : this.state.connection.connectionDuration,
+    //     jwtDuration: jwtDuration ? jwtDuration * 1000 : DEFAULT_JWT_DURATION,
+    //     prohibitGroups,
+    //     walletId,
+    //   });
+    if (wallet.type === 'browser')
+      // REMOVE: Vig return here: We need to get a return type on results, problem is that browserConnect and wcConnect will be returning differently shaped objects.
+      // Solution would be to make them return the same standard shape with {connector, state, resetState, error}.
+      // This means that the result of both browserConnect and wcConnect will need to be the same shape/a shared type which will live in ServiceMethods type folder and get used within each method
+      results = await browserConnect({
+        ...requestParams,
+        wallet: requestParams.wallet as BrowserWallet,
       });
-      console.log('wcjs | walletConnectService.ts | connect results: ', results);
-      // Based on the results perform service actions
-      // if (results.error) return { error: results.error };
-      // No error means we've connected, add the disconnect event if passed in
-      // else {
-      if (onDisconnect) this.#setState({ connection: { onDisconnect } });
-      if (results.connector) this.#connector = results.connector;
-      if (results.resetState) this.#setState('reset');
-      if (results.state) {
-        this.#setState(results.state);
-        // Start the connection timer
-        this.#startConnectionTimer();
-      }
-      // TODO: What should we return to the user? Right now returning everything...
-      return results;
-      // }
-    } else {
-      return { error: 'Already connected' };
+    console.log('wcjs | walletConnectService.ts | connect results: ', results);
+    // Based on the results perform service actions
+    // if (results.error) return { error: results.error };
+    // No error means we've connected, add the disconnect event if passed in
+    // else {
+    if (onDisconnect) this.#setState({ connection: { onDisconnect } });
+    if (results.connector) this.#connector = results.connector;
+    if (results.resetState) this.#setState('reset');
+    if (results.state) {
+      this.#setState(results.state);
+      // Start the connection timer
+      this.#startConnectionTimer();
     }
+    // TODO: What should we return to the user? Right now returning everything...
+    return results;
+    // }
   };
 
   /**
@@ -400,51 +428,51 @@ export class WalletConnectService {
    * @param nonCriticalExtensionOptions (optional) Tx body nonCriticalExtensionOptions
    * @param timeoutHeight (optional) Tx body timeoutHeight
    */
-  sendMessage = async ({
-    customId,
-    description,
-    extensionOptions,
-    feeGranter,
-    feePayer,
-    gasPrice,
-    memo,
-    message,
-    method,
-    nonCriticalExtensionOptions,
-    timeoutHeight,
-  }: any) => {
-    // TODO: Remove any
-    // Only run this if we have a wallet id
-    if (this.state.connection.walletId) {
-      // Loading while we wait for response
-      this.#setState({ connection: { pendingMethod: 'sendMessage' } });
-      const result = await sendMessageMethod({
-        address: this.state.wallet.address || '',
-        connector: this.#connector,
-        customId,
-        walletId: this.state.connection.walletId,
-        data: {
-          message,
-          description,
-          gasPrice,
-          method,
-          feeGranter,
-          feePayer,
-          timeoutHeight,
-          extensionOptions,
-          nonCriticalExtensionOptions,
-          memo,
-        },
-      });
-      // No longer loading
-      this.#setState({ connection: { pendingMethod: '' } });
-      // Refresh auto-disconnect timer
-      this.resetConnectionTimeout();
+  // sendMessage = async ({
+  //   customId,
+  //   description,
+  //   extensionOptions,
+  //   feeGranter,
+  //   feePayer,
+  //   gasPrice,
+  //   memo,
+  //   message,
+  //   method,
+  //   nonCriticalExtensionOptions,
+  //   timeoutHeight,
+  // }: any) => {
+  //   // TODO: Remove any
+  //   // Only run this if we have a wallet id
+  //   if (this.state.connection.walletId) {
+  //     // Loading while we wait for response
+  //     this.#setState({ connection: { pendingMethod: 'sendMessage' } });
+  //     const result = await sendMessageMethod({
+  //       address: this.state.wallet.address || '',
+  //       connector: this.#connector,
+  //       customId,
+  //       walletId: this.state.connection.walletId,
+  //       data: {
+  //         message,
+  //         description,
+  //         gasPrice,
+  //         method,
+  //         feeGranter,
+  //         feePayer,
+  //         timeoutHeight,
+  //         extensionOptions,
+  //         nonCriticalExtensionOptions,
+  //         memo,
+  //       },
+  //     });
+  //     // No longer loading
+  //     this.#setState({ connection: { pendingMethod: '' } });
+  //     // Refresh auto-disconnect timer
+  //     this.resetConnectionTimeout();
 
-      return result;
-    }
-    return { error: 'missing wallet id' };
-  };
+  //     return result;
+  //   }
+  //   return { error: 'missing wallet id' };
+  // };
 
   /**
    *
@@ -453,125 +481,125 @@ export class WalletConnectService {
    * @param description (optional) provide description to display in the wallet when
    *        switching to group policy address
    */
-  switchToGroup = async (groupPolicyAddress?: string, description?: string) => {
-    // Only run this if we have a wallet id
-    if (this.state.connection.walletId) {
-      // Loading while we wait for response
-      this.#setState({ connection: { pendingMethod: 'switchToGroup' } });
-      const result = await sendWalletActionMethod({
-        connector: this.#connector,
-        walletId: this.state.connection.walletId,
-        data: {
-          action: 'switchToGroup',
-          payload: groupPolicyAddress ? { address: groupPolicyAddress } : undefined,
-          description,
-          method: 'wallet_action',
-        },
-      });
-      // No longer loading
-      this.#setState({ connection: { pendingMethod: '' } });
-      // Refresh auto-disconnect timer
-      this.resetConnectionTimeout();
+  // switchToGroup = async (groupPolicyAddress?: string, description?: string) => {
+  //   // Only run this if we have a wallet id
+  //   if (this.state.connection.walletId) {
+  //     // Loading while we wait for response
+  //     this.#setState({ connection: { pendingMethod: 'switchToGroup' } });
+  //     const result = await sendWalletActionMethod({
+  //       connector: this.#connector,
+  //       walletId: this.state.connection.walletId,
+  //       data: {
+  //         action: 'switchToGroup',
+  //         payload: groupPolicyAddress ? { address: groupPolicyAddress } : undefined,
+  //         description,
+  //         method: 'wallet_action',
+  //       },
+  //     });
+  //     // No longer loading
+  //     this.#setState({ connection: { pendingMethod: '' } });
+  //     // Refresh auto-disconnect timer
+  //     this.resetConnectionTimeout();
 
-      return result;
-    }
-    return { error: 'missing wallet id' };
-  };
+  //     return result;
+  //   }
+  //   return { error: 'missing wallet id' };
+  // };
 
   /**
    *
    * @param expires Time from now in seconds to expire new JWT
    * @param description (optional) Additional information for wallet to display
    */
-  signJWT = async (
-    expires: number,
-    options?: { customId?: string; description?: string }
-  ) => {
-    // Only run this if we have a wallet id
-    if (this.state.connection.walletId) {
-      // Loading while we wait for response
-      this.#setState({ connection: { pendingMethod: 'signJWT' } });
-      const result = await signJWTMethod({
-        address: this.state.wallet.address || '',
-        connector: this.#connector,
-        customId: options?.customId,
-        expires,
-        publicKey: this.state.wallet.publicKey || '',
-        walletId: this.state.connection.walletId,
-      });
-      // No longer loading
-      this.#setState({ connection: { pendingMethod: '' } });
-      // Refresh auto-disconnect timer
-      this.resetConnectionTimeout();
-      return result;
-    }
-    return { error: 'missing wallet id' };
-  };
+  // signJWT = async (
+  //   expires: number,
+  //   options?: { customId?: string; description?: string }
+  // ) => {
+  //   // Only run this if we have a wallet id
+  //   if (this.state.connection.walletId) {
+  //     // Loading while we wait for response
+  //     this.#setState({ connection: { pendingMethod: 'signJWT' } });
+  //     const result = await signJWTMethod({
+  //       address: this.state.wallet.address || '',
+  //       connector: this.#connector,
+  //       customId: options?.customId,
+  //       expires,
+  //       publicKey: this.state.wallet.publicKey || '',
+  //       walletId: this.state.connection.walletId,
+  //     });
+  //     // No longer loading
+  //     this.#setState({ connection: { pendingMethod: '' } });
+  //     // Refresh auto-disconnect timer
+  //     this.resetConnectionTimeout();
+  //     return result;
+  //   }
+  //   return { error: 'missing wallet id' };
+  // };
 
   /**
    *
    * @param customMessage Message you want the wallet to sign
    * @param description (optional) Additional information for wallet to display
    */
-  signMessage = async (
-    message: string,
-    options?: {
-      customId?: string;
-      isHex?: boolean;
-      description?: string;
-    }
-  ) => {
-    // Only run this if we have a wallet id
-    if (this.state.connection.walletId) {
-      // Loading while we wait for response
-      this.#setState({ connection: { pendingMethod: 'signHexMessage' } });
-      // Wait to get the result back
-      const result = await signMessageMethod({
-        address: this.state.wallet.address || '',
-        connector: this.#connector,
-        customId: options?.customId,
-        message,
-        isHex: options?.isHex,
-        description: options?.description,
-        publicKey: this.state.wallet.publicKey || '',
-        walletId: this.state.connection.walletId,
-      });
-      console.log('walletConnectService | signHex result: ', result);
-      // No longer loading
-      this.#setState({ connection: { pendingMethod: '' } });
-      // Refresh auto-disconnect timer
-      this.resetConnectionTimeout();
+  // signMessage = async (
+  //   message: string,
+  //   options?: {
+  //     customId?: string;
+  //     isHex?: boolean;
+  //     description?: string;
+  //   }
+  // ) => {
+  //   // Only run this if we have a wallet id
+  //   if (this.state.connection.walletId) {
+  //     // Loading while we wait for response
+  //     this.#setState({ connection: { pendingMethod: 'signHexMessage' } });
+  //     // Wait to get the result back
+  //     const result = await signMessageMethod({
+  //       address: this.state.wallet.address || '',
+  //       connector: this.#connector,
+  //       customId: options?.customId,
+  //       message,
+  //       isHex: options?.isHex,
+  //       description: options?.description,
+  //       publicKey: this.state.wallet.publicKey || '',
+  //       walletId: this.state.connection.walletId,
+  //     });
+  //     console.log('walletConnectService | signHex result: ', result);
+  //     // No longer loading
+  //     this.#setState({ connection: { pendingMethod: '' } });
+  //     // Refresh auto-disconnect timer
+  //     this.resetConnectionTimeout();
 
-      return result;
-    }
-    return { error: 'missing wallet id' };
-  };
+  //     return result;
+  //   }
+  //   return { error: 'missing wallet id' };
+  // };
 
   /**
    * @param customId string (required) string id value of pending action you want to target
    */
-  removePendingMethod = async (customId: string) => {
-    // Only run this if we have a wallet id
-    if (this.state.connection.walletId) {
-      // Loading while we wait for response
-      this.#setState({ connection: { pendingMethod: 'removePendingMethod' } });
-      // Wait to get the result back
-      const result = await sendWalletActionMethod({
-        connector: this.#connector,
-        walletId: this.state.connection.walletId,
-        data: {
-          action: 'removePendingMethod',
-          payload: { customId },
-          method: 'wallet_action',
-        },
-      });
-      // No longer loading
-      this.#setState({ connection: { pendingMethod: '' } });
-      // Refresh auto-disconnect timer
-      this.resetConnectionTimeout();
+  // removePendingMethod = async (customId: string) => {
+  //   // Only run this if we have a wallet id
+  //   if (this.state.connection.walletId) {
+  //     // Loading while we wait for response
+  //     this.#setState({ connection: { pendingMethod: 'removePendingMethod' } });
+  //     // Wait to get the result back
+  //     const result = await sendWalletActionMethod({
+  //       connector: this.#connector,
+  //       walletId: this.state.connection.walletId,
+  //       data: {
+  //         action: 'removePendingMethod',
+  //         payload: { customId },
+  //         method: 'wallet_action',
+  //       },
+  //     });
+  //     // No longer loading
+  //     this.#setState({ connection: { pendingMethod: '' } });
+  //     // Refresh auto-disconnect timer
+  //     this.resetConnectionTimeout();
 
-      return result;
-    }
-    return { error: 'missing wallet id' };
-  };
+  //     return result;
+  //   }
+  //   return { error: 'missing wallet id' };
+  // };
 }

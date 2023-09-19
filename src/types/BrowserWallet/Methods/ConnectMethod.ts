@@ -1,0 +1,80 @@
+import type WalletConnectClient from '@walletconnect/client';
+import { ProvenanceMethod } from '../../Cosmos';
+import type { AccountObject } from '../../Wallet';
+import { BrowserWallet } from '../../Wallet';
+import type { PartialState, WCSState } from '../../WalletConnectService';
+import type { ResponseError } from './Generic';
+
+/*  Full flow of communication:
+  1) dApp => wcjs.method()  
+  2) wcjs.method() => methodFunction()
+  3) methodFunction() => wallet (walletconnect || browser message)
+  4) wallet => methodFunction() (walletconnect || browser message)
+  5) methodFunction() => wcjs.method()
+  6) wcjs.method() => dApp
+*/
+
+// ----------------------------------
+// CONNECT
+// ----------------------------------
+
+// Values passing into method when dApp calls service function
+// 1) dApp => wcjs.method()
+export interface ConnectMethodBrowser {
+  connectionDuration?: number;
+  groupAddress?: string;
+  individualAddress?: string;
+  jwtDuration?: number;
+  onDisconnect?: (message?: string) => void;
+  prohibitGroups?: boolean;
+  wallet: BrowserWallet;
+}
+// Values passed into method when services calls function w/defaults (optional values now filled)
+// 2) wcjs.method() => methodFunction()
+export type ConnectMethodBrowserFunction = ConnectMethodBrowser & {
+  connectionDuration: number;
+  jwtDuration: number;
+  prohibitGroups: boolean;
+};
+// Values sent from service to wallet (browser)
+// methodFunction() => wallet
+export interface ConnectRequestBrowser {
+  browserEvent: string; // TODO: Get this type
+  connectionDuration: number;
+  groupAddress?: string;
+  individualAddress?: string;
+  jwtDuration: number;
+  method: ProvenanceMethod; // TODO: Get this type
+  prohibitGroups: boolean;
+  requestFavicon?: string[];
+  requestName?: string;
+  requestOrigin?: string;
+}
+// Values returned to service from wallet (browser)
+// wallet => methodFunction()
+export interface ConnectResponseBrowser {
+  request: ConnectRequestBrowser;
+  result: {
+    chainId: string; // TODO: Get this type
+    accounts: AccountObject;
+  };
+  error?: ResponseError;
+}
+// Values returned by service function
+// methodFunction() => wcjs.method()
+export interface ConnectMethodResultsBrowser {
+  state?: PartialState<WCSState>;
+  error?: string;
+  resetState?: boolean;
+  connector?: WalletConnectClient;
+}
+// Values returned to dApp by service
+// wcjs.method() => dApp
+export interface ConnectResultBrowser {
+  result?: {
+    connectionEST: number;
+    connectionEXP: number;
+    connectionType: 'existing session' | 'new session';
+  };
+  error?: ResponseError;
+}

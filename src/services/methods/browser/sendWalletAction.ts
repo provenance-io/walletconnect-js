@@ -1,23 +1,14 @@
-import { PROVENANCE_METHODS } from '../../consts';
-import { sendWalletMessage } from '../../helpers';
-import type {
-  // RemovePendingMethodResponse,
-  // SendWalletActionMethod,
-  // SwitchGroupResponse,
-  WalletConnectClientType,
-  WalletId,
-} from '../../types';
+import { PROVENANCE_METHODS } from '../../../consts';
+import { BrowserWallet } from '../../../types';
 import { rngNum } from '../../utils';
 
 interface SendWalletAction {
-  connector?: WalletConnectClientType;
   data: any;
-  walletId: WalletId;
+  wallet: BrowserWallet;
 }
 
 export const sendWalletAction = async ({
-  connector,
-  walletId,
+  wallet,
   data,
 }: SendWalletAction): Promise<any> => {
   const {
@@ -40,7 +31,7 @@ export const sendWalletAction = async ({
     params: [metadata],
   };
   // Send a message to the wallet containing the request and wait for a response
-  const response = await sendWalletMessage({ request, walletId, connector });
+  const response = await wallet.browserEventAction(request, request);
 
   return { valid: !!response && !response.error, ...response };
 };
