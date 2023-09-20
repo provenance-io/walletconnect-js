@@ -1,5 +1,5 @@
 import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../../../consts';
-import { BrowserWallet, ConnectMethodResultsBrowser } from '../../../types';
+import { BrowserWallet, ConnectMethodServiceFunctionResults } from '../../../types';
 import { getPageData } from '../../../utils';
 
 interface Connect {
@@ -18,7 +18,7 @@ export const connect = async ({
   jwtDuration,
   prohibitGroups,
   wallet,
-}: Connect): Promise<ConnectMethodResultsBrowser> => {
+}: Connect): Promise<ConnectMethodServiceFunctionResults> => {
   const {
     favicon: requestFavicon,
     origin: requestOrigin,
@@ -52,7 +52,7 @@ export const connect = async ({
   const est = Date.now();
   const exp = connectionDuration + est;
 
-  const result: ConnectMethodResultsBrowser = {
+  const result: ConnectMethodServiceFunctionResults = {
     state: {
       connection: { status: 'connected', connectionDuration, jwtDuration, est, exp },
       wallet: {

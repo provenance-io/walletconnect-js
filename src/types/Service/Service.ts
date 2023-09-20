@@ -1,6 +1,6 @@
 import type WalletConnectClient from '@walletconnect/client';
-import { MasterGroupPolicy } from './MasterGroupPolicy';
-import type { AccountAttribute, AccountObject, WalletId } from './Wallet';
+import { MasterGroupPolicy } from '../MasterGroupPolicy';
+import type { AccountAttribute, AccountObject, WalletId } from '../Wallet';
 
 type PendingMethod =
   | ''

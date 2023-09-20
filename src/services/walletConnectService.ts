@@ -11,6 +11,7 @@ import {
 import type {
   BrowserWallet,
   ConnectMethodService,
+  ConnectMethodServiceFunctionResults,
   PartialState,
   // SendMessageMethod,
   WCLocalState,
@@ -357,7 +358,7 @@ export class WalletConnectService {
       prohibitGroups,
       wallet,
     };
-    let results;
+    let results: ConnectMethodServiceFunctionResults = {};
     // TODO: Refactor walletconnect connect method
     // if (wallet.type === 'walletconnect')
     //   results = await wcConnect({
@@ -373,9 +374,6 @@ export class WalletConnectService {
     //     walletId,
     //   });
     if (wallet.type === 'browser')
-      // REMOVE: Vig return here: We need to get a return type on results, problem is that browserConnect and wcConnect will be returning differently shaped objects.
-      // Solution would be to make them return the same standard shape with {connector, state, resetState, error}.
-      // This means that the result of both browserConnect and wcConnect will need to be the same shape/a shared type which will live in ServiceMethods type folder and get used within each method
       results = await browserConnect({
         ...requestParams,
         wallet: requestParams.wallet as BrowserWallet,

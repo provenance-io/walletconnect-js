@@ -1,8 +1,6 @@
-import type WalletConnectClient from '@walletconnect/client';
 import { ProvenanceMethod } from '../../Cosmos';
 import type { AccountObject } from '../../Wallet';
 import { BrowserWallet } from '../../Wallet';
-import type { PartialState, WCSState } from '../../WalletConnectService';
 import type { ResponseError } from './Generic';
 
 /*  Full flow of communication:
@@ -62,12 +60,13 @@ export interface ConnectResponseBrowser {
 }
 // Values returned by service function
 // methodFunction() => wcjs.method()
-export interface ConnectMethodResultsBrowser {
-  state?: PartialState<WCSState>;
-  error?: string;
-  resetState?: boolean;
-  connector?: WalletConnectClient;
-}
+// Note: This is shared with wcConnect so it will live within ServiceMethods ConnectMethod
+// export interface ConnectMethodResultsBrowser {
+//   state?: PartialState<WCSState>;
+//   error?: string;
+//   resetState?: boolean;
+//   connector?: WalletConnectClient;
+// }
 // Values returned to dApp by service
 // wcjs.method() => dApp
 export interface ConnectResultBrowser {
