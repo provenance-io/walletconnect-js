@@ -59,7 +59,7 @@ export const signJWT = async ({
   request.params.push(hexJWT);
 
   // Send a message to the wallet containing the request and wait for a response
-  const response = await wallet.browserEventAction(request, request);
+  const response = await wallet.browserEventAction(request, method);
   const signature = Buffer.from(response.result, 'hex');
   // verify signature
   const valid = await verifySignature(hexJWT, signature, pubKeyB64);

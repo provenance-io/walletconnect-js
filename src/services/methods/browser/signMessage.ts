@@ -41,7 +41,7 @@ export const signMessage = async ({
   const hexMessage = isHex ? message : convertUtf8ToHex(message);
   request.params.push(hexMessage);
   // Send a message to the wallet containing the request and wait for a response
-  const response = await wallet.browserEventAction(request, request);
+  const response = await wallet.browserEventAction(request, method);
   // result is a hex encoded signature
   const signature = Uint8Array.from(Buffer.from(response.result, 'hex'));
   // verify signature

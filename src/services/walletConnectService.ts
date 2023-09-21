@@ -103,7 +103,7 @@ export class WalletConnectService {
   }
 
   // Interval timer which will check
-  #backupTimer(status: 'start' | 'clear') {
+  #backupTimer = (status: 'start' | 'clear') => {
     if (status === 'start') {
       // If we're connected and there is not already a backup timer running, start one
       if (
@@ -120,7 +120,7 @@ export class WalletConnectService {
       window.clearInterval(this.#backupConnectionTimer);
       this.#backupConnectionTimer = 0;
     }
-  }
+  };
 
   // Keep the WalletConnect connector saved, but inaccessable/out of the class state
   #setConnector(connector?: WalletConnectClient) {
@@ -206,7 +206,7 @@ export class WalletConnectService {
       // Update wallet info
       newState.wallet = {
         address,
-        signedJWT: jwt,
+        jwt,
         publicKey,
         attributes,
         representedGroupPolicy,
@@ -226,9 +226,10 @@ export class WalletConnectService {
 
   // WalletConnect-JS localStorage values changed, just merge it into state since we will store everything now
   #localStorageChangeBrowserWallet(newValue: string | null) {
-    // TODO: We don't want to do this, doing this will mean if one page is loading the other page should be loading too
-    // Need to pick out certain things we care about and ignore the others (state wise)
-    const newValueObj = JSON.parse(newValue || '{}') as PartialState<WCSState>;
+    // TODO: Is it an issue that same origin, all pages will get "pending" status when one is connecting? For now, leave as is and find out
+    const newValueObj = newValue
+      ? (JSON.parse(newValue || '{}') as PartialState<WCSState>)
+      : 'reset';
     this.#setState(newValueObj);
   }
 
@@ -243,7 +244,7 @@ export class WalletConnectService {
   };
 
   // One or more values within localStorage have changed, see if we care about any of the values and update the state as needed
-  #handleLocalStorageChange(storageEvent: StorageEvent) {
+  #handleLocalStorageChange = (storageEvent: StorageEvent) => {
     const { key: storageEventKey, newValue } = storageEvent;
     // Info: Another tab triggered a disconnect, or "switch account", connectionTimeout reset, etc
     if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECTJS)
@@ -251,7 +252,7 @@ export class WalletConnectService {
     // WalletConnect localStorage values changed
     else if (storageEventKey === LOCAL_STORAGE_NAMES.WALLETCONNECT)
       this.#localStorageChangeWalletConnect(newValue);
-  }
+  };
 
   // // Update the modal values
   // updateModal = (newModalData: UpdateModalData) => {
@@ -373,12 +374,16 @@ export class WalletConnectService {
     //     prohibitGroups,
     //     walletId,
     //   });
+    console.log('wcjs | walletConnectService.ts | browserConnect pending');
     if (wallet.type === 'browser')
       results = await browserConnect({
         ...requestParams,
         wallet: requestParams.wallet as BrowserWallet,
       });
-    console.log('wcjs | walletConnectService.ts | connect results: ', results);
+    console.log(
+      'wcjs | walletConnectService.ts | browserConnect results: ',
+      results
+    );
     // Based on the results perform service actions
     // if (results.error) return { error: results.error };
     // No error means we've connected, add the disconnect event if passed in

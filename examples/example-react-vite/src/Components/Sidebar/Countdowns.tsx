@@ -70,12 +70,13 @@ export const Countdowns: React.FC = () => {
   const [popupModalMsg, setPopupModalMsg] = useState(''); // What message should the popup modal display?
   const { walletConnectState } = useWalletConnect();
   const { status, exp: connectionEXP } = walletConnectState.connection;
-  const { address, signedJWT } = walletConnectState.wallet;
+  const { address, jwt } = walletConnectState.wallet;
   const connected = status === 'connected';
-  // Need to decode signedJWT and note the expiration time
-  const { payload: JWTPayload, valid: JWTValid } = decodeJWT(signedJWT, {
+  // Need to decode jwt and note the expiration time
+  const { payload: JWTPayload, valid: JWTValid } = decodeJWT(jwt, {
     addr: address || 'n/a',
   });
+
   // Pull out expiration date for jwt (in seconds)
   const { exp: JWTExpMs } = JWTPayload;
 

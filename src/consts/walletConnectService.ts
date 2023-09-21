@@ -34,7 +34,7 @@ export const WCS_DEFAULT_STATE: WCSState = {
     name: undefined,
     publicKey: undefined,
     representedGroupPolicy: undefined,
-    signedJWT: undefined,
+    jwt: undefined,
   },
 } as const;
 

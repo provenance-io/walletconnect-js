@@ -1,13 +1,13 @@
-import { Wallet } from '../../types';
+import { BrowserWallet, BrowserWalletEventActionResponses } from '../../types';
 import { CUSTOM_EVENT_EXTENSION } from '../browserEvents';
-import { WALLET_IDS } from '../walletIds';
+import { WALLET_IDS } from '../wallet';
 
 export const FIGURE_EXTENSION = {
   id: WALLET_IDS.FIGURE_EXTENSION,
   type: 'browser',
   title: 'Figure Extension',
   icon: 'figure',
-  browserEventAction: (browserEventData) =>
+  browserEventAction: (browserEventData, method) =>
     new Promise((resolve, reject) => {
       const sendMessageEvent = new CustomEvent(CUSTOM_EVENT_EXTENSION, {
         detail: { request: browserEventData },
@@ -19,18 +19,19 @@ export const FIGURE_EXTENSION = {
       addEventListener(
         CUSTOM_EVENT_EXTENSION,
         (message) => {
-          const { sender, result } = (message as CustomEvent).detail;
+          // TODO: Get sender types
+          const {
+            sender,
+            result,
+          }: {
+            sender: string;
+            result: BrowserWalletEventActionResponses[typeof method];
+          } = (message as CustomEvent).detail;
           // Only listen to messages sent by the content-script
           // TODO: Maybe check the origin instead? Might get wires crossed with multiple tab requests
           if (sender === 'content-script') {
             console.log('wcjs | eventAction | catchEvent | message: ', message);
-            if (result) {
-              if (result.error) {
-                reject(result.error);
-              } else {
-                resolve(result);
-              }
-            }
+            resolve(result);
           }
         },
         { once: true }
@@ -45,4 +46,4 @@ export const FIGURE_EXTENSION = {
   },
   walletCheck: () =>
     !!(window?.figureWalletExtension && window?.figureWalletExtension?.isFigure),
-} as Wallet;
+} as BrowserWallet;

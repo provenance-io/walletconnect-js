@@ -5,7 +5,7 @@ export * from './hooks';
 export * from './services';
 
 export type {
-  ConnectMethod,
+  // ConnectMethod,
   ProvenanceMethod,
   // Wallet info
   WalletId,

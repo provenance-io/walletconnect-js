@@ -44,10 +44,8 @@ export const connect = async ({
   );
   console.log('wcjs | connect.ts | connectResults: ', response);
   // Use the response to pull out data for wcjs store/dApp response
-  const { accounts } = response.result;
-  const { address, attributes, jwt, publicKey, walletInfo, representedGroupPolicy } =
-    accounts;
-  const { coin, id, name } = walletInfo;
+  const { wallet: walletResponse, error } = response;
+  if (error) return { error, resetState: true };
   // Calculate and set the new exp, est times
   const est = Date.now();
   const exp = connectionDuration + est;
@@ -55,16 +53,7 @@ export const connect = async ({
   const result: ConnectMethodServiceFunctionResults = {
     state: {
       connection: { status: 'connected', connectionDuration, jwtDuration, est, exp },
-      wallet: {
-        address,
-        attributes,
-        signedJWT: jwt,
-        publicKey,
-        representedGroupPolicy,
-        coin,
-        id,
-        name,
-      },
+      wallet: walletResponse,
     },
   };
 

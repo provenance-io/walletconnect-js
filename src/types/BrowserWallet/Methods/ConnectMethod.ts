@@ -1,5 +1,5 @@
+import { WalletState } from 'types/Service';
 import { ProvenanceMethod } from '../../Cosmos';
-import type { AccountObject } from '../../Wallet';
 import { BrowserWallet } from '../../Wallet';
 import type { ResponseError } from './Generic';
 
@@ -51,12 +51,12 @@ export interface ConnectRequestBrowser {
 // Values returned to service from wallet (browser)
 // wallet => methodFunction()
 export interface ConnectResponseBrowser {
-  request: ConnectRequestBrowser;
-  result: {
-    chainId: string; // TODO: Get this type
-    accounts: AccountObject;
-  };
+  // request: ConnectRequestBrowser;
+  // result: {
+  chainId: string; // TODO: Get this type
+  wallet: WalletState;
   error?: ResponseError;
+  // };
 }
 // Values returned by service function
 // methodFunction() => wcjs.method()

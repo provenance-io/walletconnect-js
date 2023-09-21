@@ -1,6 +1,6 @@
 import { PROVENANCE_METHODS } from '../../../consts';
 import { BrowserWallet } from '../../../types';
-import { rngNum } from '../../utils';
+import { rngNum } from '../../../utils';
 
 interface SendWalletAction {
   data: any;
@@ -31,7 +31,7 @@ export const sendWalletAction = async ({
     params: [metadata],
   };
   // Send a message to the wallet containing the request and wait for a response
-  const response = await wallet.browserEventAction(request, request);
+  const response = await wallet.browserEventAction(request, method);
 
   return { valid: !!response && !response.error, ...response };
 };

@@ -14,7 +14,7 @@ export type WalletId = typeof WALLET_IDS[keyof typeof WALLET_IDS];
 // Currently just points to a local file name
 export type WalletIcons = typeof WALLET_ICONS[keyof typeof WALLET_ICONS];
 
-export interface Wallet {
+interface BasicWallet {
   dev?: boolean; // Is this wallet still in development?  If true, QRCode modal won't render by default
   icon?: WalletIcons; // Icon to display next to the wallet selection
   id: WalletId; // Id to reference this specific wallet
@@ -22,7 +22,7 @@ export interface Wallet {
   type: WalletType; // How does wcjs communicate w/wallet (wc vs browser messaging)
 }
 
-export type BrowserWallet = Wallet & {
+export type BrowserWallet = BasicWallet & {
   browserEventAction: <M extends ProvenanceMethod>(
     request: BrowserWalletEventActionRequests[M],
     method: M
@@ -31,12 +31,12 @@ export type BrowserWallet = Wallet & {
   walletUrls?: Record<string, string>; // Url to download wallet based on browser
 };
 
-export type WCWallet = Wallet & {
+export type WCWallet = BasicWallet & {
   dynamicUrl?: string; // The result of generateUrl, the dyanmic url for mobile users.
   generateUrl?: (QRCodeUrl: string) => string; // Function to generate a dynamic URL for mobile users
 };
 
-export type WalletList = Wallet[];
+export type FullWallet = Partial<BrowserWallet> & Partial<WCWallet>;
 
 // This structure is due to walletconnect
 export type WalletInfo = {

@@ -111,7 +111,7 @@ Holds current walletconnect-js state values
     peer: {}, // Connected wallet info [object]
     pendingMethod: '', // Are any methods currently pending [string]
     publicKey: '', // Wallet public key (base64url encoded)
-    signedJWT: '', // Signed JWT token [string]
+    jwt: '', // Signed JWT token [string]
     walletAppId: '', // Type of wallet [string]
     walletInfo: { // Information about the currently connected wallet account
       coin: '', // [string]

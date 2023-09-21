@@ -1,4 +1,4 @@
-import { Wallet } from '../../types';
+import { WCWallet } from '../../types';
 import { generateDynamicUrl } from '../../utils';
 import {
   DYNAMIC_LINK_FIGURE_MOBILE_URL,
@@ -23,7 +23,7 @@ export const FIGURE_MOBILE = {
       packageName: FIGURE_MOBILE_WALLET_PACKAGE_NAME,
       walletConnectUrl: FIGURE_MOBILE_WALLET_CONNECT_URL,
     }),
-} as Wallet;
+} as WCWallet;
 
 export const FIGURE_MOBILE_TEST = {
   id: WALLET_IDS.FIGURE_MOBILE_TEST,
@@ -38,4 +38,4 @@ export const FIGURE_MOBILE_TEST = {
       packageName: FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST,
       walletConnectUrl: FIGURE_MOBILE_WALLET_CONNECT_URL,
     }),
-} as Wallet;
+} as WCWallet;

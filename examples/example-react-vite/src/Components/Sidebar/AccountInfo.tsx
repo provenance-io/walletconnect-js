@@ -39,7 +39,6 @@ const RowInfoValue = styled.div`
 
 export const AccountInfo: React.FC = () => {
   const { walletConnectState } = useWalletConnect();
-  console.log('walletConnectState: ', walletConnectState);
   const { bridge } = walletConnectState.connection;
   const { address, representedGroupPolicy, name: walletName } = walletConnectState.wallet;
   const groupAddress = representedGroupPolicy?.address;

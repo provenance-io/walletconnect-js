@@ -36,7 +36,7 @@ export interface WalletState {
   name?: string;
   publicKey?: string;
   representedGroupPolicy?: MasterGroupPolicy;
-  signedJWT?: string;
+  jwt?: string;
 }
 export interface ConnectionState {
   bridge?: string;
