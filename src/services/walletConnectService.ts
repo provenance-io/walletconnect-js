@@ -24,7 +24,10 @@ import {
   walletConnectAccountInfo,
 } from '../utils';
 // browser methods
-import { connect as browserConnect } from './methods/browser';
+import {
+  connect as browserConnect,
+  disconnect as browserDisconnect,
+} from './methods/browser';
 
 // If we don't have a value for Buffer (node core module) create it/polyfill it
 if (window.Buffer === undefined) window.Buffer = Buffer;
@@ -397,7 +400,9 @@ export class WalletConnectService {
       this.#startConnectionTimer();
     }
     // TODO: What should we return to the user? Right now returning everything...
-    return results;
+    // Certain values do not/should not be returned. Manually filter them for now, later can create const or helper...
+    const { resetState, ...wantedResults } = results;
+    return wantedResults;
     // }
   };
 
@@ -415,6 +420,14 @@ export class WalletConnectService {
     if (this.#connector && this.#connector.connected)
       await this.#connector.killSession({ message });
     this.#setState('reset');
+    // Need a walletID to send the wallet a message
+    if (this.state.connection.walletId) {
+      const wallet = WALLET_LIST.find(
+        ({ id }) => id === this.state.connection.walletId
+      );
+      if (wallet && wallet.type === 'browser')
+        await browserDisconnect(message, wallet as BrowserWallet);
+    }
     return message;
   };
 

@@ -11,6 +11,7 @@ export interface ResponseError {
 // All possible requests sent to the wallet from service
 export type BrowserWalletEventActionRequests = {
   [PROVENANCE_METHODS.CONNECT]: ConnectRequestBrowser;
+  [PROVENANCE_METHODS.DISCONNECT]: any; // TODO: Build out type
   [PROVENANCE_METHODS.SEND]: any; // TODO: Build out type
   [PROVENANCE_METHODS.SIGN]: any; // TODO: Build out type
   [PROVENANCE_METHODS.ACTION]: any; // TODO: Build out type
@@ -19,6 +20,7 @@ export type BrowserWalletEventActionRequests = {
 // All possible responses sent to service from wallet
 export type BrowserWalletEventActionResponses = {
   [PROVENANCE_METHODS.CONNECT]: ConnectResponseBrowser;
+  [PROVENANCE_METHODS.DISCONNECT]: any; // TODO: Build out type
   [PROVENANCE_METHODS.SEND]: any; // TODO: Build out type
   [PROVENANCE_METHODS.SIGN]: any; // TODO: Build out type
   [PROVENANCE_METHODS.ACTION]: any; // TODO: Build out type

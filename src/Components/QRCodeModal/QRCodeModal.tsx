@@ -318,5 +318,5 @@ export const QRCodeModal: React.FC<Props> = ({
   //     </div>
   //   </div>
   // ) : null;
-  <div>QRCodeModal</div>
+  <></>
 );
