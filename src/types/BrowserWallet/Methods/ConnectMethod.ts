@@ -1,4 +1,5 @@
 import { WalletState } from 'types/Service';
+import { BROWSER_EVENTS } from '../../../consts';
 import { ProvenanceMethod } from '../../Cosmos';
 import { BrowserWallet } from '../../Wallet';
 import type { ResponseError } from './Generic';
@@ -37,7 +38,7 @@ export type ConnectMethodBrowserFunction = ConnectMethodBrowser & {
 // Values sent from service to wallet (browser)
 // methodFunction() => wallet
 export interface ConnectRequestBrowser {
-  browserEvent: string; // TODO: Get this type
+  browserEvent: typeof BROWSER_EVENTS[keyof typeof BROWSER_EVENTS];
   connectionDuration: number;
   groupAddress?: string;
   individualAddress?: string;

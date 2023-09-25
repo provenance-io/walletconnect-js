@@ -1,8 +1,8 @@
 export const BROWSER_EVENTS = {
-  RESET_TIMEOUT: 'resetConnectionTimeout',
-  DISCONNECT: 'disconnect',
   BASIC: 'basic',
+  DISCONNECT: 'disconnect',
   HIDDEN: 'hidden',
+  RESET_TIMEOUT: 'resetConnectionTimeout',
 } as const;
 
 // Window message event name when communicating with figureHosted/extension wallets

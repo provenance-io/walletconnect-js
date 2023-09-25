@@ -52,7 +52,14 @@ export const connect = async ({
 
   const result: ConnectMethodServiceFunctionResults = {
     state: {
-      connection: { status: 'connected', connectionDuration, jwtDuration, est, exp },
+      connection: {
+        status: 'connected',
+        connectionDuration,
+        jwtDuration,
+        est,
+        exp,
+        walletId: wallet.id,
+      },
       wallet: walletResponse,
     },
   };

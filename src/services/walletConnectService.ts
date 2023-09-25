@@ -1,6 +1,7 @@
 import WalletConnectClient from '@walletconnect/client';
 import { Buffer } from 'buffer';
 import {
+  // BROWSER_WALLETS,
   DEFAULT_JWT_DURATION,
   LOCAL_STORAGE_NAMES,
   WALLETCONNECT_BRIDGE_URL,
@@ -27,6 +28,7 @@ import {
 import {
   connect as browserConnect,
   disconnect as browserDisconnect,
+  resumeConnection as browserResumeConnection,
 } from './methods/browser';
 
 // If we don't have a value for Buffer (node core module) create it/polyfill it
@@ -130,20 +132,11 @@ export class WalletConnectService {
     this.#connector = connector;
   }
 
-  constructor() {
-    // Pull 'walletconnect' and 'walletconnect-js' localStorage values to see if we might already be connected
-    const { existingWCJSState, existingWCState } = getLocalStorageValues();
-    console.log('wcjs | constructor | localStorageValues: ', {
-      existingWCJSState,
-      existingWCState,
-    });
-    // Merge all the existing wcjs values from localStorage into state
-    // TODO: We need to think this through, certain values don't need to be saved (eg: status: 'pending')
-
-    // If we were previously "pending" we will no longer be "pending"
-    if (existingWCJSState?.connection?.status === 'pending')
-      existingWCJSState.connection.status = 'disconnected';
-    this.#setState(existingWCJSState);
+  #checkExistingConnectionWC = (existingWCState?: WalletConnectClient) => {
+    console.log(
+      'wcjs | #checkExistingConnectionWC | existingWCState: ',
+      existingWCState
+    );
     // Are we already connected with walletconnect?
     if (
       existingWCState &&
@@ -156,6 +149,52 @@ export class WalletConnectService {
       });
       this.#setConnector(newConnector);
     }
+  };
+
+  #checkExistingConnectionBrowser = async (existingWCJSState?: WCSState) => {
+    console.log(
+      'wcjs | #checkExistingConnectionBrowser | existingWCJSState: ',
+      existingWCJSState
+    );
+    if (existingWCJSState) {
+      const { status, exp, walletId } = existingWCJSState.connection;
+      // Are we previously connected, not expired, & have a valid wallet?
+      const isConnected = status && status === 'connected';
+      const isNotExpired = exp && exp > Date.now();
+      // const isBrowserWallet = walletId && BROWSER_WALLETS.includes(walletId);
+      if (walletId) {
+        const wallet = WALLET_LIST.find(({ id }) => id === walletId);
+        const isBrowserWallet = wallet && wallet.type === 'browser';
+        // Check if criteria for resuming a browser connection is met
+        if (isConnected && isNotExpired && isBrowserWallet) {
+          console.log(
+            'wcjs | #checkExistingConnectionBrowser | we might be connected...'
+          );
+          // Send a connection request to confirm that the connection still exists
+          const results = await browserResumeConnection(wallet as BrowserWallet);
+          console.log(
+            'wcjs | #checkExistingConnectionBrowser | are we connected results: ',
+            results
+          );
+          // TODO: These should be a separate method in wcjs service to reuse for other method results (they should all return a similar shape)
+          if (results.resetState) this.#setState('reset');
+          if (results.state) {
+            this.#setState(results.state);
+            // Start the connection timer
+            this.#startConnectionTimer();
+          }
+        }
+      }
+    }
+  };
+
+  constructor() {
+    // Pull 'walletconnect' and 'walletconnect-js' localStorage values to see if we might already be connected
+    const { existingWCJSState, existingWCState } = getLocalStorageValues();
+    // Page has just loaded/reloaded, check for existing connections
+    this.#checkExistingConnectionWC(existingWCState);
+    this.#checkExistingConnectionBrowser(existingWCJSState);
+
     // Setup a listener for localStorage changes
     window.addEventListener('storage', this.#handleLocalStorageChange);
     // If we're connected, start the backup timer
@@ -392,6 +431,7 @@ export class WalletConnectService {
     // No error means we've connected, add the disconnect event if passed in
     // else {
     if (onDisconnect) this.#setState({ connection: { onDisconnect } });
+    // TODO: These should be a separate method in wcjs service to reuse for other method results (they should all return a similar shape)
     if (results.connector) this.#connector = results.connector;
     if (results.resetState) this.#setState('reset');
     if (results.state) {

@@ -3,5 +3,6 @@ export const PROVENANCE_METHODS = {
   SEND: 'provenance_sendTransaction',
   ACTION: 'wallet_action',
   CONNECT: 'connect',
+  RESUME: 'resume',
   DISCONNECT: 'disconnect',
 } as const;

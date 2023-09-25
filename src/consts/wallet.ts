@@ -14,3 +14,13 @@ export const WALLET_TYPES = {
 export const WALLET_ICONS = {
   FIGURE: 'figure',
 } as const;
+
+export const BROWSER_WALLETS = [
+  WALLET_IDS.FIGURE_EXTENSION,
+  WALLET_IDS.FIGURE_HOSTED,
+  WALLET_IDS.FIGURE_HOSTED_TEST,
+] as const;
+export const WC_WALLETS = [
+  WALLET_IDS.FIGURE_MOBILE,
+  WALLET_IDS.FIGURE_MOBILE_TEST,
+] as const;

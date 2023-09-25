@@ -2,6 +2,7 @@
 
 import { PROVENANCE_METHODS } from 'consts';
 import { ConnectRequestBrowser, ConnectResponseBrowser } from './ConnectMethod';
+import { ResumeRequestBrowser, ResumeResponseBrowser } from './ResumeMethod';
 
 export interface ResponseError {
   error?: { message: string; code: number };
@@ -11,6 +12,7 @@ export interface ResponseError {
 // All possible requests sent to the wallet from service
 export type BrowserWalletEventActionRequests = {
   [PROVENANCE_METHODS.CONNECT]: ConnectRequestBrowser;
+  [PROVENANCE_METHODS.RESUME]: ResumeRequestBrowser;
   [PROVENANCE_METHODS.DISCONNECT]: any; // TODO: Build out type
   [PROVENANCE_METHODS.SEND]: any; // TODO: Build out type
   [PROVENANCE_METHODS.SIGN]: any; // TODO: Build out type
@@ -20,6 +22,7 @@ export type BrowserWalletEventActionRequests = {
 // All possible responses sent to service from wallet
 export type BrowserWalletEventActionResponses = {
   [PROVENANCE_METHODS.CONNECT]: ConnectResponseBrowser;
+  [PROVENANCE_METHODS.RESUME]: ResumeResponseBrowser;
   [PROVENANCE_METHODS.DISCONNECT]: any; // TODO: Build out type
   [PROVENANCE_METHODS.SEND]: any; // TODO: Build out type
   [PROVENANCE_METHODS.SIGN]: any; // TODO: Build out type
