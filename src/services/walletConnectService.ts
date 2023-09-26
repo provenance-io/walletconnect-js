@@ -46,6 +46,9 @@ export class WalletConnectService {
   state: WCSState = WCS_DEFAULT_STATE; // Main data held and used within this class object
 
   // Keep all state updates tidy in a single method (prevent random setting in methods)
+  // TODO: This function isn't working correctly
+  // Ideally it will look at the key and only update that specific state key's values provided, leaving the other existing keys/values alone
+  // Actually is only setting the values provided and defaulting all other values (default state)
   #setState = (
     updatedState: PartialState<WCSState> | 'reset',
     updateLocalStorage = true
@@ -68,6 +71,11 @@ export class WalletConnectService {
         // Note: Due to TS limitations, we can't infer the key here and have to manually build out state
         switch (updateKey) {
           case 'connection':
+            console.log(
+              'wcjs | walletConnectService.ts | #updateState | connection | newNestedState, existingNestedState: ',
+              newNestedState,
+              existingNestedState
+            );
             newState.connection = {
               ...existingNestedState,
               ...newNestedState,
@@ -151,13 +159,15 @@ export class WalletConnectService {
     }
   };
 
-  #checkExistingConnectionBrowser = async (existingWCJSState?: WCSState) => {
+  #checkExistingConnectionBrowser = async (
+    existingConnection?: WCSState['connection']
+  ) => {
     console.log(
-      'wcjs | #checkExistingConnectionBrowser | existingWCJSState: ',
-      existingWCJSState
+      'wcjs | #checkExistingConnectionBrowser | existingConnection: ',
+      existingConnection
     );
-    if (existingWCJSState) {
-      const { status, exp, walletId } = existingWCJSState.connection;
+    if (existingConnection) {
+      const { status, exp, walletId } = existingConnection;
       // Are we previously connected, not expired, & have a valid wallet?
       const isConnected = status && status === 'connected';
       const isNotExpired = exp && exp > Date.now();
@@ -191,9 +201,13 @@ export class WalletConnectService {
   constructor() {
     // Pull 'walletconnect' and 'walletconnect-js' localStorage values to see if we might already be connected
     const { existingWCJSState, existingWCState } = getLocalStorageValues();
-    // Page has just loaded/reloaded, check for existing connections
+    // If we have an existing wcjs state, update this service state and check for existing connection
+    if (existingWCJSState) {
+      this.#setState(existingWCJSState, false);
+      this.#checkExistingConnectionBrowser(existingWCJSState.connection);
+    }
+    // Check for existing walletconnect data
     this.#checkExistingConnectionWC(existingWCState);
-    this.#checkExistingConnectionBrowser(existingWCJSState);
 
     // Setup a listener for localStorage changes
     window.addEventListener('storage', this.#handleLocalStorageChange);
@@ -457,17 +471,19 @@ export class WalletConnectService {
     // Run disconnect callback function if provided/exists
     if (this.state.connection.onDisconnect)
       this.state.connection.onDisconnect(message);
+    // If walletconnect connected, kill the session
     if (this.#connector && this.#connector.connected)
       await this.#connector.killSession({ message });
-    this.#setState('reset');
-    // Need a walletID to send the wallet a message
+    // Check if we need to send a browser wallet message about the disconnect
     if (this.state.connection.walletId) {
       const wallet = WALLET_LIST.find(
         ({ id }) => id === this.state.connection.walletId
       );
       if (wallet && wallet.type === 'browser')
-        await browserDisconnect(message, wallet as BrowserWallet);
+        browserDisconnect(message, wallet as BrowserWallet);
     }
+    // Move the wcjs state back to default values
+    this.#setState('reset');
     return message;
   };
 

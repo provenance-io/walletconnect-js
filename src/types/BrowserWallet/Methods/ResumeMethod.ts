@@ -1,6 +1,5 @@
 import { BROWSER_EVENTS } from '../../../consts';
 import { ProvenanceMethod } from '../../Cosmos';
-import { WalletState } from '../../Service';
 import { ResponseError } from './Generic';
 
 export interface ResumeRequestBrowser {
@@ -13,11 +12,7 @@ export interface ResumeRequestBrowser {
 // Values returned to service from wallet (browser)
 // wallet => methodFunction()
 export interface ResumeResponseBrowser {
-  // request: ConnectRequestBrowser;
-  // result: {
-  wallet: WalletState;
   est: number;
   exp: number;
   error?: ResponseError;
-  // };
 }

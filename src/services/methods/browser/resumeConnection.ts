@@ -13,7 +13,7 @@ export const resumeConnection = async (wallet: BrowserWallet) => {
   } = getPageData();
 
   const request = {
-    browserEvent: BROWSER_EVENTS.HIDDEN,
+    browserEvent: BROWSER_EVENTS.RESUME_CONNECTION,
     method,
     requestFavicon,
     requestName,
@@ -22,13 +22,12 @@ export const resumeConnection = async (wallet: BrowserWallet) => {
 
   const response = await wallet.browserEventAction(request, method);
 
-  const { wallet: walletResponse, error, est, exp } = response;
+  const { error, est, exp } = response;
   if (error) return { error, resetState: true };
 
   const result: ResumeMethodServiceFunctionResults = {
     state: {
       connection: { status: 'connected', est, exp },
-      wallet: walletResponse,
     },
   };
 
