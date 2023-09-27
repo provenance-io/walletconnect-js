@@ -7,8 +7,8 @@ import {
   RESET_CONNECTION_URL,
   SEND_COIN_URL,
   SEND_MESSAGE_URL,
-  SIGN_HEX_MESSAGE_URL,
   SIGN_JWT_URL,
+  SIGN_MESSAGE_URL,
   SWITCH_TO_GROUP_URL,
 } from 'consts';
 import { useState } from 'react';
@@ -91,9 +91,9 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       url: SIGN_JWT_URL,
     },
     {
-      name: 'Sign Hex Message',
+      name: 'Sign Message',
       icon: ICON_NAMES.PENCIL,
-      url: SIGN_HEX_MESSAGE_URL,
+      url: SIGN_MESSAGE_URL,
     },
   ];
 

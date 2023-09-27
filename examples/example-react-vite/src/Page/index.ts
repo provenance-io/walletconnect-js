@@ -5,6 +5,6 @@ export * from './ResetConnectionTimeout';
 export * from './Root';
 export * from './SendCoin';
 export * from './SendMessage';
-export * from './SignHexMessage';
 export * from './SignJWT';
+export * from './SignMessage';
 export * from './SwitchToGroup';

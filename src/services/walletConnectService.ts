@@ -1,6 +1,7 @@
 import WalletConnectClient from '@walletconnect/client';
 import { Buffer } from 'buffer';
 import {
+  CUSTOM_EVENT_EXTENSION,
   // BROWSER_WALLETS,
   DEFAULT_JWT_DURATION,
   LOCAL_STORAGE_NAMES,
@@ -11,12 +12,14 @@ import {
 } from '../consts';
 import type {
   BrowserWallet,
+  BrowserWalletEventActionResponses,
   ConnectMethodService,
   ConnectMethodServiceFunctionResults,
   PartialState,
   // SendMessageMethod,
   WCLocalState,
   WCSState,
+  WalletId,
 } from '../types';
 import {
   addToLocalStorage,
@@ -29,6 +32,7 @@ import {
   connect as browserConnect,
   disconnect as browserDisconnect,
   resumeConnection as browserResumeConnection,
+  signMessage as browserSignMessage,
 } from './methods/browser';
 
 // If we don't have a value for Buffer (node core module) create it/polyfill it
@@ -46,9 +50,6 @@ export class WalletConnectService {
   state: WCSState = WCS_DEFAULT_STATE; // Main data held and used within this class object
 
   // Keep all state updates tidy in a single method (prevent random setting in methods)
-  // TODO: This function isn't working correctly
-  // Ideally it will look at the key and only update that specific state key's values provided, leaving the other existing keys/values alone
-  // Actually is only setting the values provided and defaulting all other values (default state)
   #setState = (
     updatedState: PartialState<WCSState> | 'reset',
     updateLocalStorage = true
@@ -189,6 +190,7 @@ export class WalletConnectService {
           // TODO: These should be a separate method in wcjs service to reuse for other method results (they should all return a similar shape)
           if (results.resetState) this.#setState('reset');
           if (results.state) {
+            this.#listenForBrowserWalletDisconnect(walletId);
             this.#setState(results.state);
             // Start the connection timer
             this.#startConnectionTimer();
@@ -203,7 +205,16 @@ export class WalletConnectService {
     const { existingWCJSState, existingWCState } = getLocalStorageValues();
     // If we have an existing wcjs state, update this service state and check for existing connection
     if (existingWCJSState) {
-      this.#setState(existingWCJSState, false);
+      // Note: We don't want to pull the "status" or "pendingMethod" (might be a better way to do this)
+      const cleanExistingWCJSState = {
+        ...existingWCJSState,
+        connection: {
+          ...existingWCJSState.connection,
+          status: WCS_DEFAULT_STATE.connection.status,
+          pendingMethod: WCS_DEFAULT_STATE.connection.pendingMethod,
+        },
+      };
+      this.#setState(cleanExistingWCJSState, false);
       this.#checkExistingConnectionBrowser(existingWCJSState.connection);
     }
     // Check for existing walletconnect data
@@ -239,6 +250,40 @@ export class WalletConnectService {
       this.#connectionTimer = newConnectionTimer;
     }
   };
+
+  #listenForBrowserWalletDisconnect(walletId: WalletId) {
+    // Since we are now connected, create an event listener to allow the wallet to say when it 'disconnects' from the dApp
+    // (Normally it's wcjs disconnecting, but users can disconnect manually from within the wallet) - This exists in resume & connect methods for browser wallets
+    // Only listen once
+
+    // Only do this for browser wallets
+    const wallet = WALLET_LIST.find(({ id }) => id === walletId);
+    if (wallet && wallet.type === 'browser') {
+      addEventListener(
+        CUSTOM_EVENT_EXTENSION,
+        (message) => {
+          // TODO: Get sender types
+          const {
+            sender,
+            event,
+          }: {
+            sender: string;
+            event: BrowserWalletEventActionResponses['disconnect'];
+          } = (message as CustomEvent).detail;
+          // Only listen to messages sent by the content-script
+          if (sender === 'content-script') {
+            console.log(
+              'wcjs | disconnectEvent | message, result: ',
+              message,
+              event
+            );
+            this.disconnect(event.disconnect, true);
+          }
+        },
+        { once: true }
+      );
+    }
+  }
 
   // WalletConnect localStorage values changed
   #localStorageChangeWalletConnect(newValue: string | null) {
@@ -449,6 +494,7 @@ export class WalletConnectService {
     if (results.connector) this.#connector = results.connector;
     if (results.resetState) this.#setState('reset');
     if (results.state) {
+      this.#listenForBrowserWalletDisconnect(walletId);
       this.#setState(results.state);
       // Start the connection timer
       this.#startConnectionTimer();
@@ -464,23 +510,26 @@ export class WalletConnectService {
    *
    * @param message (optional) Custom disconnect message to send back to dApp
    * */
-  disconnect = async (message = 'Disconnected') => {
+  disconnect = async (message = 'Disconnected', triggeredByWallet = false) => {
     // Clear connection timers
     this.#backupTimer('clear');
     this.#clearConnectionTimer();
     // Run disconnect callback function if provided/exists
     if (this.state.connection.onDisconnect)
       this.state.connection.onDisconnect(message);
-    // If walletconnect connected, kill the session
-    if (this.#connector && this.#connector.connected)
-      await this.#connector.killSession({ message });
-    // Check if we need to send a browser wallet message about the disconnect
-    if (this.state.connection.walletId) {
-      const wallet = WALLET_LIST.find(
-        ({ id }) => id === this.state.connection.walletId
-      );
-      if (wallet && wallet.type === 'browser')
-        browserDisconnect(message, wallet as BrowserWallet);
+    // If this disconnect was triggered by the wallet, there is no reason to let the wallet know we've been disconnected
+    if (!triggeredByWallet) {
+      // If walletconnect connected, kill the session
+      if (this.#connector && this.#connector.connected)
+        await this.#connector.killSession({ message });
+      // Check if we need to send a browser wallet message about the disconnect
+      if (this.state.connection.walletId) {
+        const wallet = WALLET_LIST.find(
+          ({ id }) => id === this.state.connection.walletId
+        );
+        if (wallet && wallet.type === 'browser')
+          browserDisconnect(message, wallet as BrowserWallet);
+      }
     }
     // Move the wcjs state back to default values
     this.#setState('reset');
@@ -613,39 +662,62 @@ export class WalletConnectService {
    * @param customMessage Message you want the wallet to sign
    * @param description (optional) Additional information for wallet to display
    */
-  // signMessage = async (
-  //   message: string,
-  //   options?: {
-  //     customId?: string;
-  //     isHex?: boolean;
-  //     description?: string;
-  //   }
-  // ) => {
-  //   // Only run this if we have a wallet id
-  //   if (this.state.connection.walletId) {
-  //     // Loading while we wait for response
-  //     this.#setState({ connection: { pendingMethod: 'signHexMessage' } });
-  //     // Wait to get the result back
-  //     const result = await signMessageMethod({
-  //       address: this.state.wallet.address || '',
-  //       connector: this.#connector,
-  //       customId: options?.customId,
-  //       message,
-  //       isHex: options?.isHex,
-  //       description: options?.description,
-  //       publicKey: this.state.wallet.publicKey || '',
-  //       walletId: this.state.connection.walletId,
-  //     });
-  //     console.log('walletConnectService | signHex result: ', result);
-  //     // No longer loading
-  //     this.#setState({ connection: { pendingMethod: '' } });
-  //     // Refresh auto-disconnect timer
-  //     this.resetConnectionTimeout();
-
-  //     return result;
-  //   }
-  //   return { error: 'missing wallet id' };
-  // };
+  signMessage = async (
+    message: string,
+    options?: {
+      customId?: string;
+      isHex?: boolean;
+      description?: string;
+    }
+  ) => {
+    // REMOVE: Just add this comment to find send message faster
+    console.log('wcjs | walletConnectService.ts | signMessage()');
+    const { status, walletId } = this.state.connection;
+    const { address, publicKey } = this.state.wallet;
+    const isConnected = status === 'connected';
+    const wallet = WALLET_LIST.find(({ id }) => id === walletId);
+    const validWallet = wallet && address && publicKey;
+    let results;
+    // Must be connected and have a valid wallet
+    if (isConnected && validWallet) {
+      this.#setState({ connection: { pendingMethod: 'signMessage' } });
+      if (wallet.type === 'browser') {
+        results = await browserSignMessage({
+          address,
+          message,
+          publicKey,
+          wallet: wallet as BrowserWallet,
+          customId: options?.customId,
+          description: options?.description,
+          isHex: options?.isHex,
+        });
+      }
+      // Wait to get the result back
+      // const result = await signMessageMethod({
+      //   address: this.state.wallet.address || '',
+      //   connector: this.#connector,
+      //   customId: options?.customId,
+      //   message,
+      //   isHex: options?.isHex,
+      //   description: options?.description,
+      //   publicKey: this.state.wallet.publicKey || '',
+      //   walletId: this.state.connection.walletId,
+      // });
+      console.log('walletConnectService | signMessage result: ', results);
+      // No longer loading
+      this.#setState({ connection: { pendingMethod: '' } });
+      // Refresh auto-disconnect timer
+      this.resetConnectionTimeout();
+    } else {
+      results = {
+        error: {
+          message: isConnected ? 'Invalid wallet' : 'Not connected',
+          code: 0,
+        },
+      };
+    }
+    return results;
+  };
 
   /**
    * @param customId string (required) string id value of pending action you want to target

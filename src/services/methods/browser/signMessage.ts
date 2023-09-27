@@ -1,5 +1,5 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
-import { PROVENANCE_METHODS } from '../../../consts';
+import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../../../consts';
 import { verifySignature } from '../../../helpers';
 import type { BrowserWallet } from '../../../types';
 import { rngNum } from '../../../utils';
@@ -14,6 +14,7 @@ interface SignMessage {
   wallet: BrowserWallet;
 }
 
+// TODO: Get proper Promise response shape...
 export const signMessage = async ({
   address,
   description = 'Sign Message',
@@ -24,26 +25,26 @@ export const signMessage = async ({
   wallet,
 }: SignMessage): Promise<any> => {
   const method = PROVENANCE_METHODS.SIGN;
-  const metadata = JSON.stringify({
+  // Build out full request object to send to browser wallet
+  const request = {
+    method,
+    browserEvent: BROWSER_EVENTS.BASIC,
+    id: rngNum(),
     description,
     address,
     date: Date.now(),
     customId,
-  });
-  // Custom Request
-  const request = {
-    id: rngNum(),
-    jsonrpc: '2.0',
-    method,
-    params: [metadata],
+    message,
   };
+
   // If needed, convert the message to hex before adding to request params
-  const hexMessage = isHex ? message : convertUtf8ToHex(message);
-  request.params.push(hexMessage);
+  const hexMessage = isHex ? message : convertUtf8ToHex(message, true);
+  request.message = hexMessage;
   // Send a message to the wallet containing the request and wait for a response
   const response = await wallet.browserEventAction(request, method);
+  console.log('wcjs | signMessage.ts | response: ', response);
   // result is a hex encoded signature
-  const signature = Uint8Array.from(Buffer.from(response.result, 'hex'));
+  const signature = Uint8Array.from(Buffer.from(response, 'hex'));
   // verify signature
   const valid = await verifySignature(hexMessage, signature, pubKeyB64);
 

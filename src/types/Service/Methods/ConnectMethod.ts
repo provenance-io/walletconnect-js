@@ -11,7 +11,7 @@ export interface ConnectMethodService {
   groupAddress?: string;
   prohibitGroups?: boolean;
   jwtExpiration?: number;
-  walletId?: WalletId;
+  walletId: WalletId;
   onDisconnect?: (message?: string) => void;
 }
 

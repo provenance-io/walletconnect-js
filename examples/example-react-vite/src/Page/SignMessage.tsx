@@ -1,19 +1,20 @@
-import type { BroadcastEventData } from '@provenanceio/walletconnect-js';
 import { useWalletConnect } from '@provenanceio/walletconnect-js';
-import { ActionCard, Button, Input, Results } from 'Components';
+import { ActionCard, Button, Checkbox, Input, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { useState } from 'react';
 
-export const SignHexMessage: React.FC = () => {
+export const SignMessage: React.FC = () => {
   const [value, setValue] = useState('');
   const [customId, setCustomId] = useState('');
-  const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
+  const [description, setDescription] = useState('');
+  const [isHex, setIsHex] = useState(false);
+  const [results, setResults] = useState<any>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState.connection;
-  const signMessageLoading = pendingMethod === 'signHexMessage';
+  const signMessageLoading = pendingMethod === 'signMessage';
 
   const handleSubmit = async () => {
-    const result = await wcs.signHexMessage(value, {customId});
+    const result = await wcs.signMessage(value, {customId, description, isHex});
     setResults(result);
   };
 
@@ -22,16 +23,16 @@ export const SignHexMessage: React.FC = () => {
   return (
     <ActionCard
       icon={ICON_NAMES.PENCIL}
-      title="Sign Hex Message"
-      description="Send a sign message request message to the wallet.
-                   The message to be signed must be hex encoded to allow for signing of bytes.
-                   The wallet will decode the hex message and sign the underlying bytes."
+      title="Sign Message"
+      description="The message to be signed may be hex encoded (signing bytes).
+                   If hex, the wallet will decode the hex message and sign the underlying bytes."
       status={status}
     >
+      <Checkbox onChange={setIsHex} checked={isHex} label='Message is already hex encoded' disabled={signMessageLoading} />
       <Input
         value={value}
-        label="Hex Encoded Message"
-        placeholder="Enter hex encoded message"
+        label="Message"
+        placeholder="Enter message"
         onChange={setValue}
         bottomGap
         disabled={signMessageLoading}
@@ -42,6 +43,14 @@ export const SignHexMessage: React.FC = () => {
           label="Custom ID (Optional)"
           placeholder="Enter Custom ID"
           onChange={setCustomId}
+          bottomGap
+          disabled={signMessageLoading}
+      />
+      <Input
+          value={description}
+          label="Description (Optional)"
+          placeholder="Enter a description for the wallet to display to users when signing"
+          onChange={setDescription}
           bottomGap
           disabled={signMessageLoading}
       />

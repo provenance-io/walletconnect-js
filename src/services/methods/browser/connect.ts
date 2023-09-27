@@ -24,9 +24,10 @@ export const connect = async ({
     origin: requestOrigin,
     title: requestName,
   } = getPageData();
+  const method = PROVENANCE_METHODS.CONNECT;
   // Build out full request object to send to browser wallet
   const request = {
-    method: PROVENANCE_METHODS.CONNECT,
+    method,
     browserEvent: BROWSER_EVENTS.BASIC,
     connectionDuration,
     groupAddress,
@@ -38,14 +39,12 @@ export const connect = async ({
     requestName,
   };
   // Wait for wallet to send back a response
-  const response = await wallet.browserEventAction(
-    request,
-    PROVENANCE_METHODS.CONNECT
-  );
+  const response = await wallet.browserEventAction(request, method);
   console.log('wcjs | connect.ts | connectResults: ', response);
   // Use the response to pull out data for wcjs store/dApp response
   const { wallet: walletResponse, error } = response;
   if (error) return { error, resetState: true };
+
   // Calculate and set the new exp, est times
   const est = Date.now();
   const exp = connectionDuration + est;

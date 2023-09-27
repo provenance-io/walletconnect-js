@@ -6,7 +6,7 @@ import { COLORS } from 'theme';
 
 export const DApp: React.FC = () => {
   const { walletConnectState } = useWalletConnect();
-  const { status } = walletConnectState;
+  const { status } = walletConnectState.connection;
   const FIGURE_CONNECT_URL = 'https://test.figure.com/figure-wallet/connect';
 
   useEffect(() => {

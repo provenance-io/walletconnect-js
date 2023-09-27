@@ -5,6 +5,6 @@ export const REMOVE_PENDING_METHOD_URL = `${HOMEPAGE_URL}/removePendingMethod`;
 export const RESET_CONNECTION_URL = `${HOMEPAGE_URL}/resetConnectionTimeout`;
 export const SEND_COIN_URL = `${HOMEPAGE_URL}/sendCoin`;
 export const SEND_MESSAGE_URL = `${HOMEPAGE_URL}/sendMessage`;
-export const SIGN_HEX_MESSAGE_URL = `${HOMEPAGE_URL}/signHexMessage`;
+export const SIGN_MESSAGE_URL = `${HOMEPAGE_URL}/signMessage`;
 export const SIGN_JWT_URL = `${HOMEPAGE_URL}/signJWT`;
 export const SWITCH_TO_GROUP_URL = `${HOMEPAGE_URL}/switchToGroup`;

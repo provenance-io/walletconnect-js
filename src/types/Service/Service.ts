@@ -6,7 +6,7 @@ type PendingMethod =
   | ''
   | 'sendMessage'
   | 'signJWT'
-  | 'signHexMessage'
+  | 'signMessage'
   | 'switchToGroup'
   | 'removePendingMethod';
 
