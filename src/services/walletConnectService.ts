@@ -73,7 +73,7 @@ export class WalletConnectService {
         switch (updateKey) {
           case 'connection':
             console.log(
-              'wcjs | walletConnectService.ts | #updateState | connection | newNestedState, existingNestedState: ',
+              'wcjs | walletConnectService.ts | #setState | connection | newNestedState, existingNestedState: ',
               newNestedState,
               existingNestedState
             );
@@ -104,6 +104,10 @@ export class WalletConnectService {
     // If needed, write state changes into wcjs localStorage
     if (updateLocalStorage) {
       if (isReset) clearLocalStorage('walletconnect-js');
+      // TODO: Needs work here
+      // Somehow need to not carelessly update this localStorage. Only if keys of value are changed and need to be saved
+      // Example: Status of "pending" should never be saved.
+      // Default store values should also never be saved (they will be pulled on load without needing to live in localStorage)
       else addToLocalStorage('walletconnect-js', newState);
     }
   };
@@ -229,6 +233,8 @@ export class WalletConnectService {
   // Allow this class to notify/update the context about state changes
   setContextUpdater(updateFunction: (state: WCSState) => void): void {
     this.#updateContext = updateFunction;
+    // Call the update context function as soon as it's created (to remain up to date)
+    this.#updateContext(this.state);
   }
 
   // Control auto-disconnect / timeout
@@ -670,7 +676,6 @@ export class WalletConnectService {
       description?: string;
     }
   ) => {
-    // REMOVE: Just add this comment to find send message faster
     console.log('wcjs | walletConnectService.ts | signMessage()');
     const { status, walletId } = this.state.connection;
     const { address, publicKey } = this.state.wallet;

@@ -73,6 +73,16 @@ const Subtitle = styled.p`
     color: inherit;
   }
 `;
+const RowClickItem = styled.p`
+  font-weight: 700;
+  font-size: 1rem;
+  user-select: none;
+  flex-basis: 100%;
+  margin-bottom: 16px;
+  color: ${COLORS.PRIMARY_400};
+  cursor: pointer;
+  font-style: italic;
+`;
 const Version = styled.a`
   font-size: 1rem;
   width: 100%;
@@ -187,6 +197,11 @@ export const Sidebar: React.FC = () => {
         <Navigation />
         <RowSplitter />
         <ExtraSettings>
+          <SettingRow>
+          {walletConnectState && (
+          <RowClickItem onClick={() => {console.log('walletConnectState: ', walletConnectState);}}>Log current state</RowClickItem>
+          )}
+          </SettingRow>
           <SettingRow>
             <Checkbox
               checked={loggingActive}
