@@ -1,21 +1,15 @@
 import { convertUtf8ToHex } from '@walletconnect/utils';
 import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../../../consts';
 import { verifySignature } from '../../../helpers';
-import type { BrowserWallet } from '../../../types';
+import type {
+  BrowserSign,
+  BrowserSignRequest,
+  BrowserSignReturn,
+} from '../../../types';
 import { getPageData, rngNum } from '../../../utils';
 
-interface SignMessage {
-  address: string;
-  description?: string;
-  customId?: string;
-  message: string;
-  isHex?: boolean;
-  publicKey: string;
-  wallet: BrowserWallet;
-}
-
 // TODO: Get proper Promise response shape...
-export const signMessage = async ({
+export const sign = async ({
   address,
   description = 'Sign Message',
   customId,
@@ -23,7 +17,8 @@ export const signMessage = async ({
   isHex = true,
   publicKey: pubKeyB64,
   wallet,
-}: SignMessage): Promise<any> => {
+}: BrowserSign): Promise<BrowserSignReturn> => {
+  // TODO: Don't use any
   const {
     favicon: requestFavicon,
     origin: requestOrigin,
@@ -32,14 +27,13 @@ export const signMessage = async ({
 
   const method = PROVENANCE_METHODS.SIGN;
   // Build out full request object to send to browser wallet
-  const request = {
+  const request: BrowserSignRequest = {
     method,
     browserEvent: BROWSER_EVENTS.BASIC,
-    id: rngNum(),
+    id: customId || `${rngNum()}`, // TODO: Should this just be customId?
     description,
     address,
     date: Date.now(),
-    customId,
     message,
     requestFavicon,
     requestOrigin,

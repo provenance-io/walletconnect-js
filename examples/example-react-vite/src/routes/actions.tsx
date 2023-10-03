@@ -1,19 +1,17 @@
 import {
   REMOVE_PENDING_METHOD_URL,
   RESET_CONNECTION_URL,
-  SEND_COIN_URL,
-  SEND_MESSAGE_URL,
+  SEND_TX_URL,
   SIGN_JWT_URL,
-  SIGN_MESSAGE_URL,
-  SWITCH_TO_GROUP_URL
+  SIGN_URL,
+  SWITCH_TO_GROUP_URL,
 } from 'consts';
 import {
   RemovePendingMethod,
   ResetConnectionTimeout,
-  SendCoin,
-  SendMessage,
+  SendTx,
+  Sign,
   SignJWT,
-  SignMessage,
   SwitchToGroup,
 } from 'Page';
 
@@ -27,9 +25,9 @@ export const RESET_CONNECTION = {
   element: <ResetConnectionTimeout />,
 };
 
-export const SEND_MESSAGE = {
-  path: SEND_MESSAGE_URL,
-  element: <SendMessage />,
+export const SEND_TX = {
+  path: SEND_TX_URL,
+  element: <SendTx />,
 };
 
 export const SWITCH_TO_GROUP_ACTION = {
@@ -42,12 +40,7 @@ export const SIGN_JWT = {
   element: <SignJWT />,
 };
 
-export const SIGN_MESSAGE = {
-  path: SIGN_MESSAGE_URL,
-  element: <SignMessage />,
-};
-
-export const SEND_COIN = {
-  path: SEND_COIN_URL,
-  element: <SendCoin />,
+export const SIGN = {
+  path: SIGN_URL,
+  element: <Sign />,
 };

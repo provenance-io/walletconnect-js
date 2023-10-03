@@ -16,6 +16,7 @@ import type {
   ConnectMethodService,
   ConnectMethodServiceFunctionResults,
   PartialState,
+  ServiceSendTx,
   // SendMessageMethod,
   WCLocalState,
   WCSState,
@@ -32,7 +33,8 @@ import {
   connect as browserConnect,
   disconnect as browserDisconnect,
   resumeConnection as browserResumeConnection,
-  signMessage as browserSignMessage,
+  sendTx as browserSendTx,
+  sign as browserSign,
 } from './methods/browser';
 
 // If we don't have a value for Buffer (node core module) create it/polyfill it
@@ -550,56 +552,55 @@ export class WalletConnectService {
    * @param feePayer (optional) Specify a fee payer address
    * @param gasPrice (optional) Gas price object to use
    * @param memo (optional) Tx body memo
-   * @param message (required) Raw Base64 encoded msgAny string
+   * @param tx (required) Raw Base64 encoded msgAny string
    * @param method (optional) What method is used to send this message
    * @param nonCriticalExtensionOptions (optional) Tx body nonCriticalExtensionOptions
    * @param timeoutHeight (optional) Tx body timeoutHeight
    */
-  // sendMessage = async ({
-  //   customId,
-  //   description,
-  //   extensionOptions,
-  //   feeGranter,
-  //   feePayer,
-  //   gasPrice,
-  //   memo,
-  //   message,
-  //   method,
-  //   nonCriticalExtensionOptions,
-  //   timeoutHeight,
-  // }: any) => {
-  //   // TODO: Remove any
-  //   // Only run this if we have a wallet id
-  //   if (this.state.connection.walletId) {
-  //     // Loading while we wait for response
-  //     this.#setState({ connection: { pendingMethod: 'sendMessage' } });
-  //     const result = await sendMessageMethod({
-  //       address: this.state.wallet.address || '',
-  //       connector: this.#connector,
-  //       customId,
-  //       walletId: this.state.connection.walletId,
-  //       data: {
-  //         message,
-  //         description,
-  //         gasPrice,
-  //         method,
-  //         feeGranter,
-  //         feePayer,
-  //         timeoutHeight,
-  //         extensionOptions,
-  //         nonCriticalExtensionOptions,
-  //         memo,
-  //       },
-  //     });
-  //     // No longer loading
-  //     this.#setState({ connection: { pendingMethod: '' } });
-  //     // Refresh auto-disconnect timer
-  //     this.resetConnectionTimeout();
-
-  //     return result;
-  //   }
-  //   return { error: 'missing wallet id' };
-  // };
+  sendTx = async (data: ServiceSendTx) => {
+    console.log('wcjs | walletConnectService.ts | sendTx()');
+    const { status, walletId } = this.state.connection;
+    const { address } = this.state.wallet;
+    const isConnected = status === 'connected';
+    const wallet = WALLET_LIST.find(({ id }) => id === walletId);
+    const validWallet = wallet && address;
+    let results;
+    // Must be connected and have a valid wallet
+    if (isConnected && validWallet) {
+      this.#setState({ connection: { pendingMethod: 'sendTx' } });
+      if (wallet.type === 'browser') {
+        results = await browserSendTx({
+          address,
+          wallet: wallet as BrowserWallet,
+          ...data,
+        });
+      }
+      // Wait to get the result back
+      // const result = await signMessageMethod({
+      //   address: this.state.wallet.address || '',
+      //   connector: this.#connector,
+      //   customId: options?.customId,
+      //   message,
+      //   isHex: options?.isHex,
+      //   description: options?.description,
+      //   publicKey: this.state.wallet.publicKey || '',
+      //   walletId: this.state.connection.walletId,
+      // });
+      console.log('walletConnectService | signMessage result: ', results);
+      // No longer loading
+      this.#setState({ connection: { pendingMethod: '' } });
+      // Refresh auto-disconnect timer
+      this.resetConnectionTimeout();
+    } else {
+      results = {
+        error: {
+          message: isConnected ? 'Invalid wallet' : 'Not connected',
+          code: 0,
+        },
+      };
+    }
+    return results;
+  };
 
   /**
    *
@@ -685,9 +686,9 @@ export class WalletConnectService {
     let results;
     // Must be connected and have a valid wallet
     if (isConnected && validWallet) {
-      this.#setState({ connection: { pendingMethod: 'signMessage' } });
+      this.#setState({ connection: { pendingMethod: 'sign' } });
       if (wallet.type === 'browser') {
-        results = await browserSignMessage({
+        results = await browserSign({
           address,
           message,
           publicKey,

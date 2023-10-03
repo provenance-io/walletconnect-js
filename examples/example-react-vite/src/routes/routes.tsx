@@ -3,10 +3,9 @@ import { HOMEPAGE_URL } from 'consts';
 import {
   REMOVE_PENDING_METHOD,
   RESET_CONNECTION,
-  SEND_COIN,
-  SEND_MESSAGE,
+  SEND_TX,
+  SIGN,
   SIGN_JWT,
-  SIGN_MESSAGE,
   SWITCH_TO_GROUP_ACTION,
 } from './actions';
 import { CONNECT } from './connect';
@@ -21,9 +20,8 @@ export const routes = [
       CONNECT,
       DAPP,
       RESET_CONNECTION,
-      SEND_COIN,
-      SEND_MESSAGE,
-      SIGN_MESSAGE,
+      SEND_TX,
+      SIGN,
       SIGN_JWT,
       SWITCH_TO_GROUP_ACTION,
       REMOVE_PENDING_METHOD,

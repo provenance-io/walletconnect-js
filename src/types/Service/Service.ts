@@ -4,9 +4,9 @@ import type { AccountAttribute, AccountObject, WalletId } from '../Wallet';
 
 type PendingMethod =
   | ''
-  | 'sendMessage'
+  | 'sendTx'
   | 'signJWT'
-  | 'signMessage'
+  | 'sign'
   | 'switchToGroup'
   | 'removePendingMethod';
 

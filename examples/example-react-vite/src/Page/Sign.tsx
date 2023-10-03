@@ -3,7 +3,7 @@ import { ActionCard, Button, Checkbox, Input, Results } from 'Components';
 import { ICON_NAMES } from 'consts';
 import { useState } from 'react';
 
-export const SignMessage: React.FC = () => {
+export const Sign: React.FC = () => {
   const [value, setValue] = useState('');
   const [customId, setCustomId] = useState('');
   const [description, setDescription] = useState('');
@@ -11,7 +11,7 @@ export const SignMessage: React.FC = () => {
   const [results, setResults] = useState<any>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState.connection;
-  const signMessageLoading = pendingMethod === 'signMessage';
+  const signMessageLoading = pendingMethod === 'sign';
 
   const handleSubmit = async () => {
     const result = await wcs.signMessage(value, {customId, description, isHex});

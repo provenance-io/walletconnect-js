@@ -5,10 +5,9 @@ import {
   ICON_NAMES,
   REMOVE_PENDING_METHOD_URL,
   RESET_CONNECTION_URL,
-  SEND_COIN_URL,
-  SEND_MESSAGE_URL,
+  SEND_TX_URL,
   SIGN_JWT_URL,
-  SIGN_MESSAGE_URL,
+  SIGN_URL,
   SWITCH_TO_GROUP_URL,
 } from 'consts';
 import { useState } from 'react';
@@ -60,6 +59,16 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
   // List of links
   const navItems = [
     {
+      name: 'Sign',
+      icon: ICON_NAMES.PENCIL,
+      url: SIGN_URL,
+    },
+    {
+      name: 'Send Transaction',
+      icon: ICON_NAMES.HASH,
+      url: SEND_TX_URL,
+    },
+    {
       name: 'Remove Pending Method',
       icon: ICON_NAMES.TAG,
       url: REMOVE_PENDING_METHOD_URL,
@@ -68,16 +77,6 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       name: 'Reset Connection',
       icon: ICON_NAMES.RELOAD,
       url: RESET_CONNECTION_URL,
-    },
-    {
-      name: 'Send Coin',
-      icon: ICON_NAMES.HASH,
-      url: SEND_COIN_URL,
-    },
-    {
-      name: 'Send Message',
-      icon: ICON_NAMES.GEAR,
-      url: SEND_MESSAGE_URL,
     },
     {
       name: 'Switch to Group',
@@ -89,11 +88,6 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       name: 'Sign JWT',
       icon: ICON_NAMES.PENCIL,
       url: SIGN_JWT_URL,
-    },
-    {
-      name: 'Sign Message',
-      icon: ICON_NAMES.PENCIL,
-      url: SIGN_MESSAGE_URL,
     },
   ];
 
