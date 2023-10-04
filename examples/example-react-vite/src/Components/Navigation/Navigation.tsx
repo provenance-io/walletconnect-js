@@ -6,7 +6,6 @@ import {
   REMOVE_PENDING_METHOD_URL,
   RESET_CONNECTION_URL,
   SEND_TX_URL,
-  SIGN_JWT_URL,
   SIGN_URL,
   SWITCH_TO_GROUP_URL,
 } from 'consts';
@@ -82,12 +81,6 @@ export const Navigation: React.FC<Props> = ({ bridgeUrl }) => {
       name: 'Switch to Group',
       icon: ICON_NAMES.GEAR,
       url: SWITCH_TO_GROUP_URL,
-    },
-
-    {
-      name: 'Sign JWT',
-      icon: ICON_NAMES.PENCIL,
-      url: SIGN_JWT_URL,
     },
   ];
 

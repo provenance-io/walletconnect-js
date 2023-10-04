@@ -44,8 +44,8 @@ export interface TxResponse {
 }
 
 export type GasPrice = {
-  gasPrice: number;
-  gasPriceDenom: string;
+  amount: string;
+  denom: string;
 };
 
 export type ProvenanceMethod =

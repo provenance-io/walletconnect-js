@@ -5,7 +5,6 @@ import {
   RESET_CONNECTION,
   SEND_TX,
   SIGN,
-  SIGN_JWT,
   SWITCH_TO_GROUP_ACTION,
 } from './actions';
 import { CONNECT } from './connect';
@@ -22,7 +21,6 @@ export const routes = [
       RESET_CONNECTION,
       SEND_TX,
       SIGN,
-      SIGN_JWT,
       SWITCH_TO_GROUP_ACTION,
       REMOVE_PENDING_METHOD,
     ],

@@ -123,10 +123,7 @@ export const Countdowns: React.FC = () => {
         >
           <RowInfoTitle>JWT Expires</RowInfoTitle>
           <RowInfoValue>
-            <CountdownTimer
-              expires={JWTExpMs}
-              onEnd={() => handleCountdownExpires('jwt')}
-            />
+            <CountdownTimer expires={JWTExpMs} />
           </RowInfoValue>
         </RowInfo>
       )}

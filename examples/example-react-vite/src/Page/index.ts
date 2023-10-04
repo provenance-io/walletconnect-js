@@ -5,5 +5,4 @@ export * from './ResetConnectionTimeout';
 export * from './Root';
 export * from './SendTx';
 export * from './Sign';
-export * from './SignJWT';
 export * from './SwitchToGroup';

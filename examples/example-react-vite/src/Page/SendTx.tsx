@@ -3,8 +3,8 @@ import {
   PROVENANCE_METHODS,
   useWalletConnect,
 } from '@provenanceio/walletconnect-js';
-import { ActionCard, ActionGas, Button, Input, Results, Sprite } from 'Components';
-import { ICON_NAMES } from 'consts';
+import { ActionCard, Button, Input, Results, Sprite } from 'Components';
+import { FIGURE_GAS_PRICE, FIGURE_GAS_PRICE_DENOM, ICON_NAMES } from 'consts';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { COLORS } from 'theme';
@@ -83,7 +83,10 @@ export const SendTx: React.FC = () => {
   const [description, setDescription] = useState('');
   const [customId, setCustomId] = useState('');
   const [txB64Array, setTxB64Array] = useState<string[]>([]);
-  const [gasData, setGasData] = useState({ gasPrice: '', gasPriceDenom: '' });
+  const [gasPrice, setGasPrice] = useState({
+    amount: `${FIGURE_GAS_PRICE}`,
+    denom: FIGURE_GAS_PRICE_DENOM,
+  });
 
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { pendingMethod } = walletConnectState.connection;
@@ -104,10 +107,9 @@ export const SendTx: React.FC = () => {
 
   const buildSendMessage = () => {
     const msg = isPremadeTx ? [b64Tx] : buildB64Message();
-    const finalGasData = { ...gasData, gasPrice: Number(gasData.gasPrice) };
     const tx = {
       method: PROVENANCE_METHODS.SEND,
-      gasPrice: finalGasData,
+      gasPrice,
       description: description || `Send ${amount}${denom} to ${toAddress}`,
       tx: msg,
       feeGranter,
@@ -164,7 +166,24 @@ export const SendTx: React.FC = () => {
         bottomGap
         disabled={sendTxLoading}
       />
-      <ActionGas setGasData={setGasData} gasData={gasData} />
+      <Input
+        key="gasPrice"
+        width="48%"
+        value={`${gasPrice.amount}`}
+        label="Gas Amount"
+        placeholder="(Optional) Gas Price Amount"
+        onChange={(amount) => setGasPrice({ amount, denom: gasPrice.denom })}
+        bottomGap
+      />
+      <Input
+        key="gasPriceDenom"
+        width="48%"
+        value={gasPrice.denom}
+        label="Gas Denom"
+        placeholder="(Optional) Gas Price Denom"
+        onChange={(denom) => setGasPrice({ amount: gasPrice.amount, denom })}
+        bottomGap
+      />
       {!isPremadeTx && (
         <>
           <Input
