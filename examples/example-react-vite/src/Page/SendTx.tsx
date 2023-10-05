@@ -63,7 +63,7 @@ const TxTypeButtons = styled.div`
 export const SendTx: React.FC = () => {
   const DEFAULT_VALUES = {
     SEND_ADDRESS: 'tp1vxlcxp2vjnyjuw6mqn9d8cq62ceu6lllpushy6',
-    DENOM: 'nhash',
+    DENOM: 'hash',
     AMOUNT: '10',
   };
   // State for component
@@ -95,10 +95,12 @@ export const SendTx: React.FC = () => {
   const sendTxLoading = pendingMethod === 'sendTx';
 
   const buildB64Message = () => {
+    // We can only send nhash, not hash, so convert has to nhash before building the tx
+    const finalAmountList = denom === 'hash' ? [{denom: 'nhash', amount: `${Number(amount) * 1e9}`}] : [{denom, amount}];
     const sendMessage = {
       fromAddress: groupAddress ? groupAddress : address!, // Address will always be available when connected
       toAddress,
-      amountList: [{ denom, amount }],
+      amountList: finalAmountList,
     };
     const msgSend = buildMessage('MsgSend', sendMessage);
 
@@ -298,7 +300,7 @@ export const SendTx: React.FC = () => {
           >
             Add to Tx Array
           </Button>
-          {txB64Array.length && (
+          {!!txB64Array.length && (
             <Button
               loading={sendTxLoading}
               onClick={() => {
