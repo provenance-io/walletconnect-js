@@ -1,4 +1,4 @@
-import { BrowserWallet, BrowserWalletEventActionResponses } from '../../types';
+import { BrowserWallet, BrowserWalletEventActionMessages, BrowserWalletEventActionResponses } from '../../types';
 import { BROWSER_MESSAGE_SENDERS, CUSTOM_EVENT_EXTENSION } from '../browserEvents';
 import { WALLET_IDS } from '../wallet';
 
@@ -9,9 +9,8 @@ export const FIGURE_EXTENSION = {
   icon: 'figure',
   browserEventAction: (browserEventData, method) =>
     new Promise((resolve, reject) => {
-      const sendMessageEvent = new CustomEvent(CUSTOM_EVENT_EXTENSION, {
-        detail: { request: browserEventData, sender: BROWSER_MESSAGE_SENDERS.WCJS },
-      });
+      const detail = { request: browserEventData, sender: BROWSER_MESSAGE_SENDERS.WCJS } as BrowserWalletEventActionMessages[typeof method];
+      const sendMessageEvent = new CustomEvent(CUSTOM_EVENT_EXTENSION, { detail });
       console.log('wcjs | eventAction | sendMessageEvent: ', sendMessageEvent);
       dispatchEvent(sendMessageEvent);
       // We will resolve this once we get a response back from content-script.js

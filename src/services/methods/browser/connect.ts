@@ -1,9 +1,11 @@
 import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../../../consts';
-import { BrowserWallet, ConnectMethodServiceFunctionResults } from '../../../types';
-import { getPageData } from '../../../utils';
+import { BrowserWallet, ConnectMethodServiceFunctionResults, ConnectRequestBrowser } from '../../../types';
+import { getPageData, rngNum } from '../../../utils';
 
 interface Connect {
   connectionDuration: number;
+  customId?: string;
+  description?: string;
   groupAddress?: string;
   individualAddress?: string;
   jwtDuration: number;
@@ -13,6 +15,8 @@ interface Connect {
 
 export const connect = async ({
   connectionDuration,
+  customId,
+  description = 'Send Wallet Action',
   groupAddress,
   individualAddress,
   jwtDuration,
@@ -26,30 +30,33 @@ export const connect = async ({
   } = getPageData();
   const method = PROVENANCE_METHODS.CONNECT;
   // Build out full request object to send to browser wallet
-  const request = {
-    method,
-    browserEvent: BROWSER_EVENTS.BASIC,
+  const request: ConnectRequestBrowser = {
     connectionDuration,
     groupAddress,
     individualAddress,
     jwtDuration,
     prohibitGroups,
+
+    browserEvent: BROWSER_EVENTS.BASIC,
+    date: Date.now(),
+    description,
+    id: customId || `${rngNum()}`,
+    method,
     requestFavicon,
-    requestOrigin,
     requestName,
+    requestOrigin,
   };
   // Wait for wallet to send back a response
-  const response = await wallet.browserEventAction(request, method);
-  console.log('wcjs | connect.ts | connectResults: ', response);
-  // Use the response to pull out data for wcjs store/dApp response
-  const { wallet: walletResponse, error } = response;
+  const { result, error } = await wallet.browserEventAction(request, method);
+  console.log('wcjs | connect.ts | connectResults: ', { result, error });
   if (error) return { error, resetState: true };
+  if (!result) return { error: { message: 'Missing result', code: 0 }, resetState: true };
 
   // Calculate and set the new exp, est times
   const est = Date.now();
   const exp = connectionDuration + est;
 
-  const result: ConnectMethodServiceFunctionResults = {
+  const methodResult: ConnectMethodServiceFunctionResults = {
     state: {
       connection: {
         status: 'connected',
@@ -59,9 +66,9 @@ export const connect = async ({
         exp,
         walletId: wallet.id,
       },
-      wallet: walletResponse,
+      wallet: result.wallet,
     },
   };
 
-  return result;
+  return methodResult;
 };

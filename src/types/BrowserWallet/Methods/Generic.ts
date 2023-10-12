@@ -6,11 +6,10 @@ import { ConnectMessageBrowser, ConnectRequestBrowser, ConnectResponseBrowser } 
 import { DisconnectMessageBrowser, DisconnectRequestBrowser, DisconnectResultBrowser } from './DisconnectMethod';
 import { ResumeMessageBrowser, ResumeRequestBrowser, ResumeResponseBrowser } from './ResumeMethod';
 import { SendTxMessageBrowser, SendTxRequestBrowser, SendTxResponseBrowser } from './SendTx';
+import { SignMessageBrowser, SignRequestBrowser, SignResponseBrowser } from './Sign';
+import { WalletActionMessageBrowser, WalletActionRequestBrowser, WalletActionResponseBrowser } from './WalletAction';
 
-export interface MessageError {
-  error?: { message: string; code: number };
-  // result: Each method needs to describe its own result (will always exist, but unique type)
-}
+export type MessageError = { message: string; code: number };
 
 export type BrowserMessageSender = typeof BROWSER_MESSAGE_SENDERS[keyof typeof BROWSER_MESSAGE_SENDERS];
 
@@ -32,8 +31,8 @@ export interface BrowserWalletEventActionMessages {
   [PROVENANCE_METHODS.RESUME]: ResumeMessageBrowser;
   [PROVENANCE_METHODS.DISCONNECT]: DisconnectMessageBrowser;
   [PROVENANCE_METHODS.SEND]: SendTxMessageBrowser;
-  [PROVENANCE_METHODS.SIGN]: any; // TODO: Build out type
-  [PROVENANCE_METHODS.ACTION]: any; // TODO: Build out type
+  [PROVENANCE_METHODS.SIGN]: SignMessageBrowser;
+  [PROVENANCE_METHODS.ACTION]: WalletActionMessageBrowser;
 }
 
 // All possible requests sent to the wallet from service
@@ -43,8 +42,8 @@ export interface BrowserWalletEventActionRequests {
   [PROVENANCE_METHODS.RESUME]: ResumeRequestBrowser;
   [PROVENANCE_METHODS.DISCONNECT]: DisconnectRequestBrowser;
   [PROVENANCE_METHODS.SEND]: SendTxRequestBrowser;
-  [PROVENANCE_METHODS.SIGN]: any; // TODO: Build out type
-  [PROVENANCE_METHODS.ACTION]: any; // TODO: Build out type
+  [PROVENANCE_METHODS.SIGN]: SignRequestBrowser;
+  [PROVENANCE_METHODS.ACTION]: WalletActionRequestBrowser;
 }
 
 // All possible responses sent to service from wallet
@@ -54,6 +53,6 @@ export interface BrowserWalletEventActionResponses {
   [PROVENANCE_METHODS.RESUME]: ResumeResponseBrowser;
   [PROVENANCE_METHODS.DISCONNECT]: DisconnectResultBrowser;
   [PROVENANCE_METHODS.SEND]: SendTxResponseBrowser;
-  [PROVENANCE_METHODS.SIGN]: any; // TODO: Build out type
-  [PROVENANCE_METHODS.ACTION]: any; // TODO: Build out type
+  [PROVENANCE_METHODS.SIGN]: SignResponseBrowser;
+  [PROVENANCE_METHODS.ACTION]: WalletActionResponseBrowser;
 }

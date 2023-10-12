@@ -1,13 +1,27 @@
 import { WALLET_ACTIONS } from 'consts';
-import { ProvenanceMethod } from 'types/Cosmos';
+import { BaseBrowserRequest, BrowserMessageSender, MessageError } from './Generic';
 
-// ----------------------------------
-// WALLET_ACTION
-// ----------------------------------
 export type WalletAction = typeof WALLET_ACTIONS[keyof typeof WALLET_ACTIONS];
-export interface WalletActionMethod {
-  method?: ProvenanceMethod;
-  description?: string;
-  action: WalletAction;
-  payload?: Record<string, unknown>;
+
+export interface WalletActionMessageBrowser {
+  request: WalletActionRequestBrowser;
+  sender: BrowserMessageSender;
 }
+
+export type WalletActionRequestBrowser = BaseBrowserRequest & {
+  action: WalletAction;
+};
+
+export interface WalletActionResponseBrowser {
+  result?: {
+    // TODO: get the proper result based on the walletAction name
+  };
+  error?: MessageError;
+}
+
+// export interface WalletActionMethod {
+//   method?: ProvenanceMethod;
+//   description?: string;
+//   action: WalletAction;
+//   payload?: Record<string, unknown>;
+// }
