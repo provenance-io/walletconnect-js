@@ -1,8 +1,6 @@
 import { WalletState } from 'types/Service';
-import { BROWSER_EVENTS } from '../../../consts';
-import { ProvenanceMethod } from '../../Cosmos';
 import { BrowserWallet } from '../../Wallet';
-import type { ResponseError } from './Generic';
+import type { BaseBrowserRequest, BrowserMessageSender, MessageError } from './Generic';
 
 /*  Full flow of communication:
   1) dApp => wcjs.method()  
@@ -27,37 +25,36 @@ export interface ConnectMethodBrowser {
   onDisconnect?: (message?: string) => void;
   prohibitGroups?: boolean;
   wallet: BrowserWallet;
-}
+} 
 // Values passed into method when services calls function w/defaults (optional values now filled)
 // 2) wcjs.method() => methodFunction()
 export type ConnectMethodBrowserFunction = ConnectMethodBrowser & {
   connectionDuration: number;
   jwtDuration: number;
-  prohibitGroups: boolean;
+  prohibitGroups: boolean; 
 };
 // Values sent from service to wallet (browser)
+export interface ConnectMessageBrowser {
+  request: ConnectRequestBrowser;
+  sender: BrowserMessageSender;
+}
 // methodFunction() => wallet
-export interface ConnectRequestBrowser {
-  browserEvent: typeof BROWSER_EVENTS[keyof typeof BROWSER_EVENTS];
+export type ConnectRequestBrowser = BaseBrowserRequest & {
   connectionDuration: number;
   groupAddress?: string;
   individualAddress?: string;
   jwtDuration: number;
-  method: ProvenanceMethod; // TODO: Get this type
   prohibitGroups: boolean;
-  requestFavicon?: string[];
-  requestName?: string;
-  requestOrigin?: string;
 }
 // Values returned to service from wallet (browser)
-// wallet => methodFunction()
+// wallet => methodFunction() 
 export interface ConnectResponseBrowser {
   // request: ConnectRequestBrowser;
-  // result: {
-  chainId: string; // TODO: Get this type
-  wallet: WalletState;
-  error?: ResponseError;
-  // };
+  result?: {
+    chainId: string; // TODO: Get this type
+    wallet: WalletState;
+  };
+  error?: MessageError;
 }
 // Values returned by service function
 // methodFunction() => wcjs.method()
@@ -70,11 +67,3 @@ export interface ConnectResponseBrowser {
 // }
 // Values returned to dApp by service
 // wcjs.method() => dApp
-export interface ConnectResultBrowser {
-  result?: {
-    connectionEST: number;
-    connectionEXP: number;
-    connectionType: 'existing session' | 'new session';
-  };
-  error?: ResponseError;
-}

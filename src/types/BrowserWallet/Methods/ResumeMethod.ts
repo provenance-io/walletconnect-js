@@ -1,18 +1,17 @@
-import { BROWSER_EVENTS } from '../../../consts';
-import { ProvenanceMethod } from '../../Cosmos';
-import { ResponseError } from './Generic';
+import { BaseBrowserRequest, BrowserMessageSender, MessageError } from './Generic';
 
-export interface ResumeRequestBrowser {
-  browserEvent: typeof BROWSER_EVENTS[keyof typeof BROWSER_EVENTS];
-  method: ProvenanceMethod;
-  requestFavicon?: string[];
-  requestName?: string;
-  requestOrigin?: string;
+export interface ResumeMessageBrowser {
+  request: ResumeRequestBrowser;
+  sender: BrowserMessageSender;
 }
+
+export type ResumeRequestBrowser = BaseBrowserRequest;
 // Values returned to service from wallet (browser)
 // wallet => methodFunction()
 export interface ResumeResponseBrowser {
-  est: number;
-  exp: number;
-  error?: ResponseError;
+  result?: {
+    est: number;
+    exp: number;
+  }
+  error?: MessageError;
 }

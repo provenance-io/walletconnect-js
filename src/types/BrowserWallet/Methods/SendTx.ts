@@ -1,7 +1,6 @@
-import { GasPrice, ProvenanceMethod } from '../../Cosmos';
+import { GasPrice, TxResponse } from '../../Cosmos';
 import { BrowserWallet } from '../../Wallet';
-import { BrowserEventValue } from '../../WalletCommunication';
-import { ResponseError } from './Generic';
+import { BaseBrowserRequest, BrowserMessageSender, MessageError } from './Generic';
 
 // Data passed into the function
 export interface BrowserSendTx {
@@ -19,22 +18,26 @@ export interface BrowserSendTx {
   wallet: BrowserWallet;
 }
 
+export interface SendTxMessageBrowser {
+  request: SendTxRequestBrowser;
+  sender: BrowserMessageSender;
+}
+
 // Data sent to the wallet
-export type BrowserSendTxRequest = Omit<BrowserSendTx, 'wallet'> & {
-  browserEvent: BrowserEventValue;
-  description: string;
-  date: number;
-  id: string;
-  method: ProvenanceMethod;
-  requestFavicon: string[];
-  requestName: string;
-  requestOrigin: string;
+export type SendTxRequestBrowser = BaseBrowserRequest & {
+  address: string;
+  feeGranter?: string;
+  feePayer?: string;
+  gasPrice?: GasPrice;
+  memo?: string;
+  tx: string | string[];
+  timeoutHeight?: number;
 };
 
 // Response from the wallet
-export interface BrowserSendTxReturn {
-  valid: boolean;
-  error?: ResponseError;
-  request?: BrowserSendTxRequest;
-  result?: any; // TODO: Get exact result
+export interface SendTxResponseBrowser {
+  error?: MessageError;
+  result?: {
+    txResponse: TxResponse;
+  }
 }

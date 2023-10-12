@@ -1,5 +1,5 @@
 import type WalletConnectClient from '@walletconnect/client';
-import { ResponseError } from '../../BrowserWallet';
+import { MessageError } from '../../BrowserWallet';
 import { WalletId } from '../../Wallet';
 import { PartialState, WCSState } from '../Service';
 
@@ -18,7 +18,16 @@ export interface ConnectMethodService {
 // TODO: This might be the results for every method, or at least should be...
 export interface ConnectMethodServiceFunctionResults {
   state?: PartialState<WCSState>;
-  error?: ResponseError;
+  error?: MessageError;
   resetState?: boolean;
   connector?: WalletConnectClient;
+}
+
+export interface ConnectMethodServiceResults {
+  result?: {
+    connectionEST: number;
+    connectionEXP: number;
+    connectionType: 'existing session' | 'new session';
+  };
+  error?: MessageError;
 }

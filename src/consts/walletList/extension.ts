@@ -1,5 +1,5 @@
 import { BrowserWallet, BrowserWalletEventActionResponses } from '../../types';
-import { CUSTOM_EVENT_EXTENSION } from '../browserEvents';
+import { BROWSER_MESSAGE_SENDERS, CUSTOM_EVENT_EXTENSION } from '../browserEvents';
 import { WALLET_IDS } from '../wallet';
 
 export const FIGURE_EXTENSION = {
@@ -10,8 +10,7 @@ export const FIGURE_EXTENSION = {
   browserEventAction: (browserEventData, method) =>
     new Promise((resolve, reject) => {
       const sendMessageEvent = new CustomEvent(CUSTOM_EVENT_EXTENSION, {
-        // TODO: Sender should be a const
-        detail: { request: browserEventData, sender: 'wcjs' },
+        detail: { request: browserEventData, sender: BROWSER_MESSAGE_SENDERS.WCJS },
       });
       console.log('wcjs | eventAction | sendMessageEvent: ', sendMessageEvent);
       dispatchEvent(sendMessageEvent);

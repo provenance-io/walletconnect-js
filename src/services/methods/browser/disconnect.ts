@@ -9,5 +9,7 @@ export const disconnect = (message: string, wallet: BrowserWallet) => {
     message,
   };
   // Note: We don't need to wait for a response, this will just disconnect as expected
+  // TODO: We should still wait for a response to match the async of other messages, expect a simple "success"
+  // Could potentially return "Failed, due to already being disconnected" or something like that
   wallet.browserEventAction(request, PROVENANCE_METHODS.DISCONNECT);
 };
