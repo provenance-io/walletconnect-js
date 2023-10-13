@@ -3,27 +3,28 @@ import { MessageError } from '../../BrowserWallet';
 import { WalletId } from '../../Wallet';
 import { PartialState, WCSState } from '../Service';
 
-export interface ConnectMethodService {
+// WalletConnectService method for connecting (Browser and WC)
+export interface ConnectMethod {
   bridge?: string;
   connectionDuration?: number;
-  jwtDuration?: number;
-  individualAddress?: string;
+  description?: string;
   groupAddress?: string;
-  prohibitGroups?: boolean;
+  individualAddress?: string;
+  jwtDuration?: number;
   jwtExpiration?: number;
-  walletId: WalletId;
   onDisconnect?: (message?: string) => void;
+  prohibitGroups?: boolean;
+  walletId: WalletId;
 }
-
-// TODO: This might be the results for every method, or at least should be...
-export interface ConnectMethodServiceFunctionResults {
+// Results given back to WalletConnectService from calling function (Browser and WC will have same results)
+export interface ConnectFunctionResults {
   state?: PartialState<WCSState>;
   error?: MessageError;
   resetState?: boolean;
   connector?: WalletConnectClient;
 }
-
-export interface ConnectMethodServiceResults {
+// Results given back to the dApp from wcjs
+export interface ConnectMethodResults {
   result?: {
     connectionEST: number;
     connectionEXP: number;

@@ -43,12 +43,12 @@ export const sign = async ({
   // Send a message to the wallet containing the request and wait for a response
   const { error, result } = await wallet.browserEventAction(request, method);
   console.log('wcjs | signMessage.ts | response: ', { error, result });
-  if (error) return { valid: false, error };
-  if (!result) return { error: { message: 'Result missing', code: 0}, valid: false};
+  if (error) return { error };
+  if (!result) return { error: { message: 'Result missing', code: 0} };
   // result is a hex encoded signature
   const signature = Uint8Array.from(Buffer.from(result.signature, 'hex'));
   // verify signature
   const valid = await verifySignature(hexMessage, signature, pubKeyB64);
 
-  return { valid, result: { signature }, request };
+  return { result: { signature, valid } };
 };

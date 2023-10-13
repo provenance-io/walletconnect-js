@@ -13,14 +13,14 @@ import {
 import type {
   BrowserWallet,
   BrowserWalletEventActionResponses,
-  ConnectMethodService,
+  ConnectMethod,
   ConnectMethodServiceFunctionResults,
   PartialState,
   ServiceSendTx,
   // SendMessageMethod,
   WCLocalState,
   WCSState,
-  WalletId,
+  WalletId
 } from '../types';
 import {
   addToLocalStorage,
@@ -420,6 +420,28 @@ export class WalletConnectService {
     }
   };
 
+  // After each method function returns the results, this function will handle wcjs state as needed
+  #handleResults = (results, onDisconnect, walletId) => {
+    // Results will always have this shape: 
+    /* results: {
+      state?: PartialState<WCSState>;
+      error?: MessageError;
+      resetState?: boolean;
+      connector?: WalletConnectClient;
+    }
+    */
+    if (onDisconnect) this.#setState({ connection: { onDisconnect } });
+    // TODO: These should be a separate method in wcjs service to reuse for other method results (they should all return a similar shape)
+    if (results.connector) this.#connector = results.connector;
+    if (results.resetState) this.#setState('reset');
+    if (results.state) {
+      this.#listenForBrowserWalletDisconnect(walletId);
+      this.#setState(results.state);
+      // Start the connection timer
+      this.#startConnectionTimer();
+    }
+  };
+
   /**
    * @param bridge - (optional) URL string of bridge to connect into (walletconnect only)
    * @param connectionDuration - (optional) Time before connection is timed out (seconds)
@@ -433,6 +455,7 @@ export class WalletConnectService {
    */
   connect = async ({
     individualAddress,
+    description,
     groupAddress,
     bridge = WALLETCONNECT_BRIDGE_URL,
     connectionDuration,
@@ -440,7 +463,7 @@ export class WalletConnectService {
     prohibitGroups = false,
     walletId,
     onDisconnect,
-  }: ConnectMethodService) => {
+  }: ConnectMethod) => {
     console.log('wcjs | walletConnectService.ts | connect()');
     // Pull wallet based on id entered
     const wallet = WALLET_LIST.find(({ id }) => id === walletId);
@@ -629,36 +652,6 @@ export class WalletConnectService {
   //     // Refresh auto-disconnect timer
   //     this.resetConnectionTimeout();
 
-  //     return result;
-  //   }
-  //   return { error: 'missing wallet id' };
-  // };
-
-  /**
-   *
-   * @param expires Time from now in seconds to expire new JWT
-   * @param description (optional) Additional information for wallet to display
-   */
-  // signJWT = async (
-  //   expires: number,
-  //   options?: { customId?: string; description?: string }
-  // ) => {
-  //   // Only run this if we have a wallet id
-  //   if (this.state.connection.walletId) {
-  //     // Loading while we wait for response
-  //     this.#setState({ connection: { pendingMethod: 'signJWT' } });
-  //     const result = await signJWTMethod({
-  //       address: this.state.wallet.address || '',
-  //       connector: this.#connector,
-  //       customId: options?.customId,
-  //       expires,
-  //       publicKey: this.state.wallet.publicKey || '',
-  //       walletId: this.state.connection.walletId,
-  //     });
-  //     // No longer loading
-  //     this.#setState({ connection: { pendingMethod: '' } });
-  //     // Refresh auto-disconnect timer
-  //     this.resetConnectionTimeout();
   //     return result;
   //   }
   //   return { error: 'missing wallet id' };

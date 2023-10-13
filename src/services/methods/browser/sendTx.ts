@@ -1,11 +1,10 @@
-export {};
-import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../../../consts';
-import type {
-  BrowserSendTx,
-  BrowserSendTxRequest,
-  BrowserSendTxReturn,
-} from '../../../types';
-import { getPageData, rngNum } from '../../../utils';
+export { };
+  import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../../../consts';
+  import type {
+    BrowserSendTx,
+    SendTxRequestBrowser
+  } from '../../../types';
+  import { getPageData, rngNum } from '../../../utils';
 
 export const sendTx = async ({
   description = 'Send Transaction',
@@ -13,7 +12,7 @@ export const sendTx = async ({
   wallet,
   tx: txB64,
   ...txData
-}: BrowserSendTx): Promise<BrowserSendTxReturn> => {
+}: BrowserSendTx) => {
   const {
     favicon: requestFavicon,
     origin: requestOrigin,
@@ -22,7 +21,7 @@ export const sendTx = async ({
   const method = PROVENANCE_METHODS.SEND;
   // Ensure the tx is an array
   const txB64Array = Array.isArray(txB64) ? txB64 : [txB64];
-  const request: BrowserSendTxRequest = {
+  const request: SendTxRequestBrowser = {
     browserEvent: BROWSER_EVENTS.BASIC,
     date: Date.now(),
     description,
@@ -37,27 +36,13 @@ export const sendTx = async ({
 
   // Send a message to the wallet containing the request and wait for a response
   // TODO: Need a type on this response
-  const response = await wallet.browserEventAction(request, method);
-  console.log('wcjs | sendTx | response: ', response);
+  const {result, error} = await wallet.browserEventAction(request, method);
+  console.log('wcjs | sendTx | response: ', {result, error});
 
-  if (response.error) return { valid: false, error: response.error };
+  if (error) return { error };
+  if (!result) return { error: { message: 'Result missing', code: 0} };
   // When the response has a code 0, something is wrong
-  const badResponseCode = response?.result?.txResponse?.code === '0';
-  const noResponse = !response;
-  const errorResponse = response.error;
-  const hasError = badResponseCode || noResponse || errorResponse;
+  if (result.txResponse.code === 0) return { error: { message: 'Tx Failed', code: 0} };
 
-  if (hasError) {
-    const error = badResponseCode
-      ? { message: 'Transaction Failed', code: 0 }
-      : noResponse
-      ? { message: 'Transaction Failed', code: 0 }
-      : errorResponse; // Error responses from wallet will be objects
-    return {
-      valid: false,
-      error,
-    };
-  }
-
-  return { valid: true, result: { ...response }, request };
+  return { result };
 };
