@@ -1,28 +1,17 @@
 import { BROWSER_EVENTS, PROVENANCE_METHODS } from '../../../consts';
-import { BrowserWallet, ConnectMethodServiceFunctionResults, ConnectRequestBrowser } from '../../../types';
+import { ConnectFunction, ConnectRequestBrowser } from '../../../types';
 import { getPageData, rngNum } from '../../../utils';
-
-interface Connect {
-  connectionDuration: number;
-  customId?: string;
-  description?: string;
-  groupAddress?: string;
-  individualAddress?: string;
-  jwtDuration: number;
-  prohibitGroups: boolean;
-  wallet: BrowserWallet;
-}
 
 export const connect = async ({
   connectionDuration,
-  customId,
+  id,
   description = 'Send Wallet Action',
   groupAddress,
   individualAddress,
   jwtDuration,
   prohibitGroups,
   wallet,
-}: Connect): Promise<ConnectMethodServiceFunctionResults> => {
+}: ConnectFunction) => {
   const {
     favicon: requestFavicon,
     origin: requestOrigin,
@@ -40,7 +29,7 @@ export const connect = async ({
     browserEvent: BROWSER_EVENTS.BASIC,
     date: Date.now(),
     description,
-    id: customId || `${rngNum()}`,
+    id: id || `${rngNum()}`,
     method,
     requestFavicon,
     requestName,

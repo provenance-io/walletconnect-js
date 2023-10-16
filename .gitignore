@@ -41,4 +41,4 @@ ignored/
 /examples/example-react-vite/provenanceio-walletconnect-js-*.tgz
 /figure-tech-walletconnect
 *.tgz
-*.notes.md
+*.notes.*

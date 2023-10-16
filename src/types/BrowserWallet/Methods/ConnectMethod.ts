@@ -2,22 +2,9 @@ import { WalletState } from 'types/Service';
 import { BrowserWallet } from '../../Wallet';
 import type { BaseBrowserRequest, BrowserMessageSender, MessageError } from './Generic';
 
-/*  Full flow of communication:
-  1) dApp => wcjs.method()  
-  2) wcjs.method() => methodFunction()
-  3) methodFunction() => wallet (walletconnect || browser message)
-  4) wallet => methodFunction() (walletconnect || browser message)
-  5) methodFunction() => wcjs.method()
-  6) wcjs.method() => dApp
-*/
-
-// ----------------------------------
-// CONNECT
-// ----------------------------------
-
 // Values passing into method when dApp calls service function
 // 1) dApp => wcjs.method()
-export interface ConnectMethodBrowser {
+export type ConnectMethod = BaseBrowserRequest & {
   connectionDuration?: number;
   groupAddress?: string;
   individualAddress?: string;
@@ -28,7 +15,7 @@ export interface ConnectMethodBrowser {
 } 
 // Values passed into method when services calls function w/defaults (optional values now filled)
 // 2) wcjs.method() => methodFunction()
-export type ConnectMethodBrowserFunction = ConnectMethodBrowser & {
+export type ConnectFunction = ConnectMethod & {
   connectionDuration: number;
   jwtDuration: number;
   prohibitGroups: boolean; 
