@@ -86,6 +86,8 @@ export class WalletConnectService {
     this.#buildInitialState();
   }
 
+  getConnector = () => this.#connector;
+
   setLogging = (logsEnabled: boolean) => {
     this.#logsEnabled = logsEnabled;
   };

@@ -105,6 +105,7 @@
     "commentSniff": "node -e 'require(\"./scripts/commentSniffer.js\").commentSniffer()'",
     "build:demo": "node -e 'require(\"./scripts/buildDemo.js\").buildDemo()' && cd figure-tech-walletconnect && npm i --package-lock-only",
     "start:example-react": "cd examples/example-react-vite && npm i && npm run start",
+    "start:simple": "nodemon -e js,ts,tsx,css --watch src --exec 'npm run build:pack && cd examples/example-react-vite-simple && npm i && npm run start'",
     "watch:example-react": "cd examples/example-react-vite && npm run start",
     "prebuild": "npm run test",
     "start:watch": "nodemon -e js,ts,tsx,css --watch src --exec 'npm run build:pack && npm run watch:example-react'",
