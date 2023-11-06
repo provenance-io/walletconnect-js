@@ -1,10 +1,8 @@
-import {
-  WalletConnectService,
-  useWalletConnect,
-} from '@provenanceio/walletconnect-js';
+import { useWalletConnect } from '@provenanceio/walletconnect-js';
 
 export const App = () => {
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
+  const isConnected = walletConnectState.status === 'connected';
 
   return (
     <div>
@@ -17,13 +15,16 @@ export const App = () => {
       <div
         style={{ marginBottom: '30px', fontWeight: 'bold', color: 'palevioletred' }}
       >
-        Bridge: {wcs.getConnector()?.bridge || 'n/a'}
+        Bridge (Connector): {wcs.getConnector()?.bridge || 'n/a'}
+      </div>
+      <div style={{ marginBottom: '30px', fontWeight: 'bold', color: 'indianred' }}>
+        Bridge (WalletConnectState): {walletConnectState.bridge || 'n/a'}
       </div>
       <div style={{ marginBottom: '30px', fontWeight: 'bold' }}>
         STATUS: {walletConnectState.status}
       </div>
 
-      {walletConnectState.status === 'connected' ? (
+      {isConnected ? (
         <button onClick={() => wcs.disconnect()}>disconnect</button>
       ) : (
         <button
