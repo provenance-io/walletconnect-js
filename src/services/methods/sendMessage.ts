@@ -86,8 +86,10 @@ export const sendMessage = async ({
     // send message
     // Logging to help track down rare, rogue bug where dApp hangs waiting on response
     log(logsEnabled, `sendMessage | request sent to wallet: `, request);
+    const requestOptions = { forcePushNotification: true };
     const result = (await connector.sendCustomRequest(
-      request
+      request,
+      requestOptions
     )) as SendMessageMethodResult;
     log(logsEnabled, `sendMessage | result sent to wallet: `, result);
     // Check to see if we had an error in the txResponse

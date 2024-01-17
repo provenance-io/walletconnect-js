@@ -89,7 +89,11 @@ export const signJWT = async ({
       knownWalletApp.eventAction(eventData);
     }
     // send message
-    const result = (await connector.sendCustomRequest(request)) as string;
+    const requestOptions = { forcePushNotification: true };
+    const result = (await connector.sendCustomRequest(
+      request,
+      requestOptions
+    )) as string;
     // result is a hex encoded signature
     // const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     const signature = Buffer.from(result, 'hex');
