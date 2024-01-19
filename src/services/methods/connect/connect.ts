@@ -142,7 +142,6 @@ export const connect = ({
     }
     const qrcodeModal = new QRCodeModal();
     // Create new connector
-    console.log('wcjs | connect | bridge: ', bridge);
     newConnector = new WalletConnectClient({ bridge, qrcodeModal });
     // ------------------------
     // CONNECT EVENT
