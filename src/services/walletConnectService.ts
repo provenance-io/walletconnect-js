@@ -3,7 +3,6 @@ import events from 'events';
 import type {
   AccountAttribute,
   BroadcastEventData,
-  ConnectMethod,
   InitMethod,
   ModalData,
   SendMessageMethod,
@@ -48,23 +47,25 @@ const defaultState: WCSState = {
   address: '',
   attributes: [] as AccountAttribute[],
   bridge: WALLETCONNECT_BRIDGE_URL,
-  status: 'disconnected',
+  connected: false,
   connectionEST: null,
   connectionEXP: null,
   connectionTimeout: CONNECTION_TIMEOUT,
+  iframeParentId: '',
   modal: {
-    showModal: false,
-    isMobile: isMobile(),
     dynamicUrl: '',
+    isMobile: isMobile(),
     QRCodeImg: '',
     QRCodeUrl: '',
+    showModal: false,
   },
   peer: null,
   pendingMethod: '',
   publicKey: '',
   representedGroupPolicy: null,
   signedJWT: '',
-  version: '3.2.1',
+  status: 'disconnected',
+  version: '3.7.1',
   walletAppId: undefined,
   walletInfo: {},
 };
@@ -84,6 +85,11 @@ export class WalletConnectService {
 
   constructor() {
     this.#buildInitialState();
+    // Add a way to log the current walletconnect-js state from console on any dApp
+    window.wcjs = window.wcjs || {
+      getState: this.#getState,
+      version: this.state.version,
+    };
   }
 
   setLogging = (logsEnabled: boolean) => {
@@ -122,14 +128,18 @@ export class WalletConnectService {
       // Default return back the current states status or default status if nothing is set/exists yet
       return currentStateStatus;
     };
+
     return {
       address: localStorageAddress || currentState.address,
       attributes: localStorageAttributes || currentState.attributes,
       bridge: existingWCState.bridge || currentState.bridge,
+      connected: currentState.status === 'connected',
       connectionEXP: existingWCJSState.connectionEXP || currentState.connectionEXP,
       connectionEST: existingWCJSState.connectionEST || currentState.connectionEST,
       connectionTimeout:
         existingWCJSState.connectionTimeout || currentState.connectionTimeout,
+      iframeParentId:
+        existingWCJSState.iframeParentId || currentState.iframeParentId,
       modal: currentState.modal,
       peer: currentState.peer,
       pendingMethod: currentState.pendingMethod,
@@ -157,7 +167,7 @@ export class WalletConnectService {
       const duration = newState.connectionTimeout
         ? newState.connectionTimeout / 1000
         : undefined;
-      await this.connect({ duration, bridge: newState.bridge });
+      await this.init({ duration, bridge: newState.bridge });
     }
   };
 
@@ -173,7 +183,7 @@ export class WalletConnectService {
       const duration = currentState.connectionTimeout
         ? currentState.connectionTimeout / 1000
         : undefined;
-      this.connect({ duration, bridge: currentState.bridge });
+      this.init({ duration, bridge: currentState.bridge });
     }
   };
 
@@ -226,6 +236,7 @@ export class WalletConnectService {
       connectionEXP,
       connectionEST,
       connectionTimeout,
+      iframeParentId,
       signedJWT,
       walletAppId,
     } = updatedState;
@@ -234,6 +245,7 @@ export class WalletConnectService {
       ...(connectionEXP !== undefined && { connectionEXP }),
       ...(connectionEST !== undefined && { connectionEST }),
       ...(connectionTimeout !== undefined && { connectionTimeout }),
+      ...(iframeParentId !== undefined && { iframeParentId }),
       ...(signedJWT !== undefined && { signedJWT }),
       ...(walletAppId !== undefined && { walletAppId }),
     };
@@ -268,6 +280,7 @@ export class WalletConnectService {
         ...updatedState,
         address,
         bridge,
+        connected: status === 'connected',
         status,
         // We always want to use the jwt in the state over the connector since newer jwts won't show up in the connector
         signedJWT: this.state.signedJWT || jwt,
@@ -470,6 +483,8 @@ export class WalletConnectService {
       const finalDurationS = finalDurationMS / 1000;
       // Update the duration of this connection
       this.#setState({
+        ...(bridge && { bridge }),
+        ...(iframeParentId && { iframeParentId }),
         connectionTimeout: finalDurationMS,
         status: 'pending',
       });
@@ -497,56 +512,8 @@ export class WalletConnectService {
 
   /**
    * @deprecated connect is being phased out and init will be used in its place (same functionality)
-   * @param bridge - (optional) URL string of bridge to connect into
-   * @param duration - (optional) Time before connection is timed out (seconds)
-   * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
-   * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
-   * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
-   * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
-   * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
-   */
-  connect = async ({
-    individualAddress,
-    groupAddress,
-    bridge,
-    duration,
-    jwtExpiration,
-    prohibitGroups,
-    walletAppId,
-  }: ConnectMethod = {}) => {
-    // Only create a new connector when we're not already connected
-    if (this.state.status !== 'connected') {
-      // Calculate duration to use (use passed in or default durations)
-      const finalDurationMS = duration
-        ? duration * 1000
-        : this.state.connectionTimeout;
-      // Convert back to seconds for wallets to use since jwtExpiration is already in seconds
-      const finalDurationS = finalDurationMS / 1000;
-      // Update the duration of this connection
-      this.#setState({
-        connectionTimeout: finalDurationMS,
-        status: 'pending',
-      });
-      const newConnector = await connectMethod({
-        bridge: bridge || this.state.bridge,
-        broadcast: this.#broadcastEvent,
-        duration: finalDurationS,
-        getState: this.#getState,
-        jwtExpiration,
-        prohibitGroups,
-        requiredGroupAddress: groupAddress,
-        requiredIndividualAddress: individualAddress,
-        resetState: this.#resetState,
-        setState: this.#setState,
-        startConnectionTimer: this.#startConnectionTimer,
-        state: this.state,
-        updateModal: this.updateModal,
-        walletAppId,
-      });
-      this.#connector = newConnector;
-    }
-    return 'initialized';
-  };
+   * */
+  connect = this.init;
 
   /**
    *
@@ -594,7 +561,6 @@ export class WalletConnectService {
       address: this.state.address,
       connector: this.#connector,
       customId,
-      walletAppId: this.state.walletAppId,
       data: {
         message,
         description,
@@ -607,7 +573,9 @@ export class WalletConnectService {
         nonCriticalExtensionOptions,
         memo,
       },
+      iframeParentId: this.state.iframeParentId,
       logsEnabled: this.#logsEnabled,
+      walletAppId: this.state.walletAppId,
     });
     // No longer loading
     this.#setState({ pendingMethod: '' });
@@ -634,13 +602,14 @@ export class WalletConnectService {
     this.#setState({ pendingMethod: 'switchToGroup' });
     const result = await sendWalletActionMethod({
       connector: this.#connector,
-      walletAppId: this.state.walletAppId,
       data: {
         action: 'switchToGroup',
         payload: groupPolicyAddress ? { address: groupPolicyAddress } : undefined,
         description,
         method: 'wallet_action',
       },
+      iframeParentId: this.state.iframeParentId,
+      walletAppId: this.state.walletAppId,
     });
     // No longer loading
     this.#setState({ pendingMethod: '' });
@@ -667,6 +636,7 @@ export class WalletConnectService {
       connector: this.#connector,
       customId: options?.customId,
       expires,
+      iframeParentId: this.state.iframeParentId,
       publicKey: this.state.publicKey,
       setState: this.#setState,
       walletAppId: this.state.walletAppId,
@@ -696,6 +666,7 @@ export class WalletConnectService {
       connector: this.#connector,
       customId: options?.customId,
       hexMessage,
+      iframeParentId: this.state.iframeParentId,
       publicKey: this.state.publicKey,
       walletAppId: this.state.walletAppId,
     });
@@ -721,12 +692,13 @@ export class WalletConnectService {
     // Wait to get the result back
     const result = await sendWalletActionMethod({
       connector: this.#connector,
-      walletAppId: this.state.walletAppId,
       data: {
         action: 'removePendingMethod',
         payload: { customId },
         method: 'wallet_action',
       },
+      iframeParentId: this.state.iframeParentId,
+      walletAppId: this.state.walletAppId,
     });
     // No longer loading
     this.#setState({ pendingMethod: '' });

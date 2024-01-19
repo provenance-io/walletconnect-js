@@ -24,30 +24,32 @@ type WCSPendingMethod =
 export type WalletConnectServiceStatus = 'connected' | 'disconnected' | 'pending';
 
 export interface ModalData {
+  dynamicUrl: string;
+  isMobile: boolean;
   QRCodeImg: string;
   QRCodeUrl: string;
   showModal: boolean;
-  isMobile: boolean;
-  dynamicUrl: string;
 }
 
 export interface WCSState {
   address: string;
   attributes: AccountAttribute[];
   bridge: string;
-  status: WalletConnectServiceStatus;
-  connectionEXP: number | null;
+  connected: boolean;
   connectionEST: number | null;
+  connectionEXP: number | null;
   connectionTimeout: number;
-  pendingMethod: WCSPendingMethod;
-  peer: IClientMeta | null;
-  publicKey: string;
+  iframeParentId?: string;
   modal: ModalData;
+  peer: IClientMeta | null;
+  pendingMethod: WCSPendingMethod;
+  publicKey: string;
+  representedGroupPolicy: MasterGroupPolicy | null;
   signedJWT: string;
+  status: WalletConnectServiceStatus;
   version: string;
   walletAppId?: WalletId;
   walletInfo: WalletInfo;
-  representedGroupPolicy: MasterGroupPolicy | null;
 }
 
 export interface WCSSetStateParam extends WCSState {
@@ -61,9 +63,10 @@ export type WCSSetState = (
 export type WCSSetFullState = (state: WCSState) => void;
 
 export interface WCJSLocalState {
-  connectionEXP: number;
   connectionEST: number;
+  connectionEXP: number;
   connectionTimeout: number;
+  iframeParentId?: string;
   signedJWT: string;
   walletAppId?: WalletId | '';
 }

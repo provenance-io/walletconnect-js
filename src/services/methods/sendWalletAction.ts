@@ -15,13 +15,15 @@ import type {
 interface SendWalletAction {
   connector?: WalletConnectClientType;
   data: SendWalletActionMethod;
+  iframeParentId?: string;
   walletAppId?: WalletId;
 }
 
 export const sendWalletAction = async ({
   connector,
-  walletAppId,
   data,
+  iframeParentId,
+  walletAppId,
 }: SendWalletAction): Promise<
   BroadcastEventData[
     | typeof WINDOW_MESSAGES.SWITCH_TO_GROUP_COMPLETE
@@ -54,7 +56,7 @@ export const sendWalletAction = async ({
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT, data };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT, data, iframeParentId };
       knownWalletApp.eventAction(eventData);
     }
 
