@@ -98,11 +98,12 @@ export interface ConnectMethod {
 export interface InitMethod {
   bridge?: string;
   duration?: number;
-  noPopup?: boolean;
-  individualAddress?: string;
   groupAddress?: string;
-  prohibitGroups?: boolean;
+  iframeParentId?: string;
+  individualAddress?: string;
   jwtExpiration?: number;
+  noPopup?: boolean;
+  prohibitGroups?: boolean;
   walletAppId?: WalletId;
 }
 

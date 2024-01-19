@@ -1,6 +1,7 @@
 export const WALLETCONNECT_BRIDGE_URL =
-  'wss://figure.tech/service-wallet-connect-bridge/ws/external';
-
+  'wss://figure.tech/service-wallet-connect-bridge/ws/external?silenceActive=true';
+export const WALLETCONNECT_TEST_BRIDGE_URL =
+  'wss://test.figure.tech/service-wallet-connect-bridge/ws/external?silenceActive=true';
 // FIGURE MOBILE WALLET DYNAMIC URLS
 export const DYNAMIC_LINK_FIGURE_MOBILE_URL = 'https://figurewallet.page.link';
 export const FIGURE_MOBILE_WALLET_CONNECT_URL = 'https://figure.com/wallet-connect';
