@@ -5,25 +5,32 @@ export * from './services';
 export * from './consts/windowMessages';
 export * from './consts/walletList';
 export * from './consts/walletConnect';
+export * from './consts/urls';
 
 export type {
-  ProvenanceMethod,
-  WalletConnectServiceStatus,
-  ConnectMethod,
-  // Broadcast events for methods
   BroadcastEventData,
-  SignHexMessageMethodResult,
-  SignHexMessageMethodEventData,
-  SignJWTMethodResult,
-  SignJWTMethodEventData,
-  SendMessageMethodResult,
-  SendMessageMethodEventData,
-  DisconnectMethodResult,
-  DisconnectMethodEventData,
-  ConnectMethodResult,
+  ConnectMethod,
   ConnectMethodEventData,
+  ConnectMethodResult,
+  DisconnectMethodEventData,
+  DisconnectMethodResult,
+  IClientMeta,
+  InitMethod,
+  MasterGroupPolicy,
+  ModalData,
+  ProvenanceMethod,
+  SendMessageMethod,
+  SendMessageMethodEventData,
+  SendMessageMethodResult,
+  SignHexMessageMethodEventData,
+  SignHexMessageMethodResult,
+  SignJWTMethodEventData,
+  SignJWTMethodResult,
   SwitchToGroupMethodEventData,
-  // Wallet info
+  WalletConnectServiceStatus,
   WalletId,
   WalletType,
+  WCJSLocalState,
+  WCLocalState,
+  WCSState,
 } from './types';

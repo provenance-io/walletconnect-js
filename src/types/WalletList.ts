@@ -22,6 +22,7 @@ export interface EventData {
   data?: WalletEventData;
   referral?: string;
   redirectUrl?: string;
+  iframeParentId?: string;
 }
 
 export interface Wallet {

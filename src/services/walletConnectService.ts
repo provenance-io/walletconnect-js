@@ -443,17 +443,19 @@ export class WalletConnectService {
   /**
    * @param bridge - (optional) URL string of bridge to connect into
    * @param duration - (optional) Time before connection is timed out (seconds)
-   * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
    * @param groupAddress - (optional) Group address to establish connection with, note, if requested, it must exist
-   * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
+   * @param iframeParentId - (optional) Render the iframe wallets within a parent element
+   * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
+   * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
    */
   init = async ({
-    individualAddress,
-    groupAddress,
     bridge,
     duration,
+    groupAddress,
+    iframeParentId,
+    individualAddress,
     jwtExpiration,
     prohibitGroups,
     walletAppId,
@@ -476,6 +478,7 @@ export class WalletConnectService {
         broadcast: this.#broadcastEvent,
         duration: finalDurationS,
         getState: this.#getState,
+        iframeParentId,
         jwtExpiration,
         prohibitGroups,
         requiredGroupAddress: groupAddress,

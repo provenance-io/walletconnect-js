@@ -28,6 +28,7 @@ interface Props {
   ) => void;
   duration: number;
   getState: () => WCSState;
+  iframeParentId?: string;
   jwtExpiration?: number;
   noPopup?: boolean;
   prohibitGroups?: boolean;
@@ -48,6 +49,7 @@ export const connect = ({
   broadcast,
   duration,
   getState,
+  iframeParentId,
   jwtExpiration,
   prohibitGroups,
   requiredGroupAddress,
@@ -75,6 +77,7 @@ export const connect = ({
               uri: uriData,
               event: 'walletconnect_init',
               redirectUrl: window.location.href,
+              iframeParentId,
             };
             // Trigger the event action based on the wallet
             targetWallet.eventAction(eventData);

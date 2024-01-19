@@ -59,7 +59,8 @@ export const sendWalletAction = async ({
     }
 
     // send message
-    const result = await connector.sendCustomRequest(request);
+    const requestOptions = { forcePushNotification: true };
+    const result = await connector.sendCustomRequest(request, requestOptions);
 
     return {
       valid: !!result,
