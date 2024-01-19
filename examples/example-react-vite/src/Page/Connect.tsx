@@ -64,10 +64,8 @@ export const Connect: React.FC = () => {
     if (initialLoad) {
       setInitialLoad(false);
       wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {
-        console.log('connect: ', eventResults);
         setResults(eventResults)});
       wcs.addListener(WINDOW_MESSAGES.DISCONNECT, (eventResults) => {
-        console.log('disconnect: ', eventResults);
         setResults(eventResults)
       });
     }
@@ -97,7 +95,7 @@ export const Connect: React.FC = () => {
     setShowQRCode(false);
     // Run connect method based on current state values
     const finalBridge = customBridge ? customBridge : selectedBridge !== 'custom' ? selectedBridge : BRIDGE_URLS[0];
-    const result = await wcs.init({
+    await wcs.init({
       // Use custom if given, or if left blank but custom selected, use the first in the options array
       bridge: finalBridge,
       duration: Number(sessionDuration),
@@ -107,7 +105,6 @@ export const Connect: React.FC = () => {
       jwtExpiration: Number(jwtExpiration),
       walletAppId,
     })
-    console.log('connect | result: ', result);
     // If connection with mobile directly, just show the QRCode
     if (mobileDirect) {
       setShowQRCode(true);
