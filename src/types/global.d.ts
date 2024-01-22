@@ -7,4 +7,8 @@ interface Window {
     version: string;
     isFigure: boolean;
   };
+  wcjs?: {
+    version?: string;
+    getState?: () => WCSState;
+  };
 }

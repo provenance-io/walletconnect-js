@@ -43,7 +43,12 @@ const QRCodeModalStyled = styled(QRCodeModal)`
 
 export const Connect: React.FC = () => {
   const [directQRCodeGenerate, setDirectQRCodeGenerate] = useState(false);
-  const [selectedBridge, setSelectedBridge] = useState(BRIDGE_URLS[0]);
+  const defaultSelectedBridge =
+    window.location.href.includes('test.figure.com') ||
+    window.location.href.includes('localhost')
+      ? BRIDGE_URLS[1]
+      : BRIDGE_URLS[0];
+  const [selectedBridge, setSelectedBridge] = useState(defaultSelectedBridge);
   const [customBridge, setCustomBridge] = useState('');
   const [individualAddress, setIndividualAddress] = useState('');
   const [groupAddress, setGroupAddress] = useState('');
@@ -104,6 +109,7 @@ export const Connect: React.FC = () => {
       prohibitGroups: !groupsAllowed,
       jwtExpiration: Number(jwtExpiration),
       walletAppId,
+      iframeParentId: 'portal',
     })
     // If connection with mobile directly, just show the QRCode
     if (mobileDirect) {

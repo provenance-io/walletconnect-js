@@ -19,8 +19,9 @@ interface SendMessage {
   connector?: WalletConnectClientType;
   customId?: string;
   data: SendMessageMethod;
-  walletAppId?: WalletId;
+  iframeParentId?: string;
   logsEnabled: boolean;
+  walletAppId?: WalletId;
 }
 
 export const sendMessage = async ({
@@ -28,8 +29,9 @@ export const sendMessage = async ({
   connector,
   customId,
   data,
-  walletAppId,
+  iframeParentId,
   logsEnabled,
+  walletAppId,
 }: SendMessage): Promise<
   BroadcastEventData[typeof WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]
 > => {
@@ -80,7 +82,7 @@ export const sendMessage = async ({
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT, iframeParentId };
       knownWalletApp.eventAction(eventData);
     }
     // send message
