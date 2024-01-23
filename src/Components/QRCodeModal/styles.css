@@ -81,6 +81,9 @@
 .wcjs-qr-img-element {
   display: inline;
   margin-top: 10px;
+  padding:18px;
+  background: #FFFFFF;
+  border-radius: 10px;
 }
 .wcjs-qr-reload {
   position: absolute;
@@ -90,7 +93,7 @@
   width: 100%;
   background: #eeeeee;
   padding: 60px 40px 40px 40px;
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
