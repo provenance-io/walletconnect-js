@@ -3,6 +3,9 @@ import figureLogo from '../../../images/figure.svg';
 
 export const createQRImage = (qrData: string): Promise<string> =>
   new Promise((resolve) => {
+    // TESTING: Try to just make an SVG for the QR code and log it
+    // QRCode.to
+
     const qrCodeCanvas = document.createElement('canvas');
     const QR_CODE_SIZE = 276;
     QRCode.toCanvas(qrCodeCanvas, qrData, {

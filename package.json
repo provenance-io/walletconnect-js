@@ -34,7 +34,7 @@
     "base64url": "3.0.1",
     "buffer": "npm:buffer@6.0.3",
     "crypto": "npm:crypto-browserify@3.12.0",
-    "qrcode": "1.5.1",
+    "qrcode": "^1.5.3",
     "secp256k1": "5.0.0",
     "stream": "npm:stream-browserify@3.0.0",
     "util": "npm:util@0.12.5"
