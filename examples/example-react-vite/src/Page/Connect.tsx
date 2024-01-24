@@ -40,6 +40,10 @@ const QRCodeModalStyled = styled(QRCodeModal)`
   background: ${COLORS.BLACK_70};
   font-family: ${FONTS.SECONDARY_FONT};
 `;
+const QRCodeImage = styled.img`
+  height: 200px;
+  width: 200px;
+`;
 
 export const Connect: React.FC = () => {
   const [directQRCodeGenerate, setDirectQRCodeGenerate] = useState(false);
@@ -62,6 +66,7 @@ export const Connect: React.FC = () => {
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status, modal } = walletConnectState;
   const { QRCodeImg, dynamicUrl } = modal;
+
   const navigate = useNavigate();
 
   // Listen for a connection, then redirect to action page
@@ -191,7 +196,7 @@ export const Connect: React.FC = () => {
             />
           </AdvancedOptions>
         )}
-        {showQRCode && !!walletConnectState.modal.QRCodeImg && <div><img src={walletConnectState.modal.QRCodeImg} /></div>}
+        {showQRCode && !!walletConnectState.modal.QRCodeImg && <div><QRCodeImage src={walletConnectState.modal.QRCodeImg} /></div>}
         <Button onClick={handleConnect}>
           Connect with Prebuilt Modal
         </Button>

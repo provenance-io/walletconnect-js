@@ -91,6 +91,14 @@
   box-shadow: 0 0 0 1px #dddddd inset;
   padding: 7px;
 }
+.wcjs-modal-back {
+  cursor: pointer;
+  height: 14px;
+  width: 14px;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
 .wcjs-qr-img {
   flex-basis: 100%;
 }
