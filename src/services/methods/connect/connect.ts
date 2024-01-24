@@ -122,17 +122,35 @@ export const connect = ({
         const connectionDurationParam = duration
           ? `&connectionDuration=${duration}`
           : '';
-        const fullData = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}${connectionDurationParam}`;
-        const qrCodeImage = await createQRImage(fullData);
+        // If this si a mobile wallet, we render a different QR code
+        const isMobileWalletOpened =
+          connectionWalletAppId === 'figure_mobile' ||
+          connectionWalletAppId === 'figure_mobile_test';
+        const isMobileWalletDev = connectionWalletAppId === 'figure_mobile_test';
+        // New QR Codes will have three parts, WC Link, figure connect link, and dynamic link
+        const wcLink = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}${connectionDurationParam}`;
+        const figureConnectLink = `${encodeURIComponent(
+          'https://figure.com/wallet/connect?data='
+        )}${encodeURIComponent(encodeURIComponent(encodeURIComponent(wcLink)))}`;
+        // TODO: Let dApp pass option here
+        const walletType = isMobileWalletDev
+          ? 'com.figure.mobile.wallet.dev'
+          : 'com.figure.mobile.wallet';
+        const isi = isMobileWalletDev ? 6444293331 : 6444263900;
+        const finalDynamicQRLink = `https://figurewallet.page.link?link=${figureConnectLink}&apn=${walletType}&ibi=${walletType}&isi=${isi}&efr=${1}`;
+        const finalQRCodeLink = isMobileWalletOpened ? finalDynamicQRLink : wcLink;
+        const qrCodeImage = await createQRImage(finalQRCodeLink);
         // Don't trigger a QRCodeModal popup if they say "noPopup" or pass a specific walletId
         updateModal({
           QRCodeImg: qrCodeImage,
-          QRCodeUrl: fullData,
+          QRCodeUrl: finalQRCodeLink,
           showModal: !connectionWalletAppId,
           walletAppId: connectionWalletAppId,
         });
         // If we need to open a wallet directly, we won't be opening the QRCodeModal and will instead trigger that wallet directly
-        if (connectionWalletAppId) openDirectWallet(connectionWalletAppId, fullData);
+        // Connecting directly with mobile will have a different QR code value
+        if (connectionWalletAppId)
+          openDirectWallet(connectionWalletAppId, finalQRCodeLink);
         resolve(newConnector);
       };
 

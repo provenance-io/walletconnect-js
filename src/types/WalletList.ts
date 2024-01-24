@@ -9,7 +9,7 @@ export type WalletId =
   | 'figure_hosted_test'
   | 'figure_mobile'
   | 'figure_mobile_test';
-export type WalletIcons = 'provenance' | 'figure';
+export type WalletIcons = 'provenance' | 'figure' | 'figureMobile' | 'chromeLogo';
 
 export type WalletEventData = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
