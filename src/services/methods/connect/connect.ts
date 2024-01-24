@@ -126,17 +126,17 @@ export const connect = ({
         const isMobileWalletOpened =
           connectionWalletAppId === 'figure_mobile' ||
           connectionWalletAppId === 'figure_mobile_test';
+        const isMobileWalletDev = connectionWalletAppId === 'figure_mobile_test';
         // New QR Codes will have three parts, WC Link, figure connect link, and dynamic link
         const wcLink = `${data}${requiredIndividualAddressParam}${requiredGroupAddressParam}${prohibitGroupsParam}${jwtExpirationParam}${connectionDurationParam}`;
         const figureConnectLink = `${encodeURIComponent(
           'https://figure.com/wallet/connect?data='
         )}${encodeURIComponent(encodeURIComponent(encodeURIComponent(wcLink)))}`;
         // TODO: Let dApp pass option here
-        const mobileWalletDev = true;
-        const walletType = mobileWalletDev
+        const walletType = isMobileWalletDev
           ? 'com.figure.mobile.wallet.dev'
           : 'com.figure.mobile.wallet';
-        const isi = mobileWalletDev ? 6444293331 : 6444263900;
+        const isi = isMobileWalletDev ? 6444293331 : 6444263900;
         const finalDynamicQRLink = `https://figurewallet.page.link?link=${figureConnectLink}&apn=${walletType}&ibi=${walletType}&isi=${isi}&efr=${1}`;
         const finalQRCodeLink = isMobileWalletOpened ? finalDynamicQRLink : wcLink;
         const qrCodeImage = await createQRImage(finalQRCodeLink);
