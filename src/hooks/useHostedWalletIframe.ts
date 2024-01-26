@@ -80,6 +80,7 @@ const createIframe = (url: string) => {
       }
       
       iframe {
+        background: #fff;
         width:${IFRAME_NOTIFICATION_WIDTH}px;
         height:${IFRAME_NOTIFICATION_HEIGHT}px;
         margin: 10px;
@@ -168,13 +169,19 @@ export function useHostedWalletIframe() {
     const overrideUrl = localStorage.getItem(
       'FIGURE_HOSTED_WALLET_URL_TEST_OVERRIDE'
     );
+
     if (overrideUrl) {
       acceptableOrigins.push(new URL(overrideUrl).origin);
     }
+
     // Only listen for events coming from the hosted wallet origin
     if (!acceptableOrigins.includes(event.origin)) return;
     if (event.data === 'window_close') {
       removeIframe();
+    }
+
+    if (event.data.type === 'authUrlReceived') {
+      window.open(event.data.url);
     }
   }
 

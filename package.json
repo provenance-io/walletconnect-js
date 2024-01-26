@@ -3,9 +3,12 @@
   "version": "3.6.0",
   "private": false,
   "sideEffects": false,
-  "main": "esm/index.js",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "main": "esm/index.js",
+    "typings": "./esm/index.d.ts"
+  },
   "license": "Apache-2.0",
-  "typings": "./esm/index.d.ts",
   "files": [
     "lib",
     "esm",
