@@ -40,10 +40,19 @@ const QRCodeModalStyled = styled(QRCodeModal)`
   background: ${COLORS.BLACK_70};
   font-family: ${FONTS.SECONDARY_FONT};
 `;
+const QRCodeImage = styled.img`
+  height: 200px;
+  width: 200px;
+`;
 
 export const Connect: React.FC = () => {
   const [directQRCodeGenerate, setDirectQRCodeGenerate] = useState(false);
-  const [selectedBridge, setSelectedBridge] = useState(BRIDGE_URLS[0]);
+  const defaultSelectedBridge =
+    window.location.href.includes('test.figure.com') ||
+    window.location.href.includes('localhost')
+      ? BRIDGE_URLS[1]
+      : BRIDGE_URLS[0];
+  const [selectedBridge, setSelectedBridge] = useState(defaultSelectedBridge);
   const [customBridge, setCustomBridge] = useState('');
   const [individualAddress, setIndividualAddress] = useState('');
   const [groupAddress, setGroupAddress] = useState('');
@@ -57,13 +66,15 @@ export const Connect: React.FC = () => {
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status, modal } = walletConnectState;
   const { QRCodeImg, dynamicUrl } = modal;
+
   const navigate = useNavigate();
 
   // Listen for a connection, then redirect to action page
   useEffect(() => {
     if (initialLoad) {
       setInitialLoad(false);
-      wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {setResults(eventResults)});
+      wcs.addListener(WINDOW_MESSAGES.CONNECTED, (eventResults) => {
+        setResults(eventResults)});
       wcs.addListener(WINDOW_MESSAGES.DISCONNECT, (eventResults) => {
         setResults(eventResults)
       });
@@ -103,6 +114,7 @@ export const Connect: React.FC = () => {
       prohibitGroups: !groupsAllowed,
       jwtExpiration: Number(jwtExpiration),
       walletAppId,
+      iframeParentId: 'portal',
     })
     // If connection with mobile directly, just show the QRCode
     if (mobileDirect) {
@@ -184,7 +196,7 @@ export const Connect: React.FC = () => {
             />
           </AdvancedOptions>
         )}
-        {showQRCode && !!walletConnectState.modal.QRCodeImg && <div><img src={walletConnectState.modal.QRCodeImg} /></div>}
+        {showQRCode && !!walletConnectState.modal.QRCodeImg && <div><QRCodeImage src={walletConnectState.modal.QRCodeImg} /></div>}
         <Button onClick={handleConnect}>
           Connect with Prebuilt Modal
         </Button>

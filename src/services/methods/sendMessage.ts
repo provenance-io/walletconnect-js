@@ -19,8 +19,9 @@ interface SendMessage {
   connector?: WalletConnectClientType;
   customId?: string;
   data: SendMessageMethod;
-  walletAppId?: WalletId;
+  iframeParentId?: string;
   logsEnabled: boolean;
+  walletAppId?: WalletId;
 }
 
 export const sendMessage = async ({
@@ -28,8 +29,9 @@ export const sendMessage = async ({
   connector,
   customId,
   data,
-  walletAppId,
+  iframeParentId,
   logsEnabled,
+  walletAppId,
 }: SendMessage): Promise<
   BroadcastEventData[typeof WINDOW_MESSAGES.SEND_MESSAGE_COMPLETE]
 > => {
@@ -80,14 +82,16 @@ export const sendMessage = async ({
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT, iframeParentId };
       knownWalletApp.eventAction(eventData);
     }
     // send message
     // Logging to help track down rare, rogue bug where dApp hangs waiting on response
     log(logsEnabled, `sendMessage | request sent to wallet: `, request);
+    const requestOptions = { forcePushNotification: true };
     const result = (await connector.sendCustomRequest(
-      request
+      request,
+      requestOptions
     )) as SendMessageMethodResult;
     log(logsEnabled, `sendMessage | result sent to wallet: `, result);
     // Check to see if we had an error in the txResponse

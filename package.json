@@ -1,6 +1,6 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "3.6.0",
+  "version": "3.7.2-develop.1",
   "private": false,
   "sideEffects": false,
   "main": "src/index.ts",
@@ -37,7 +37,7 @@
     "base64url": "3.0.1",
     "buffer": "npm:buffer@6.0.3",
     "crypto": "npm:crypto-browserify@3.12.0",
-    "qrcode": "1.5.1",
+    "qrcode": "^1.5.3",
     "secp256k1": "5.0.0",
     "stream": "npm:stream-browserify@3.0.0",
     "util": "npm:util@0.12.5"

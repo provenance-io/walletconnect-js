@@ -44,7 +44,7 @@ const channel = new BroadcastChannel('figure-hosted-wallet');
 channel.onmessage = handleChannelMessage;
 
 // Add ability for dApp/website to send a message to this extension
-const createIframe = (url: string) => {
+const createIframe = (url: string, iframeParentId?: string) => {
   // Remove any existing iframes on this window
   removeIframe();
 
@@ -63,6 +63,8 @@ const createIframe = (url: string) => {
         all: initial;
         width:${IFRAME_NOTIFICATION_WIDTH}px;
         height:${IFRAME_NOTIFICATION_HEIGHT}px;
+        max-width: 100%;
+        max-height: 100%;
         display: flex !important;
         align-items: start;
         justify-content: flex-end;
@@ -83,6 +85,8 @@ const createIframe = (url: string) => {
         background: #fff;
         width:${IFRAME_NOTIFICATION_WIDTH}px;
         height:${IFRAME_NOTIFICATION_HEIGHT}px;
+        max-width: 100%;
+        max-height: 100%;
         margin: 10px;
         border: none;
         border-radius: 4px;
@@ -111,8 +115,10 @@ const createIframe = (url: string) => {
   container.appendChild(style);
   container.appendChild(iframe);
 
-  // Add iframe and style to the shadow
-  document.body.appendChild(container);
+  // Add iframe and style to either parent element (if passed in and found) or body
+  const targetParent =
+    (iframeParentId && document.getElementById(iframeParentId)) || document.body;
+  targetParent.appendChild(container);
 
   // Post message to BroadcastChannel to close other hosted wallet iframes (prevent corrupted state)
   channel.postMessage({ type: 'create_iframe' });
@@ -125,7 +131,16 @@ const createIframe = (url: string) => {
 
 // Handle each specific notification event type
 const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
-  const { event, uri, duration, data, referral, address, redirectUrl } = detail;
+  const {
+    event,
+    uri,
+    duration,
+    data,
+    referral,
+    address,
+    redirectUrl,
+    iframeParentId,
+  } = detail;
   // Based on the event type handle what we do
   switch (event) {
     case 'walletconnect_event':
@@ -140,7 +155,7 @@ const catchWCJSMessage = ({ detail }: CustomEvent<EventData>) => {
       if (address) windowUrl.searchParams.append('address', address);
       if (event) windowUrl.searchParams.append('event', event);
       if (redirectUrl) windowUrl.searchParams.append('redirectUrl', redirectUrl);
-      createIframe(windowUrl.toString());
+      createIframe(windowUrl.toString(), iframeParentId);
       break;
     }
     default:

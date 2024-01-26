@@ -17,6 +17,7 @@ interface SignHexMessage {
   connector?: WalletConnectClientType;
   customId?: string;
   hexMessage: string;
+  iframeParentId?: string;
   publicKey: string;
   walletAppId?: WalletId;
 }
@@ -26,6 +27,7 @@ export const signHexMessage = async ({
   connector,
   customId,
   hexMessage,
+  iframeParentId,
   publicKey: pubKeyB64,
   walletAppId,
 }: SignHexMessage): Promise<
@@ -54,11 +56,15 @@ export const signHexMessage = async ({
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT, iframeParentId };
       knownWalletApp.eventAction(eventData);
     }
     // send message
-    const result = (await connector.sendCustomRequest(request)) as string;
+    const requestOptions = { forcePushNotification: true };
+    const result = (await connector.sendCustomRequest(
+      request,
+      requestOptions
+    )) as string;
     // result is a hex encoded signature
     const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     // verify signature

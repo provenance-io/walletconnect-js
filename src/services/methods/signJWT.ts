@@ -20,6 +20,7 @@ interface SignJWT {
   connector?: WalletConnectClientType;
   customId?: string;
   expires?: number;
+  iframeParentId?: string;
   publicKey: string;
   setState: WCSSetState;
   walletAppId?: WalletId;
@@ -30,6 +31,7 @@ export const signJWT = async ({
   connector,
   customId,
   expires, // Custom expiration time in seconds from now
+  iframeParentId,
   publicKey: pubKeyB64,
   setState,
   walletAppId,
@@ -85,11 +87,15 @@ export const signJWT = async ({
   try {
     // If the wallet app has an eventAction (web/extension) trigger it
     if (knownWalletApp && knownWalletApp.eventAction) {
-      const eventData = { event: WALLET_APP_EVENTS.EVENT };
+      const eventData = { event: WALLET_APP_EVENTS.EVENT, iframeParentId };
       knownWalletApp.eventAction(eventData);
     }
     // send message
-    const result = (await connector.sendCustomRequest(request)) as string;
+    const requestOptions = { forcePushNotification: true };
+    const result = (await connector.sendCustomRequest(
+      request,
+      requestOptions
+    )) as string;
     // result is a hex encoded signature
     // const signature = Uint8Array.from(Buffer.from(result, 'hex'));
     const signature = Buffer.from(result, 'hex');
