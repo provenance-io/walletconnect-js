@@ -65,7 +65,7 @@ const defaultState: WCSState = {
   representedGroupPolicy: null,
   signedJWT: '',
   status: 'disconnected',
-  version: '3.7.1',
+  version: '3.7.2',
   walletAppId: undefined,
   walletInfo: {},
 };

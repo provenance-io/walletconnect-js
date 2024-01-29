@@ -9,7 +9,7 @@ import appleAppStoreImg from '../../images/appStoreBadge.svg';
 import googlePlayImg from '../../images/googlePlayBadge.png';
 import { WALLET_ICONS } from '../../images';
 import { Wallet, EventData, WalletId } from '../../types';
-import './styles.css';
+import './stylesNew.css';
 
 interface Props {
   className?: string;
