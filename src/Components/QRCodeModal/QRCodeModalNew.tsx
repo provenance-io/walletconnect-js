@@ -1,14 +1,7 @@
-import React, { useState, useEffect } from 'react'; // eslint-disable-line no-unused-vars
+import React, { useState } from 'react'; // eslint-disable-line no-unused-vars
 import { WalletConnectService } from '../../services';
-import {
-  APP_STORE_GOOGLE_PLAY_FIGURE,
-  APP_STORE_APPLE_FIGURE,
-  WALLET_LIST,
-} from '../../consts';
-import appleAppStoreImg from '../../images/appStoreBadge.svg';
-import googlePlayImg from '../../images/googlePlayBadge.png';
 import { WALLET_ICONS } from '../../images';
-import { Wallet, EventData, WalletId } from '../../types';
+import { WalletId } from '../../types';
 import './stylesNew.css';
 
 interface Props {
@@ -29,7 +22,6 @@ export const QRCodeModal: React.FC<Props> = ({
   allowShowingHidden = true,
   visibleWallets = ['figure_mobile'],
   disabledWallets = [],
-  // disabledWallets = ['figure_hosted_test', 'figure_mobile_test'],
 }) => {
   const { state } = wcs;
   const { modal } = state;
