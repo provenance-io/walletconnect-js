@@ -1,20 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
 
 #wcjs-qr-modal {
-  top: 0;
-  left: 0;
-  position: fixed;
-  font-family: "Poppins",sans-serif;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.25);
   color: #444444;
-  z-index: 1000;
+  display: flex;
+  font-family: "Poppins",sans-serif;
   font-weight: 400;
+  height: 100%;
+  justify-content: center;
+  left: 0;
   letter-spacing: 0.4px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+.wcjs-modal-title {
+  font-size: 24px;
+  margin-bottom: 40px;
+  letter-spacing: 0;
+}
+.wcjs-modal-subtitle {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0;
+  margin-bottom:14px;
 }
 .wcjs-qr-appicongroup {
   display: flex;
@@ -30,10 +42,10 @@
   background: #ffffff;
   height: 24px;
   width: 24px;
+  cursor: pointer;
   position: absolute;
   top: 10px;
   right: 10px;
-  cursor: pointer;
   border-radius: 100%;
   display: flex;
   justify-content: center;
@@ -45,13 +57,13 @@
   position: relative;
   border-radius: 10px;
   background: #eeeeee;
-  padding: 40px;
+  padding: 30px 20px;
   display: flex;
   text-align: center;
   flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.25);
 }
 .wcjs-qr-copy {
@@ -63,15 +75,59 @@
   padding: 0 6px;
 }
 .wcjs-qr-icon {
-  background: #ffffff;
-  border-radius: 4px;
-  height: 30px;
-  width: 30px;
+  height: 32px;
+  width: 32px;
+  border-radius: 8px;
   margin-right: 20px;
-  padding: 4px;
+  overflow: hidden;
+}
+.wcjs-qr-icon-figure-account {
+  height: 32px;
+  width: 32px;
+  border-radius: 8px;
+  margin-right: 20px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #dddddd inset;
+  padding: 7px;
+}
+.wcjs-modal-back {
+  cursor: pointer;
+  height: 14px;
+  width: 14px;
+  position: absolute;
+  top: 16px;
+  left: 16px;
 }
 .wcjs-qr-img {
   flex-basis: 100%;
+}
+.wcjs-qr-fineprint {
+  font-size: 10px;
+  cursor: pointer;
+  color: #361da2;
+  font-style: italic;
+  margin-top: 30px;
+}
+.wcjs-qr-wallet-button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 20px;
+  width: 100%;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.wcjs-qr-wallet-button:hover {
+  background: #fafafa;
+  border-color: #cccccc;
+}
+.wcjs-qr-wallet-button:active {
+  background: #eeeeee;
+  border-color: #bbbbbb;
 }
 .wcjs-qr-appicon-element {
   display: inline;
@@ -81,6 +137,9 @@
 .wcjs-qr-img-element {
   display: inline;
   margin-top: 10px;
+  padding:18px;
+  background: #FFFFFF;
+  border-radius: 10px;
 }
 .wcjs-qr-reload {
   position: absolute;
@@ -90,7 +149,7 @@
   width: 100%;
   background: #eeeeee;
   padding: 60px 40px 40px 40px;
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
