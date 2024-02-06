@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import events from 'events';
+import { version } from '../../package.json';
 import type {
   AccountAttribute,
   BroadcastEventData,
@@ -65,7 +66,7 @@ const defaultState: WCSState = {
   representedGroupPolicy: null,
   signedJWT: '',
   status: 'disconnected',
-  version: '3.7.2',
+  version,
   walletAppId: undefined,
   walletInfo: {},
 };
