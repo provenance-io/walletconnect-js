@@ -1,7 +1,7 @@
 {
   "name": "example-react-vite",
   "private": true,
-  "version": "3.7.2",
+  "version": "3.8.0",
   "homepage": "/walletconnect-demo",
   "type": "module",
   "scripts": {
@@ -9,8 +9,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "clean:cache": "rm -rf ./node_modules/.vite",
-    "start": "npm run clean:cache && npm i ../provenanceio-walletconnect-js-${npm_package_version}.tgz && npm run dev",
-    "start_old": "npm run dev",
+    "start": "npm run dev",
     "start:host": "npm run dev --host"
   },
   "dependencies": {
