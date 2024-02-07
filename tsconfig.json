@@ -31,5 +31,6 @@
     ".eslintrc.js",
     "scripts",
     "babel.config.js",
+    "prepublish.ts"
   ],
 }

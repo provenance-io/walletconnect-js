@@ -15,29 +15,28 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+          cache: npm
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
           version: "3.x"
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: |
-            - recursive: true
-              args: [--frozen-lockfile, --strict-peer-dependencies]
+      - name: Install dependencies
+        run: npm i
 
       - name: Build folders for npm
-        run: |
-          pnpm build
+        run: npm run build
         env:
           CI: true
 
+      - name: Fix package.json
+        run: npm run pre:publish
+
       - name: Set publishing config
-        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+        run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - name: NPM Publish Main
-        run: pnpm publish
+        run: npm publish
