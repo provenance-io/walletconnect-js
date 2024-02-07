@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
 
 jobs:
   build:
@@ -12,39 +11,33 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: Use Node.js 14.6.0
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: "14.6.0"
+          node-version: 18.x
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
           version: "3.x"
 
-      - name: Install npm packages
-        run: |
-          npm i
-        env:
-          CI: true
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
 
       - name: Build folders for npm
         run: |
-          npm run build
+          pnpm build
         env:
           CI: true
 
-      - name: NPM Publish Main
-        if: github.ref == 'refs/heads/main'
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{secrets.NPM_TOKEN}}
-          access: "public"
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+        env:
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
 
-      - name: NPM Publish Develop
-        if: github.ref == 'refs/heads/develop'
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{secrets.NPM_TOKEN}}
-          tag: "develop"
-          access: "public"
+      - name: NPM Publish Main
+        run: pnpm publish

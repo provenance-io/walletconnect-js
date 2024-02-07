@@ -1,11 +1,11 @@
 {
   "name": "@provenanceio/walletconnect-js",
-  "version": "3.8.0",
+  "version": "3.8.1",
   "private": false,
   "sideEffects": false,
-  "main": "src/index.ts",
+  "main": "./src/index.ts",
   "publishConfig": {
-    "main": "esm/index.js",
+    "main": "./esm/index.js",
     "typings": "./esm/index.d.ts"
   },
   "license": "Apache-2.0",
