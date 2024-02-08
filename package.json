@@ -110,7 +110,7 @@
     "start:watch": "nodemon -e js,ts,tsx,css --watch src --exec 'npm run build:pack && npm run watch:example-react'",
     "start": "npm run start:watch && npm run start:example-react",
     "test": "jest && npm run test:example-build",
-    "test:example-build": "cd examples/example-react-vite && npm i && npm run build",
+    "test:example-build": "cd examples/example-react-vite && npm run install && npm run build",
     "tsc:commonjs": "tsc --module commonjs --outDir lib",
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "vup:major": "npm version major --no-git-tag-version && cd examples/example-react-vite && npm version major --no-git-tag-version",
