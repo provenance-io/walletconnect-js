@@ -70,7 +70,7 @@ const defaultState: WCSState = {
   walletAppId: undefined,
   walletInfo: {},
 };
-
+// Temp comment for commit
 export class WalletConnectService {
   #connectionTimer = 0;
 
