@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-npm run test && npm run commentSniff
+npm run test:push && npm run commentSniff
