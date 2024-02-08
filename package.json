@@ -115,8 +115,7 @@
     "tsc:esm": "tsc --module es2015 --outDir esm",
     "vup:major": "npm version major --no-git-tag-version && cd examples/example-react-vite && npm version major --no-git-tag-version",
     "vup:minor": "npm version minor --no-git-tag-version && cd examples/example-react-vite && npm version minor --no-git-tag-version",
-    "vup:patch": "npm version patch --no-git-tag-version && cd examples/example-react-vite && npm version patch --no-git-tag-version",
-    "prepare": "husky"
+    "vup:patch": "npm version patch --no-git-tag-version && cd examples/example-react-vite && npm version patch --no-git-tag-version"
   },
   "browserslist": [
     "defaults"

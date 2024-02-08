@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-. "${0%/*}/h"
+npm run test && npm run commentSniff
