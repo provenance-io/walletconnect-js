@@ -13,6 +13,7 @@ import type {
 import {
   CONNECTION_TYPES,
   CONNECTOR_EVENTS,
+  DYNAMIC_LINK_SHORLINK_GENERATOR_URL,
   WALLET_APP_EVENTS,
   WALLET_LIST,
   WINDOW_MESSAGES,
@@ -139,7 +140,24 @@ export const connect = ({
         const isi = isMobileWalletDev ? 6444293331 : 6444263900;
         const finalDynamicQRLink = `https://figurewallet.page.link?link=${figureConnectLink}&apn=${walletType}&ibi=${walletType}&isi=${isi}&efr=${1}`;
         const finalQRCodeLink = isMobileWalletOpened ? finalDynamicQRLink : wcLink;
-        const qrCodeImage = await createQRImage(finalQRCodeLink);
+        // Attempt to get a shortlink for the QR Code from firebase
+        let shortlinkQRCode = '';
+        try {
+          const shortlinkQRCodeResponse = await fetch(
+            DYNAMIC_LINK_SHORLINK_GENERATOR_URL,
+            {
+              method: 'POST',
+              body: JSON.stringify({ longDynamicLink: finalQRCodeLink }),
+            }
+          );
+          if (shortlinkQRCodeResponse) {
+            const { shortLink } = await shortlinkQRCodeResponse.json();
+            shortlinkQRCode = shortLink;
+          }
+        } catch (error) {
+          console.error('Failed to fetch short QR code: ', error);
+        }
+        const qrCodeImage = await createQRImage(shortlinkQRCode || finalQRCodeLink);
         // Don't trigger a QRCodeModal popup if they say "noPopup" or pass a specific walletId
         updateModal({
           QRCodeImg: qrCodeImage,
