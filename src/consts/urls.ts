@@ -9,6 +9,8 @@ export const FIGURE_MOBILE_WALLET_APP_ID = '6444263900';
 export const FIGURE_MOBILE_WALLET_APP_ID_TEST = '6444293331';
 export const FIGURE_MOBILE_WALLET_PACKAGE_NAME = 'com.figure.mobile.wallet';
 export const FIGURE_MOBILE_WALLET_PACKAGE_NAME_TEST = 'com.figure.mobile.wallet.dev';
+export const DYNAMIC_LINK_SHORLINK_GENERATOR_URL =
+  'https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyDgxmYAGpQGHKCoJ3LW6CnD9B_utl3sLkY';
 
 // APP STORE ICONS
 export const APP_STORE_GOOGLE_PLAY_FIGURE =
