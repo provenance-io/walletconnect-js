@@ -71,8 +71,6 @@ const defaultState: WCSState = {
 };
 
 export class WalletConnectService {
-  #connectionTimer = 0;
-
   #connector?: WalletConnectClientType;
 
   #eventEmitter = new events.EventEmitter();
@@ -84,6 +82,7 @@ export class WalletConnectService {
   state: WCSState = defaultState;
 
   constructor() {
+    this.#startConnectionTimer();
     this.#buildInitialState();
     // Add a way to log the current walletconnect-js state from console on any dApp
     window.wcjs = window.wcjs || {
@@ -199,32 +198,18 @@ export class WalletConnectService {
 
   // Control auto-disconnect / timeout
   #startConnectionTimer = () => {
-    // Can't start a timer if one is already running (make sure we have EXP and EST too)
-    if (
-      !this.#connectionTimer &&
-      this.state.connectionEXP &&
-      this.state.connectionEST
-    ) {
-      // Get the time until expiration (typically this.state.connectionTimeout, but might not be if session restored from refresh)
-      const connectionTimeout = this.state.connectionEXP - Date.now();
-      // Create a new timer
-      const newConnectionTimer = window.setTimeout(() => {
-        // When this timer expires, kill the session
-        this.disconnect();
-      }, connectionTimeout);
-      // Save this timer (so it can be deleted on a reset)
-      this.#connectionTimer = newConnectionTimer;
-    }
-  };
-
-  // Stop the current running connection timer
-  #clearConnectionTimer = () => {
-    if (this.#connectionTimer) {
-      // Stop timer
-      window.clearTimeout(this.#connectionTimer);
-      // Reset timer value to 0
-      this.#connectionTimer = 0;
-    }
+    // Every 1000ms check to see if connection is expired
+    setInterval(() => {
+      const nowMs = Date.now();
+      if (
+        this.state.connected &&
+        this.state.connectionEXP &&
+        nowMs >= this.state.connectionEXP
+      ) {
+        // We're connected, with a valid connectionEXP, and the current time is past the exp, so disconnect.
+        this.disconnect('Connection Expired');
+      }
+    }, 1000);
   };
 
   // Pull latest state values on demand (prevent stale state in callback events)
@@ -264,7 +249,7 @@ export class WalletConnectService {
 
   // Change the class state
   #setState: WCSSetState = (updatedState, updateLocalStorage = true) => {
-    // If the updatedState passes a connector value we want to use it but save it separatly from the public state
+    // If the updatedState passes a connector value we want to use it but save it separately from the public state
     const { connector, ...filteredUpdatedState } = updatedState;
     let finalUpdatedState = { ...filteredUpdatedState };
     // If we get a new "connector" passed in, pull various data keys out
@@ -435,14 +420,10 @@ export class WalletConnectService {
     const newConnectionTimeout = connectionTimeout
       ? connectionTimeout * 1000
       : this.state.connectionTimeout;
-    // Kill the last timer (if it exists)
-    this.#clearConnectionTimer();
     // Build a new connectionEXP (Iat + connectionTimeout)
     const connectionEXP = newConnectionTimeout + Date.now();
     // Save these new values (needed for session restore functionality/page refresh)
     this.#setState({ connectionTimeout: newConnectionTimeout, connectionEXP });
-    // Start a new timer
-    this.#startConnectionTimer();
     // Send connected wallet custom event with the new connection details
     if (this.state.walletAppId) {
       sendWalletEvent(
@@ -500,7 +481,6 @@ export class WalletConnectService {
         requiredIndividualAddress: individualAddress,
         resetState: this.#resetState,
         setState: this.#setState,
-        startConnectionTimer: this.#startConnectionTimer,
         state: this.state,
         updateModal: this.updateModal,
         walletAppId,
@@ -520,8 +500,6 @@ export class WalletConnectService {
    * @param message (optional) Custom disconnect message to send back to dApp
    * */
   disconnect = async (message?: string) => {
-    // Clear out the existing connection timer
-    this.#clearConnectionTimer();
     // Only do this if we have a connector and the connector is connected
     // Note: If we don't check for connected can generate an "invalid topic" error
     if (this.#connector && this.#connector.connected)
