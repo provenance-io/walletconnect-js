@@ -37,7 +37,6 @@ interface Props {
   requiredIndividualAddress?: string;
   resetState: () => void;
   setState: WCSSetState;
-  startConnectionTimer: () => void;
   state: WCSState;
   updateModal: (
     newModalData: Partial<ModalData> & { walletAppId?: WalletId }
@@ -57,7 +56,6 @@ export const connect = ({
   requiredIndividualAddress,
   resetState,
   setState,
-  startConnectionTimer,
   state,
   updateModal,
   walletAppId: connectionWalletAppId,
@@ -185,7 +183,6 @@ export const connect = ({
     // - Calculate new connection EST/EXP
     // - Save accounts (account data), peer, connection EST/EXP, and connected value to walletConnectService
     // - Broadcast "connect" event (let the dApp know)
-    // - Start the "connection timer" to auto-disconnect wcjs when session is expired
     // - Trigger wallet event for "connect" (let the wallet know)
     newConnector.on(CONNECTOR_EVENTS.connect, (error, payload: ConnectData) => {
       if (error) throw error;
@@ -221,7 +218,6 @@ export const connect = ({
           connectionType: CONNECTION_TYPES.new_session,
         },
       });
-      startConnectionTimer();
       const { walletAppId } = getState();
       if (walletAppId) sendWalletEvent(walletAppId, WALLET_APP_EVENTS.CONNECT);
     });
@@ -252,7 +248,6 @@ export const connect = ({
     //    - Note: connectionEXP must exist to "update" the session
     // - Save newConnector to walletConnectService state (data inside likely changed due to this event)
     // - Broadcast "session_update" event (let the dApp know)
-    // - Start the "connection timer" to auto-disconnect wcjs when session is expired
     // - Trigger wallet event for "session_update" (let the wallet know)
     const resumeResumeEvent = () => {
       if (newConnector) {
@@ -274,7 +269,6 @@ export const connect = ({
               connectionType: CONNECTION_TYPES.existing_session,
             },
           });
-          startConnectionTimer();
           const { walletAppId } = getState();
           if (walletAppId) {
             sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
@@ -293,7 +287,6 @@ export const connect = ({
     // ------------------------
     // - Save accounts (account data), peer, connection EST/EXP, and connected value to walletConnectService
     // - Broadcast "session_update" event (let the dApp know)
-    // - Start the "connection timer" to auto-disconnect wcjs when session is expired
     // - Trigger wallet event for "session_update" (let the wallet know)
     newConnector.on(
       CONNECTOR_EVENTS.wc_sessionUpdate,
@@ -337,7 +330,6 @@ export const connect = ({
             connectionType: CONNECTION_TYPES.existing_session,
           },
         });
-        startConnectionTimer();
         const { walletAppId } = getState();
         if (walletAppId)
           sendWalletEvent(walletAppId, WALLET_APP_EVENTS.SESSION_UPDATE);
