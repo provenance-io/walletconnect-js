@@ -71,8 +71,6 @@ const defaultState: WCSState = {
 };
 
 export class WalletConnectService {
-  #connectionTimer = 0;
-
   #connector?: WalletConnectClientType;
 
   #eventEmitter = new events.EventEmitter();
