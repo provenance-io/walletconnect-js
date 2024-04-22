@@ -441,6 +441,7 @@ export class WalletConnectService {
    * @param iframeParentId - (optional) Render the iframe wallets within a parent element
    * @param individualAddress - (optional) Individual address to establish connection with, note, if requested, it must exist
    * @param jwtExpiration - (optional) Time from now in seconds to expire new JWT returned
+   * @param qrOptions - (optional) Customize how the QR code looks
    * @param prohibitGroups - (optional) Does this dApp ban group accounts connecting to it
    * @param walletAppId - (optional) Open a specific wallet directly (bypassing the QRCode modal)
    */
@@ -452,6 +453,7 @@ export class WalletConnectService {
     individualAddress,
     jwtExpiration,
     prohibitGroups,
+    qrOptions,
     walletAppId,
   }: InitMethod = {}) => {
     // Only create a new connector when we're not already connected
@@ -477,6 +479,7 @@ export class WalletConnectService {
         iframeParentId,
         jwtExpiration,
         prohibitGroups,
+        qrOptions,
         requiredGroupAddress: groupAddress,
         requiredIndividualAddress: individualAddress,
         resetState: this.#resetState,

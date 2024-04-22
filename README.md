@@ -142,6 +142,7 @@ Used to call walletconnect-js methods
   | individualAddress | string | no       | `''` | `tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh` | Required individual address for dApp connection |
   | groupAddress | string | no       | `''` | `tp1knsxfnn0lq48mmnkfnkgtkk8qnxxdu0y2tklkh` | Required group address for dApp connection |
   | prohibitGroups | boolean | no       | `false` | `true` | Prohibit group accounts from connecting to this dApp |
+  | qrOptions | shape | no       | `null` | - | Customize the QR code (padding, background, foreground, logo, note: must use hex colors) |
   | jwtExpiration | number | no       | `''` | `3600` | Time from now in seconds to expire new JWT returned |
   | walletAppId | string | no | `''` | `'figure_extension'` | Open a specific wallet directly (bypassing the QRCode modal)
 

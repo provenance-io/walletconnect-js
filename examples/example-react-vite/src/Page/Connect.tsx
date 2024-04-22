@@ -1,4 +1,4 @@
-import type { BroadcastEventData, WalletId } from '@provenanceio/walletconnect-js';
+import type { BroadcastEventData, QrOptions, WalletId } from '@provenanceio/walletconnect-js';
 import {
   QRCodeModal,
   WALLET_LIST,
@@ -44,6 +44,11 @@ const QRCodeImage = styled.img`
   height: 200px;
   width: 200px;
 `;
+const QRSection = styled.div`
+  margin-top: 20px;
+  margin-bottom: 12px;
+  font-weight: bold;
+`;
 
 export const Connect: React.FC = () => {
   const [directQRCodeGenerate, setDirectQRCodeGenerate] = useState(false);
@@ -62,6 +67,14 @@ export const Connect: React.FC = () => {
   const [sessionDuration, setSessionDuration] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+
+  // Custom QR
+  const [qrBackgroundColor, setQrBackgroundColor] = useState('#ffffff');
+  const [qrForegroundColor, setQrForegroundColor] = useState('#000000');
+  const [qrLogoColor, setQrLogoColor] = useState('#000000');
+  const [qrShowLogo, setQrShowLogo] = useState(true);
+  const [qrPadding, setQrPadding] = useState('0');
+
   const [results, setResults] = useState<BroadcastEventData[keyof BroadcastEventData] | undefined>();
   const { walletConnectService: wcs, walletConnectState } = useWalletConnect();
   const { status, modal } = walletConnectState;
@@ -105,16 +118,24 @@ export const Connect: React.FC = () => {
     setShowQRCode(false);
     // Run connect method based on current state values
     const finalBridge = customBridge ? customBridge : selectedBridge !== 'custom' ? selectedBridge : BRIDGE_URLS[0];
+    const qrOptions: QrOptions = {
+      backgroundColor: qrBackgroundColor,
+      foregroundColor: qrForegroundColor,
+      logoColor: qrLogoColor,
+      padding: qrPadding ? Number(qrPadding) : undefined,
+      showLogo: qrShowLogo
+    };
     await wcs.init({
       // Use custom if given, or if left blank but custom selected, use the first in the options array
       bridge: finalBridge,
       duration: Number(sessionDuration),
-      individualAddress,
       groupAddress,
-      prohibitGroups: !groupsAllowed,
-      jwtExpiration: Number(jwtExpiration),
-      walletAppId,
       iframeParentId: 'portal',
+      individualAddress,
+      jwtExpiration: Number(jwtExpiration),
+      prohibitGroups: !groupsAllowed,
+      qrOptions,
+      walletAppId,
     })
     // If connection with mobile directly, just show the QRCode
     if (mobileDirect) {
@@ -193,6 +214,40 @@ export const Connect: React.FC = () => {
               label="Group Accounts Allowed"
               checked={groupsAllowed}
               onChange={setGroupsAllowed}
+            />
+            <QRSection>Customize QR Code</QRSection>
+            <Checkbox
+              label="Show Figure Logo"
+              checked={qrShowLogo}
+              onChange={setQrShowLogo}
+            />
+            <Input
+              onChange={setQrLogoColor}
+              value={qrLogoColor}
+              label="Figure Logo Color"
+              placeholder="Enter custom logo color"
+              bottomGap
+            />
+            <Input
+              onChange={setQrBackgroundColor}
+              value={qrBackgroundColor}
+              label="QR Background Color"
+              placeholder="Enter custom QR background color"
+              bottomGap
+            />
+            <Input
+              onChange={setQrForegroundColor}
+              value={qrForegroundColor}
+              label="QR Foreground Color"
+              placeholder="Enter custom QR foreground color"
+              bottomGap
+            />
+            <Input
+              onChange={setQrPadding}
+              value={qrPadding}
+              label="QR Image Padding"
+              placeholder="Enter custom QR image padding"
+              bottomGap
             />
           </AdvancedOptions>
         )}
