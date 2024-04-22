@@ -9,6 +9,7 @@ import type {
   WalletConnectEventDisconnect,
   BroadcastEventName,
   BroadcastEventData,
+  QrOptions,
 } from '../../../types';
 import {
   CONNECTION_TYPES,
@@ -38,6 +39,7 @@ interface Props {
   resetState: () => void;
   setState: WCSSetState;
   state: WCSState;
+  qrOptions?: QrOptions;
   updateModal: (
     newModalData: Partial<ModalData> & { walletAppId?: WalletId }
   ) => void;
@@ -52,6 +54,7 @@ export const connect = ({
   iframeParentId,
   jwtExpiration,
   prohibitGroups,
+  qrOptions,
   requiredGroupAddress,
   requiredIndividualAddress,
   resetState,
@@ -155,7 +158,10 @@ export const connect = ({
         } catch (error) {
           console.error('Failed to fetch short QR code: ', error);
         }
-        const qrCodeImage = await createQRImage(shortlinkQRCode || finalQRCodeLink);
+        const qrCodeImage = await createQRImage(
+          shortlinkQRCode || finalQRCodeLink,
+          qrOptions
+        );
         // Don't trigger a QRCodeModal popup if they say "noPopup" or pass a specific walletId
         updateModal({
           QRCodeImg: qrCodeImage,

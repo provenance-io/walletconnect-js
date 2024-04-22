@@ -19,6 +19,7 @@ export type {
   MasterGroupPolicy,
   ModalData,
   ProvenanceMethod,
+  QrOptions,
   SendMessageMethod,
   SendMessageMethodEventData,
   SendMessageMethodResult,

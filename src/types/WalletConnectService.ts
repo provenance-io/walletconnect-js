@@ -107,6 +107,7 @@ export interface InitMethod {
   jwtExpiration?: number;
   noPopup?: boolean;
   prohibitGroups?: boolean;
+  qrOptions?: QrOptions;
   walletAppId?: WalletId;
 }
 
@@ -130,3 +131,11 @@ export interface SendWalletActionMethod {
   action: WalletAction;
   payload?: Record<string, unknown>;
 }
+
+export type QrOptions = {
+  backgroundColor?: string;
+  foregroundColor?: string;
+  logoColor?: string;
+  padding?: number;
+  showLogo?: boolean;
+};
