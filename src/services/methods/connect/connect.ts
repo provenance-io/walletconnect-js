@@ -143,20 +143,23 @@ export const connect = ({
         const finalQRCodeLink = isMobileWalletOpened ? finalDynamicQRLink : wcLink;
         // Attempt to get a shortlink for the QR Code from firebase
         let shortlinkQRCode = '';
-        try {
-          const shortlinkQRCodeResponse = await fetch(
-            DYNAMIC_LINK_SHORLINK_GENERATOR_URL,
-            {
-              method: 'POST',
-              body: JSON.stringify({ longDynamicLink: finalQRCodeLink }),
+        // Only generate a shortlink for mobile wallet
+        if (isMobileWalletDev) {
+          try {
+            const shortlinkQRCodeResponse = await fetch(
+              DYNAMIC_LINK_SHORLINK_GENERATOR_URL,
+              {
+                method: 'POST',
+                body: JSON.stringify({ longDynamicLink: finalQRCodeLink }),
+              }
+            );
+            if (shortlinkQRCodeResponse) {
+              const { shortLink } = await shortlinkQRCodeResponse.json();
+              shortlinkQRCode = shortLink;
             }
-          );
-          if (shortlinkQRCodeResponse) {
-            const { shortLink } = await shortlinkQRCodeResponse.json();
-            shortlinkQRCode = shortLink;
+          } catch (error) {
+            console.error('Failed to fetch short QR code: ', error);
           }
-        } catch (error) {
-          console.error('Failed to fetch short QR code: ', error);
         }
         const qrCodeImage = await createQRImage(
           shortlinkQRCode || finalQRCodeLink,
