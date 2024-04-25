@@ -144,7 +144,7 @@ export const connect = ({
         // Attempt to get a shortlink for the QR Code from firebase
         let shortlinkQRCode = '';
         // Only generate a shortlink for mobile wallet
-        if (isMobileWalletDev) {
+        if (isMobileWalletOpened) {
           try {
             const shortlinkQRCodeResponse = await fetch(
               DYNAMIC_LINK_SHORLINK_GENERATOR_URL,
